@@ -8,9 +8,10 @@
 
 `feeds/` 디렉토리 아래에 그룹별로 구성됩니다. 새 그룹을 추가하려면 폴더를 만들고 CSV 파일 2개만 넣으면 됩니다.
 
-| 그룹 | 설명 | 신문사 수 | 피드 수 |
-|------|------|-----------|---------|
+| 그룹 | 설명 | 소스 수 | 피드 수 |
+|------|------|---------|---------|
 | `economy` | 경제신문사 | 9 | 93 |
+| `dev` | 개발/테크 블로그 | 22 | 22 |
 
 ### economy 그룹
 
@@ -44,14 +45,62 @@
 | `sports` | 스포츠 |
 | `entertainment` | 연예 |
 
+### dev 그룹
+
+**국내 테크 블로그**
+
+| ID | 소스 | 포커스 |
+|----|------|--------|
+| `geeknews` | GeekNews 개발뉴스 | 국내 개발 트렌드 |
+| `nhn` | NHN Toast 기술블로그 | 클라우드/웹 개발 |
+| `woowahan` | 우아한형제들 테크 | 백엔드/DevOps |
+| `kurly` | 컬리 기술블로그 | 마이크로서비스 |
+| `naver-d2` | 네이버 D2 | AI/웹 표준 |
+| `coupang` | 쿠팡 테크블로그 | 스케일링 |
+| `daangn` | 당근마켓 테크 | React Native |
+| `awesome-blogs` | Awesome Blogs | 250+ 개발자 블로그 모음 |
+| `musinsa` | 무신사 테크블로그 | e커머스 개발 |
+| `banksalad` | 뱅크샐러드 테크 | 핀테크 |
+
+**해외 개발 미디어**
+
+| ID | 소스 | 포커스 |
+|----|------|--------|
+| `js-weekly` | JavaScript Weekly | JS/프론트엔드 |
+| `frontend-focus` | Frontend Focus | 웹 개발 뉴스 |
+| `css-tricks` | CSS-Tricks | CSS/디자인 |
+| `smashing` | Smashing Magazine | UX/웹 개발 |
+| `hackernews` | Hacker News | 스타트업/테크 |
+| `devto` | Dev.to | React/Next.js |
+| `logrocket` | LogRocket Blog | 디버깅/퍼포먼스 |
+| `webdev` | Web.dev (Google) | 웹 표준 |
+| `github` | GitHub Changelog | GitHub 업데이트 |
+| `cloudflare` | Cloudflare Blog | DevOps/CDN |
+| `netflix` | Netflix Tech Blog | 스케일링 |
+| `infoq` | InfoQ DevOps | DevOps 트렌드 |
+
+### dev 카테고리
+
+| 카테고리 | 설명 |
+|----------|------|
+| `frontend` | 프론트엔드 (JS, CSS, React, UX) |
+| `backend` | 백엔드 (서버, DB, 마이크로서비스) |
+| `devops` | DevOps (CI/CD, 인프라, CDN) |
+| `ai` | AI/ML |
+| `trend` | 개발 트렌드/뉴스 |
+| `mobile` | 모바일 (React Native) |
+
 ## 프로젝트 구조
 
 ```
 tera-rss/
 ├── feeds/                       # 그룹별 피드 설정
-│   └── economy/                 # 경제 그룹
-│       ├── publishers.csv       # 신문사 목록
-│       └── feed_specs.csv       # RSS 피드 URL 및 카테고리 매핑
+│   ├── economy/                 # 경제 그룹
+│   │   ├── publishers.csv
+│   │   └── feed_specs.csv
+│   └── dev/                     # 개발 그룹
+│       ├── publishers.csv
+│       └── feed_specs.csv
 ├── src/
 │   ├── deps.ts                  # 외부 의존성
 │   ├── dev_deps.ts              # 테스트 의존성
@@ -120,6 +169,10 @@ deno task merge
 deno task collect:economy
 deno task merge:economy
 
+# dev 그룹만
+deno task collect:dev
+deno task merge:dev
+
 # 테스트
 deno task test
 ```
@@ -130,17 +183,22 @@ deno task test
 
 ```
 rss/
-└── economy/                          # 경제 그룹
-    ├── all.xml                       # 전체 피드
-    ├── jsons/                        # 중간 JSON 파일
-    │   └── {publisher-id}-{categories}.json
-    ├── publishers/                   # 신문사별 RSS
-    │   ├── hankyung.xml
-    │   ├── mk.xml
+├── economy/                          # 경제 그룹
+│   ├── all.xml
+│   ├── publishers/
+│   │   ├── hankyung.xml
+│   │   └── ...
+│   └── categories/
+│       ├── stock.xml
+│       └── ...
+└── dev/                              # 개발 그룹
+    ├── all.xml
+    ├── publishers/
+    │   ├── geeknews.xml
     │   └── ...
-    └── categories/                   # 카테고리별 RSS
-        ├── stock.xml
-        ├── economy.xml
+    └── categories/
+        ├── frontend.xml
+        ├── backend.xml
         └── ...
 ```
 
@@ -153,9 +211,15 @@ GitHub에 push하면 Actions workflow가 설정됩니다.
 - **결과**: GitHub Pages에서 RSS XML에 접근 가능
 
 ```
+# 경제
 https://{username}.github.io/tera-rss/economy/all.xml
 https://{username}.github.io/tera-rss/economy/publishers/hankyung.xml
 https://{username}.github.io/tera-rss/economy/categories/stock.xml
+
+# 개발
+https://{username}.github.io/tera-rss/dev/all.xml
+https://{username}.github.io/tera-rss/dev/publishers/geeknews.xml
+https://{username}.github.io/tera-rss/dev/categories/frontend.xml
 ```
 
 ## 새 그룹 추가
