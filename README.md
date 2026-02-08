@@ -1,4 +1,4 @@
-# econ-news-rss
+# tera-rss
 
 한국 뉴스 RSS 피드 수집기. 그룹별로 RSS 피드를 수집하고, 신문사별/카테고리별로 통합된 RSS XML을 생성합니다.
 
@@ -47,7 +47,7 @@
 ## 프로젝트 구조
 
 ```
-econ-news-rss/
+tera-rss/
 ├── feeds/                       # 그룹별 피드 설정
 │   └── economy/                 # 경제 그룹
 │       ├── publishers.csv       # 신문사 목록
@@ -153,9 +153,9 @@ GitHub에 push하면 Actions workflow가 설정됩니다.
 - **결과**: GitHub Pages에서 RSS XML에 접근 가능
 
 ```
-https://{username}.github.io/econ-news-rss/economy/all.xml
-https://{username}.github.io/econ-news-rss/economy/publishers/hankyung.xml
-https://{username}.github.io/econ-news-rss/economy/categories/stock.xml
+https://{username}.github.io/tera-rss/economy/all.xml
+https://{username}.github.io/tera-rss/economy/publishers/hankyung.xml
+https://{username}.github.io/tera-rss/economy/categories/stock.xml
 ```
 
 ## 새 그룹 추가
