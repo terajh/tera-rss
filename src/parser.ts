@@ -193,7 +193,6 @@ export function serialize(
   }));
 
   const rss = {
-    "?xml": { "@version": "1.0", "@encoding": "UTF-8" },
     rss: {
       "@version": "2.0",
       "@xmlns:dc": "http://purl.org/dc/elements/1.1/",
@@ -208,7 +207,7 @@ export function serialize(
     },
   };
 
-  return stringifyXml(rss);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + stringifyXml(rss);
 }
 
 // --- Grouping Utilities ---
