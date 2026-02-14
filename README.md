@@ -10,7 +10,7 @@
 
 | 그룹 | 설명 | 소스 수 | 피드 수 |
 |------|------|---------|---------|
-| `economy` | 경제신문사 | 9 | 93 |
+| `economy` | 경제신문사 + 해외 주요 매체 | 15 | 104 |
 | `dev` | 개발/테크 블로그 | 22 | 22 |
 
 ### economy 그룹
@@ -26,6 +26,12 @@
 | `fnnews` | 파이낸셜뉴스 | 16 | https://www.fnnews.com |
 | `herald` | 헤럴드경제 | 13 | https://biz.heraldcorp.com |
 | `ajunews` | 아주경제 | 9 | https://www.ajunews.com |
+| `bbc` | BBC News | 2 | https://www.bbc.com |
+| `cnn` | CNN | 2 | https://www.cnn.com |
+| `reuters` | Reuters | 2 | https://www.reuters.com |
+| `nyt` | NYT | 2 | https://www.nytimes.com |
+| `wsj` | WSJ | 2 | https://www.wsj.com |
+| `aljazeera` | Al Jazeera | 1 | https://www.aljazeera.com |
 
 ### economy 카테고리
 
