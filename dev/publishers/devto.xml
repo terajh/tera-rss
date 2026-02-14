@@ -4,7 +4,701 @@
     <title>dev RSS - Dev.to</title>
     <link>https://dev.to</link>
     <description>Dev.to RSS 피드</description>
-    <lastBuildDate>Sat, 14 Feb 2026 18:29:16 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 14 Feb 2026 18:32:56 GMT</lastBuildDate>
+    <item>
+      <title>10 Mistakes You&apos;re making in Kubernetes that cost you money</title>
+      <link>https://dev.to/tal_shafir_49b67973e9d3b4/10-mistakes-youre-making-in-kubernetes-that-cost-you-money-48c5</link>
+      <guid>https://dev.to/tal_shafir_49b67973e9d3b4/10-mistakes-youre-making-in-kubernetes-that-cost-you-money-48c5</guid>
+      <pubDate>Sat, 14 Feb 2026 17:55:44 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;Kubernetes is an incredible tool, but it&apos;s also a complex tool with a lot of buttons and levers for you to tweak.&amp;lt;br&amp;gt;
+        It&apos;s easy to make a mistake and end up paying more than you should.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;In this article, I&apos;ll try to list some of the most common mistakes I&apos;ve seen teams make and how to avoid them.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Not upgrading your cluster
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;This point is mainly focusing on managed Kubernetes services like GKE, EKS, AKS, etc.&amp;lt;br&amp;gt;
+        Once your Kubernetes version is old enough you need to &quot;upgrade&quot; your cluster to use &quot;extended support&quot;.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The Kubernetes community supports minor versions for approximately 14 months.&amp;lt;br&amp;gt;
+        Old clusters aren&apos;t just a security risk. They are a hidden tax.&amp;lt;br&amp;gt;
+        Once a version reaches its end-of-life, cloud providers force you into &quot;extended support&quot; to keep running it securely.&amp;lt;br&amp;gt;
+        The cost for this is high - often jumping from &amp;lt;strong&amp;gt;$0.10/hr&amp;lt;/strong&amp;gt; to &amp;lt;strong&amp;gt;$0.60/hr&amp;lt;/strong&amp;gt; for the control plane.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Relying on the &apos;Power of 2&apos; Instinct
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;We are wired to love powers of 2. It feels right. But in Kubernetes, this instinct is killing your cluster utilization.&amp;lt;br&amp;gt;
+        It&apos;s a relic of a time where we used to choose specific VMs for our workloads. In a containerized world, it&apos;s a costly habit.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&quot;How much resources does my app need?&quot; - &quot;Well, I&apos;m not sure, but let&apos;s go with 2 vCPUs and 4GiB of RAM.&quot;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        What&apos;s the problem you ask?
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Let&apos;s think about our example with common cloud providers VM sizes.&amp;lt;br&amp;gt;
+        (For this example I chose AWS latest generation with AMD based instances of the most common families C / M / R)&amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;table-wrapper-paragraph&quot;&amp;gt;&amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;InstanceType&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;vCPUs&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;RAM&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;c8a.medium&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;1&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;2 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;m8a.medium&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;1&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;4 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;r8a.medium&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;1&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;c8a.large&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;2&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;4 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;m8a.large&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;2&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;r8a.large&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;2&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;16 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;c8a.xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;4&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;m8a.xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;4&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;16 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;r8a.xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;4&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;32 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;c8a.2xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;16 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;m8a.2xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;32 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;r8a.2xlarge&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;8&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;64 GiB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;&amp;lt;/div&amp;gt;
+        
+        &amp;lt;p&amp;gt;You&apos;re probably thinking, what&apos;s the problem? I&apos;ll give the cluster to choose from &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; and will get 100% utilization, that would be awesome right?&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Not exactly.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;We&apos;re forgetting 2 things:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;DaemonSets - Your cluster definitely has some DaemonSets running, like node-exporter, kube-proxy, etc. They need resources too&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Node allocation overhead - the values we see in the table are the node&apos;s capacity not the allocatable resources (see &amp;lt;a href=&quot;https://github.com/awslabs/amazon-eks-ami/blob/main/templates/al2/runtime/bootstrap.sh#L267-L302&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;how EKS calculates allocatable resources&amp;lt;/a&amp;gt; or check out this &amp;lt;a href=&quot;https://learnkube.com/allocatable-resources&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;great article about allocatable resources&amp;lt;/a&amp;gt;)&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        
+        &amp;lt;p&amp;gt;Let&apos;s assume for a second we kept only &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; and that our DaemonSets need around 100m cpu and 256MiB of memory.&amp;lt;br&amp;gt;
+        &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt;, even when ignoring allocatable vs capacity, is not enough for a single pod.&amp;lt;br&amp;gt;
+        &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; is enough for a single pod, but not for 2 - so we&apos;ll end up with 1 pod on a &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; node with utilization of 53% CPU / 60% Memory (2,100m / 3,910m and 4,352MiB / ~7,168 MiB).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;We&apos;ll be wasting almost half of our node.&amp;lt;br&amp;gt;
+        Going for a larger instance can make this issue less bad, for example if we would go with &amp;lt;code&amp;gt;c8a.2xlarge&amp;lt;/code&amp;gt; we&apos;ll end up with 3 pods on a &amp;lt;code&amp;gt;c8a.2xlarge&amp;lt;/code&amp;gt; node with utilization of 77% CPU / 81% Memory (6,100m / 7,900m and 12,544MiB / 15,360 MiB).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Solution
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Try to avoid the power of 2 instinct and try to think about where your workloads will run.&amp;lt;br&amp;gt;
+        If for example we needed 3 pods of 2 VCPU and 4 GiB of RAM, unless we have a good reason to go with this specific size, choosing smaller/bigger pods and changing replicas accordingly will save us a lot of money.&amp;lt;br&amp;gt;
+        For example, reducing the request to &amp;lt;strong&amp;gt;1.8 vCPU&amp;lt;/strong&amp;gt; and &amp;lt;strong&amp;gt;3 GiB RAM&amp;lt;/strong&amp;gt; allows the pod to fit efficiently on &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt; with &amp;lt;strong&amp;gt;95% CPU / 98% Memory&amp;lt;/strong&amp;gt; utilization, or 2 pods on &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; with &amp;lt;strong&amp;gt;94% CPU / 89% Memory&amp;lt;/strong&amp;gt; utilization.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Specific usage numbers:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt;: 1,900m / 2,000m used.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt;: 3,700m / 3,910m used.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;In this example we made the pods smaller, but sometimes it makes more sense to go larger — requesting 3.8 vCPU instead of 2 vCPU can pack better on certain node sizes for example.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x8g5ote3hu45wh1owtdy.png&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fx8g5ote3hu45wh1owtdy.png&quot; alt=&quot;Power of 2 Bin Packing Efficiency&quot; width=&quot;800&quot; height=&quot;466&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;blockquote&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;💡 Tip:&amp;lt;/strong&amp;gt; Avoid &quot;over-fitting&quot; your resource requests to specific node sizes or DaemonSet configurations—these can change over time. Aim for small improvements (like avoiding exact powers of 2) rather than calculating exact values to maximize utilization.&amp;lt;/p&amp;gt;
+        &amp;lt;/blockquote&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Not rightsizing your resources
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;In the previous section, we&apos;ve seen that small tweaking of manual pod sizing can make a big change.&amp;lt;br&amp;gt;
+        In general we want our resources to be accurate as well.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Allocating too much
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;For example, requesting 3 GiB of memory for a workload that rarely uses more than 2 GiB of memory is a waste of resources. The same can be said with allocating CPU.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Allocating too little
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Requesting too few resources can result either in failures in the workloads that are under-allocated or with a harder thing to detect - the issue of noisy neighbors.&amp;lt;br&amp;gt;
+        If many of your workloads are using 110% of their allocation, it&apos;s likely that some of them won&apos;t have available resources on the actual node.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Solution
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Don&apos;t guess the workload resource requirements, measure them.&amp;lt;br&amp;gt;
+        Usually you should start with higher resources than what you think is suitable and after a while you can measure the actual usage and adjust accordingly.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;There are tools for doing that automatically or semi-automatically - like &amp;lt;a href=&quot;https://github.com/robusta-dev/krr&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;krr&amp;lt;/a&amp;gt; or &amp;lt;a href=&quot;https://kubernetes.io/docs/tasks/run-application/vertical-pod-autoscaler/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;VPA&amp;lt;/a&amp;gt; and other commercial tools.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Personally, I think that for realtime needs of your workloads Horizontal scaling should be preferred over Vertical scaling - but now that &amp;lt;a href=&quot;https://kubernetes.io/blog/2025/12/19/kubernetes-v1-35-in-place-pod-resize-ga/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;in-place pod resize&amp;lt;/a&amp;gt; has reached stable in Kubernetes v1.35 and many of its earlier limitations have been removed, Vertical scaling has become a much more viable option for certain use-cases.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Choosing the wrong instance types
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;A lot of times, teams choose a limited amount of instance types for their clusters.&amp;lt;br&amp;gt;
+        This was very common during the early days of Cluster Autoscaler.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Not allowing for enough sizes
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Let&apos;s take our example from the previous section, we have a 2 VCPU and 4 GiB of RAM workload.&amp;lt;br&amp;gt;
+        If we would only allow for &amp;lt;code&amp;gt;c8a.large&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; we would end up with 1 pod on a &amp;lt;code&amp;gt;c8a.xlarge&amp;lt;/code&amp;gt; node with utilization of around 50% but by allowing for &amp;lt;code&amp;gt;c8a.2xlarge&amp;lt;/code&amp;gt; we would &amp;lt;em&amp;gt;sometimes&amp;lt;/em&amp;gt; end up with 3 pods for closer to 80% utilization.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Generally speaking, larger nodes are more cost-efficient, you only need one set of DaemonSets and the Kubelet overhead and similar are lower for more resources you use - for example in CPU 6% is reserved for the first core, while only 0.25% will be reserved for the fourth core onwards.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Not mixing instance families
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;The cloud-providers have different categories for instance types, for example AWS has &amp;lt;code&amp;gt;c&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;m&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;r&amp;lt;/code&amp;gt; families - compute optimized / general purpose / memory optimized, respectively.&amp;lt;br&amp;gt;
+        Depending on your use-case, some families may suit your workload better than others. &amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I recall a specific case where a workload needed to be scaled up due to memory issues. Our DevOps team was concerned that the new instance size would be too large - some of the largest in our fleet. &amp;lt;br&amp;gt;
+        Upon investigation, we found that our cluster was mostly configured with &amp;lt;code&amp;gt;c&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;m&amp;lt;/code&amp;gt; families. We weren&apos;t utilizing the CPU we already had, we just needed more RAM. Switching to &amp;lt;code&amp;gt;r&amp;lt;/code&amp;gt; family instances allowed us to use a smaller tier (e.g., replacing &amp;lt;code&amp;gt;c&amp;lt;/code&amp;gt;/&amp;lt;code&amp;gt;m&amp;lt;/code&amp;gt; 8xlarge with &amp;lt;code&amp;gt;r&amp;lt;/code&amp;gt; 4xlarge), effectively solving the issue while saving money.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Not allowing for instance variants
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Within each family, there are multiple variants. For example, within the &amp;lt;code&amp;gt;c&amp;lt;/code&amp;gt; (compute) family, we have for the latest generation:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;c8a&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8g&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8gb&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8gd&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8gn&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8i-flex&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;c8i&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        
+        &amp;lt;p&amp;gt;Usually the &quot;special&quot; instance types are more expensive than the &quot;regular&quot; ones, but can offer better performance in some areas (like better EBS performance for &amp;lt;code&amp;gt;c8gb&amp;lt;/code&amp;gt; or better network performance for &amp;lt;code&amp;gt;c8gn&amp;lt;/code&amp;gt;).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Not preparing for ARM instances
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;All those instance types that ended with &amp;lt;code&amp;gt;g&amp;lt;/code&amp;gt; (&amp;lt;code&amp;gt;c8g&amp;lt;/code&amp;gt; for example) are ARM instances based on AWS Graviton.&amp;lt;br&amp;gt;
+        They are usually cheaper than their Intel/AMD based instances and offer better price-to-performance.&amp;lt;br&amp;gt;
+        Unlike the previous recommendation, this is usually not just &quot;plug and play&quot; and you need to have your workloads support ARM (in a lot of languages and tools it&apos;s very easy).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Lack of visibility
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;It can be tough in large environments to find where you&apos;re less efficient or where most of the money goes.&amp;lt;br&amp;gt;
+        Optimizing by hunch often fails. You might spend a week improving a service by &amp;lt;strong&amp;gt;80%&amp;lt;/strong&amp;gt;, only to realize the total cost was just $200/month. Meanwhile, a &amp;lt;strong&amp;gt;5%&amp;lt;/strong&amp;gt; improvement on another area could have saved you $5,000/month.&amp;lt;br&amp;gt;
+        There are some great Open-source tools built for that, like &amp;lt;a href=&quot;https://opencost.io/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;OpenCost&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Not considering Spot Instances and Reserved Capacity
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;My view about this one may be a bit skewed as I used to work on Spot Ocean for 4 years.&amp;lt;br&amp;gt;
+        At least some parts of your workload can run on Spot Instances. This is yet again another thing that is not a &quot;plug and play&quot; solution — Not all workloads can run on spot instances.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;One of the things that was surprising to me when I started is that Spot was fully committed to &quot;drinking your own champagne&quot; and most of our workloads ran on spot instances and Spot products (when I started it was Spot Elastigroup and during my time there we migrated to Spot Ocean) - I would say that over 90% of our workloads ran on spot instances (excluding managed databases and very specific services/databases).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Spot Instances can be a great way to save A LOT of money, but it should be handled with care.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;For workloads that are stable and predictable, don&apos;t forget about &amp;lt;strong&amp;gt;Reserved Instances&amp;lt;/strong&amp;gt; (or &amp;lt;strong&amp;gt;Savings Plans&amp;lt;/strong&amp;gt; on AWS / &amp;lt;strong&amp;gt;Committed Use Discounts&amp;lt;/strong&amp;gt; on GCP). If you know you&apos;ll be running a baseline capacity 24/7, committing to 1-3 years can save 30-60% compared to on-demand pricing.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Not thinking about Network costs
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Network cost is something that is often overlooked, but can be a significant cost.&amp;lt;br&amp;gt;
+        For example in AWS:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;table-wrapper-paragraph&quot;&amp;gt;&amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Traffic Type&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Cost&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Internet → EC2 (inbound)&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;Free&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;EC2 → Internet (outbound)&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;Free first 100 GB, then $0.09/GB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;EC2 → Another AWS region&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;$0.02/GB&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Within same AZ&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;Free&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Between AZs (same region)&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;$0.02/GB ($0.01 in + $0.01 out)&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;&amp;lt;/div&amp;gt;
+        
+        &amp;lt;p&amp;gt;For a usual cluster, transfer to outside is not &quot;negotiable&quot; (e.g it&apos;s what you return to your customers) but transfer within the same region is.&amp;lt;br&amp;gt;
+        Optimizing your workloads to be closer to each other can save you a lot of money and improve performance.&amp;lt;br&amp;gt;
+        There are other Kubernetes features you can use to optimize this, like &amp;lt;a href=&quot;https://kubernetes.io/docs/concepts/services-networking/topology-aware-routing/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;topology-aware routing&amp;lt;/a&amp;gt; and &amp;lt;a href=&quot;https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;service traffic distribution&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Not using Auto-scaling
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Auto-scaling can save you money when done right, there are 2 &quot;layers&quot; for it:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;Workload auto-scaling - you can use tools like &amp;lt;a href=&quot;https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;HPA&amp;lt;/a&amp;gt; or &amp;lt;a href=&quot;https://keda.sh/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;KEDA&amp;lt;/a&amp;gt; to scale your workloads based on metrics or events.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Node auto-scaling - you can use tools like &amp;lt;a href=&quot;https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Cluster Autoscaler&amp;lt;/a&amp;gt;, &amp;lt;a href=&quot;https://karpenter.sh/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Karpenter&amp;lt;/a&amp;gt; or &amp;lt;a href=&quot;https://spot.io/product/ocean/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Spot Ocean&amp;lt;/a&amp;gt; to scale your nodes to your workload&apos;s requirements.&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        
+        &amp;lt;blockquote&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;⚠️ Warning:&amp;lt;/strong&amp;gt; Be careful with aggressive HPA configurations on latency-sensitive workloads. Too-tight thresholds can cause oscillation—rapidly scaling up and down—which wastes resources and can actually hurt performance. Test your scaling behavior under realistic load before going to production.&amp;lt;/p&amp;gt;
+        &amp;lt;/blockquote&amp;gt;
+        
+        &amp;lt;p&amp;gt;When discussing cost, it&apos;s obvious that we want our compute capacity to fit our workload&apos;s requirements with as little waste as possible. However, our workloads&apos; demands change over time according to our load and other factors (like holidays, etc).&amp;lt;br&amp;gt;
+        Paying for peak capacity while your customers are asleep is simply burning money.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Beyond standard auto-scalers, specialized tools can help with niche use cases:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;&amp;lt;a href=&quot;https://www.vcluster.com/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Vcluster&amp;lt;/a&amp;gt;&amp;lt;/strong&amp;gt;: Runs virtual clusters inside a host cluster. Perfect for isolating multi-tenant dev/test environments without paying for multiple control planes (among other use cases).&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;&amp;lt;a href=&quot;https://github.com/moonorange/snorlax&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Snorlax&amp;lt;/a&amp;gt;&amp;lt;/strong&amp;gt;: Automatically sleeps selected workloads on nights and weekends, ensuring you only pay for resources when developers are actually working.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;Or if you have serverless workloads, you can use a tool like &amp;lt;strong&amp;gt;&amp;lt;a href=&quot;https://knative.dev/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;Knative&amp;lt;/a&amp;gt;&amp;lt;/strong&amp;gt; which offers the ability to scale to zero and scale up to the required capacity. This can be great for cases where you can &quot;afford&quot; cold starts. &amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Mismanaging Node Pools
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Most node auto-scaling tools group different &quot;kinds&quot; of nodes into different pools, for Karpenter it&apos;s called Node Pools, for Spot Ocean it&apos;s called Virtual Node Groups.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;These are similar in concept and allow you to create a group of nodes with the same configurations, you can filter different instance types, different behaviors (different set of labels/taints, how often can it be scaled down, how many at a time, etc).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Separating too much
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;One of Kubernetes&apos; main cost advantages is resource sharing. Workloads with different needs (e.g., CPU-intensive vs. Memory-intensive) can run on the same node, maximizing overall utilization.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;However, teams often over-segment their node pools, isolating workloads and losing this efficiency. A common mistake is creating separate pools for Spot and On-Demand instances. This can lead to situations where Spot pods trigger a new Spot node while your existing On-Demand nodes have ample free space. The cheapest instance is no instance at all.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Instead, consider combining them. By using Pod PriorityClasses, you can allow Spot workloads to run on &quot;spare&quot; On-Demand capacity. If a critical On-Demand pod needs that space later, the scheduler will simply evict the lower-priority Spot pod to make room.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Not separating enough
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;A common case where you probably should separate your node pools is when you have workloads that shouldn&apos;t be scaled down, such as long-running batch jobs or StatefulSets with slow recovery times.&amp;lt;br&amp;gt;
+        In this case, it can help you avoid the case where you have this very large node that made sense when it was scaled up, but now after a while only one pod that can&apos;t be scaled down is running on it, and you&apos;re paying for a very large node that is only running one pod.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;It&apos;s important to note that you can make this scenario uncommon even without a dedicated node pool but it requires some more work and planning.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        The Hidden Cost of Rapid Scale-Down
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Karpenter, for example, by default will scale down nodes as soon as they are underutilized, but you can configure it to wait for a certain amount of time before scaling down a node.&amp;lt;br&amp;gt;
+        Now you&apos;re probably wondering why would I do that? It&apos;s wasting money right?&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Technically, yes. However, since developers often lack access to configure node pools, they tend to react with the only tools they have: locking down workloads. They might set restrictive PDBs or annotations to prevent eviction, which ironically leads to worse bin-packing.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Depending on your use case, even a few minutes of consolidation delay can make a huge difference in developer experience without significantly impacting costs.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Bottom line
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Kubernetes is powerful, but without proper planning, it can become a financial black hole.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Go check your node utilization right now. I bet you&apos;ll find a &apos;perfect&apos; 4GB pod sitting on a partially empty node.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>From Chaos to Clarity: My Journey Building JSON Query Pro</title>
+      <link>https://dev.to/priyabratapaul/from-chaos-to-clarity-my-journey-building-json-query-pro-45kg</link>
+      <guid>https://dev.to/priyabratapaul/from-chaos-to-clarity-my-journey-building-json-query-pro-45kg</guid>
+      <pubDate>Sat, 14 Feb 2026 17:48:41 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;While the web is full of JSON formatters and simple viewers, I often found that they stopped short when it came to real-world utility. Most existing solutions either buckled under the weight of enterprise-scale files or lacked a truly intuitive, interactive query system that bridged the gap between simple path selection and complex data transformation. I needed a tool that combined high-performance visualization with a professional-grade query engine, so I decided to build it myself.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I’ve spent countless hours staring at API responses that look like a never-ending wall of text. Thousands of lines of nested brackets and quotes used to stare back at me, hiding that one single piece of data I actually needed. I realized that for most of us, the solution was a frustrating cycle of copying, pasting into a formatter, and manually hunting for keys. &amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I decided to build &amp;lt;strong&amp;gt;&amp;lt;a href=&quot;https://json-query-pro.vercel.app&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;JSON Query Pro&amp;lt;/a&amp;gt;&amp;lt;/strong&amp;gt; because I wanted a tool that felt like an extension of my own logic—a professional-grade toolkit that could handle the large json data from browser only. &amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;👉App Link: &amp;lt;a href=&quot;https://json-query-pro.vercel.app&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://json-query-pro.vercel.app&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        📋 The Blueprint: What I Set Out to Build
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Before writing a single line of code, I mapped out exactly what a &quot;pro&quot; JSON tool should look like. I didn&apos;t want a passive viewer; I wanted a dynamic workspace. My primary goals were:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;  &amp;lt;strong&amp;gt;Virtualized Tree Engine&amp;lt;/strong&amp;gt;: The UI had to remain fluid (60fps) regardless of whether the file was 1KB or 500MB. This meant only rendering what was visible in the viewport.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;  &amp;lt;strong&amp;gt;A &quot;Point-and-Click&quot; Selection Mode&amp;lt;/strong&amp;gt;: I wanted to eliminate the need to manually count array indices or type out long, error-prone property paths. Clicking a node should instantly populate the query editor.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;  &amp;lt;strong&amp;gt;Dual-Tier Querying&amp;lt;/strong&amp;gt;: A hybrid approach using native JS pathing for simple lookups and the industry-standard JSONata engine for complex filters, counts, and data reshaping.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;  &amp;lt;strong&amp;gt;Local-First Persistence&amp;lt;/strong&amp;gt;: Data should be stored safely in the browser&apos;s IndexedDB, ensuring that accidentally closing a tab didn&apos;t mean losing hours of investigative work.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;  &amp;lt;strong&amp;gt;Professional Aesthetics&amp;lt;/strong&amp;gt;: A high-density, developer-focused interface with support for dark mode, custom typography, and adjustable layouts.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🧩 The Wall: Obstacles Faced During Implementation
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;However, moving from blueprint to browser revealed several harsh engineering realities. As I began implementing these features, I ran into three major hurdles:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        1. The &quot;Where Am I?&quot; Problem
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Even with a clean tree view, working with deeply nested objects (like large database exports) made it impossible to keep track of a field&apos;s context. A field named &quot;status&quot; might exist in five different parent objects at different levels.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;How I solved it:&amp;lt;/strong&amp;gt; I integrated the selection logic directly into the virtualization engine. Now, every node &quot;knows&quot; its exact absolute path from the root. When you click it, the app doesn&apos;t just show you the data; it calculates the precise breadcrumb path and writes the corresponding JSONata code for you.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        2. The Performance Wall
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;Early on, the browser simply died when I loaded a 100MB file. The main thread would freeze for 10 seconds just parsing the JSON, and then another 5 seconds trying to calculate the tree structure.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;How I solved it:&amp;lt;/strong&amp;gt; I offloaded the entire data lifecycle to a &amp;lt;strong&amp;gt;Web Worker&amp;lt;/strong&amp;gt;. The &quot;brain&quot; of the app now lives in a separate thread. While the worker parses, queries, and flattens the JSON, the main UI remains completely interactive. This was the only way to support professional-scale datasets.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        3. The 1GB String Ceiling and V8 Buffer Limits
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;During implementation, I hit the hardest wall of all: the &quot;allocation size overflow.&quot; I discovered that Chromium-based browsers (Chrome, Edge) have a hard internal limit on string length—roughly &amp;lt;strong&amp;gt;512MB&amp;lt;/strong&amp;gt;. Even if a machine has 64GB of RAM, the JavaScript engine cannot create a single string long enough to represent a massive JSON file.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;How I solved it:&amp;lt;/strong&amp;gt; I implemented a defensive loading strategy. Instead of relying on a single large string, the worker uses modern streaming APIs (&amp;lt;code&amp;gt;Response.json()&amp;lt;/code&amp;gt;) to parse data in chunks. I also added explicit memory cleanup, nulling out large buffers the moment they are no longer needed to maximize the available heap.&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Screenshots
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Main page: &amp;lt;a href=&quot;https://json-query-pro.vercel.app/#/Main&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://json-query-pro.vercel.app/#/Main&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F3th7fttditxxjunsqplt.png&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F3th7fttditxxjunsqplt.png&quot; alt=&quot;Main page&quot; width=&quot;800&quot; height=&quot;449&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Help page: &amp;lt;a href=&quot;https://json-query-pro.vercel.app/#/Help&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://json-query-pro.vercel.app/#/Help&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fk90vns4zxcb421exncgd.png&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fk90vns4zxcb421exncgd.png&quot; alt=&quot;Help page&quot; width=&quot;800&quot; height=&quot;630&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Sample Queries
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        🚀 Sample Data
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;All examples below reference the default &quot;Tech Innovations&quot; dataset:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Company&amp;lt;/strong&amp;gt;: Tech Innovations (San Francisco)&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Structure&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;company&amp;lt;/code&amp;gt; → &amp;lt;code&amp;gt;departments[]&amp;lt;/code&amp;gt; → &amp;lt;code&amp;gt;employees[]&amp;lt;/code&amp;gt; → &amp;lt;code&amp;gt;projects[]&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        🔍 Basic Retrieval (Simple Queries)
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;div class=&quot;table-wrapper-paragraph&quot;&amp;gt;&amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Goal&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Standard PATH Syntax&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;JSONata Syntax&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;strong&amp;gt;Get Company Name&amp;lt;/strong&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;$.company.name&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;company.name&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;strong&amp;gt;First Department&amp;lt;/strong&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;$.company.departments[0]&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;company.departments[0]&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;strong&amp;gt;All Dept Names&amp;lt;/strong&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;em&amp;gt;Not supported (requires index)&amp;lt;/em&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;company.departments.name&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;strong&amp;gt;First Employee Name&amp;lt;/strong&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;$.company.departments[0].employees[0].name&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;company.departments[0].employees[0].name&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;&amp;lt;/div&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        ⚡ Advanced Selection (Complex Queries)
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;h4&amp;gt;
+        
+        
+        Filtering Data (JSONata Only)
+        &amp;lt;/h4&amp;gt;
+        
+        &amp;lt;p&amp;gt;Find specific items without knowing their index.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Engineering Dept&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;company.departments[name=&quot;Engineering&quot;]&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Software Engineers&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;company.departments.employees[position=&quot;Software Engineer&quot;]&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;High Value Clients&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;company.departments.employees.clients[contract_value &amp;amp;gt; 60000]&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;h4&amp;gt;
+        
+        
+        Deep Search (The Double Star)
+        &amp;lt;/h4&amp;gt;
+        
+        &amp;lt;p&amp;gt;Find data anywhere in the file regardless of depth.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Find &quot;Alice&quot;&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;**[name=&quot;Alice&quot;]&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Find all Projects&amp;lt;/strong&amp;gt;: &amp;lt;code&amp;gt;**.projects&amp;lt;/code&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;h4&amp;gt;
+        
+        
+        Reshaping Output
+        &amp;lt;/h4&amp;gt;
+        
+        &amp;lt;p&amp;gt;Create a custom report from the data.&amp;lt;br&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight plaintext&quot;&amp;gt;&amp;lt;code&amp;gt;company.departments.{
+        &quot;department&quot;: name,
+        &quot;headcount&quot;: $count(employees),
+        &quot;totalValue&quot;: $sum(employees.clients.contract_value)
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        💡 Lessons Learned
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Performance IS the experience:&amp;lt;/strong&amp;gt; Users don&apos;t care how many features you have if the app lags. Background processing is non-negotiable for pro tools.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;The V8 Buffer Limit:&amp;lt;/strong&amp;gt; I learned that the hard way: if your JSON file is 500MB+, standard &amp;lt;code&amp;gt;JSON.parse&amp;lt;/code&amp;gt; is a gamble in Chromium-based browsers. &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Ghost Truncation:&amp;lt;/strong&amp;gt; I found that some streaming APIs don&apos;t always give you a nice error message when they fail under memory pressure; they often just stop reading.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Dynamic Engine Feedback:&amp;lt;/strong&amp;gt; We implemented runtime browser detection in our Background Worker to explain memory restrictions specifically when they occur.&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🚀 Future Horizons: Breaking the 1GB Barrier
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;While JSON Query Pro is currently optimized for datasets up to 512MB (Chromium) and 1GB (Firefox), the next frontier is breaking through this browser-imposed ceiling:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;True Binary Streaming:&amp;lt;/strong&amp;gt; Moving away from standard JSON parsing to a custom binary buffer implementation.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;Wasm-Powered Parsers:&amp;lt;/strong&amp;gt; Implementing a Rust or C++ based parser via WebAssembly to bypass the JavaScript heap&apos;s string limitations.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;strong&amp;gt;IndexedDB Sharding:&amp;lt;/strong&amp;gt; Storing the JSON structure as a sharded index in IndexedDB to allow &quot;lazy loading&quot; of specific branches.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Conclusion
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;I built JSON Query Pro to turn a messy wall of text into a clear, searchable map. By combining background processing with powerful query languages, I&apos;ve created a workspace where data isn&apos;t just something you see—it&apos;s something you can easily query.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;👉Link to app: &amp;lt;a href=&quot;https://json-query-pro.vercel.app&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://json-query-pro.vercel.app&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Happy Querying!&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How I Brought Wiimotes Back to Life in 2026</title>
       <link>https://dev.to/juanipis/how-i-bring-back-the-wiimotes-on-2026-29h8</link>
@@ -91,6 +785,425 @@
         &amp;lt;/ul&amp;gt;
         
         &amp;lt;p&amp;gt;I invite you to explore the &amp;lt;a href=&quot;https://github.com/Juanipis/WiimoteManagerPro&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;GitHub Repository&amp;lt;/a&amp;gt; to see the clean architecture, browse the documentation, or even open a PR! Whether you want to add support for a new controller or just fix a typo, contributions are welcome.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>NDM-TCP: The 100Gbps Ultra-Low Latency Build</title>
+      <link>https://dev.to/hejhdiss/ndm-tcp-the-100gbps-ultra-low-latency-build-24ie</link>
+      <guid>https://dev.to/hejhdiss/ndm-tcp-the-100gbps-ultra-low-latency-build-24ie</guid>
+      <pubDate>Sat, 14 Feb 2026 17:45:28 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;h2&amp;gt;
+        
+        
+        What&apos;s New in the Optimized Build (v2.0.0-100g)
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;The &quot;Ultra Optimized&quot; build of NDM-TCP (ndm_tcp_100g_opt.c) represents a radical shift from the standard v1.0 logic. While the standard version prioritizes mathematical precision and readability, this 100Gbps target build prioritizes &amp;lt;strong&amp;gt;CPU cache locality&amp;lt;/strong&amp;gt; and &amp;lt;strong&amp;gt;interrupt-context efficiency.&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This version is designed specifically for high-throughput environments (100GbE/400GbE) where the CPU budget per packet is measured in nanoseconds.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Github:&amp;lt;/strong&amp;gt;&amp;lt;a href=&quot;https://github.com/hejhdiss/lkm-ndm-tcp&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;hejdiss/lkm-ndm-tcp&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Key Optimizations vs v1.0
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;1. Aggressive Quantization (s8/u8)&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;v1.0: Used s32 for inputs and s16 for weights.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;100G Build: Converted the entire neural network pipeline to signed 8-bit integers (s8).&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;Impact: This reduces memory bandwidth requirements by 75%. The entire weight matrix now fits in L1 cache, and vector operations can be performed using standard integer registers without complex casting.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;2. Single-Cache-Line Struct (40 Bytes)&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;v1.0: The ndm_tcp struct was packed to fit ICSK_CA_PRIV_SIZE (64 bytes) but utilized most of it.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;100G Build: Compressed to exactly 40 bytes.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;Impact: This fits comfortably within a single x86 cache line (64 bytes). When the CPU fetches the congestion control state, it gets the entire context (history, weights, flags) in a single memory fetch, eliminating L2/L3 cache misses during the critical path.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;3. Bitwise Entropy Calculation&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;v1.0: Used division and loops to calculate Shannon entropy.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;100G Build: Replaces division with bitwise shifts based on range magnitude. The loop is unrolled and operates on u8 history data, allowing the CPU to calculate entropy in fewer than 20 cycles.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        5. &quot;Stable State&quot; Neural Bypass
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;The module now includes a nn_skip_counter. If the network entropy is low (stable) and plasticity is high, the algorithm assumes the network state hasn&apos;t changed effectively enough to warrant a full forward pass. It reuses the previous cwnd calculation for up to 16 packets, saving massive amounts of CPU time during bulk data transfers.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Important Disclaimers&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This optimized version is a specialized low-latency implementation.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;Precision: The move to 8-bit quantization reduces the &quot;resolution&quot; of the neural network. While sufficient for TCP congestion control (which is inherently noisy), it effectively trades mathematical purity for raw speed.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;Performance: You should expect a 50-60% reduction in CPU cycles per packet. Throughput gains will be most noticeable on CPU-bound senders driving 100Gbps links.&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        Compilation Instructions
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;The Linux kernel build system expects the source file to match the module name defined in the Makefile. To compile this ultra-optimized version, you must rename it to replace the standard source.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Step 1: Backup standard version
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;&amp;lt;br&amp;gt;
+        mv ndm_tcp_lkm.c ndm_tcp_lkm.c.bak&amp;lt;br&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Step 2: Rename optimized source
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;&amp;lt;br&amp;gt;
+        cp ndm_tcp_optimized_ultra.c ndm_tcp_lkm.c&amp;lt;br&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Step 3: Compile
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;&amp;lt;br&amp;gt;
+        make&amp;lt;br&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h3&amp;gt;
+        
+        
+        Step 4: Load Module
+        &amp;lt;/h3&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;&amp;lt;br&amp;gt;
+        make enable&amp;lt;br&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How I Built My Django Portfolio Website from Scratch (Step-by-Step Guide)</title>
+      <link>https://dev.to/anonymous2583/how-i-built-my-django-portfolio-website-from-scratch-step-by-step-guide-2ma6</link>
+      <guid>https://dev.to/anonymous2583/how-i-built-my-django-portfolio-website-from-scratch-step-by-step-guide-2ma6</guid>
+      <pubDate>Sat, 14 Feb 2026 17:43:57 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;If you&apos;re learning Django and wondering whether you should build a portfolio with it — the answer is yes.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Instead of using a static template or website builder, I decided to build my personal portfolio using Django, a powerful Python web framework. I wanted something dynamic, scalable, and professionally structured — not just a simple HTML page.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;In this article, I’ll walk you through:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Why I chose Django for my portfolio&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The tech stack I used&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Key features I implemented&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Security best practices I followed&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;How I deployed it&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;What I learned from the process&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;If you&apos;re planning to build a Django portfolio website, this guide will help you.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        💡 Why I Chose Django for My Portfolio
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Many developers create static portfolios using HTML, CSS, and JavaScript. While that works, I wanted my portfolio to:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Be database-driven&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Allow dynamic content updates&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Demonstrate backend development skills&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Follow real-world project structure&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Be scalable for future features&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Django was the perfect choice because it provides:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Built-in admin dashboard&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Secure authentication system&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Clean project architecture&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Excellent documentation&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Production-ready structure&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Building a portfolio with Django shows more than design skills — it proves backend knowledge.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🛠️ Tech Stack Used
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Here’s the complete stack I used to build my Django portfolio website:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Backend: Django (Python)&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Frontend: HTML, CSS, Bootstrap&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Database: SQLite (for development)&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Deployment Platform: PythonAnywhere&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Version Control: Git &amp;amp;amp; GitHub&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This setup allowed me to build, test, and deploy efficiently.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🏗️ Project Structure &amp;amp;amp; Architecture&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The project follows Django’s MVT (Model–View–Template) architecture.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Models&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I created models to manage:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Projects&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Skills&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Contact messages&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This makes the portfolio dynamic. Instead of editing HTML every time I want to add a project, I can update content directly from the admin panel.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Views&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Views handle:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Rendering dynamic content&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Processing form submissions&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Managing page responses&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Templates&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I used:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;A base template for consistent layout&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Reusable components&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Responsive design structure&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This keeps the code clean and maintainable.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;✨ Key Features of My Django Portfolio&amp;lt;br&amp;gt;
+        1️⃣ Dynamic Project Showcase&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Projects are stored in the database and displayed dynamically. This means:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Easy updates&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Scalable structure&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Clean separation of content and design&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;2️⃣ Contact Form with Backend Processing&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The contact form:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Validates user input&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Handles submissions securely&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Stores messages for review&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;This demonstrates real-world backend form handling.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;3️⃣ Admin Dashboard for Content Management&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Using Django’s built-in admin panel, I can:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Add new projects&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Update skills&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Manage content easily&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;No need to manually edit templates every time.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;4️⃣ Responsive Design&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The site works smoothly across:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Mobile devices&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Tablets&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Desktops&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;A portfolio should look professional everywhere.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🔐 Security Best Practices Implemented
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Even though it’s a personal portfolio, I treated it like a production-level web application.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Here are some security-focused practices I followed:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;CSRF protection enabled for forms&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Proper configuration for production settings&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Server-side form validation&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Clean separation between development and production environments&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Secure handling of application settings&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Security is especially important in backend development, and Django makes it easier by providing built-in protections.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🚀 Deployment Experience
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Deploying the project was one of the most valuable learning experiences.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;The general process included:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Setting up a virtual environment&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Installing dependencies&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Configuring application settings&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Collecting static files&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Running database migrations&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Connecting the app to the hosting platform&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Deployment taught me how web applications move from local development to a live production environment — something every developer should understand.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        ⚠️ Challenges I Faced (And How I Solved Them)
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Every real project comes with obstacles.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Static File Configuration&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;I had to properly configure static file handling to ensure styles and scripts loaded correctly in production.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Template Refactoring&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Initially, I had repeated code across pages. Creating a base template solved this and improved maintainability.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔹 Production Configuration&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Understanding environment-based settings helped me structure the application more professionally.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Each challenge improved my understanding of how Django works in real-world scenarios.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        📚 What I Learned from Building a Django Portfolio
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;This project helped me:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Understand Django architecture deeply&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Improve backend logic structuring&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Gain hands-on deployment experience&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Apply web security fundamentals&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Think like a production-level developer&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Tutorials teach concepts — building your own project builds confidence.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🎯 Why You Should Build Your Portfolio with Django&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;If you&apos;re learning Django or backend development, building your own portfolio:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Strengthens your resume&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Demonstrates real skills&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Gives you deployment experience&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Helps you understand application structure&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Makes you stand out from other candidates&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;A dynamic portfolio says more than a static template ever could.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;🔮 Future Improvements&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Planned enhancements include:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Adding a blog section powered by Django&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Improving UI interactions&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Custom domain integration&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Performance optimization&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Expanding project sections&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Building never truly stops — it evolves.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🏁 Final Thoughts
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Creating my Django-based portfolio was more than just building a website. It was about:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Applying backend development in a real project&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Following best practices&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Writing clean and structured code&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Understanding deployment&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Thinking about scalability and security&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;If you’re serious about becoming a Django developer, start by building something real.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
     <item>
@@ -1863,812 +2976,6 @@
         
         
         &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;I&apos;m&amp;lt;/em&amp;gt; &amp;lt;a href=&quot;https://ioanistrate.com/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;&amp;lt;em&amp;gt;Ioan Istrate&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;em&amp;gt;, founder of&amp;lt;/em&amp;gt; &amp;lt;a href=&quot;https://tripvento.com/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;&amp;lt;em&amp;gt;Tripvento&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt; &amp;lt;em&amp;gt;— a ranking API that scores hotels by traveler intent using geospatial intelligence. Previously worked on ranking systems at U.S. News &amp;amp;amp; World Report. If you&apos;re working on something similar or want to nerd out about PostGIS, find me on&amp;lt;/em&amp;gt; &amp;lt;a href=&quot;https://linkedin.com/in/istrateioan/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;&amp;lt;em&amp;gt;LinkedIn&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;em&amp;gt;.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>HakoNyans: A Transparent Lossless Codec Challenge (with GitHub Copilot CLI)</title>
-      <link>https://dev.to/charmpic/hakonyans-a-transparent-lossless-codec-challenge-with-github-copilot-cli-2imj</link>
-      <guid>https://dev.to/charmpic/hakonyans-a-transparent-lossless-codec-challenge-with-github-copilot-cli-2imj</guid>
-      <pubDate>Sat, 14 Feb 2026 17:11:27 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is a submission for the &amp;lt;a href=&quot;https://dev.to/challenges/github-2026-01-21&quot;&amp;gt;GitHub Copilot CLI Challenge&amp;lt;/a&amp;gt;&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What I Built
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I built &amp;lt;strong&amp;gt;HakoNyans&amp;lt;/strong&amp;gt;, an experimental image codec focused on practical decode speed and transparent lossless results&amp;lt;br&amp;gt;
-        across different image types (photo, anime, UI/screen).&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;For this challenge, I focused on two things:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ol&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;A clearer lossless workflow in CLI&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Added a new command:&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;hakonyans encode-lossless &amp;amp;lt;in.ppm&amp;amp;gt; &amp;amp;lt;out.hkn&amp;amp;gt; [preset: fast|balanced|max]&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;This makes lossless testing reproducible from the terminal without custom scripts.&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Reproducible visual and metric snapshots&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Prepared a dedicated asset pack for challenge demos:&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;docs/assets/devchallenge_2026_01_21/&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Included side-by-side comparisons and both &amp;lt;strong&amp;gt;win&amp;lt;/strong&amp;gt; and &amp;lt;strong&amp;gt;lose&amp;lt;/strong&amp;gt; cases (to keep reporting honest).&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;/ol&amp;gt;
-        
-        &amp;lt;p&amp;gt;What this project means to me:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;I wanted to show not just “best-case screenshots,” but a realistic engineering snapshot:&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;where HKN already wins (some natural-photo cases), and where PNG is still much stronger (some structured/UI-like
-        cases).&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Demo
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Repository:&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://github.com/hakorune/HakoNyans&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://github.com/hakorune/HakoNyans&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;Challenge asset pack:&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://github.com/hakorune/HakoNyans/tree/main/docs/assets/devchallenge_2026_01_21&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://github.com/hakorune/HakoNyans/tree/main/docs/assets/devchallenge_2026_01_21&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Screenshots
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Main comparison&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
-        &amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Flinerwry58cyhywxlham.jpg&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Flinerwry58cyhywxlham.jpg&quot; alt=&quot;Artoria side-by-side compare&quot; width=&quot;800&quot; height=&quot;180&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Lossless win case (nature_01)&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
-        &amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fcmfj47tsy0jd6txnx5h3.jpg&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fcmfj47tsy0jd6txnx5h3.jpg&quot; alt=&quot;Lossless win case&quot; width=&quot;800&quot; height=&quot;164&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Lossless lose case (hd_01)&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
-        &amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F0egq5apvf0pezi0hwp1k.jpg&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F0egq5apvf0pezi0hwp1k.jpg&quot; alt=&quot;Lossless lose case&quot; width=&quot;800&quot; height=&quot;164&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Example metrics snapshot (fixed6, max preset)
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;code&amp;gt;nature_01&amp;lt;/code&amp;gt;: HKN 812,567 bytes vs PNG 1,281,481 bytes (&amp;lt;code&amp;gt;PNG/HKN = 1.577&amp;lt;/code&amp;gt;)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;code&amp;gt;nature_02&amp;lt;/code&amp;gt;: HKN 999,685 bytes vs PNG 1,446,470 bytes (&amp;lt;code&amp;gt;PNG/HKN = 1.447&amp;lt;/code&amp;gt;)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;code&amp;gt;hd_01&amp;lt;/code&amp;gt;: HKN 710,888 bytes vs PNG 8,785 bytes (&amp;lt;code&amp;gt;PNG/HKN = 0.012&amp;lt;/code&amp;gt;)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;So currently:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;HKN can beat PNG on some photo-like content.&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;PNG still dominates some structured/worst-case images.&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;The project is actively improving both sides.&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        My Experience with GitHub Copilot CLI
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;GitHub Copilot CLI was most useful for my fast implementation loop:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Refactoring large headers into smaller units safely&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Adding a new CLI command (&amp;lt;code&amp;gt;encode-lossless&amp;lt;/code&amp;gt;) while preserving existing behavior&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Running repetitive verify loops quickly (&amp;lt;code&amp;gt;build&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;ctest&amp;lt;/code&amp;gt;, benchmark checks)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Generating and validating challenge-ready visual assets from command pipelines&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;The biggest impact was &amp;lt;strong&amp;gt;speed + consistency&amp;lt;/strong&amp;gt;:&amp;lt;br&amp;gt;
-        I could iterate quickly in terminal-first workflows while keeping changes verifiable (tests, checksums, RMSE checks,&amp;lt;br&amp;gt;
-        benchmark CSVs).&amp;lt;/p&amp;gt;
-        
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Attribution note used in demo assets&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
-        Source: Fate series (Character: Artoria Pendragon), illustration by Takeuchi Takashi&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Making offline time-tracker with Copilot CLI</title>
-      <link>https://dev.to/zmateusz/making-offline-time-tracker-with-copilot-cli-34c2</link>
-      <guid>https://dev.to/zmateusz/making-offline-time-tracker-with-copilot-cli-34c2</guid>
-      <pubDate>Sat, 14 Feb 2026 17:10:31 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is a submission for the &amp;lt;a href=&quot;https://dev.to/challenges/github-2026-01-21&quot;&amp;gt;GitHub Copilot CLI Challenge&amp;lt;/a&amp;gt;&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What I Built
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I created simple app that works offline and allows to track time spent on any activities user will enter to it. I plan to add more features to it like: exporting to text file or CSV, assign task to project, showing stats and charts, calling backend to save data in other app.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Demo
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Link to app: &amp;lt;a href=&quot;https://zmateusz.github.io/time/timer.html&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;https://zmateusz.github.io/time/timer.html&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fjl92s50f0kzj2u3hn48k.png&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fjl92s50f0kzj2u3hn48k.png&quot; alt=&quot; &quot; width=&quot;800&quot; height=&quot;1117&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        My Experience with GitHub Copilot CLI
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I used Copilot CLI for the first time, installation and log in was quick and simple on WSL under Windows system. For coding I use VS Code and when I opened the repository for this project I had all the chat history from CLI in the IDE which is nice.&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>I Built the First A11y CLI That Auto-Fixes Code While You Type (+ Teaches Copilot Your Patterns)</title>
-      <link>https://dev.to/liztacular/i-built-the-first-a11y-cli-that-auto-fixes-code-while-you-type-teaches-copilot-your-patterns-49il</link>
-      <guid>https://dev.to/liztacular/i-built-the-first-a11y-cli-that-auto-fixes-code-while-you-type-teaches-copilot-your-patterns-49il</guid>
-      <pubDate>Sat, 14 Feb 2026 17:10:20 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;h2&amp;gt;
-        
-        
-        🎬 Watch It In Action First
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;iframe width=&quot;710&quot; height=&quot;399&quot; src=&quot;https://www.youtube.com/embed/r2LgYIoVrU4&quot;&amp;gt;
-        &amp;lt;/iframe&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        The Problem Nobody&apos;s Solved
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Every accessibility tool tells you what&apos;s broken. &amp;lt;strong&amp;gt;None of them fix it automatically while you code.&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;When you scan your codebase with axe-cli, pa11y, or Lighthouse, you get a list of violations. Then you context-switch to fix them. By next week, new violations creep in. The backlog grows. Teams feel overwhelmed.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;95.9% of websites still fail basic WCAG standards&amp;lt;/strong&amp;gt; (WebAIM Million). That&apos;s 1 billion users who can&apos;t fully use the web.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What Makes ally Different
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I built &amp;lt;strong&amp;gt;ally&amp;lt;/strong&amp;gt; - an accessibility CLI with &amp;lt;strong&amp;gt;two industry-first features&amp;lt;/strong&amp;gt; that no competitor has:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        1. Real-Time Auto-Fix on Save
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Watches your files and auto-applies WCAG fixes as you save — zero manual intervention.&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;ally watch src/ &amp;lt;span class=&quot;nt&quot;&amp;gt;--fix-on-save&amp;lt;/span&amp;gt;
-        
-        ✓ Auto-fix: ON &amp;lt;span class=&quot;o&quot;&amp;gt;(&amp;lt;/span&amp;gt;confidence ≥ 90%&amp;lt;span class=&quot;o&quot;&amp;gt;)&amp;lt;/span&amp;gt;
-        📄 Button.tsx changed
-        ✓ Auto-applied 2 fixes
-        • &amp;amp;lt;button&amp;amp;gt; → &amp;amp;lt;button aria-label&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;Submit&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;
-        • &amp;amp;lt;img&amp;amp;gt; → &amp;amp;lt;img &amp;lt;span class=&quot;nv&quot;&amp;gt;alt&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;Logo&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;
-        
-        Score: 62 → 100 ✨
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Why this matters:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;🔥 Instant fixes — No &quot;fix later&quot; backlog&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🎯 High confidence — Only applies fixes ≥90% certainty&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;⚡ Zero friction — Edit files normally, ally handles the rest&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🤖 Pattern learning — Learns from your fix history&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;No other accessibility tool has this.&amp;lt;/strong&amp;gt; Not axe-cli. Not pa11y. Not Lighthouse.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        2. Impact Scoring (0-100)
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Shows which violations &amp;lt;strong&amp;gt;actually hurt users&amp;lt;/strong&amp;gt; — eliminates developer overwhelm.&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;ally scan ./src
-        
-        &amp;lt;span class=&quot;o&quot;&amp;gt;[!!!]&amp;lt;/span&amp;gt; CRITICAL Impact: 98/100 &amp;lt;span class=&quot;o&quot;&amp;gt;(&amp;lt;/span&amp;gt;WCAG A&amp;lt;span class=&quot;o&quot;&amp;gt;)&amp;lt;/span&amp;gt;
-        Buttons must have discernible text
-        💡 Users cannot activate buttons, blocking core actions
-        👥 Affects: Screen reader &amp;lt;span class=&quot;nb&quot;&amp;gt;users&amp;lt;/span&amp;gt;, Voice control &amp;lt;span class=&quot;nb&quot;&amp;gt;users&amp;lt;/span&amp;gt;
-        📊 Estimated: 15-20% of &amp;lt;span class=&quot;nb&quot;&amp;gt;users&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;Instead of treating all violations equally, ally scores each 0-100 based on:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;WCAG level (A &amp;amp;gt; AA &amp;amp;gt; AAA for priority)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;User groups affected (screen readers, keyboard-only, low vision)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;% of users impacted&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Business context (checkout pages score higher for form issues)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Fix the highest-score issues first.&amp;lt;/strong&amp;gt; Stop guessing.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        The GitHub Copilot CLI Integration That Changes Everything
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Here&apos;s where it gets interesting for this challenge.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;Most submissions will say &quot;I used Copilot to write my code.&quot;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;ally goes further:&amp;lt;/strong&amp;gt; I built a &amp;lt;strong&amp;gt;custom MCP (Model Context Protocol) server&amp;lt;/strong&amp;gt; (2,094 lines) that &amp;lt;strong&amp;gt;teaches GitHub Copilot about YOUR accessibility patterns&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        How It Works
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;When you install ally and run &amp;lt;code&amp;gt;ally init&amp;lt;/code&amp;gt;, it creates &amp;lt;code&amp;gt;.copilot/mcp-config.json&amp;lt;/code&amp;gt;:&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight json&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;mcpServers&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;ally-patterns&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;type&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;local&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;command&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;node&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;args&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;./node_modules/ally-a11y/mcp-server/dist/index.js&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;Now when you ask Copilot to fix accessibility issues, it gets context from &amp;lt;strong&amp;gt;7 MCP tools&amp;lt;/strong&amp;gt;:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ol&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;get_component_patterns&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - Your existing ARIA patterns&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;get_design_tokens&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - WCAG-compliant colors from your codebase&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;get_fix_history&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - Previously applied fixes for consistency&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;get_scan_summary&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - Current accessibility violations&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;get_wcag_guideline&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - Full WCAG criterion details&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;suggest_aria_pattern&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - ARIA patterns for component types&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;check_color_contrast&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; - Calculate WCAG contrast ratios&amp;lt;/li&amp;gt;
-        &amp;lt;/ol&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        The Feedback Loop
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;This creates a powerful workflow:&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c&quot;&amp;gt;# 1. ally scans and finds issues&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;ally scan Button.tsx
-        &amp;lt;span class=&quot;o&quot;&amp;gt;[!!!]&amp;lt;/span&amp;gt; CRITICAL: Button missing aria-label
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# 2. Use Copilot with ally&apos;s context&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;gh copilot suggest &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;fix the button accessibility&quot;&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Behind the scenes, Copilot calls your MCP server:&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# - get_component_patterns → sees you use aria-label consistently&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# - get_design_tokens → knows your color palette&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# - get_fix_history → sees 47 previous aria-label fixes&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# - get_scan_summary → knows this specific violation&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Result: Copilot suggests code that matches YOUR patterns&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# &amp;amp;lt;button aria-label=&quot;Submit form&quot;&amp;amp;gt;&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# 3. Apply fix and rescan&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;ally scan Button.tsx
-        ✓ No violations found &amp;lt;span class=&quot;o&quot;&amp;gt;(&amp;lt;/span&amp;gt;score: 100&amp;lt;span class=&quot;o&quot;&amp;gt;)&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# 4. Fix becomes part of your history&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;ally &amp;lt;span class=&quot;nb&quot;&amp;gt;history&amp;lt;/span&amp;gt;
-        ✓ Button.tsx: 62 → 100 &amp;lt;span class=&quot;o&quot;&amp;gt;(&amp;lt;/span&amp;gt;+38&amp;lt;span class=&quot;o&quot;&amp;gt;)&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;This is what Copilot CLI integration should look like:&amp;lt;/strong&amp;gt; Not just using Copilot to build a tool, but &amp;lt;strong&amp;gt;making Copilot smarter&amp;lt;/strong&amp;gt; at its job.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What I Learned Building With Copilot CLI
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        1. MCP Servers Are Incredibly Powerful
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Building the MCP server taught me that Copilot CLI isn&apos;t just a code generator — it&apos;s an &amp;lt;strong&amp;gt;extensible platform&amp;lt;/strong&amp;gt;. By giving Copilot access to project-specific context, you can transform it from &quot;generic Stack Overflow suggestions&quot; to &quot;expert on your codebase.&quot;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;The telemetry proves it works:&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight plaintext&quot;&amp;gt;&amp;lt;code&amp;gt;[MCP Telemetry] get_component_patterns called (47x total)
-        [MCP Telemetry] get_design_tokens called (23x total)
-        [MCP Telemetry] get_fix_history called (156x total)
-        [MCP Telemetry] suggest_aria_pattern called (89x total)
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;Real developers are using it. Copilot is getting smarter about accessibility because of ally&apos;s MCP server.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        2. Context Is Everything for AI Code Generation
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Generic Copilot suggestions are often wrong for accessibility because every project uses different ARIA patterns, design systems, and conventions.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;The MCP server solves this by teaching Copilot &amp;lt;strong&amp;gt;your patterns&amp;lt;/strong&amp;gt;, not generic ones.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        3. Developer Experience &amp;amp;gt; Features
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;ally has 19 commands, but the two that matter most solve &amp;lt;strong&amp;gt;emotional problems&amp;lt;/strong&amp;gt;:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ol&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;code&amp;gt;ally watch --fix-on-save&amp;lt;/code&amp;gt; (removes friction)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;code&amp;gt;ally scan&amp;lt;/code&amp;gt; with impact scores (eliminates overwhelm)&amp;lt;/li&amp;gt;
-        &amp;lt;/ol&amp;gt;
-        
-        &amp;lt;p&amp;gt;Copilot CLI taught me this during development — the best features &amp;lt;strong&amp;gt;remove blockers&amp;lt;/strong&amp;gt;, not add capabilities.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Why This Matters (The $200B Problem)
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;The Business Case:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;95.9% of websites fail WCAG (WebAIM Million)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;1 billion users have disabilities&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;ADA lawsuits increased 400% (2017-2023)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;WCAG compliance is legally required (US, EU, Canada)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;What ally Solves:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Eliminates overwhelm via impact scoring&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Zero-friction fixes via auto-fix on save&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Pattern consistency via MCP server&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Compliance documentation via reports&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Team education via &amp;lt;code&amp;gt;ally learn&amp;lt;/code&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        The Complete Toolkit (19 Commands)
-        &amp;lt;/h2&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c&quot;&amp;gt;# Scanning &amp;amp;amp; Real-Time&amp;lt;/span&amp;gt;
-        ally scan ./src              &amp;lt;span class=&quot;c&quot;&amp;gt;# Impact scoring&amp;lt;/span&amp;gt;
-        ally watch &amp;lt;span class=&quot;nt&quot;&amp;gt;--fix-on-save&amp;lt;/span&amp;gt;     &amp;lt;span class=&quot;c&quot;&amp;gt;# Auto-fix as you code&amp;lt;/span&amp;gt;
-        ally crawl &amp;amp;lt;url&amp;amp;gt;             &amp;lt;span class=&quot;c&quot;&amp;gt;# Multi-page scanning&amp;lt;/span&amp;gt;
-        ally scan-storybook          &amp;lt;span class=&quot;c&quot;&amp;gt;# Storybook integration&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Fixing &amp;amp;amp; Triage  &amp;lt;/span&amp;gt;
-        ally fix                     &amp;lt;span class=&quot;c&quot;&amp;gt;# Interactive fixes&amp;lt;/span&amp;gt;
-        ally triage                  &amp;lt;span class=&quot;c&quot;&amp;gt;# Prioritize violations&amp;lt;/span&amp;gt;
-        ally explain                 &amp;lt;span class=&quot;c&quot;&amp;gt;# WCAG + Copilot tips&amp;lt;/span&amp;gt;
-        ally learn &amp;amp;lt;topic&amp;amp;gt;           &amp;lt;span class=&quot;c&quot;&amp;gt;# WCAG education&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Reporting &amp;amp;amp; Progress&amp;lt;/span&amp;gt;
-        ally report                  &amp;lt;span class=&quot;c&quot;&amp;gt;# MD/HTML/JSON/SARIF/CSV&amp;lt;/span&amp;gt;
-        ally &amp;lt;span class=&quot;nb&quot;&amp;gt;history&amp;lt;/span&amp;gt;                 &amp;lt;span class=&quot;c&quot;&amp;gt;# Progress trends&amp;lt;/span&amp;gt;
-        ally stats                   &amp;lt;span class=&quot;c&quot;&amp;gt;# Dashboard&amp;lt;/span&amp;gt;
-        ally pr-check                &amp;lt;span class=&quot;c&quot;&amp;gt;# GitHub PR comments&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Plus: tree, badge, audit-palette, init, doctor, health, completion&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Try It Yourself (3 Commands)
-        &amp;lt;/h2&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c&quot;&amp;gt;# 1. Install&amp;lt;/span&amp;gt;
-        npm &amp;lt;span class=&quot;nb&quot;&amp;gt;install&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nt&quot;&amp;gt;-g&amp;lt;/span&amp;gt; ally-a11y
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# 2. Initialize (creates MCP config)&amp;lt;/span&amp;gt;
-        ally init
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# 3. Start auto-fixing&amp;lt;/span&amp;gt;
-        ally watch src/ &amp;lt;span class=&quot;nt&quot;&amp;gt;--fix-on-save&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;With GitHub Copilot CLI:&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nv&quot;&amp;gt;$ &amp;lt;/span&amp;gt;gh copilot suggest &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;fix accessibility in Button.tsx&quot;&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Copilot now uses ally&apos;s MCP server for project-specific context&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Why This Should Win
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;1. Genuinely Novel Features&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Real-time auto-fix (no competitor has this)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Impact scoring 0-100 (industry-first)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;2. Deep Copilot Integration&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Not just &quot;built with&quot; but &quot;makes Copilot smarter&quot;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;2,094-line MCP server with 7 tools&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Production telemetry proving real usage&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;3. Production-Ready&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Published to npm&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;16,505 lines TypeScript&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;122+ tests&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;GitHub Action + SARIF output&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;4. Real Impact&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;$200B accessibility market&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;1 billion users affected&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Solves #1 developer pain point&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Technical Highlights
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;MCP Server (2,094 lines):&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;7 tools with telemetry&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Pattern/token caching&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Error handling&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;TypeScript safety&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Impact Scoring:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;WCAG level weighting&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;User group analysis&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Business context&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;0-100 scale&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Auto-Fix:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;35+ patterns&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Confidence threshold (≥90%)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Fix history tracking&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Dry-run mode&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Links
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;GitHub:&amp;lt;/strong&amp;gt; &amp;lt;a href=&quot;https://github.com/forbiddenlink/ally&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;github.com/forbiddenlink/ally&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;npm:&amp;lt;/strong&amp;gt; &amp;lt;a href=&quot;https://www.npmjs.com/package/ally-a11y&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;npmjs.com/package/ally-a11y&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Demo Video:&amp;lt;/strong&amp;gt; &amp;lt;a href=&quot;https://youtu.be/r2LgYIoVrU4&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;youtu.be/r2LgYIoVrU4&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Built for the &amp;lt;a href=&quot;https://dev.to/challenges/github-2026-01-21&quot;&amp;gt;GitHub Copilot CLI Challenge&amp;lt;/a&amp;gt;&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Making the web accessible, one auto-fix at a time.&amp;lt;/em&amp;gt; ♿✨&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What I Learned Building With Copilot CLI
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Why accessibility matters:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;95.9% of top 1 million websites have WCAG failures&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;1 billion people worldwide have disabilities&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;ADA lawsuits increased 400% from 2017-2023&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;WCAG compliance is legally required in many countries&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;What ally solves:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Eliminates overwhelm&amp;lt;/strong&amp;gt; - Impact scoring shows what to fix first&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Zero-friction fixes&amp;lt;/strong&amp;gt; - Auto-fix on save means no backlog accumulation&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Pattern consistency&amp;lt;/strong&amp;gt; - MCP server ensures fixes match your codebase&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Compliance documentation&amp;lt;/strong&amp;gt; - Generate reports for audits&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Full Command Reference
-        &amp;lt;/h2&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;ally scan ./src              &amp;lt;span class=&quot;c&quot;&amp;gt;# Scan with impact scoring&amp;lt;/span&amp;gt;
-        ally watch &amp;lt;span class=&quot;nt&quot;&amp;gt;--fix-on-save&amp;lt;/span&amp;gt;     &amp;lt;span class=&quot;c&quot;&amp;gt;# Auto-fix as you code&amp;lt;/span&amp;gt;
-        ally &amp;lt;span class=&quot;nb&quot;&amp;gt;history&amp;lt;/span&amp;gt;                 &amp;lt;span class=&quot;c&quot;&amp;gt;# View progress over time&amp;lt;/span&amp;gt;
-        ally fix                     &amp;lt;span class=&quot;c&quot;&amp;gt;# Interactive fix approval&amp;lt;/span&amp;gt;
-        ally explain                 &amp;lt;span class=&quot;c&quot;&amp;gt;# WCAG explanations&amp;lt;/span&amp;gt;
-        ally report                  &amp;lt;span class=&quot;c&quot;&amp;gt;# Generate reports (MD/HTML/JSON/SARIF)&amp;lt;/span&amp;gt;
-        ally triage                  &amp;lt;span class=&quot;c&quot;&amp;gt;# Prioritize violations interactively&amp;lt;/span&amp;gt;
-        ally crawl &amp;amp;lt;url&amp;amp;gt;             &amp;lt;span class=&quot;c&quot;&amp;gt;# Multi-page website scanning&amp;lt;/span&amp;gt;
-        ally pr-check                &amp;lt;span class=&quot;c&quot;&amp;gt;# Post results to GitHub PRs&amp;lt;/span&amp;gt;
-        ally badge                   &amp;lt;span class=&quot;c&quot;&amp;gt;# Generate accessibility badges&amp;lt;/span&amp;gt;
-        ally learn &amp;amp;lt;topic&amp;amp;gt;           &amp;lt;span class=&quot;c&quot;&amp;gt;# Educational WCAG explainer&amp;lt;/span&amp;gt;
-        ally tree &amp;amp;lt;url&amp;amp;gt;              &amp;lt;span class=&quot;c&quot;&amp;gt;# View accessibility tree&amp;lt;/span&amp;gt;
-        ally doctor                  &amp;lt;span class=&quot;c&quot;&amp;gt;# Diagnose setup issues&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Try It Yourself
-        &amp;lt;/h2&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c&quot;&amp;gt;# Install&amp;lt;/span&amp;gt;
-        npm &amp;lt;span class=&quot;nb&quot;&amp;gt;install&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nt&quot;&amp;gt;-g&amp;lt;/span&amp;gt; ally-a11y
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Initialize in your project&amp;lt;/span&amp;gt;
-        ally init
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Scan your project&amp;lt;/span&amp;gt;
-        ally scan ./src
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# See what&apos;s wrong&amp;lt;/span&amp;gt;
-        ally explain
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Fix with AI assistance&amp;lt;/span&amp;gt;
-        ally fix
-        
-        &amp;lt;span class=&quot;c&quot;&amp;gt;# Generate report&amp;lt;/span&amp;gt;
-        ally report
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Requirements:&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Node.js 18+&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;GitHub Copilot CLI (optional, for AI-powered explain/fix)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Links
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;GitHub:&amp;lt;/strong&amp;gt; &amp;lt;a href=&quot;https://github.com/forbiddenlink/ally&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;github.com/forbiddenlink/ally&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;npm:&amp;lt;/strong&amp;gt; &amp;lt;a href=&quot;https://npmjs.com/package/ally-a11y&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;npmjs.com/package/ally-a11y&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Built for the &amp;lt;a href=&quot;https://dev.to/challenges/github-2026-01-21&quot;&amp;gt;GitHub Copilot CLI Challenge&amp;lt;/a&amp;gt;&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Learning Programming Alone: From Panic Loops to Mental Pictures 💻</title>
-      <link>https://dev.to/oyinade_olawoyin_aaaa6272/learning-programming-alone-from-panic-loops-to-mental-pictures-21i8</link>
-      <guid>https://dev.to/oyinade_olawoyin_aaaa6272/learning-programming-alone-from-panic-loops-to-mental-pictures-21i8</guid>
-      <pubDate>Sat, 14 Feb 2026 17:09:34 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;Learning programming alone can feel like trying to assemble a machine without a manual. It requires resilience and persistence to push through. &amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;Understanding concepts is often the hardest part of learning any language. &amp;lt;em&amp;gt;How does this work? How does that work?&amp;lt;/em&amp;gt; Everything looks important, but nothing makes sense at first. If you’ve ever ended up in an infinite &amp;lt;code&amp;gt;while&amp;lt;/code&amp;gt; loop, panicking that your precious laptop might blow up, then yes—&amp;lt;strong&amp;gt;you’re someone like me.&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        The Struggle with Fundamentals
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I struggled a lot to understand concepts like:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;While and For loops&amp;lt;/strong&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Functions&amp;lt;/strong&amp;gt; (and what &amp;lt;code&amp;gt;return&amp;lt;/code&amp;gt; actually does)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;Break and Continue&amp;lt;/strong&amp;gt; keywords&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;strong&amp;gt;If-else blocks&amp;lt;/strong&amp;gt; and logic&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Global and Local scope&amp;lt;/strong&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;These concepts can be difficult to grasp, yet they are the essential fundamentals every programmer needs to make decisions and execute tasks.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Making the Abstract Concrete
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;When I finally began to understand these concepts, I promised myself I would write articles for beginners in a clear and concrete way. To make sense of these ideas, I started creating simple mental pictures:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;📦 &amp;lt;strong&amp;gt;Variables:&amp;lt;/strong&amp;gt; I think of a variable as a box or a label.&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🌪️ &amp;lt;strong&amp;gt;Functions:&amp;lt;/strong&amp;gt; A function is like a &amp;lt;strong&amp;gt;blender&amp;lt;/strong&amp;gt;. It takes in your ingredients (peppers/onions), processes them, and gives you the desired output (sauce!).&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🏠 &amp;lt;strong&amp;gt;Scope:&amp;lt;/strong&amp;gt; Your room might be your &amp;lt;strong&amp;gt;local scope&amp;lt;/strong&amp;gt;, while your entire house is your &amp;lt;strong&amp;gt;global scope&amp;lt;/strong&amp;gt;. &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🔄 &amp;lt;strong&amp;gt;Loops:&amp;lt;/strong&amp;gt; It’s like sending someone on an errand a certain number of times, sometimes with specific conditions.&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        The Journey is Worth It
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I spent five months learning Python. It might seem like a long time just to learn the basics, but it helped me greatly when I started learning JavaScript. Once you grasp the core concepts of programming, it becomes much easier to explore other languages. &amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;The beginning is always the hardest part. But don’t be afraid. If you believe you can do it, you will.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What&apos;s Coming Next
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;I will be writing posts about the concepts I personally found most difficult. I’ll be breaking down the ideas that kept me up at night, starting next week:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;📦 &amp;lt;strong&amp;gt;Variables&amp;lt;/strong&amp;gt; (The Labels)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🔄 &amp;lt;strong&amp;gt;For &amp;amp;amp; While Loops&amp;lt;/strong&amp;gt; (The Errands)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🚦 &amp;lt;strong&amp;gt;Break &amp;amp;amp; Continue&amp;lt;/strong&amp;gt; (The Traffic Lights)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🛤️ &amp;lt;strong&amp;gt;Conditional Statements&amp;lt;/strong&amp;gt; (The Decision Makers)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🏠 &amp;lt;strong&amp;gt;Scope&amp;lt;/strong&amp;gt; (Local vs. Global)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;🌪️ &amp;lt;strong&amp;gt;Functions&amp;lt;/strong&amp;gt; (The Blenders)&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        
-        
-        
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Are you currently in the &quot;nothing makes sense&quot; phase of learning?&amp;lt;/strong&amp;gt; Drop a 💻 in the comments if you are! I&apos;ll be posting about &amp;lt;strong&amp;gt;Variables&amp;lt;/strong&amp;gt; next week—see you then.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
     <item>
