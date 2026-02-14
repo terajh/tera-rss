@@ -4,12 +4,829 @@
     <title>dev RSS - ai</title>
     <link>https://github.com</link>
     <description>dev ai 카테고리 RSS</description>
-    <lastBuildDate>Sat, 14 Feb 2026 01:51:03 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 14 Feb 2026 09:38:47 GMT</lastBuildDate>
+    <item>
+      <title>스마트스토어센터 Oracle에서 MySQL로의 무중단 전환기</title>
+      <link>https://d2.naver.com/helloworld/6512234</link>
+      <guid>https://d2.naver.com/helloworld/6512234</guid>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;스마트스토어 플랫폼 내 여러 파트가 공동으로 사용하던 Oracle DBMS는 비즈니스 성장에 따라 리소스 경합이 심화되면서 서비스 성능 불안정을 초래했습니다. 기존 Oracle 인프라의 확장은 막대한 라이선스 비용 증가로 이어지기 때문에, 스마트스토어 회원 파트는 운영 비효율성과 비용 압박을 해소하고자 오픈소스인 MySQL로 DBMS 마이그레이션을 결정했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 글에서는 10년 이상의 레거시 프로젝트가 서비스 중단 없이 Oracle 공동 환경에서 벗어나 MySQL로 전환하며 채택한 전략과 기술적 해결 과정을 공유합니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;마이그레이션 준비 및 전략 수립&lt;/h2&gt;
+        
+        &lt;p&gt;기존 서비스는 Oracle DBMS 환경에서 JPA와 MyBatis를 사용하고 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/1-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;기존 서비스 아키텍처&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;회원 파트의 모듈은 타 부서 시스템과 광범위하게 연계되어 있어 서비스 중단이 불가능했습니다. 따라서 Oracle에서 MySQL로의 DB 전환에는 무중단 배포가 필수였습니다. 또한 사소한 기능 버그에는 핫픽스로 대응할 수 있지만, DB 전환 후 치명적인 성능 저하나 서비스 장애가 발생하는 경우에는 재배포만으로 해결할 수 없으므로 신속한 롤백 능력도 확보해야 했습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;&quot;&gt;전환 전략: 이중 쓰기&lt;/h3&gt;
+        
+        &lt;p&gt;Kubernetes 환경에서 MyBatis 및 Spring JPA를 사용하는 기존 Oracle DB 기반 서비스를 MySQL로 무중단 전환하고 롤백 가능성을 확보하기 위해 이중 쓰기(dual write) 기법을 채택했습니다. 이중 쓰기란 모든 쓰기 트랜잭션을 기존 데이터베이스와 새 데이터베이스에 동시에 반영하는 기법으로, 신규 시스템의 안정성을 검증하는 기간 동안 두 DB가 완벽하게 동기화된 상태를 유지하는 것을 보장해, 데이터 손실이나 서비스 중단 없이 안전하게 신규 환경으로 전환하기 위한 안전장치가 되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;전환 과정은 다음과 같이 진행됩니다.&lt;/p&gt;
+        
+        &lt;ol&gt;
+        &lt;li&gt;전환 전 단계: 구버전 애플리케이션은 모든 Read/Write 트래픽을 Oracle에서 처리하되, CUD(Create, Update, Delete) 작업 시에만 백그라운드에서 MySQL에도 이중 쓰기를 수행합니다.  &lt;/li&gt;
+        &lt;li&gt;데이터 마이그레이션: 신버전 애플리케이션 배포 전에 Oracle의 전체 데이터를 MySQL로 마이그레이션해 정합성을 맞춥니다.  &lt;/li&gt;
+        &lt;li&gt;전환 후 단계: 신버전 애플리케이션은 모든 Read/Write 트래픽을 MySQL에서 처리하며, CUD 작업 시 백그라운드에서 Oracle에도 이중 쓰기를 수행합니다.&lt;/li&gt;
+        &lt;/ol&gt;
+        
+        &lt;p&gt;이 구조를 통해 데이터 정합성을 유지하면서 무중단 배포가 가능해지며, Oracle 방향으로 이중 쓰기가 지속되므로 롤백이 필요한 경우에도 별도의 데이터 복구 과정 없이 즉시 롤백할 수 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;이중 쓰기 아키텍처&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;기술적 도전과 해결 과정&lt;/h2&gt;
+        
+        &lt;h3 id=&quot;jpa&quot;&gt;JPA 이중 쓰기&lt;/h3&gt;
+        
+        &lt;p&gt;저희 서비스에서 JPA로 수행하는 CUD 작업은 대부분 단순한 SQL 조합으로 이루어져, Oracle과 MySQL 간 CUD 쿼리 차이는 거의 없었습니다. 따라서 실제 수행되는 쿼리를 가져와 MySQL에서도 동일하게 실행하면 JPA 이중 쓰기를 큰 문제 없이 구현할 수 있을 것이라고 생각했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;a href=&quot;https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/&quot;&gt;datasource-proxy&lt;/a&gt; 라이브러리를 활용해 Oracle에서 수행되는 쿼리를 가져온 뒤 별도의 MySQL DataSource로 해당 쿼리를 실행하도록 JPA용 DataSource를 구성했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/3-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Proxy DataSource 구조&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;LocalContainerEntityManagerFactoryBean&lt;/code&gt; 빈 등록 시점에 Proxy DataSource 구현체를 설정했습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Primary
+        public LocalContainerEntityManagerFactoryBean entityManagerFactory() {  
+        LocalContainerEntityManagerFactoryBean factory = getLocalContainerEntityManagerFactoryBean();
+        factory.setDataSource(dualWriteProxyDatasource);    // Proxy DataSource 구현체
+        return factory;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이렇게 설정하면 &lt;code&gt;EntityManager&lt;/code&gt;에서 Oracle DB로 쿼리가 flush될 때 MySQL DB에도 쿼리가 수행됩니다. 다만 몇 가지 해결해야 할 문제가 있습니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;&quot;&gt;트랜잭션 처리&lt;/h4&gt;
+        
+        &lt;p&gt;한 트랜잭션 내에서 여러 쿼리가 수행되던 중 오류가 발생하면 두 DB 간의 정합성이 유지될까요?&lt;/p&gt;
+        
+        &lt;p&gt;저희 서비스에서는 트랜잭션 매니저로 &lt;code&gt;JpaTransactionManager&lt;/code&gt;를 사용하고 있습니다. 이중 쓰기 Proxy DataSource에서 두 DB의 DataSource를 참조하더라도, 실제 트랜잭션에 사용되는 쪽은 메인 DB인 Oracle DataSource이고 MySQL DataSource는 트랜잭션으로 관리되지 않습니다. 따라서 롤백 과정에서 두 DB의 정합성이 깨질 수 있으므로 이중 쓰기 수행 시 트랜잭션 대응을 별도로 구성해야 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;단, &lt;code&gt;ChainedTransactionManager&lt;/code&gt;를 사용하거나 분산 트랜잭션으로 MySQL 쿼리를 트랜잭션에 포함시키면 안 됩니다. 그 이유는 다음과 같습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;이중 쓰기를 구현하는 시점에는 Oracle과 MySQL 간 데이터 정합성이 대부분 맞지 않습니다.&lt;/li&gt;
+        &lt;li&gt;서비스 내 JPA의 모든 Oracle CUD 쿼리가 MySQL에서 오류 없이 동작하는지 아직 검증되지 않았습니다.&lt;/li&gt;
+        &lt;li&gt;테이블 인덱스 구성이나 커넥션 풀 등 환경 설정이 아직 최적화되지 않았습니다.&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;실제 Read 전환이 이루어지기 전까지 다양한 이유로 MySQL 쿼리만 실패하는 상황이 발생할 수 있습니다. 따라서 MySQL 쿼리는 트랜잭션에 따라 원자적으로 수행하되, 실패하더라도 트랜잭션이 롤백되지 않고 무시되어야 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;이에 MySQL 쿼리만 실패하는 케이스를 용인하고, 주기적으로 마이그레이션과 검증(아래 &lt;a href=&quot;#정합성-검증&quot;&gt;정합성 검증&lt;/a&gt; 참고)을 반복하며 불일치 원인을 찾아 제거해 나가는 방식을 선택했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;Oracle 쿼리 수행에 영향을 주지 않는 가장 확실한 방법은 트랜잭션 도중 수행되는 쿼리를 모아두었다가 커밋 후 한꺼번에 MySQL에서 수행하는 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/4-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;트랜잭션 처리 흐름&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;트랜잭션이 롤백되더라도 MySQL에서는 수행된 쿼리가 없으므로 신경 쓰지 않아도 됩니다. Oracle 커넥션을 점유하는 시간이 늘어나지도 않고 예외 처리 및 추적도 용이합니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;TransactionSynchronizationManager&lt;/code&gt;를 활용해 이 동작을 구현할 수 있습니다. 다음은 datasource-proxy 라이브러리 사용을 가정한 예입니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public void execute(ExecutionInfo execInfo, List&amp;lt;QueryInfo&amp;gt; queryInfoList) throws SQLException {  
+        // 트랜잭션이 있으면 커밋 시점에 한 번에 이중 쓰기 수행
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt; queryExecInfos = (List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt;)TransactionSynchronizationManager.getResource(OBJECT);
+        // 트랜잭션에서 첫 호출 시 동기화 및 리소스 등록
+        if (Objects.isNull(queryExecInfos)) {
+        queryExecInfos = Lists.newArrayList();
+        initDualWriteQueryAccumulationInTransaction(queryExecInfos);
+        }
+        // 리스트에 쿼리 저장
+        queryExecInfos.add(Pair.of(execInfo, queryInfoList));
+        } else {
+        // 트랜잭션이 없으면 바로 이중 쓰기 수행
+        }
+        }
+        
+        private void initDualWriteQueryAccumulationInTransaction(List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt; queryExecInfos) {  
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+        @Override
+        public void afterCommit() {
+        try {
+        // MySQL 커넥션을 열어서 queryExecInfos에 쌓인 쿼리를 한 번에 실행
+        } catch (SQLException e) {
+        // 쿼리 로깅해 실패 원인 분석
+        }
+        }
+        
+        @Override
+        public void afterCompletion(int status) {
+        TransactionSynchronizationManager.unbindResourceIfPossible(OBJECT);
+        queryExecInfos.clear();
+        }
+        });
+        TransactionSynchronizationManager.bindResource(property, queryExecInfos);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h4 id=&quot;&quot;&gt;엔티티 설정&lt;/h4&gt;
+        
+        &lt;p&gt;Oracle에서는 Primary Key 생성 전략으로 시퀀스를 사용했으나, MySQL에서는 시퀀스가 없으므로 auto increment를 사용하도록 변경해야 합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Id
+        // @SequenceGenerator(name = &quot;SQ_ID&quot;, sequenceName = &quot;SQ_ID&quot;, allocationSize = 1)
+        // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = &quot;SQ_ID&quot;)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = &quot;ID_PK&quot;, nullable = false)
+        private Long id;  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이렇게 설정하면 MySQL INSERT 쿼리에는 PK가 없기 때문에, Read 전환 후 MySQL에서 Oracle 방향으로 이중 쓰기할 때 쿼리를 그대로 사용할 수 없습니다. 이 문제를 해결하려면 MySQL INSERT 쿼리 수행 시 generated key 정보를 별도로 가져와 PK를 채우도록 쿼리를 수정한 후 Oracle에서 수행해야 합니다.(UUID v7이나 Snowflake ID 등 DB에 의존하지 않는 방식으로 PK를 생성했다면 이런 고민은 필요 없습니다.)&lt;/p&gt;
+        
+        &lt;p&gt;일부 경우에는 엔티티 클래스의 칼럼 구성에서 &lt;code&gt;columnDefinition&lt;/code&gt;을 MySQL 칼럼 타입에 맞게 지정해야 합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Oracle VARCHAR2(n) -&amp;gt; MySQL TEXT 변경 시
+        // @Column(name = &quot;TEXT1&quot;) - Oracle
+        @Column(name = &quot;TEXT1&quot;, columnDefinition = &quot;text&quot;)
+        private String text1;
+        
+        // Oracle CLOB -&amp;gt; MySQL LONGTEXT 변경 시
+        // @Column(name = &quot;LONGTEXT1&quot;) - Oracle
+        @Column (name = &quot;LONGTEXT1&quot;, columnDefinition = &quot;longtext&quot;)
+        private String longtext1;
+        
+        // Oracle NUMBER(n,m) -&amp;gt; MySQL DECIMAL(n,m) 변경 시
+        // @Column(name = &quot;DECIMAL1&quot;, columnDefinition = &quot;NUMBER(11, 2)&quot;) - Oracle
+        @Column(name = &quot;DECIMAL1&quot;, columnDefinition = &quot;decimal(11, 2)&quot;)
+        private Double decimal1;  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h3 id=&quot;mybatis&quot;&gt;MyBatis 이중 쓰기&lt;/h3&gt;
+        
+        &lt;p&gt;MyBatis 이중 쓰기를 구현할 때, 기존 Oracle DataSource와 신규 MySQL DataSource를 처리하는 MyBatis 인터페이스를 각각 분리해 호출하는 방식은 소스 코드 변경 범위가 지나치게 넓다는 문제가 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;다음과 같은 코드를 모든 쓰기 로직에 추가하려면 10년 넘은 서비스의 비즈니스 로직 전체에 걸쳐 수백, 수천 곳을 수정해야 합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;mybatisRepository.updateData(i); // oracle mybatis  
+        mybatisForMySQLRepository.updateData(i); // mysql mybatis  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이는 휴먼 에러 발생 가능성 증대와 개발 기간 대폭 증가로 이어져 위험성이 높다고 판단해, 비즈니스 로직 코드 수정 없이 Oracle과 MySQL 양쪽으로 쓰기 작업을 수행하는 방법을 고민했습니다. 비즈니스 로직의 순수성을 유지하면서 이중 쓰기 로직을 단일 위치에 중앙 집중화해 관리하고, 마이그레이션 완료 시점에 이중 쓰기 코드를 쉽게 제거할 수 있는 유연성과 유지보수성을 확보하기 위한 것이기도 합니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;mybatis&quot;&gt;MyBatis 동작 구조&lt;/h4&gt;
+        
+        &lt;p&gt;MyBatis의 동작 구조를 간단히 설명하면, &lt;code&gt;@Mapper&lt;/code&gt; 애너테이션이 붙은 인터페이스가 XML 등에 정의된 QueryId와 Query를 참조하는 구조입니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;MyBatis 동작 구조&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;SqlSession&lt;/code&gt;은 &lt;code&gt;Configuration&lt;/code&gt; 객체를 참조합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/session/SqlSession.java#L360
+        
+        /**
+        * Retrieves current configuration.
+        *
+        * @return Configuration
+        */
+        Configuration getConfiguration();  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; 객체 안에는 XML 등에 정의된 쿼리가 QueryId와 함께 &lt;code&gt;MappedStatement&lt;/code&gt; 객체로 변환되어 저장됩니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/session/Configuration.java#L158
+        
+        protected final Map&amp;lt;String, MappedStatement&amp;gt; mappedStatements = new StrictMap&amp;lt;MappedStatement&amp;gt;(  
+        &quot;Mapped Statements collection&quot;)
+        .conflictMessageProducer((savedValue, targetValue) -&amp;gt; &quot;. please check &quot; + savedValue.getResource() + &quot; and &quot;
+        + targetValue.getResource());
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;code&gt;@Mapper&lt;/code&gt; 애너테이션이 붙은 MyBatis용 인터페이스는 &lt;code&gt;MapperProxy&lt;/code&gt; 빈으로 등록되고, &lt;code&gt;mybatisRepository.findById()&lt;/code&gt; 등의 메서드 호출은 &lt;code&gt;MapperProxy&lt;/code&gt; 객체의 &lt;code&gt;invoke&lt;/code&gt; 함수가 호출되는 구조입니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/binding/MapperProxy.java
+        
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {  
+        if (Object.class.equals(method.getDeclaringClass())) {
+        try {
+        return method.invoke(this, args);
+        } catch (Throwable t) {
+        throw ExceptionUtil.unwrapThrowable(t);
+        }
+        }
+        // ...
+        final MapperMethod mapperMethod = cachedMapperMethod(method);
+        return mapperMethod.execute(sqlSession, args);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;code&gt;MapperProxy&lt;/code&gt;의 &lt;code&gt;invoke&lt;/code&gt;는 &lt;code&gt;MapperMethod&lt;/code&gt;의 &lt;code&gt;execute&lt;/code&gt;를 수행합니다. &lt;code&gt;MapperMethod&lt;/code&gt;의 &lt;code&gt;execute&lt;/code&gt;는 쿼리 타입에 맞게 &lt;code&gt;SqlSession&lt;/code&gt;의 메서드를 수행합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/binding/MapperMethod.java
+        
+        public Object execute(SqlSession sqlSession, Object[] args) {  
+        Object result;
+        switch (command.getType()) {
+        case INSERT: {
+        Object param = method.convertArgsToSqlCommandParam(args);
+        result = rowCountResult(sqlSession.insert(command.getName(), param));
+        break;
+        }
+        case UPDATE: {
+        Object param = method.convertArgsToSqlCommandParam(args);
+        result = rowCountResult(sqlSession.update(command.getName(), param));
+        break;
+        }
+        // ...
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;즉, XML에 정의된 SQL은 &lt;code&gt;MappedStatement&lt;/code&gt; 객체가 되고, &lt;code&gt;SqlSession&lt;/code&gt;은 MyBatis 설정 시 주입된 DataSource를 참조하면서 이 &lt;code&gt;MappedStatement&lt;/code&gt; 객체를 보유했다가 필요할 때 실행합니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;MybatisRepository&lt;/code&gt;는 &lt;code&gt;MapperMethod&lt;/code&gt;를 invoke하고, &lt;code&gt;MapperMethod&lt;/code&gt;는 &lt;code&gt;SqlSession&lt;/code&gt;의 메서드를 invoke합니다. 따라서 &lt;code&gt;SqlSession&lt;/code&gt;의 invoke 시 Oracle과 MySQL 양쪽으로 실행할 수 있다면 원하는 바를 이룰 수 있습니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;&quot;&gt;구현 방법&lt;/h4&gt;
+        
+        &lt;p&gt;이 구조를 활용하기 위해, 쿼리 문법 차이를 고려해 MySQL 문법에 맞는 SQL로 작성된 MyBatis XML을 한 벌 더 만들어야 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;XML 내의 SQL을 보유하는 &lt;code&gt;SqlSession&lt;/code&gt;은 &lt;code&gt;SessionTemplate&lt;/code&gt;이 &lt;code&gt;SqlSessionFactory&lt;/code&gt;에 위임해서 만드는 구조입니다. &lt;code&gt;SqlSessionFactory&lt;/code&gt;를 추상화해서 Oracle과 MySQL 두 개의 &lt;code&gt;SqlSession&lt;/code&gt;이 모두 수행하게 구현하면 됩니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;CombinedSqlSessionFactory 구조&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;CombinedSqlSessionFactory&lt;/code&gt;라는 이름으로 다음과 같이 구현했습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public class CombinedSqlSessionFactory implements SqlSessionFactory {
+        
+        private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+        SqlSession primarySession = openPrimarySessionFromDataSource(execType, level, autoCommit);
+        SqlSession secondarySession = openSecondarySessionFromDataSource(execType, level, autoCommit);
+        
+        return (SqlSession) Proxy.newProxyInstance(
+        // 세션을 만들 때 양쪽으로 쓰는 로직을 사용하도록 Proxy 객체로 리턴
+        SqlSession.class.getClassLoader(),
+        new Class[]{SqlSession.class},
+        // CombinedSqlSessionHandler는 원하는 로직을 보유하고,
+        // 양쪽에 써야 하기 때문에 Oracle과 MySQL 세션을 모두 보유
+        new CombinedSqlSessionHandler(primarySession, secondarySession, applicationEventPublisher)
+        );
+        }
+        // ...
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public class CombinedSqlSessionHandler implements InvocationHandler {
+        
+        private SqlSession oracleSqlSession;
+        private SqlSession mysqlSqlSession;
+        
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        final String methodName = method.getName();
+        
+        if (CUD액션인_경우(methodName, maybeStatement)) {
+        Object oracleResult = method.invoke(oracleSqlSession, args);
+        Object mysqlResult = method.invoke(mysqlSqlSession, args);
+        
+        log.warn(&quot;primaryResult: {}&quot;, primaryResult);
+        log.warn(&quot;secondary: {}&quot;, secondaryResult);
+        // 쓰기 자체가 목적이므로 쓰기 액션의 결과 값은 Oracle의 결과를 반환
+        return oracleResult;
+        }
+        
+        // READ인 경우 Oracle의 결과를 사용
+        Object oracleResult = method.invoke(oracleSqlSession, args);
+        return oracleResult;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;Oracle과 MySQL 간에는 근본적인 문법 차이가 있습니다. 특히 날짜/시간 처리 함수(&lt;code&gt;SYSDATE&lt;/code&gt; vs &lt;code&gt;NOW()&lt;/code&gt;, &lt;code&gt;TO_CHAR&lt;/code&gt; vs &lt;code&gt;DATE_FORMAT&lt;/code&gt;), NULL 값 처리(&lt;code&gt;NVL&lt;/code&gt; vs &lt;code&gt;IFNULL&lt;/code&gt;), 페이징 처리(&lt;code&gt;ROWNUM&lt;/code&gt; vs &lt;code&gt;LIMIT&lt;/code&gt;) 방식이 다릅니다. 따라서 모든 MyBatis XML 쿼리를 MySQL 문법에 맞게 재작성해 위 구조로 MyBatis 이중 쓰기를 수행했습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;dbms&quot;&gt;쿼리/DBMS 성능 검증&lt;/h3&gt;
+        
+        &lt;p&gt;새로운 MySQL 데이터베이스로의 전환을 추진할 때, 기존 Oracle 환경에서 안정적으로 처리되던 대규모 트랜잭션과 복잡한 쿼리가 MySQL 환경에서도 동일한 성능을 보장하는지 검증하는 것이 핵심 과제였습니다. Oracle과 MySQL 간의 쿼리 실행 계획 및 최적화 엔진 차이로 인해, 특정 고부하 쿼리가 신규 MySQL의 CPU, 메모리, I/O 등 핵심 DB 자원에 예상치 못한 과부하를 초래해 서비스 안정성을 저해할 위험이 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;따라서 이중 쓰기 기간 동안 실제 운영 트래픽을 신규 DB에 반영하면서 MySQL 데이터베이스의 CPU 사용률, 메모리 사용량, 연결 수(connection count) 등의 자원 지표를 정밀하게 측정하고 모니터링하는 작업은 마이그레이션의 안정성을 확보하고 성능 저하 위험을 사전에 방지하기 위한 필수 단계였습니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;&quot;&gt;성능 검증 전략&lt;/h4&gt;
+        
+        &lt;p&gt;운영과 동일한 부하를 주기 위해 HTTP 트래픽 복사나 Kafka 토픽 복제 같은 방식을 사용하면 비즈니스 로직 호출 시 타 부서 시스템에 중복 호출 부하를 야기하거나, 예상치 못한 부작용으로 운영에 영향을 줄 위험이 매우 높습니다.&lt;/p&gt;
+        
+        &lt;p&gt;타 부서와 연관된 시스템에 영향을 주지 않고 성능 검증이라는 목표를 달성하기 위해, 이미 수행 중인 이중 쓰기 로직을 유지하면서 오직 내부 서비스 로직에서 발생하는 Read 트래픽만 신규 MySQL DB로 복제해 호출하는 전략을 채택했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;MyBatis나 JPA 같은 영속성 프레임워크의 특성상, 대부분의 Read 메서드는 매개변수가 쿼리로 변환되기 전에는 원시 타입이나 직렬화가 가능한 객체를 매개변수로 사용합니다. 이 특성을 활용해 기존 Oracle로 향하는 Repository 계층의 Read 메서드 호출이 발생할 때 해당 메서드의 실행 시간과 함께 이름, 매개변수 값을 캡처하고 JSON으로 직렬화했습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &quot;repositoryInterfaceName&quot;: &quot;com.example.DataRepository&quot;,
+        &quot;methodName&quot;: &quot;findByKey&quot;,
+        &quot;parameterList&quot;: [
+        {
+        &quot;index&quot;: 0,
+        &quot;className&quot;: &quot;java.lang.Class&quot;,
+        &quot;valueString&quot;: &quot;com.example.ParamVO&quot;
+        },
+        {
+        &quot;index&quot;: 1,
+        &quot;className&quot;: &quot;com.example.KeyVO&quot;,
+        &quot;valueString&quot;: &quot;{\&quot;key\&quot;:1234}&quot;
+        }
+        ],
+        &quot;oracleExecutionTime&quot;: 71
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;직렬화된 데이터를 Kafka 같은 메시지 큐로 전송했습니다. 메시지를 수신한 별도의 성능 측정 Consumer 모듈은 수신된 데이터를 역직렬화해 원본 메서드 이름과 매개변수 리스트를 복원했습니다. 이후 Java Reflection API를 사용해 신규 MySQL을 바라보는 Repository 인터페이스의 동일한 메서드를 찾아 매개변수를 주입하고 호출함으로써, 마치 실제 서비스가 호출한 것처럼 읽기 작업을 MySQL에서 수행할 수 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/7-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Read 트래픽 복제 아키텍처&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;각 토픽 메시지마다 실행 시간이 있으므로, 이를 시각화해 각 쿼리의 성능도 확인할 수 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/8-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;쿼리 실행 시간 분포&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/9-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;성능 모니터링 대시보드&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;위 지표를 활용해 성능이 좋지 않은 쿼리를 수정하고 인덱스 추가 등을 수행해 안정적인 성능을 확보할 수 있었습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;&quot;&gt;정합성 검증&lt;/h3&gt;
+        
+        &lt;p&gt;프로젝트의 중요한 목표는 &lt;strong&gt;데이터 정합성의 완벽한 확보&lt;/strong&gt;였습니다. 이중 쓰기로 실시간 쓰기 동기화는 이루었지만, 이중 쓰기 로직에 문제가 있어 데이터가 다르게 쓰이고 있지는 않은지, 최종 전환 전에 두 DBMS 간의 데이터 일치 여부를 &lt;strong&gt;정량적으로&lt;/strong&gt; 검증하는 과정이 필수였습니다.&lt;/p&gt;
+        
+        &lt;p&gt;워크플로 관리 도구인 Airflow로 정합성 검증 프로세스를 자동화했습니다. Airflow 파이프라인으로 주기적으로 기존 Oracle DB와 신규 MySQL DB의 주요 테이블 데이터를 추출해 Hive 데이터 웨어하우스로 통합했습니다. Hive 환경에서 고성능의 분산 쿼리를 실행해 두 데이터셋을 비교했으며, 레코드 수 비교, 핵심 칼럼 값의 해시 비교, 주요 비즈니스 통계 값의 차이를 검출했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 과정에서 발견된 불일치 건은 상세 분석 및 수정을 거쳐 최종적으로 두 데이터베이스 간의 정합성이 100% 보장되도록 조치했습니다. 이 엄격한 검증 단계는 신규 MySQL 환경으로의 최종 컷오버를 위한 결정적인 안전장치가 되었습니다. 테이블별 row의 추출 시간 차이 때문에 발생하는 불일치 건은 수동으로 검증하는 과정을 거쳤습니다.&lt;/p&gt;
+        
+        &lt;p&gt;약 6개월간 테이블별 불일치 데이터 건수와 그 내용을 분석해 로직을 수정한 끝에 이중 쓰기 환경에서 데이터 정합성을 확보했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;테이블별 불일치 건수 리포트&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;불일치 내용 상세&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;마이그레이션 후 아키텍처 및 검증&lt;/h2&gt;
+        
+        &lt;h3 id=&quot;&quot;&gt;서비스 테스트 및 전환&lt;/h3&gt;
+        
+        &lt;p&gt;데이터베이스를 Oracle에서 MySQL로 전환하는 과제에서 중요한 것은 사용자가 이용하는 기능을 이전과 완전히 동일하게 유지하는 것이었습니다. 단순히 데이터만 옮기는 것이 아니라, DBMS 변화가 기존 비즈니스 로직에 예기치 못한 영향을 주지 않도록 약 3개월간의 QA 기간을 거쳤습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 과정에서 쿼리 실행 결과의 미세한 차이부터 트랜잭션 처리 방식까지 철저히 검증함으로써, 내부 인프라의 변화에도 불구하고 서비스의 모든 기능이 기존과 변함없이 안정적으로 작동함을 확인했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;QA 진행 현황&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;전환이 제대로 되었다는 것은 회원 부서가 발행하는 쿼리가 더 이상 Oracle로 유입되지 않고 MySQL로 유입된다는 의미입니다.&lt;/p&gt;
+        
+        &lt;p&gt;이를 검증하기 위해 모든 기존의 전환 대상 쿼리에 사전에 &lt;code&gt;\*\*회원개발쿼리\*\*&lt;/code&gt;와 같은 임의의 주석을 추가했습니다. 전환 후 해당 주석이 포함된 쿼리가 Oracle 데이터베이스에 더 이상 인입되지 않는지 모니터링했습니다. 기존 Oracle로 향하던 트래픽이 완전히 차단되었음을 확인해, 모든 데이터 요청이 의도한 대로 신규 MySQL로 정상 전환되었음을 확인했습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;트러블슈팅 및 기타 고려 사항&lt;/h2&gt;
+        
+        &lt;p&gt;전환 과정에서 겪은 몇 가지 트러블슈팅 사례와 성능을 위해 고려한 요소를 소개합니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;mysqlindexmergeoptimizationhttpsdevmysqlcomdocrefman80enindexmergeoptimizationhtml&quot;&gt;MySQL의 &lt;a href=&quot;https://dev.mysql.com/doc/refman/8.0/en/index-merge-optimization.html&quot;&gt;Index Merge Optimization&lt;/a&gt;&lt;/h3&gt;
+        
+        &lt;p&gt;Index Merge는 MySQL에서 WHERE 절에 여러 인덱스 칼럼이 OR 조건으로 연결되는 경우, 각 인덱스를 독립적으로 검색한 후 결과를 합치는 전략입니다.&lt;/p&gt;
+        
+        &lt;p&gt;다만 nesting OR 등 조건이 조금만 복잡해지면 최적화하지 못하고 풀스캔을 사용합니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Index Merge 실행 계획&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;다음 조건문의 &lt;code&gt;KEY&lt;/code&gt;, &lt;code&gt;KEY2&lt;/code&gt;, &lt;code&gt;TP&lt;/code&gt;, &lt;code&gt;TP2&lt;/code&gt;에 모두 인덱스가 있을 때 Oracle에서는 성능이 좋았으나, MySQL에서는 최적화하지 못해 풀스캔을 사용했습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;TABLE.KEY = 11  
+        AND TABLE.TP = &apos;ALPHA&apos;  
+        OR TABLE.KEY2 = 22  
+        AND TABLE.TP2 IN (&apos;ALPHA2&apos;, &apos;BETA2&apos;)  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이러한 경우 다음과 같이 UNION으로 쿼리를 변경해 대응했습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;SELECT *  
+        FROM TABLE  
+        WHERE KEY = 11  
+        AND TP = &apos;ALPHA&apos;
+        
+        UNION
+        
+        SELECT *  
+        FROM TABLE  
+        WHERE KEY2 = 22  
+        AND TP2 IN (&apos;ALPHA2&apos;, &apos;BETA2&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h3 id=&quot;&quot;&gt;마이그레이션 배치 성능 이슈&lt;/h3&gt;
+        
+        &lt;p&gt;마이그레이션 배치는 Spring Batch로 작성했으며, 크기가 큰 테이블은 &lt;code&gt;JdbcPagingItemReader&lt;/code&gt;로 Oracle 전체 데이터를 가져와 MySQL로 쓰기를 수행합니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;code&gt;QueryProvider&lt;/code&gt;로 &lt;code&gt;OraclePagingQueryProvider&lt;/code&gt;를 사용했을 때, 조회 시 수행되는 페이징 쿼리는 다음과 같습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 TABLE_ID = 500일 때
+        SELECT *  
+        FROM (  
+        SELECT TABLE_ID
+        FROM SOURCE_TABLE
+        ORDER BY TABLE_ID ASC
+        )
+        WHERE ROWNUM &amp;lt;= 100 AND (TABLE_ID &amp;gt; 500)  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;페이징 시 사용되는 sortKey(위 쿼리에서 &lt;code&gt;TABLE_ID&lt;/code&gt;)는 반드시 정의되어야 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;여러 개의 sortKey가 필요한 다중 PK 테이블의 경우 다음과 같이 페이징 쿼리가 생성됩니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
+        SELECT *  
+        FROM (  
+        SELECT TABLE_ID1, TABLE_ID2
+        FROM SOURCE_TABLE2
+        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
+        )
+        WHERE ROWNUM &amp;lt;= 100 AND (TABLE_ID1 &amp;gt; 300 OR (TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8))  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;위 쿼리들은 과연 빠르게 수행될 수 있을까요?&lt;/p&gt;
+        
+        &lt;p&gt;테이블 크기가 충분히 클 때 위의 단일 PK 페이징 쿼리는 옵티마이저가 INDEX RANGE SCAN + COUNT STOPKEY로 최적화해 주기도 하지만, 아래의 다중 PK 페이징 쿼리는 거의 항상 전체 정렬이 발생합니다. 서브쿼리 내 정렬 + OR 조건으로 인해 인덱스 시작 지점을 특정할 수 없기 때문에, 옵티마이저가 최적화하지 못하고 &apos;전체 정렬 후 조건에 맞는 데이터 100건을 조회&apos;하는 가장 비효율적인 방식으로 동작합니다.&lt;/p&gt;
+        
+        &lt;p&gt;이를 해결하려면 &apos;PK 순서로 조건을 만족하는 상위 100건을 조회&apos;할 수 있도록 쿼리 튜닝이 필요합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
+        SELECT TABLE_ID1, TABLE_ID2  
+        FROM SOURCE_TABLE2  
+        WHERE TABLE_ID1 &amp;gt; 300 OR (TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8)  
+        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC  
+        FETCH NEXT 100 ROWS ONLY  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;OR 조건으로 INDEX FULL SCAN이 발생할 수 있으므로, 다음과 같이 UNION ALL 구문으로 변경합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
+        SELECT * FROM  
+        (
+        SELECT TABLE_ID1, TABLE_ID2
+        FROM SOURCE_TABLE2
+        WHERE TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8
+        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
+        FETCH NEXT 100 ROWS ONLY
+        )
+        UNION ALL  
+        (
+        SELECT TABLE_ID1, TABLE_ID2
+        FROM SOURCE_TABLE2
+        WHERE TABLE_ID1 &amp;gt; 300
+        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
+        FETCH NEXT 100 ROWS ONLY
+        )
+        FETCH NEXT 100 ROWS ONLY  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;인덱스를 탄 두 번의 Top-N 조회 후 최종적으로 page size만큼의 row를 가져옵니다. 이와 같이 쿼리를 생성하도록 커스텀 &lt;code&gt;QueryProvider&lt;/code&gt;를 구현해 사용하면 조회 성능을 최적화할 수 있습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;mysqlhikaricp&quot;&gt;MySQL의 HikariCP 설정&lt;/h3&gt;
+        
+        &lt;p&gt;Oracle과 달리 MySQL에서만 권고되는 설정값이 있습니다. &lt;a href=&quot;https://github.com/brettwooldridge/hikaricp/wiki/MYSQL-Configuration&quot;&gt;HikariCP MySQL Configuration&lt;/a&gt;에서 권장하는 설정입니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-properties&quot;&gt;dataSource.cachePrepStmts=true  
+        dataSource.prepStmtCacheSize=250  
+        dataSource.prepStmtCacheSqlLimit=2048  
+        dataSource.useServerPrepStmts=true  
+        dataSource.useLocalSessionState=true  
+        dataSource.rewriteBatchedStatements=true  
+        dataSource.cacheResultSetMetadata=true  
+        dataSource.cacheServerConfiguration=true  
+        dataSource.elideSetAutoCommits=true  
+        dataSource.maintainTimeStats=false  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h4 id=&quot;cacheprepstmtsuseserverprepstmts&quot;&gt;cachePrepStmts, useServerPrepStmts&lt;/h4&gt;
+        
+        &lt;p&gt;쿼리를 수행하는 객체에는 &lt;code&gt;Statement&lt;/code&gt;, &lt;code&gt;PreparedStatement&lt;/code&gt; 등이 있습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Statement
+        stmt = connection.createStatement();  
+        rs = stmt.executeQuery(&quot;SELECT * FROM car WHERE car_id = 1&quot;);
+        
+        // Prepared Statement
+        connection = DriverManager.getConnection(jdbcUrl + properties, id, password);  
+        // prepareStatement() 메서드 실행
+        stmt = connection.prepareStatement(&quot;SELECT * FROM car WHERE car_id = ?&quot;);  
+        // 쿼리에 전달할 파라미터 세팅
+        stmt.setLong(1, 1L);  
+        rs = stmt.executeQuery();  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;pre&gt;&lt;code&gt;// https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/Statement.html
+        The object used for executing a static SQL statement and returning the results it produces.
+        
+        // https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html
+        An object that represents a precompiled SQL statement.  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;code&gt;Statement&lt;/code&gt;는 정적인 쿼리를 실행할 때, &lt;code&gt;PreparedStatement&lt;/code&gt;는 동적인 쿼리를 실행할 때 주로 사용합니다.&lt;/p&gt;
+        
+        &lt;p&gt;JDBC 인터페이스로 DBMS(MySQL)의 &lt;code&gt;PreparedStatement&lt;/code&gt;를 사용하므로 JDBC 없이 MySQL만 사용해도 &lt;code&gt;PreparedStatement&lt;/code&gt;를 사용할 수 있습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- prepared statement 생성
+        PREPARE pstmt1 FROM &apos;SELECT * FROM car WHERE car_id = ?&apos;;
+        
+        -- 파라미터를 지정해 prepared statement 실행
+        SET @a = 1;  
+        EXECUTE pstmt1 USING @a;
+        
+        -- prepared statement 제거
+        DEALLOCATE PREPARE pstmt1;  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;code&gt;cachePrepStmts&lt;/code&gt;와 &lt;code&gt;useServerPrepStmts&lt;/code&gt;는 &lt;code&gt;PreparedStatement&lt;/code&gt; 캐시를 DBMS에서 할지, 클라이언트에서 할지 결정하는 값입니다.&lt;/p&gt;
+        
+        &lt;p&gt;MySQL Connector/J는 &lt;code&gt;PreparedStatement&lt;/code&gt;의 구현을 &lt;code&gt;ClientPreparedStatement&lt;/code&gt;와 &lt;code&gt;ServerPreparedStatement&lt;/code&gt;로 하고 있으며, &lt;code&gt;useServerPrepStmts&lt;/code&gt; 속성값에 따라 어떤 구현체를 사용할지 결정합니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mysql/mysql-connector-j/blob/release/9.x/src/main/user-impl/java/com/mysql/cj/jdbc/ConnectionImpl.java#L1631
+        
+        ClientPreparedStatement pStmt = null;  
+        if (this.useServerPrepStmts.getValue()) {  
+        if (this.cachePrepStmts.getValue()) {
+        pStmt = // 캐시에서 ServerPreparedStatement 조회
+        } else {
+        pStmt = ServerPreparedStatement.getInstance()
+        }
+        } else {
+        if (this.cachePrepStmts.getValue()) {
+        pStmt = // 캐시에서 ClientPreparedStatement 조회
+        } else {
+        pStmt = ClientPreparedStatement.getInstance()
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h4 id=&quot;uselocalsessionstate&quot;&gt;useLocalSessionState&lt;/h4&gt;
+        
+        &lt;p&gt;&lt;code&gt;useLocalSessionState&lt;/code&gt;가 false면 임의 세션의 상태를 매번 DB로 전송하고, true면 로컬에서 관리해 네트워크 오버헤드를 제거합니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;rewritebatchedstatements&quot;&gt;rewriteBatchedStatements&lt;/h4&gt;
+        
+        &lt;p&gt;INSERT나 UPDATE를 배치로 실행할 때, 여러 개의 쿼리를 하나의 쿼리(&lt;code&gt;INSERT INTO ... VALUES (...), (...), (...)&lt;/code&gt;)로 묶어서 보냅니다. 대량 데이터 삽입 시 성능이 수십 배 차이 날 수 있습니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;cacheresultsetmetadata&quot;&gt;cacheResultSetMetadata&lt;/h4&gt;
+        
+        &lt;p&gt;&lt;code&gt;ResultSet&lt;/code&gt; 객체의 &lt;code&gt;getMetadata()&lt;/code&gt; 메서드가 반환하는 객체를 캐시할지에 대한 설정입니다. true로 설정하면 쿼리 결과의 메타데이터(칼럼 이름, 타입 등)를 캐싱해 매번 서버에 요청하지 않습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code&gt;getColumnCount()              - Returns the number of columns in this ResultSet object.  
+        getColumnName(int column)     - Get the designated column&apos;s name.  
+        getColumnTypeName(int column) - Retrieves the designated column&apos;s database-specific type  
+        name.
+        getPrecision(int column)      - Get the designated column&apos;s specified column size.  
+        getTableName()                - Returns the qualifier for the underlying table of the  
+        ResultSet
+        getSchemaName()               - Returns the the designated column&apos;s table&apos;s schema name  
+        getColumnDisplaySize()        - Returns column display length  
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;h4 id=&quot;cacheserverconfiguration&quot;&gt;cacheServerConfiguration&lt;/h4&gt;
+        
+        &lt;p&gt;MySQL 서버의 구성 정보를 클라이언트 측에서 캐싱할지 여부입니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;elidesetautocommits&quot;&gt;elideSetAutoCommits&lt;/h4&gt;
+        
+        &lt;p&gt;JDBC 클라이언트에서 &lt;code&gt;setAutoCommit()&lt;/code&gt;이 호출될 때마다 MySQL 서버로 &lt;code&gt;SET autocommit=?&lt;/code&gt; 명령을 전송합니다. true로 설정하면 현재 상태와 불일치할 때만 전송합니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;maintaintimestats&quot;&gt;maintainTimeStats&lt;/h4&gt;
+        
+        &lt;p&gt;MySQL JDBC 드라이버에서 제공하는 설정 옵션으로, SQL 쿼리 실행 시간 통계를 유지할지 여부입니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;oraclemysqlautoincrement&quot;&gt;Oracle 시퀀스와 MySQL auto increment&lt;/h3&gt;
+        
+        &lt;p&gt;Oracle 시퀀스를 사용하던 환경에서 MySQL auto increment로 변경하면서, JPA의 식별자 생성 시점 차이로 인해 연관관계 객체 저장 로직을 수정해야 했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;기존 Oracle 환경에서는 SEQUENCE 기반으로 식별자가 INSERT 이전에 생성되므로 &lt;code&gt;persist()&lt;/code&gt; 호출 직후에도 ID를 활용할 수 있어 연관관계 설정과 저장 로직이 자연스럽게 동작했습니다. 반면 MySQL의 IDENTITY 전략에서는 INSERT 이후에야 식별자가 생성되기 때문에, 동일한 로직을 그대로 적용하면 연관관계 설정 시점에 ID가 존재하지 않아 의도하지 않은 동작이 발생할 수 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;따라서 &lt;code&gt;flush()&lt;/code&gt; 호출 시점 조정이나 저장 순서 변경이 필요했습니다. 이 과정에서 식별자에 의존하던 로직을 정리하고 연관관계의 주인 설정을 명확히 하는 등 코드를 수정했습니다. 로직 수정이 불가능한 경우에는 채번용 MySQL 테이블을 별도로 두어 테이블에서 ID를 채번하도록 수정했습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
+        
+        &lt;p&gt;성공적인 이관 작업의 결과, Oracle 데이터베이스의 세션 수가 감소하면서 시스템의 PGA 메모리 사용량이 줄어들었습니다. 이로 인해 PagingSpace Used(swap)가 감소하고 메모리 자원이 추가로 확보되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Oracle 세션 수 및 메모리 사용량 변화&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;이 리소스 여유분은 공용 장비를 사용하는 타 부서에 자원적 안정성을 제공하는 동시에, 서비스 측면에서는 확보된 별도 장비 환경에서 기존 공용 장비 제약(타 부서 영향 및 부하 우려) 없이 파드 개수를 늘려 안정적인 서비스 확장 및 운영의 토대를 마련하게 되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;서비스 확장 후 아키텍처&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;또한 과제 수행 중 성능 모니터링을 통해 데이터베이스 쿼리 튜닝을 포함한 시스템 최적화를 수행한 결과, 서비스 API의 Latency(응답 지연 시간)가 유의미하게 개선되었습니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>네이버 통합검색 AIB 도입과 웹 성능 변화 분석</title>
+      <link>https://d2.naver.com/helloworld/4241703</link>
+      <guid>https://d2.naver.com/helloworld/4241703</guid>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;AIB(AI Briefing)는 네이버 통합검색에서 AI 기반 요약·브리핑 경험을 제공하는 기능입니다. 2025년 3월부터 단계적으로 도입되었으며, 초기에는 정적인 요약 형태 중심이었고 2025년 7월 채팅 UI 기반의 애니메이션 인터페이스가 추가되면서 상호작용 요소가 확장되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이러한 변화와 함께 트래픽에서 AIB가 차지하는 비중도 점차 증가하고 있습니다. 현재 네이버 통합검색에서 LCP(Largest Contentful Paint)로 측정되는 영역 중 AIB 영역이 약 10%를 차지하며, LCP 후보 영역으로 선택되는 빈도 또한 상위권입니다. 즉, AIB는 더 이상 일부 사용자에게만 노출되는 부가 기능이 아니라, 그 렌더링 방식이 검색 성능 지표 전반에 영향을 주는 단계라고 볼 수 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 글에서는 AIB의 UI 특성이 LCP에 어떤 영향을 주는지 정리하고, 채팅 UI에서 성능 지표를 해석할 때 주의할 점과 개선 방향을 제안합니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;aib&quot;&gt;AIB 도입 이후 성능 지표 변화&lt;/h2&gt;
+        
+        &lt;p&gt;최근 네이버 통합검색의 LCP p95는 약 3.1초 수준으로 관측됩니다. 95%의 경우 뷰포트에서 가장 큰 콘텐츠가 3.1초 이내에 그려진다는 의미입니다. 이는 목표인 ‘LCP p95 2.5초 이하’를 상회하는 값입니다. 특히 AIB 노출량이 증가하는 시점과 LCP p95가 악화되는 시점이 비슷한 흐름을 보입니다.&lt;/p&gt;
+        
+        &lt;p&gt;다음 그래프는 네이버 통합검색 LCP p95와 AIB 노출량(QC) 추이입니다. 두 지표가 매우 유사한 패턴을 보이는 것을 확인할 수 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;네이버 통합검색 LCP p95 추이&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;AIB 노출량(QC) 추이&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;분포(distribution) 관점에서도 변화가 보입니다. AIB 도입 이후 Good 구간(LCP &amp;lt; 2.5초)에 해당하는 사용자 비율이 줄고, 상대적으로 느린 구간에 해당하는 사용자의 비율이 늘었습니다. 이는 AIB가 전체 LCP 분포의 뒤쪽, 즉 tail 영역에 영향을 주고 있음을 의미합니다. 구글 검색에서도 유사한 현상을 확인할 수 있습니다. 구글은 2024년 12월 AI Overview를 도입했고, 2025년 서비스 지역을 확대했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;네이버 통합검색과 구글 검색의 LCP 분포 변화&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;다만 두 서비스의 악화 양상에는 차이가 있습니다. 차이는 주로 렌더링 단위와 애니메이션 적용 방식에서 비롯됩니다. 구글 AI Overview는 비교적 큰 텍스트 블록 단위로 렌더링하며 애니메이션도 블록 단위로 제한적으로 적용됩니다. 반면 네이버 통합검색의 AIB는 텍스트를 어절 단위로 쪼개 점진적으로 표시하는 구조를 채택하고, 노출 애니메이션도 상대적으로 적극적으로 사용합니다. 콘텐츠가 화면에 노출되는 애니메이션 속도에도 차이가 있습니다. 이러한 요소는 사용자 경험뿐만 아니라, LCP와 같은 렌더링 기반 성능 지표가 측정되는 방식에도 영향을 미칩니다.&lt;/p&gt;
+        
+        &lt;p&gt;이제 네이버 통합검색의 AIB 영역이 실제로 어느 정도의 지연을 유발하는지, 그리고 이러한 구조적 특성을 고려했을 때 어떤 개선 가능성이 있는지를 더욱 구체적으로 살펴보겠습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;aib&quot;&gt;AIB가 얼마나 느린지 확인&lt;/h2&gt;
+        
+        &lt;p&gt;LCP 악화가 AIB 서버 성능 저하를 의미하는지 확인하기 위해 서버 응답과 클라이언트 렌더링을 나눠 살펴보았습니다. 도입 전후를 비교했을 때 서버 응답 시간이나 초기 콘텐츠 전달 구간에서 유의미한 차이는 없었습니다. 즉, 네트워크 지연이나 서버 처리 성능이 LCP 악화의 직접적인 원인이라고 보기는 어려웠습니다.&lt;/p&gt;
+        
+        &lt;p&gt;반면 클라이언트 렌더링 과정에서는 분명한 특이점을 확인했습니다. AIB는 채팅 UI를 사용해, 여러 줄의 텍스트가 순차적으로 등장하는 애니메이션을 포함합니다. 이 과정에서 약 900ms 수준의 스켈레톤 UI 노출과 텍스트 애니메이션이 발생해, 해당 영역의 최종 렌더링 시점이 뒤로 밀리고 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;지표를 보면, 일반적으로 가장 느린 LCP 영역으로 알려진 지도 영역과 비교해도 p75 값이 3.3초 이상 길었습니다. 다만 단순히 스켈레톤 UI와 텍스트 애니메이션만으로 설명하기에는 지나치게 격차가 커, LCP 측정 시점이 구조적으로 지연되고 있다고 의심하게 되었습니다.&lt;/p&gt;
+        
+        &lt;table&gt;  
+        &lt;thead&gt;  
+        &lt;tr&gt;  
+        &lt;th scope=&quot;col&quot;&gt;구분&lt;/th&gt;  
+        &lt;th scope=&quot;col&quot;&gt;p75&lt;/th&gt;  
+        &lt;th scope=&quot;col&quot;&gt;p95&lt;/th&gt;  
+        &lt;/tr&gt;  
+        &lt;/thead&gt;  
+        &lt;tbody&gt;  
+        &lt;tr&gt;  
+        &lt;td&gt;AIB 영역이 LCP인 경우&lt;/td&gt;  
+        &lt;td&gt;4,573ms&lt;/td&gt;  
+        &lt;td&gt;6,921ms&lt;/td&gt;  
+        &lt;/tr&gt;  
+        &lt;tr&gt;  
+        &lt;td&gt;지도 영역이 LCP인 경우&lt;/td&gt;  
+        &lt;td&gt;1,270ms&lt;/td&gt;  
+        &lt;td&gt;3,369ms&lt;/td&gt;  
+        &lt;/tr&gt;  
+        &lt;/tbody&gt;  
+        &lt;/table&gt;
+        
+        &lt;h2 id=&quot;uilcp&quot;&gt;채팅 UI에서 LCP가 실제 사용자 경험을 반영하지 못하는 이유&lt;/h2&gt;
+        
+        &lt;p&gt;AIB 영역의 LCP가 비정상적으로 길게 측정되는 원인을 분석한 결과, 채팅 UI 특유의 DOM 구조와 상호작용 기능이 주요한 영향을 미치는 것을 확인했습니다. AIB는 텍스트가 한 글자 또는 어절 단위로 점진적으로 나타나는 텍스트 애니메이션을 포함하며, 특히 PC 환경에서는 각주에 마우스 포인터를 올리면 해당 텍스트가 하이라이트되는 인터랙션을 제공합니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 하이라이트 기능 구현 과정에서, 텍스트 애니메이션이 모두 끝난 뒤 AIB 영역의 DOM을 한 번 더 재구성하는 로직이 존재했습니다. 초기 렌더링 이후에 하이라이트에 적합한 구조로 DOM이 다시 변경되면서 LCP 후보가 포함된 영역이 뒤늦게 렌더링되어, LCP의 renderTime이 실제 사용자 경험보다 크게 늦춰진 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;텍스트 애니메이션 완료 후 AIB 영역의 텍스트가 재정렬되는 모습&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;하이라이트 인터랙션&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;모바일 환경에서는 하이라이트 기능이 직접적으로 사용되지는 않지만, PC·모바일이 공통 렌더링 로직을 공유했기 때문에 동일한 LCP 지연이 발생했습니다. 즉, AIB 영역의 LCP는 실제로 콘텐츠가 사용자에게 의미 있게 전달된 시점이 아니라, DOM 재구성까지 완료된 시점을 기준으로 측정되고 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;그렇다면 이 DOM 재구성 로직을 제거하거나 수정하면 AIB 영역의 LCP를 의도에 맞게 측정할 수 있을까요? 그렇게 단정하기는 어렵습니다. 일부 개선 효과는 기대할 수 있으나, 채팅 UI 특성상 여전히 주의해야 할 구조적 문제가 남아 있기 때문입니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;lcp&quot;&gt;어절 단위 렌더링에 따른 LCP 후보 분산&lt;/h3&gt;
+        
+        &lt;p&gt;AIB는 서버로부터 텍스트를 스트리밍 방식으로 전달받아, 어절 단위로 DOM에 점진적으로 렌더링하는 방식을 사용합니다. 이 방식은 사용자 입장에서는 자연스러운 대화 흐름을 제공하지만 LCP 측정 관점에서는 새로운 문제를 만들어 냅니다.&lt;/p&gt;
+        
+        &lt;p&gt;LCP는 뷰포트 내에서 ‘가장 큰 텍스트 블록 또는 이미지’를 기준으로 계산됩니다. 텍스트가 어절 단위로 쪼개져 있으면 어절이 개별 후보가 되며, 사용자가 인지하는 ‘하나의 큰 응답 영역’이 아니라 그중 면적이 가장 큰 어절이나 다른 UI 요소가 LCP로 선택될 수 있습니다. 이 경우 AIB가 화면에서 중요한 콘텐츠여도 LCP가 이를 대표하지 못하거나, 상황에 따라 의미가 낮은 요소가 LCP로 선택되는 문제가 생깁니다. 이는 하이라이트 기능을 제거하더라도 피하기 어려운, 렌더링 단위 자체에서 비롯되는 한계라고 볼 수 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;어절 단위 렌더링에서 상대적으로 의미가 적은 요소가 LCP로 선택되는 예&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;h3 id=&quot;chromiumpaintinvalidation&quot;&gt;Chromium 렌더링 파이프라인 특성에 따른 paint invalidation&lt;/h3&gt;
+        
+        &lt;p&gt;또 하나의 문제는 Chromium 기반 브라우저의 렌더링 파이프라인과 LCP 계산 방식이 채팅 UI의 점진적 렌더링 패턴과 잘 맞지 않는다는 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;Chromium에서는 LCP 후보가 포함된 요소가 속한 레이어에서 paint invalidation이 발생하면 레이어가 다시 페인트되고, 그 시점에 LCP 후보의 renderTime이 갱신됩니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;점진적 렌더링에서 paint invalidation이 반복되는 사례&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;채팅 UI처럼 여러 줄의 텍스트가 순차적으로 추가되는 구조에서는, 충분히 인지 가능한 콘텐츠가 이미 화면에 표시된 후에도 하위 텍스트 변경으로 인해 같은 레이어가 반복적으로 다시 그려집니다. 이 과정에서 초기에 그려진 큰 텍스트 블록도 계속해서 ‘다시 그려진 요소’로 인식되며 LCP renderTime이 프레임 단위로 뒤로 밀리게 됩니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 현상은 특정 구현의 버그라기보다, 채팅 UI와 같은 스트리밍·점진적 렌더링 UI가 LCP의 설계 가정과 잘 맞지 않아 발생하는 구조적 한계에 가깝습니다. 관련 배경은 아래 문서를 참고할 수 있습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;페이지 무효화 관련 설명: &lt;a href=&quot;https://developer.chrome.com/docs/chromium/blinkng?hl=ko&quot;&gt;RenderingNG 심층 분석: BlinkNG&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Chromium core의 prepaint, paint invalidation 설명: &lt;a href=&quot;https://chromium.googlesource.com/chromium/src/+/HEAD/third_party/blink/renderer/core/paint/README.md#PrePaint&quot;&gt;PrePaint&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;h2 id=&quot;aib&quot;&gt;AIB를 제외한 네이버 통합검색 성능&lt;/h2&gt;
+        
+        &lt;p&gt;AIB 영역을 제외한 LCP 분포를 보면 Good 비율이 약 96% 수준을 유지하는 것을 확인할 수 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;AIB 영역을 제외한 LCP 분포&lt;/span&gt;&lt;/p&gt;
+        
+        &lt;p&gt;즉, 네이버 통합검색의 기본 성능 품질은 안정적이며, 최근 LCP 악화는 특정 UI(AIB 채팅 UI)의 구조적 요인이 크게 작용했다고 해석할 수 있습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;향후 개선 방향&lt;/h2&gt;
+        
+        &lt;p&gt;네이버 검색은 채팅 UI의 특성 때문에 발생하는 LCP 왜곡 문제를 해결하기 위해, AIB 영역의 성능을 측정·관리하는 독립적인 기준을 도입할 계획입니다. 이는 단순히 특정 지표를 보정하기 위한 조치가 아니라, 서로 다른 UI 패턴을 동일한 성능 지표로 평가해 왔던 기존 방식의 한계를 인식하고, UI 특성에 맞는 측정 체계를 재정립하려는 시도입니다.&lt;/p&gt;
+        
+        &lt;p&gt;특히 채팅 UI에서는 페이지의 ‘완전한 렌더링 시점’보다, 사용자가 첫 번째 의미 있는 응답을 인지하는 시점이 체감 성능과 더 밀접하게 연결됩니다. 실제로 여러 연구와 사례에서도 채팅 UI 환경에서는 LCP보다 첫 번째 토큰이 사용자에게 도달하는 시점, 즉 Time to First Token(TTFT)이 사용자 경험을 설명하는 데 더 적합한 지표임이 제시되고 있습니다. 이러한 배경을 바탕으로, 네이버 검색 역시 AIB 영역에 대해 TTFT를 새로운 핵심 성능 지표로 도입하는 방안을 검토하고 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;LCP가 의미 없는 지표라는 뜻은 아닙니다. 전통적인 검색 결과 페이지나 정적 콘텐츠 중심의 UI에서는 여전히 LCP가 중요한 품질 지표로, 검색 전반의 기본적인 속도와 안정성을 판단하는 데 유효합니다. 중요한 것은 LCP 하나로 모든 UI를 동일하게 평가하려 하기보다, 각 UI의 특성에 맞는 해석과 활용 방식을 함께 고민하는 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;기존의 LCP Good 구간(LCP &amp;lt; 2.5초)을 단순히 합격/불합격 기준으로만 사용하는 대신, 구간을 더 세분화해 사용자 체감 성능을 정밀하게 분석하는 접근도 고려할 수 있습니다. 최근 웹 성능 분야에서는 최적화(optimization) 중심의 사고에서 벗어나, 실제 사용자 경험을 더 잘 예측하고 설명하기 위한 지표 해석과 분포 분석의 중요성이 강조되고 있습니다. 이러한 흐름은 검색 성능 관리에도 시사하는 바가 크다고 생각합니다.(참고: &lt;a href=&quot;https://calendar.perfplanet.com/2025/web-performance-2025-the-shift-from-optimization-to-prediction&quot;&gt;Web Performance 2025: The Shift from Optimization to Prediction&lt;/a&gt;)&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
+        
+        &lt;p&gt;네이버 검색은 앞으로 이러한 고민을 바탕으로, AIB와 같은 새로운 UI 패턴이 기존 성능 지표에 어떤 영향을 미치는지 지속적으로 관찰하고, 지표 설계와 렌더링 구조를 함께 개선해 나갈 계획입니다. 이를 통해 단순히 수치를 개선하는 데 그치지 않고, 사용자 체감 성능과 성능 지표가 보다 일관되게 맞물리는 성능 측정·관리 체계를 고도화해 나가고자 합니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>FE News 26년 1월 소식을 전해드립니다!</title>
+      <link>https://d2.naver.com/news/5798505</link>
+      <guid>https://d2.naver.com/news/5798505</guid>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;주요소식&lt;/h2&gt;
+        
+        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/image-2026-1-7_10-23-25.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;다음과 같은 유용한 정보들을 만나보실 수 있습니다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;rscexplorerreactservercomponents&quot;&gt;RSC Explorer - React Server Components 시각화 도구&lt;/h4&gt;
+        
+        &lt;p&gt;Dan Abramov가 React Server Components(RSC) 프로토콜을 시각화하는 도구를 공개했다. 브라우저에서 RSC 스트림을 단계별로 재생하고 분해할 수 있으며, 서버·클라이언트·flight·preview 4개 패널로 데이터 흐름을 표시한다. 네트워크 요청 없이 동작하고 React가 제공하는 reader/writer를 그대로 사용하기 때문에 출력 결과는 실제 프로토콜과 동일하다. 스트리밍(Suspense), Client Reference, Server Actions, Router refresh 같은 프레임워크 내부 동작 원리를 이해할 수 있는 RSC 디버깅과 교육 자료로 활용하기 좋은 도구다..&lt;/p&gt;
+        
+        &lt;h4 id=&quot;webaisummit2025ai&quot;&gt;Web AI Summit 2025 - 클라이언트 사이드 AI의 새로운 흐름&lt;/h4&gt;
+        
+        &lt;p&gt;클라이언트 사이드 모델과 에이전트를 주제로 하는 행사다. &quot;웹에서 AI&quot; 흐름이 서버 호출 중심에서 점점 브라우저 실행과 에이전트 상호작용 쪽으로 이동하는 분위기를 보여준다. Transformers.js로 브라우저에서 100% 로컬로 ML 모델을 실행하고, webMCP로 웹 저자가 사이트 기능을 브라우저 에이전트가 사용할 수 있는 도구로 정의하며, Wasm/WebGPU/WebNN을 활용한 클라이언트 사이드 AI 구축 방법 등 WebGPU/온디바이스 추론, 에이전트 UX, 브라우저 API 연동 같은 주제를 탐색하기에 적합한 세션들로 구성되어 있다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;stanfordaiclubjeffdeanonimportantaitrends&quot;&gt;Stanford AI Club: Jeff Dean on Important AI Trends&lt;/h4&gt;
+        
+        &lt;p&gt;Stanford AI Club 스피커 시리즈에서 Jeff Dean이 중요한 AI 트렌드를 연구와 제품 양쪽 관점에서 정리한다. 모델 성능뿐 아니라 시스템·데이터·워크플로 관점의 논의를 포함한다. 프런트엔드 관점에서는 브라우저/클라이언트에서 AI를 적용하는 방법과 제품 UX 변화 지점을 탐색하는 데 힌트를 얻을 수 있다. AI를 단순한 기능 추가가 아니라 제품 구조 전체를 바꾸는 변화로 보는 시각을 정리하는 데 도움이 된다.&lt;/p&gt;
+        
+        &lt;h4 id=&quot;thethinkinggamedeepmind&quot;&gt;The Thinking Game - DeepMind의 여정을 담은 다큐멘터리&lt;/h4&gt;
+        
+        &lt;p&gt;세계에서 가장 저명한 AI 연구소이자 기업 중 하나인 DeepMind 설립과 여정을 담은 영화다. 과학자 Demis Hassabis와 그의 팀이 인공 일반 지능(AGI)의 수수께끼를 풀기 위해 끊임없이 탐구하는 과정을 담고 있다. 5년에 걸쳐 촬영된 이 영화는 Hassabis와 그의 팀이 생물학의 50년 난제를 해결한 획기적인 프로그램인 AlphaFold로 역사를 쓰는 순간을 포착한다. &lt;/p&gt;
+        
+        &lt;h4 id=&quot;ai&quot;&gt;디자인시스템이 AI를 만났을 때&lt;/h4&gt;
+        
+        &lt;p&gt;네이버파이낸셜 디자인시스템과 AI를 활용한 마크업 자동화 경험 공유. Figma Code Connect와 instruction을 활용해 AI가 컴포넌트 기반 마크업을 생성하도록 했다. 디자인 토큰과 컴포넌트 구조를 AI에 학습시켜 FE 개발 시작 가능한 수준의 마크업 생성에 성공했지만, 복잡한 레이아웃이나 반응형 처리는 여전히 사람 개입이 필요. 디자인시스템 문서화와 표준화가 AI 활용 효율을 크게 좌우한다는 인사이트를 제공한다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;fenews261httpsgithubcomnaverfenewsblobmasterissues202601md&quot;&gt;&lt;a href=&quot;https://github.com/naver/fe-news/blob/master/issues/2026-01.md&quot;&gt;&gt;&gt; FE News 26년 1월 소식 보러가기&lt;/a&gt;&lt;/h2&gt;
+        
+        &lt;p&gt;&lt;br/&gt;  &lt;/p&gt;
+        
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;strong&gt;◎ FE News란?&lt;/strong&gt;&lt;br/&gt;
+        네이버 FE 엔지니어들이 엄선한 양질의 FE 및 주요한 기술 소식들을 큐레이션해 공유하는 것을 목표로 하며, 이를 통해 국내 개발자들에게 지식 공유에 대한 가치 인식과 성장에 도움을 주고자 하는 기술소식 공유 프로젝트 입니다.&lt;/p&gt;
+        
+        &lt;p&gt;매월 첫째 주 수요일, 월 1회 발행 되고 있으니 많은 관심 부탁드립니다.&lt;br/&gt;
+        &lt;a href=&quot;https://fenews.substack.com/embed&quot;&gt;▷ 구독하기&lt;/a&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>비용, 성능, 안정성을 목표로 한 지능형 로그 파이프라인 도입</title>
       <link>https://d2.naver.com/helloworld/0004394</link>
       <guid>https://d2.naver.com/helloworld/0004394</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Logiss는 AIDA(Advanced Interface for Data &amp;amp; AI)라는 네이버 사내 통합 데이터 플랫폼의 일부로, 로그 수집과 실시간 검색을 통해 문제를 추적하고 데이터를 분석하도록 지원합니다. 또한 Cuve와 CQuery라는 대용량 데이터 저장소 및 분석 설루션과 데이터를 연동합니다.&lt;/p&gt;
         
@@ -679,7 +1496,7 @@
       <title>[인턴십] 2026 NAVER AI CHALLENGE를 소개합니다.</title>
       <link>https://d2.naver.com/news/7477295</link>
       <guid>https://d2.naver.com/news/7477295</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=&quot;/content/images/2025/12/-----------2025-12-10------5-46-58.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
         
@@ -708,7 +1525,7 @@
       <title>디자인시스템이 AI를 만났을 때: FE 개발 패러다임의 변화</title>
       <link>https://d2.naver.com/helloworld/3442203</link>
       <guid>https://d2.naver.com/helloworld/3442203</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -760,7 +1577,7 @@
       <title>LLM이지만 PDF는 읽고 싶어: 복잡한 PDF를 LLM이 이해하는 방법</title>
       <link>https://d2.naver.com/helloworld/9036125</link>
       <guid>https://d2.naver.com/helloworld/9036125</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -827,7 +1644,7 @@
       <title>VLOps:Event-driven MLOps &amp; Omni-Evaluator</title>
       <link>https://d2.naver.com/helloworld/0931890</link>
       <guid>https://d2.naver.com/helloworld/0931890</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -879,7 +1696,7 @@
       <title>FE News 25년 12월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/3740852</link>
       <guid>https://d2.naver.com/news/3740852</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -926,7 +1743,7 @@
       <title>사용자의 목소리를 AI로 재현하다: LLM기반 Multi Agent UX플랫폼 개발기</title>
       <link>https://d2.naver.com/helloworld/2678553</link>
       <guid>https://d2.naver.com/helloworld/2678553</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; 
         해당 발표는 &lt;a href=&quot;https://dan.naver.com/25/sessions/699&quot;&gt;팀네이버 컨퍼런스 DAN25 홈페이지&lt;/a&gt;에서도 살펴보실 수 있습니다.&lt;/p&gt;
@@ -991,7 +1808,7 @@
       <title>웹툰 창작 생태계 보호를 위한 연구</title>
       <link>https://d2.naver.com/helloworld/4571155</link>
       <guid>https://d2.naver.com/helloworld/4571155</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 웹툰은 웹툰, 웹소설 등 다양한 창작물을 독자에게 제공하는 플랫폼을 구축하고, 이를 통해 창작자가 전 세계 독자와 만나 소통하며 안정적인 수익을 바탕으로 창작 활동에 온전히 집중할 수 있는 환경을 만들기 위해 노력하고 있습니다. 특히 하나의 스토리를 다양한 IP(intellectual property)로 확장해 글로벌 시장의 규모를 지속적으로 키우고 있으며, 창작자와 독자, 플랫폼이 상생하며 지속 가능한 가치를 창출하는 디지털 창작 생태계를 만들어 나가는 데 주력하고 있습니다.&lt;/p&gt;
         
@@ -1245,7 +2062,7 @@
       <title>Iceberg Low-Latency Queries with Materialized Views  (feat. 실시간 거래 리포트)</title>
       <link>https://d2.naver.com/helloworld/9290684</link>
       <guid>https://d2.naver.com/helloworld/9290684</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -1296,7 +2113,7 @@
       <title>[DAN25] 기술세션 영상이 모두 공개되었습니다.</title>
       <link>https://d2.naver.com/news/9333656</link>
       <guid>https://d2.naver.com/news/9333656</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=&quot;/content/images/2025/11/---------.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
         
@@ -1365,7 +2182,7 @@
       <title>경험이 쌓일수록 똑똑해지는 네이버 통합검색 LLM Devops Agent</title>
       <link>https://d2.naver.com/helloworld/4199466</link>
       <guid>https://d2.naver.com/helloworld/4199466</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -1428,7 +2245,7 @@
       <title>AI와 함께하는 프로젝트 자동화 : 더 빠르고, 더 스마트하게</title>
       <link>https://d2.naver.com/helloworld/3691494</link>
       <guid>https://d2.naver.com/helloworld/3691494</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -1475,7 +2292,7 @@
       <title>@RequestCache: HTTP 요청 범위 캐싱을 위한 커스텀 애너테이션 개발기</title>
       <link>https://d2.naver.com/helloworld/7610642</link>
       <guid>https://d2.naver.com/helloworld/7610642</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;웹 애플리케이션을 개발하다 보면 하나의 HTTP 요청 내에서 동일한 외부 API를 여러 번 호출하거나 동일한 연산을 반복하는 경우가 종종 발생합니다. 이러한 중복 호출은 응답 시간을 증가시키고 불필요한 네트워크 오버헤드를 유발합니다.&lt;/p&gt;
         
@@ -2170,7 +2987,7 @@
       <title>이건 첫 번째 클릭! 히트맵 같이 보기</title>
       <link>https://d2.naver.com/helloworld/0957098</link>
       <guid>https://d2.naver.com/helloworld/0957098</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2209,7 +3026,7 @@
       <title>DBT, Airflow를 활용한 데이터 계보 중심 파이프라인 만들기</title>
       <link>https://d2.naver.com/helloworld/8992409</link>
       <guid>https://d2.naver.com/helloworld/8992409</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2277,7 +3094,7 @@
       <title>서비스 조직에서 Kafka를 사용할 때 알아 두어야 할 것들 (5)</title>
       <link>https://d2.naver.com/helloworld/3974242</link>
       <guid>https://d2.naver.com/helloworld/3974242</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2325,7 +3142,7 @@
       <title>API 호출식 웜업의 부작용을 넘어서 : 라이브러리만 데우는 JVM 웜업</title>
       <link>https://d2.naver.com/helloworld/1580651</link>
       <guid>https://d2.naver.com/helloworld/1580651</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
+      <pubDate>Sat, 14 Feb 2026 09:31:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2362,823 +3179,6 @@
         &lt;p&gt;NAVER에서는 사내 개발 경험과 기술 트렌드를 교류를 할 수 있는 프로그램이 많이 있습니다. 그중 매회 평균 70개 이상의 발표가 이루어지는 NAVER ENGINEERING DAY를 빼놓을 수 없는데요. &lt;br /&gt;
         2016년부터 시작된 ENGINEERING DAY는 실무에서의 기술 개발 경험과 새로운 기술과 플랫폼 도입 시 유용하게 활용될 수 있는 팁 등을 공유하며 서로 배우고 성장하는 네이버의 대표적인 사내 개발자 행사입니다. &lt;br /&gt;
         올해 진행된 NAVER ENGINEERING DAY의 일부 세션을 공개합니다.&lt;/p&gt;
-        &lt;/blockquote&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>스마트스토어센터 Oracle에서 MySQL로의 무중단 전환기</title>
-      <link>https://d2.naver.com/helloworld/6512234</link>
-      <guid>https://d2.naver.com/helloworld/6512234</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;스마트스토어 플랫폼 내 여러 파트가 공동으로 사용하던 Oracle DBMS는 비즈니스 성장에 따라 리소스 경합이 심화되면서 서비스 성능 불안정을 초래했습니다. 기존 Oracle 인프라의 확장은 막대한 라이선스 비용 증가로 이어지기 때문에, 스마트스토어 회원 파트는 운영 비효율성과 비용 압박을 해소하고자 오픈소스인 MySQL로 DBMS 마이그레이션을 결정했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 글에서는 10년 이상의 레거시 프로젝트가 서비스 중단 없이 Oracle 공동 환경에서 벗어나 MySQL로 전환하며 채택한 전략과 기술적 해결 과정을 공유합니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;마이그레이션 준비 및 전략 수립&lt;/h2&gt;
-        
-        &lt;p&gt;기존 서비스는 Oracle DBMS 환경에서 JPA와 MyBatis를 사용하고 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/1-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;기존 서비스 아키텍처&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;회원 파트의 모듈은 타 부서 시스템과 광범위하게 연계되어 있어 서비스 중단이 불가능했습니다. 따라서 Oracle에서 MySQL로의 DB 전환에는 무중단 배포가 필수였습니다. 또한 사소한 기능 버그에는 핫픽스로 대응할 수 있지만, DB 전환 후 치명적인 성능 저하나 서비스 장애가 발생하는 경우에는 재배포만으로 해결할 수 없으므로 신속한 롤백 능력도 확보해야 했습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;&quot;&gt;전환 전략: 이중 쓰기&lt;/h3&gt;
-        
-        &lt;p&gt;Kubernetes 환경에서 MyBatis 및 Spring JPA를 사용하는 기존 Oracle DB 기반 서비스를 MySQL로 무중단 전환하고 롤백 가능성을 확보하기 위해 이중 쓰기(dual write) 기법을 채택했습니다. 이중 쓰기란 모든 쓰기 트랜잭션을 기존 데이터베이스와 새 데이터베이스에 동시에 반영하는 기법으로, 신규 시스템의 안정성을 검증하는 기간 동안 두 DB가 완벽하게 동기화된 상태를 유지하는 것을 보장해, 데이터 손실이나 서비스 중단 없이 안전하게 신규 환경으로 전환하기 위한 안전장치가 되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;전환 과정은 다음과 같이 진행됩니다.&lt;/p&gt;
-        
-        &lt;ol&gt;
-        &lt;li&gt;전환 전 단계: 구버전 애플리케이션은 모든 Read/Write 트래픽을 Oracle에서 처리하되, CUD(Create, Update, Delete) 작업 시에만 백그라운드에서 MySQL에도 이중 쓰기를 수행합니다.  &lt;/li&gt;
-        &lt;li&gt;데이터 마이그레이션: 신버전 애플리케이션 배포 전에 Oracle의 전체 데이터를 MySQL로 마이그레이션해 정합성을 맞춥니다.  &lt;/li&gt;
-        &lt;li&gt;전환 후 단계: 신버전 애플리케이션은 모든 Read/Write 트래픽을 MySQL에서 처리하며, CUD 작업 시 백그라운드에서 Oracle에도 이중 쓰기를 수행합니다.&lt;/li&gt;
-        &lt;/ol&gt;
-        
-        &lt;p&gt;이 구조를 통해 데이터 정합성을 유지하면서 무중단 배포가 가능해지며, Oracle 방향으로 이중 쓰기가 지속되므로 롤백이 필요한 경우에도 별도의 데이터 복구 과정 없이 즉시 롤백할 수 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;이중 쓰기 아키텍처&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;기술적 도전과 해결 과정&lt;/h2&gt;
-        
-        &lt;h3 id=&quot;jpa&quot;&gt;JPA 이중 쓰기&lt;/h3&gt;
-        
-        &lt;p&gt;저희 서비스에서 JPA로 수행하는 CUD 작업은 대부분 단순한 SQL 조합으로 이루어져, Oracle과 MySQL 간 CUD 쿼리 차이는 거의 없었습니다. 따라서 실제 수행되는 쿼리를 가져와 MySQL에서도 동일하게 실행하면 JPA 이중 쓰기를 큰 문제 없이 구현할 수 있을 것이라고 생각했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;a href=&quot;https://jdbc-observations.github.io/datasource-proxy/docs/current/user-guide/&quot;&gt;datasource-proxy&lt;/a&gt; 라이브러리를 활용해 Oracle에서 수행되는 쿼리를 가져온 뒤 별도의 MySQL DataSource로 해당 쿼리를 실행하도록 JPA용 DataSource를 구성했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/3-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Proxy DataSource 구조&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;LocalContainerEntityManagerFactoryBean&lt;/code&gt; 빈 등록 시점에 Proxy DataSource 구현체를 설정했습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Primary
-        public LocalContainerEntityManagerFactoryBean entityManagerFactory() {  
-        LocalContainerEntityManagerFactoryBean factory = getLocalContainerEntityManagerFactoryBean();
-        factory.setDataSource(dualWriteProxyDatasource);    // Proxy DataSource 구현체
-        return factory;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이렇게 설정하면 &lt;code&gt;EntityManager&lt;/code&gt;에서 Oracle DB로 쿼리가 flush될 때 MySQL DB에도 쿼리가 수행됩니다. 다만 몇 가지 해결해야 할 문제가 있습니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;트랜잭션 처리&lt;/h4&gt;
-        
-        &lt;p&gt;한 트랜잭션 내에서 여러 쿼리가 수행되던 중 오류가 발생하면 두 DB 간의 정합성이 유지될까요?&lt;/p&gt;
-        
-        &lt;p&gt;저희 서비스에서는 트랜잭션 매니저로 &lt;code&gt;JpaTransactionManager&lt;/code&gt;를 사용하고 있습니다. 이중 쓰기 Proxy DataSource에서 두 DB의 DataSource를 참조하더라도, 실제 트랜잭션에 사용되는 쪽은 메인 DB인 Oracle DataSource이고 MySQL DataSource는 트랜잭션으로 관리되지 않습니다. 따라서 롤백 과정에서 두 DB의 정합성이 깨질 수 있으므로 이중 쓰기 수행 시 트랜잭션 대응을 별도로 구성해야 합니다.&lt;/p&gt;
-        
-        &lt;p&gt;단, &lt;code&gt;ChainedTransactionManager&lt;/code&gt;를 사용하거나 분산 트랜잭션으로 MySQL 쿼리를 트랜잭션에 포함시키면 안 됩니다. 그 이유는 다음과 같습니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;이중 쓰기를 구현하는 시점에는 Oracle과 MySQL 간 데이터 정합성이 대부분 맞지 않습니다.&lt;/li&gt;
-        &lt;li&gt;서비스 내 JPA의 모든 Oracle CUD 쿼리가 MySQL에서 오류 없이 동작하는지 아직 검증되지 않았습니다.&lt;/li&gt;
-        &lt;li&gt;테이블 인덱스 구성이나 커넥션 풀 등 환경 설정이 아직 최적화되지 않았습니다.&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;실제 Read 전환이 이루어지기 전까지 다양한 이유로 MySQL 쿼리만 실패하는 상황이 발생할 수 있습니다. 따라서 MySQL 쿼리는 트랜잭션에 따라 원자적으로 수행하되, 실패하더라도 트랜잭션이 롤백되지 않고 무시되어야 합니다.&lt;/p&gt;
-        
-        &lt;p&gt;이에 MySQL 쿼리만 실패하는 케이스를 용인하고, 주기적으로 마이그레이션과 검증(아래 &lt;a href=&quot;#정합성-검증&quot;&gt;정합성 검증&lt;/a&gt; 참고)을 반복하며 불일치 원인을 찾아 제거해 나가는 방식을 선택했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;Oracle 쿼리 수행에 영향을 주지 않는 가장 확실한 방법은 트랜잭션 도중 수행되는 쿼리를 모아두었다가 커밋 후 한꺼번에 MySQL에서 수행하는 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/4-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;트랜잭션 처리 흐름&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;트랜잭션이 롤백되더라도 MySQL에서는 수행된 쿼리가 없으므로 신경 쓰지 않아도 됩니다. Oracle 커넥션을 점유하는 시간이 늘어나지도 않고 예외 처리 및 추적도 용이합니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;TransactionSynchronizationManager&lt;/code&gt;를 활용해 이 동작을 구현할 수 있습니다. 다음은 datasource-proxy 라이브러리 사용을 가정한 예입니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public void execute(ExecutionInfo execInfo, List&amp;lt;QueryInfo&amp;gt; queryInfoList) throws SQLException {  
-        // 트랜잭션이 있으면 커밋 시점에 한 번에 이중 쓰기 수행
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-        List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt; queryExecInfos = (List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt;)TransactionSynchronizationManager.getResource(OBJECT);
-        // 트랜잭션에서 첫 호출 시 동기화 및 리소스 등록
-        if (Objects.isNull(queryExecInfos)) {
-        queryExecInfos = Lists.newArrayList();
-        initDualWriteQueryAccumulationInTransaction(queryExecInfos);
-        }
-        // 리스트에 쿼리 저장
-        queryExecInfos.add(Pair.of(execInfo, queryInfoList));
-        } else {
-        // 트랜잭션이 없으면 바로 이중 쓰기 수행
-        }
-        }
-        
-        private void initDualWriteQueryAccumulationInTransaction(List&amp;lt;Pair&amp;lt;ExecutionInfo, List&amp;lt;QueryInfo&amp;gt;&amp;gt;&amp;gt; queryExecInfos) {  
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-        @Override
-        public void afterCommit() {
-        try {
-        // MySQL 커넥션을 열어서 queryExecInfos에 쌓인 쿼리를 한 번에 실행
-        } catch (SQLException e) {
-        // 쿼리 로깅해 실패 원인 분석
-        }
-        }
-        
-        @Override
-        public void afterCompletion(int status) {
-        TransactionSynchronizationManager.unbindResourceIfPossible(OBJECT);
-        queryExecInfos.clear();
-        }
-        });
-        TransactionSynchronizationManager.bindResource(property, queryExecInfos);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;엔티티 설정&lt;/h4&gt;
-        
-        &lt;p&gt;Oracle에서는 Primary Key 생성 전략으로 시퀀스를 사용했으나, MySQL에서는 시퀀스가 없으므로 auto increment를 사용하도록 변경해야 합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Id
-        // @SequenceGenerator(name = &quot;SQ_ID&quot;, sequenceName = &quot;SQ_ID&quot;, allocationSize = 1)
-        // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = &quot;SQ_ID&quot;)
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = &quot;ID_PK&quot;, nullable = false)
-        private Long id;  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이렇게 설정하면 MySQL INSERT 쿼리에는 PK가 없기 때문에, Read 전환 후 MySQL에서 Oracle 방향으로 이중 쓰기할 때 쿼리를 그대로 사용할 수 없습니다. 이 문제를 해결하려면 MySQL INSERT 쿼리 수행 시 generated key 정보를 별도로 가져와 PK를 채우도록 쿼리를 수정한 후 Oracle에서 수행해야 합니다.(UUID v7이나 Snowflake ID 등 DB에 의존하지 않는 방식으로 PK를 생성했다면 이런 고민은 필요 없습니다.)&lt;/p&gt;
-        
-        &lt;p&gt;일부 경우에는 엔티티 클래스의 칼럼 구성에서 &lt;code&gt;columnDefinition&lt;/code&gt;을 MySQL 칼럼 타입에 맞게 지정해야 합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Oracle VARCHAR2(n) -&amp;gt; MySQL TEXT 변경 시
-        // @Column(name = &quot;TEXT1&quot;) - Oracle
-        @Column(name = &quot;TEXT1&quot;, columnDefinition = &quot;text&quot;)
-        private String text1;
-        
-        // Oracle CLOB -&amp;gt; MySQL LONGTEXT 변경 시
-        // @Column(name = &quot;LONGTEXT1&quot;) - Oracle
-        @Column (name = &quot;LONGTEXT1&quot;, columnDefinition = &quot;longtext&quot;)
-        private String longtext1;
-        
-        // Oracle NUMBER(n,m) -&amp;gt; MySQL DECIMAL(n,m) 변경 시
-        // @Column(name = &quot;DECIMAL1&quot;, columnDefinition = &quot;NUMBER(11, 2)&quot;) - Oracle
-        @Column(name = &quot;DECIMAL1&quot;, columnDefinition = &quot;decimal(11, 2)&quot;)
-        private Double decimal1;  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h3 id=&quot;mybatis&quot;&gt;MyBatis 이중 쓰기&lt;/h3&gt;
-        
-        &lt;p&gt;MyBatis 이중 쓰기를 구현할 때, 기존 Oracle DataSource와 신규 MySQL DataSource를 처리하는 MyBatis 인터페이스를 각각 분리해 호출하는 방식은 소스 코드 변경 범위가 지나치게 넓다는 문제가 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;다음과 같은 코드를 모든 쓰기 로직에 추가하려면 10년 넘은 서비스의 비즈니스 로직 전체에 걸쳐 수백, 수천 곳을 수정해야 합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;mybatisRepository.updateData(i); // oracle mybatis  
-        mybatisForMySQLRepository.updateData(i); // mysql mybatis  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이는 휴먼 에러 발생 가능성 증대와 개발 기간 대폭 증가로 이어져 위험성이 높다고 판단해, 비즈니스 로직 코드 수정 없이 Oracle과 MySQL 양쪽으로 쓰기 작업을 수행하는 방법을 고민했습니다. 비즈니스 로직의 순수성을 유지하면서 이중 쓰기 로직을 단일 위치에 중앙 집중화해 관리하고, 마이그레이션 완료 시점에 이중 쓰기 코드를 쉽게 제거할 수 있는 유연성과 유지보수성을 확보하기 위한 것이기도 합니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;mybatis&quot;&gt;MyBatis 동작 구조&lt;/h4&gt;
-        
-        &lt;p&gt;MyBatis의 동작 구조를 간단히 설명하면, &lt;code&gt;@Mapper&lt;/code&gt; 애너테이션이 붙은 인터페이스가 XML 등에 정의된 QueryId와 Query를 참조하는 구조입니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;MyBatis 동작 구조&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;SqlSession&lt;/code&gt;은 &lt;code&gt;Configuration&lt;/code&gt; 객체를 참조합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/session/SqlSession.java#L360
-        
-        /**
-        * Retrieves current configuration.
-        *
-        * @return Configuration
-        */
-        Configuration getConfiguration();  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; 객체 안에는 XML 등에 정의된 쿼리가 QueryId와 함께 &lt;code&gt;MappedStatement&lt;/code&gt; 객체로 변환되어 저장됩니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/session/Configuration.java#L158
-        
-        protected final Map&amp;lt;String, MappedStatement&amp;gt; mappedStatements = new StrictMap&amp;lt;MappedStatement&amp;gt;(  
-        &quot;Mapped Statements collection&quot;)
-        .conflictMessageProducer((savedValue, targetValue) -&amp;gt; &quot;. please check &quot; + savedValue.getResource() + &quot; and &quot;
-        + targetValue.getResource());
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;code&gt;@Mapper&lt;/code&gt; 애너테이션이 붙은 MyBatis용 인터페이스는 &lt;code&gt;MapperProxy&lt;/code&gt; 빈으로 등록되고, &lt;code&gt;mybatisRepository.findById()&lt;/code&gt; 등의 메서드 호출은 &lt;code&gt;MapperProxy&lt;/code&gt; 객체의 &lt;code&gt;invoke&lt;/code&gt; 함수가 호출되는 구조입니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/binding/MapperProxy.java
-        
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {  
-        if (Object.class.equals(method.getDeclaringClass())) {
-        try {
-        return method.invoke(this, args);
-        } catch (Throwable t) {
-        throw ExceptionUtil.unwrapThrowable(t);
-        }
-        }
-        // ...
-        final MapperMethod mapperMethod = cachedMapperMethod(method);
-        return mapperMethod.execute(sqlSession, args);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;code&gt;MapperProxy&lt;/code&gt;의 &lt;code&gt;invoke&lt;/code&gt;는 &lt;code&gt;MapperMethod&lt;/code&gt;의 &lt;code&gt;execute&lt;/code&gt;를 수행합니다. &lt;code&gt;MapperMethod&lt;/code&gt;의 &lt;code&gt;execute&lt;/code&gt;는 쿼리 타입에 맞게 &lt;code&gt;SqlSession&lt;/code&gt;의 메서드를 수행합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/binding/MapperMethod.java
-        
-        public Object execute(SqlSession sqlSession, Object[] args) {  
-        Object result;
-        switch (command.getType()) {
-        case INSERT: {
-        Object param = method.convertArgsToSqlCommandParam(args);
-        result = rowCountResult(sqlSession.insert(command.getName(), param));
-        break;
-        }
-        case UPDATE: {
-        Object param = method.convertArgsToSqlCommandParam(args);
-        result = rowCountResult(sqlSession.update(command.getName(), param));
-        break;
-        }
-        // ...
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;즉, XML에 정의된 SQL은 &lt;code&gt;MappedStatement&lt;/code&gt; 객체가 되고, &lt;code&gt;SqlSession&lt;/code&gt;은 MyBatis 설정 시 주입된 DataSource를 참조하면서 이 &lt;code&gt;MappedStatement&lt;/code&gt; 객체를 보유했다가 필요할 때 실행합니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;MybatisRepository&lt;/code&gt;는 &lt;code&gt;MapperMethod&lt;/code&gt;를 invoke하고, &lt;code&gt;MapperMethod&lt;/code&gt;는 &lt;code&gt;SqlSession&lt;/code&gt;의 메서드를 invoke합니다. 따라서 &lt;code&gt;SqlSession&lt;/code&gt;의 invoke 시 Oracle과 MySQL 양쪽으로 실행할 수 있다면 원하는 바를 이룰 수 있습니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;구현 방법&lt;/h4&gt;
-        
-        &lt;p&gt;이 구조를 활용하기 위해, 쿼리 문법 차이를 고려해 MySQL 문법에 맞는 SQL로 작성된 MyBatis XML을 한 벌 더 만들어야 합니다.&lt;/p&gt;
-        
-        &lt;p&gt;XML 내의 SQL을 보유하는 &lt;code&gt;SqlSession&lt;/code&gt;은 &lt;code&gt;SessionTemplate&lt;/code&gt;이 &lt;code&gt;SqlSessionFactory&lt;/code&gt;에 위임해서 만드는 구조입니다. &lt;code&gt;SqlSessionFactory&lt;/code&gt;를 추상화해서 Oracle과 MySQL 두 개의 &lt;code&gt;SqlSession&lt;/code&gt;이 모두 수행하게 구현하면 됩니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;CombinedSqlSessionFactory 구조&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;CombinedSqlSessionFactory&lt;/code&gt;라는 이름으로 다음과 같이 구현했습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public class CombinedSqlSessionFactory implements SqlSessionFactory {
-        
-        private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
-        SqlSession primarySession = openPrimarySessionFromDataSource(execType, level, autoCommit);
-        SqlSession secondarySession = openSecondarySessionFromDataSource(execType, level, autoCommit);
-        
-        return (SqlSession) Proxy.newProxyInstance(
-        // 세션을 만들 때 양쪽으로 쓰는 로직을 사용하도록 Proxy 객체로 리턴
-        SqlSession.class.getClassLoader(),
-        new Class[]{SqlSession.class},
-        // CombinedSqlSessionHandler는 원하는 로직을 보유하고,
-        // 양쪽에 써야 하기 때문에 Oracle과 MySQL 세션을 모두 보유
-        new CombinedSqlSessionHandler(primarySession, secondarySession, applicationEventPublisher)
-        );
-        }
-        // ...
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;public class CombinedSqlSessionHandler implements InvocationHandler {
-        
-        private SqlSession oracleSqlSession;
-        private SqlSession mysqlSqlSession;
-        
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        final String methodName = method.getName();
-        
-        if (CUD액션인_경우(methodName, maybeStatement)) {
-        Object oracleResult = method.invoke(oracleSqlSession, args);
-        Object mysqlResult = method.invoke(mysqlSqlSession, args);
-        
-        log.warn(&quot;primaryResult: {}&quot;, primaryResult);
-        log.warn(&quot;secondary: {}&quot;, secondaryResult);
-        // 쓰기 자체가 목적이므로 쓰기 액션의 결과 값은 Oracle의 결과를 반환
-        return oracleResult;
-        }
-        
-        // READ인 경우 Oracle의 결과를 사용
-        Object oracleResult = method.invoke(oracleSqlSession, args);
-        return oracleResult;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;Oracle과 MySQL 간에는 근본적인 문법 차이가 있습니다. 특히 날짜/시간 처리 함수(&lt;code&gt;SYSDATE&lt;/code&gt; vs &lt;code&gt;NOW()&lt;/code&gt;, &lt;code&gt;TO_CHAR&lt;/code&gt; vs &lt;code&gt;DATE_FORMAT&lt;/code&gt;), NULL 값 처리(&lt;code&gt;NVL&lt;/code&gt; vs &lt;code&gt;IFNULL&lt;/code&gt;), 페이징 처리(&lt;code&gt;ROWNUM&lt;/code&gt; vs &lt;code&gt;LIMIT&lt;/code&gt;) 방식이 다릅니다. 따라서 모든 MyBatis XML 쿼리를 MySQL 문법에 맞게 재작성해 위 구조로 MyBatis 이중 쓰기를 수행했습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;dbms&quot;&gt;쿼리/DBMS 성능 검증&lt;/h3&gt;
-        
-        &lt;p&gt;새로운 MySQL 데이터베이스로의 전환을 추진할 때, 기존 Oracle 환경에서 안정적으로 처리되던 대규모 트랜잭션과 복잡한 쿼리가 MySQL 환경에서도 동일한 성능을 보장하는지 검증하는 것이 핵심 과제였습니다. Oracle과 MySQL 간의 쿼리 실행 계획 및 최적화 엔진 차이로 인해, 특정 고부하 쿼리가 신규 MySQL의 CPU, 메모리, I/O 등 핵심 DB 자원에 예상치 못한 과부하를 초래해 서비스 안정성을 저해할 위험이 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;따라서 이중 쓰기 기간 동안 실제 운영 트래픽을 신규 DB에 반영하면서 MySQL 데이터베이스의 CPU 사용률, 메모리 사용량, 연결 수(connection count) 등의 자원 지표를 정밀하게 측정하고 모니터링하는 작업은 마이그레이션의 안정성을 확보하고 성능 저하 위험을 사전에 방지하기 위한 필수 단계였습니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;성능 검증 전략&lt;/h4&gt;
-        
-        &lt;p&gt;운영과 동일한 부하를 주기 위해 HTTP 트래픽 복사나 Kafka 토픽 복제 같은 방식을 사용하면 비즈니스 로직 호출 시 타 부서 시스템에 중복 호출 부하를 야기하거나, 예상치 못한 부작용으로 운영에 영향을 줄 위험이 매우 높습니다.&lt;/p&gt;
-        
-        &lt;p&gt;타 부서와 연관된 시스템에 영향을 주지 않고 성능 검증이라는 목표를 달성하기 위해, 이미 수행 중인 이중 쓰기 로직을 유지하면서 오직 내부 서비스 로직에서 발생하는 Read 트래픽만 신규 MySQL DB로 복제해 호출하는 전략을 채택했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;MyBatis나 JPA 같은 영속성 프레임워크의 특성상, 대부분의 Read 메서드는 매개변수가 쿼리로 변환되기 전에는 원시 타입이나 직렬화가 가능한 객체를 매개변수로 사용합니다. 이 특성을 활용해 기존 Oracle로 향하는 Repository 계층의 Read 메서드 호출이 발생할 때 해당 메서드의 실행 시간과 함께 이름, 매개변수 값을 캡처하고 JSON으로 직렬화했습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &quot;repositoryInterfaceName&quot;: &quot;com.example.DataRepository&quot;,
-        &quot;methodName&quot;: &quot;findByKey&quot;,
-        &quot;parameterList&quot;: [
-        {
-        &quot;index&quot;: 0,
-        &quot;className&quot;: &quot;java.lang.Class&quot;,
-        &quot;valueString&quot;: &quot;com.example.ParamVO&quot;
-        },
-        {
-        &quot;index&quot;: 1,
-        &quot;className&quot;: &quot;com.example.KeyVO&quot;,
-        &quot;valueString&quot;: &quot;{\&quot;key\&quot;:1234}&quot;
-        }
-        ],
-        &quot;oracleExecutionTime&quot;: 71
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;직렬화된 데이터를 Kafka 같은 메시지 큐로 전송했습니다. 메시지를 수신한 별도의 성능 측정 Consumer 모듈은 수신된 데이터를 역직렬화해 원본 메서드 이름과 매개변수 리스트를 복원했습니다. 이후 Java Reflection API를 사용해 신규 MySQL을 바라보는 Repository 인터페이스의 동일한 메서드를 찾아 매개변수를 주입하고 호출함으로써, 마치 실제 서비스가 호출한 것처럼 읽기 작업을 MySQL에서 수행할 수 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/7-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Read 트래픽 복제 아키텍처&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;각 토픽 메시지마다 실행 시간이 있으므로, 이를 시각화해 각 쿼리의 성능도 확인할 수 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/8-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;쿼리 실행 시간 분포&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/9-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;성능 모니터링 대시보드&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;위 지표를 활용해 성능이 좋지 않은 쿼리를 수정하고 인덱스 추가 등을 수행해 안정적인 성능을 확보할 수 있었습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;&quot;&gt;정합성 검증&lt;/h3&gt;
-        
-        &lt;p&gt;프로젝트의 중요한 목표는 &lt;strong&gt;데이터 정합성의 완벽한 확보&lt;/strong&gt;였습니다. 이중 쓰기로 실시간 쓰기 동기화는 이루었지만, 이중 쓰기 로직에 문제가 있어 데이터가 다르게 쓰이고 있지는 않은지, 최종 전환 전에 두 DBMS 간의 데이터 일치 여부를 &lt;strong&gt;정량적으로&lt;/strong&gt; 검증하는 과정이 필수였습니다.&lt;/p&gt;
-        
-        &lt;p&gt;워크플로 관리 도구인 Airflow로 정합성 검증 프로세스를 자동화했습니다. Airflow 파이프라인으로 주기적으로 기존 Oracle DB와 신규 MySQL DB의 주요 테이블 데이터를 추출해 Hive 데이터 웨어하우스로 통합했습니다. Hive 환경에서 고성능의 분산 쿼리를 실행해 두 데이터셋을 비교했으며, 레코드 수 비교, 핵심 칼럼 값의 해시 비교, 주요 비즈니스 통계 값의 차이를 검출했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 과정에서 발견된 불일치 건은 상세 분석 및 수정을 거쳐 최종적으로 두 데이터베이스 간의 정합성이 100% 보장되도록 조치했습니다. 이 엄격한 검증 단계는 신규 MySQL 환경으로의 최종 컷오버를 위한 결정적인 안전장치가 되었습니다. 테이블별 row의 추출 시간 차이 때문에 발생하는 불일치 건은 수동으로 검증하는 과정을 거쳤습니다.&lt;/p&gt;
-        
-        &lt;p&gt;약 6개월간 테이블별 불일치 데이터 건수와 그 내용을 분석해 로직을 수정한 끝에 이중 쓰기 환경에서 데이터 정합성을 확보했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;테이블별 불일치 건수 리포트&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;불일치 내용 상세&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;마이그레이션 후 아키텍처 및 검증&lt;/h2&gt;
-        
-        &lt;h3 id=&quot;&quot;&gt;서비스 테스트 및 전환&lt;/h3&gt;
-        
-        &lt;p&gt;데이터베이스를 Oracle에서 MySQL로 전환하는 과제에서 중요한 것은 사용자가 이용하는 기능을 이전과 완전히 동일하게 유지하는 것이었습니다. 단순히 데이터만 옮기는 것이 아니라, DBMS 변화가 기존 비즈니스 로직에 예기치 못한 영향을 주지 않도록 약 3개월간의 QA 기간을 거쳤습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 과정에서 쿼리 실행 결과의 미세한 차이부터 트랜잭션 처리 방식까지 철저히 검증함으로써, 내부 인프라의 변화에도 불구하고 서비스의 모든 기능이 기존과 변함없이 안정적으로 작동함을 확인했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;QA 진행 현황&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;전환이 제대로 되었다는 것은 회원 부서가 발행하는 쿼리가 더 이상 Oracle로 유입되지 않고 MySQL로 유입된다는 의미입니다.&lt;/p&gt;
-        
-        &lt;p&gt;이를 검증하기 위해 모든 기존의 전환 대상 쿼리에 사전에 &lt;code&gt;\*\*회원개발쿼리\*\*&lt;/code&gt;와 같은 임의의 주석을 추가했습니다. 전환 후 해당 주석이 포함된 쿼리가 Oracle 데이터베이스에 더 이상 인입되지 않는지 모니터링했습니다. 기존 Oracle로 향하던 트래픽이 완전히 차단되었음을 확인해, 모든 데이터 요청이 의도한 대로 신규 MySQL로 정상 전환되었음을 확인했습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;트러블슈팅 및 기타 고려 사항&lt;/h2&gt;
-        
-        &lt;p&gt;전환 과정에서 겪은 몇 가지 트러블슈팅 사례와 성능을 위해 고려한 요소를 소개합니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;mysqlindexmergeoptimizationhttpsdevmysqlcomdocrefman80enindexmergeoptimizationhtml&quot;&gt;MySQL의 &lt;a href=&quot;https://dev.mysql.com/doc/refman/8.0/en/index-merge-optimization.html&quot;&gt;Index Merge Optimization&lt;/a&gt;&lt;/h3&gt;
-        
-        &lt;p&gt;Index Merge는 MySQL에서 WHERE 절에 여러 인덱스 칼럼이 OR 조건으로 연결되는 경우, 각 인덱스를 독립적으로 검색한 후 결과를 합치는 전략입니다.&lt;/p&gt;
-        
-        &lt;p&gt;다만 nesting OR 등 조건이 조금만 복잡해지면 최적화하지 못하고 풀스캔을 사용합니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Index Merge 실행 계획&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;다음 조건문의 &lt;code&gt;KEY&lt;/code&gt;, &lt;code&gt;KEY2&lt;/code&gt;, &lt;code&gt;TP&lt;/code&gt;, &lt;code&gt;TP2&lt;/code&gt;에 모두 인덱스가 있을 때 Oracle에서는 성능이 좋았으나, MySQL에서는 최적화하지 못해 풀스캔을 사용했습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;TABLE.KEY = 11  
-        AND TABLE.TP = &apos;ALPHA&apos;  
-        OR TABLE.KEY2 = 22  
-        AND TABLE.TP2 IN (&apos;ALPHA2&apos;, &apos;BETA2&apos;)  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이러한 경우 다음과 같이 UNION으로 쿼리를 변경해 대응했습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;SELECT *  
-        FROM TABLE  
-        WHERE KEY = 11  
-        AND TP = &apos;ALPHA&apos;
-        
-        UNION
-        
-        SELECT *  
-        FROM TABLE  
-        WHERE KEY2 = 22  
-        AND TP2 IN (&apos;ALPHA2&apos;, &apos;BETA2&apos;);
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h3 id=&quot;&quot;&gt;마이그레이션 배치 성능 이슈&lt;/h3&gt;
-        
-        &lt;p&gt;마이그레이션 배치는 Spring Batch로 작성했으며, 크기가 큰 테이블은 &lt;code&gt;JdbcPagingItemReader&lt;/code&gt;로 Oracle 전체 데이터를 가져와 MySQL로 쓰기를 수행합니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;code&gt;QueryProvider&lt;/code&gt;로 &lt;code&gt;OraclePagingQueryProvider&lt;/code&gt;를 사용했을 때, 조회 시 수행되는 페이징 쿼리는 다음과 같습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 TABLE_ID = 500일 때
-        SELECT *  
-        FROM (  
-        SELECT TABLE_ID
-        FROM SOURCE_TABLE
-        ORDER BY TABLE_ID ASC
-        )
-        WHERE ROWNUM &amp;lt;= 100 AND (TABLE_ID &amp;gt; 500)  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;페이징 시 사용되는 sortKey(위 쿼리에서 &lt;code&gt;TABLE_ID&lt;/code&gt;)는 반드시 정의되어야 합니다.&lt;/p&gt;
-        
-        &lt;p&gt;여러 개의 sortKey가 필요한 다중 PK 테이블의 경우 다음과 같이 페이징 쿼리가 생성됩니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
-        SELECT *  
-        FROM (  
-        SELECT TABLE_ID1, TABLE_ID2
-        FROM SOURCE_TABLE2
-        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
-        )
-        WHERE ROWNUM &amp;lt;= 100 AND (TABLE_ID1 &amp;gt; 300 OR (TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8))  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;위 쿼리들은 과연 빠르게 수행될 수 있을까요?&lt;/p&gt;
-        
-        &lt;p&gt;테이블 크기가 충분히 클 때 위의 단일 PK 페이징 쿼리는 옵티마이저가 INDEX RANGE SCAN + COUNT STOPKEY로 최적화해 주기도 하지만, 아래의 다중 PK 페이징 쿼리는 거의 항상 전체 정렬이 발생합니다. 서브쿼리 내 정렬 + OR 조건으로 인해 인덱스 시작 지점을 특정할 수 없기 때문에, 옵티마이저가 최적화하지 못하고 &apos;전체 정렬 후 조건에 맞는 데이터 100건을 조회&apos;하는 가장 비효율적인 방식으로 동작합니다.&lt;/p&gt;
-        
-        &lt;p&gt;이를 해결하려면 &apos;PK 순서로 조건을 만족하는 상위 100건을 조회&apos;할 수 있도록 쿼리 튜닝이 필요합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
-        SELECT TABLE_ID1, TABLE_ID2  
-        FROM SOURCE_TABLE2  
-        WHERE TABLE_ID1 &amp;gt; 300 OR (TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8)  
-        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC  
-        FETCH NEXT 100 ROWS ONLY  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;OR 조건으로 INDEX FULL SCAN이 발생할 수 있으므로, 다음과 같이 UNION ALL 구문으로 변경합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- page size = 100, 이전 조회에서 마지막 (TABLE_ID1, TABLE_ID2) = (300, 8)일 때
-        SELECT * FROM  
-        (
-        SELECT TABLE_ID1, TABLE_ID2
-        FROM SOURCE_TABLE2
-        WHERE TABLE_ID1 = 300 AND TABLE_ID2 &amp;gt; 8
-        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
-        FETCH NEXT 100 ROWS ONLY
-        )
-        UNION ALL  
-        (
-        SELECT TABLE_ID1, TABLE_ID2
-        FROM SOURCE_TABLE2
-        WHERE TABLE_ID1 &amp;gt; 300
-        ORDER BY TABLE_ID1 ASC, TABLE_ID2 ASC
-        FETCH NEXT 100 ROWS ONLY
-        )
-        FETCH NEXT 100 ROWS ONLY  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;인덱스를 탄 두 번의 Top-N 조회 후 최종적으로 page size만큼의 row를 가져옵니다. 이와 같이 쿼리를 생성하도록 커스텀 &lt;code&gt;QueryProvider&lt;/code&gt;를 구현해 사용하면 조회 성능을 최적화할 수 있습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;mysqlhikaricp&quot;&gt;MySQL의 HikariCP 설정&lt;/h3&gt;
-        
-        &lt;p&gt;Oracle과 달리 MySQL에서만 권고되는 설정값이 있습니다. &lt;a href=&quot;https://github.com/brettwooldridge/hikaricp/wiki/MYSQL-Configuration&quot;&gt;HikariCP MySQL Configuration&lt;/a&gt;에서 권장하는 설정입니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-properties&quot;&gt;dataSource.cachePrepStmts=true  
-        dataSource.prepStmtCacheSize=250  
-        dataSource.prepStmtCacheSqlLimit=2048  
-        dataSource.useServerPrepStmts=true  
-        dataSource.useLocalSessionState=true  
-        dataSource.rewriteBatchedStatements=true  
-        dataSource.cacheResultSetMetadata=true  
-        dataSource.cacheServerConfiguration=true  
-        dataSource.elideSetAutoCommits=true  
-        dataSource.maintainTimeStats=false  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h4 id=&quot;cacheprepstmtsuseserverprepstmts&quot;&gt;cachePrepStmts, useServerPrepStmts&lt;/h4&gt;
-        
-        &lt;p&gt;쿼리를 수행하는 객체에는 &lt;code&gt;Statement&lt;/code&gt;, &lt;code&gt;PreparedStatement&lt;/code&gt; 등이 있습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Statement
-        stmt = connection.createStatement();  
-        rs = stmt.executeQuery(&quot;SELECT * FROM car WHERE car_id = 1&quot;);
-        
-        // Prepared Statement
-        connection = DriverManager.getConnection(jdbcUrl + properties, id, password);  
-        // prepareStatement() 메서드 실행
-        stmt = connection.prepareStatement(&quot;SELECT * FROM car WHERE car_id = ?&quot;);  
-        // 쿼리에 전달할 파라미터 세팅
-        stmt.setLong(1, 1L);  
-        rs = stmt.executeQuery();  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;pre&gt;&lt;code&gt;// https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/Statement.html
-        The object used for executing a static SQL statement and returning the results it produces.
-        
-        // https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/PreparedStatement.html
-        An object that represents a precompiled SQL statement.  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;code&gt;Statement&lt;/code&gt;는 정적인 쿼리를 실행할 때, &lt;code&gt;PreparedStatement&lt;/code&gt;는 동적인 쿼리를 실행할 때 주로 사용합니다.&lt;/p&gt;
-        
-        &lt;p&gt;JDBC 인터페이스로 DBMS(MySQL)의 &lt;code&gt;PreparedStatement&lt;/code&gt;를 사용하므로 JDBC 없이 MySQL만 사용해도 &lt;code&gt;PreparedStatement&lt;/code&gt;를 사용할 수 있습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;-- prepared statement 생성
-        PREPARE pstmt1 FROM &apos;SELECT * FROM car WHERE car_id = ?&apos;;
-        
-        -- 파라미터를 지정해 prepared statement 실행
-        SET @a = 1;  
-        EXECUTE pstmt1 USING @a;
-        
-        -- prepared statement 제거
-        DEALLOCATE PREPARE pstmt1;  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;code&gt;cachePrepStmts&lt;/code&gt;와 &lt;code&gt;useServerPrepStmts&lt;/code&gt;는 &lt;code&gt;PreparedStatement&lt;/code&gt; 캐시를 DBMS에서 할지, 클라이언트에서 할지 결정하는 값입니다.&lt;/p&gt;
-        
-        &lt;p&gt;MySQL Connector/J는 &lt;code&gt;PreparedStatement&lt;/code&gt;의 구현을 &lt;code&gt;ClientPreparedStatement&lt;/code&gt;와 &lt;code&gt;ServerPreparedStatement&lt;/code&gt;로 하고 있으며, &lt;code&gt;useServerPrepStmts&lt;/code&gt; 속성값에 따라 어떤 구현체를 사용할지 결정합니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// https://github.com/mysql/mysql-connector-j/blob/release/9.x/src/main/user-impl/java/com/mysql/cj/jdbc/ConnectionImpl.java#L1631
-        
-        ClientPreparedStatement pStmt = null;  
-        if (this.useServerPrepStmts.getValue()) {  
-        if (this.cachePrepStmts.getValue()) {
-        pStmt = // 캐시에서 ServerPreparedStatement 조회
-        } else {
-        pStmt = ServerPreparedStatement.getInstance()
-        }
-        } else {
-        if (this.cachePrepStmts.getValue()) {
-        pStmt = // 캐시에서 ClientPreparedStatement 조회
-        } else {
-        pStmt = ClientPreparedStatement.getInstance()
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h4 id=&quot;uselocalsessionstate&quot;&gt;useLocalSessionState&lt;/h4&gt;
-        
-        &lt;p&gt;&lt;code&gt;useLocalSessionState&lt;/code&gt;가 false면 임의 세션의 상태를 매번 DB로 전송하고, true면 로컬에서 관리해 네트워크 오버헤드를 제거합니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;rewritebatchedstatements&quot;&gt;rewriteBatchedStatements&lt;/h4&gt;
-        
-        &lt;p&gt;INSERT나 UPDATE를 배치로 실행할 때, 여러 개의 쿼리를 하나의 쿼리(&lt;code&gt;INSERT INTO ... VALUES (...), (...), (...)&lt;/code&gt;)로 묶어서 보냅니다. 대량 데이터 삽입 시 성능이 수십 배 차이 날 수 있습니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;cacheresultsetmetadata&quot;&gt;cacheResultSetMetadata&lt;/h4&gt;
-        
-        &lt;p&gt;&lt;code&gt;ResultSet&lt;/code&gt; 객체의 &lt;code&gt;getMetadata()&lt;/code&gt; 메서드가 반환하는 객체를 캐시할지에 대한 설정입니다. true로 설정하면 쿼리 결과의 메타데이터(칼럼 이름, 타입 등)를 캐싱해 매번 서버에 요청하지 않습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code&gt;getColumnCount()              - Returns the number of columns in this ResultSet object.  
-        getColumnName(int column)     - Get the designated column&apos;s name.  
-        getColumnTypeName(int column) - Retrieves the designated column&apos;s database-specific type  
-        name.
-        getPrecision(int column)      - Get the designated column&apos;s specified column size.  
-        getTableName()                - Returns the qualifier for the underlying table of the  
-        ResultSet
-        getSchemaName()               - Returns the the designated column&apos;s table&apos;s schema name  
-        getColumnDisplaySize()        - Returns column display length  
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;h4 id=&quot;cacheserverconfiguration&quot;&gt;cacheServerConfiguration&lt;/h4&gt;
-        
-        &lt;p&gt;MySQL 서버의 구성 정보를 클라이언트 측에서 캐싱할지 여부입니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;elidesetautocommits&quot;&gt;elideSetAutoCommits&lt;/h4&gt;
-        
-        &lt;p&gt;JDBC 클라이언트에서 &lt;code&gt;setAutoCommit()&lt;/code&gt;이 호출될 때마다 MySQL 서버로 &lt;code&gt;SET autocommit=?&lt;/code&gt; 명령을 전송합니다. true로 설정하면 현재 상태와 불일치할 때만 전송합니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;maintaintimestats&quot;&gt;maintainTimeStats&lt;/h4&gt;
-        
-        &lt;p&gt;MySQL JDBC 드라이버에서 제공하는 설정 옵션으로, SQL 쿼리 실행 시간 통계를 유지할지 여부입니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;oraclemysqlautoincrement&quot;&gt;Oracle 시퀀스와 MySQL auto increment&lt;/h3&gt;
-        
-        &lt;p&gt;Oracle 시퀀스를 사용하던 환경에서 MySQL auto increment로 변경하면서, JPA의 식별자 생성 시점 차이로 인해 연관관계 객체 저장 로직을 수정해야 했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;기존 Oracle 환경에서는 SEQUENCE 기반으로 식별자가 INSERT 이전에 생성되므로 &lt;code&gt;persist()&lt;/code&gt; 호출 직후에도 ID를 활용할 수 있어 연관관계 설정과 저장 로직이 자연스럽게 동작했습니다. 반면 MySQL의 IDENTITY 전략에서는 INSERT 이후에야 식별자가 생성되기 때문에, 동일한 로직을 그대로 적용하면 연관관계 설정 시점에 ID가 존재하지 않아 의도하지 않은 동작이 발생할 수 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;따라서 &lt;code&gt;flush()&lt;/code&gt; 호출 시점 조정이나 저장 순서 변경이 필요했습니다. 이 과정에서 식별자에 의존하던 로직을 정리하고 연관관계의 주인 설정을 명확히 하는 등 코드를 수정했습니다. 로직 수정이 불가능한 경우에는 채번용 MySQL 테이블을 별도로 두어 테이블에서 ID를 채번하도록 수정했습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
-        
-        &lt;p&gt;성공적인 이관 작업의 결과, Oracle 데이터베이스의 세션 수가 감소하면서 시스템의 PGA 메모리 사용량이 줄어들었습니다. 이로 인해 PagingSpace Used(swap)가 감소하고 메모리 자원이 추가로 확보되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;Oracle 세션 수 및 메모리 사용량 변화&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;이 리소스 여유분은 공용 장비를 사용하는 타 부서에 자원적 안정성을 제공하는 동시에, 서비스 측면에서는 확보된 별도 장비 환경에서 기존 공용 장비 제약(타 부서 영향 및 부하 우려) 없이 파드 개수를 늘려 안정적인 서비스 확장 및 운영의 토대를 마련하게 되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;서비스 확장 후 아키텍처&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;또한 과제 수행 중 성능 모니터링을 통해 데이터베이스 쿼리 튜닝을 포함한 시스템 최적화를 수행한 결과, 서비스 API의 Latency(응답 지연 시간)가 유의미하게 개선되었습니다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>네이버 통합검색 AIB 도입과 웹 성능 변화 분석</title>
-      <link>https://d2.naver.com/helloworld/4241703</link>
-      <guid>https://d2.naver.com/helloworld/4241703</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;AIB(AI Briefing)는 네이버 통합검색에서 AI 기반 요약·브리핑 경험을 제공하는 기능입니다. 2025년 3월부터 단계적으로 도입되었으며, 초기에는 정적인 요약 형태 중심이었고 2025년 7월 채팅 UI 기반의 애니메이션 인터페이스가 추가되면서 상호작용 요소가 확장되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이러한 변화와 함께 트래픽에서 AIB가 차지하는 비중도 점차 증가하고 있습니다. 현재 네이버 통합검색에서 LCP(Largest Contentful Paint)로 측정되는 영역 중 AIB 영역이 약 10%를 차지하며, LCP 후보 영역으로 선택되는 빈도 또한 상위권입니다. 즉, AIB는 더 이상 일부 사용자에게만 노출되는 부가 기능이 아니라, 그 렌더링 방식이 검색 성능 지표 전반에 영향을 주는 단계라고 볼 수 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 글에서는 AIB의 UI 특성이 LCP에 어떤 영향을 주는지 정리하고, 채팅 UI에서 성능 지표를 해석할 때 주의할 점과 개선 방향을 제안합니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;aib&quot;&gt;AIB 도입 이후 성능 지표 변화&lt;/h2&gt;
-        
-        &lt;p&gt;최근 네이버 통합검색의 LCP p95는 약 3.1초 수준으로 관측됩니다. 95%의 경우 뷰포트에서 가장 큰 콘텐츠가 3.1초 이내에 그려진다는 의미입니다. 이는 목표인 ‘LCP p95 2.5초 이하’를 상회하는 값입니다. 특히 AIB 노출량이 증가하는 시점과 LCP p95가 악화되는 시점이 비슷한 흐름을 보입니다.&lt;/p&gt;
-        
-        &lt;p&gt;다음 그래프는 네이버 통합검색 LCP p95와 AIB 노출량(QC) 추이입니다. 두 지표가 매우 유사한 패턴을 보이는 것을 확인할 수 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;네이버 통합검색 LCP p95 추이&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;AIB 노출량(QC) 추이&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;분포(distribution) 관점에서도 변화가 보입니다. AIB 도입 이후 Good 구간(LCP &amp;lt; 2.5초)에 해당하는 사용자 비율이 줄고, 상대적으로 느린 구간에 해당하는 사용자의 비율이 늘었습니다. 이는 AIB가 전체 LCP 분포의 뒤쪽, 즉 tail 영역에 영향을 주고 있음을 의미합니다. 구글 검색에서도 유사한 현상을 확인할 수 있습니다. 구글은 2024년 12월 AI Overview를 도입했고, 2025년 서비스 지역을 확대했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;네이버 통합검색과 구글 검색의 LCP 분포 변화&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;다만 두 서비스의 악화 양상에는 차이가 있습니다. 차이는 주로 렌더링 단위와 애니메이션 적용 방식에서 비롯됩니다. 구글 AI Overview는 비교적 큰 텍스트 블록 단위로 렌더링하며 애니메이션도 블록 단위로 제한적으로 적용됩니다. 반면 네이버 통합검색의 AIB는 텍스트를 어절 단위로 쪼개 점진적으로 표시하는 구조를 채택하고, 노출 애니메이션도 상대적으로 적극적으로 사용합니다. 콘텐츠가 화면에 노출되는 애니메이션 속도에도 차이가 있습니다. 이러한 요소는 사용자 경험뿐만 아니라, LCP와 같은 렌더링 기반 성능 지표가 측정되는 방식에도 영향을 미칩니다.&lt;/p&gt;
-        
-        &lt;p&gt;이제 네이버 통합검색의 AIB 영역이 실제로 어느 정도의 지연을 유발하는지, 그리고 이러한 구조적 특성을 고려했을 때 어떤 개선 가능성이 있는지를 더욱 구체적으로 살펴보겠습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;aib&quot;&gt;AIB가 얼마나 느린지 확인&lt;/h2&gt;
-        
-        &lt;p&gt;LCP 악화가 AIB 서버 성능 저하를 의미하는지 확인하기 위해 서버 응답과 클라이언트 렌더링을 나눠 살펴보았습니다. 도입 전후를 비교했을 때 서버 응답 시간이나 초기 콘텐츠 전달 구간에서 유의미한 차이는 없었습니다. 즉, 네트워크 지연이나 서버 처리 성능이 LCP 악화의 직접적인 원인이라고 보기는 어려웠습니다.&lt;/p&gt;
-        
-        &lt;p&gt;반면 클라이언트 렌더링 과정에서는 분명한 특이점을 확인했습니다. AIB는 채팅 UI를 사용해, 여러 줄의 텍스트가 순차적으로 등장하는 애니메이션을 포함합니다. 이 과정에서 약 900ms 수준의 스켈레톤 UI 노출과 텍스트 애니메이션이 발생해, 해당 영역의 최종 렌더링 시점이 뒤로 밀리고 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;지표를 보면, 일반적으로 가장 느린 LCP 영역으로 알려진 지도 영역과 비교해도 p75 값이 3.3초 이상 길었습니다. 다만 단순히 스켈레톤 UI와 텍스트 애니메이션만으로 설명하기에는 지나치게 격차가 커, LCP 측정 시점이 구조적으로 지연되고 있다고 의심하게 되었습니다.&lt;/p&gt;
-        
-        &lt;table&gt;  
-        &lt;thead&gt;  
-        &lt;tr&gt;  
-        &lt;th scope=&quot;col&quot;&gt;구분&lt;/th&gt;  
-        &lt;th scope=&quot;col&quot;&gt;p75&lt;/th&gt;  
-        &lt;th scope=&quot;col&quot;&gt;p95&lt;/th&gt;  
-        &lt;/tr&gt;  
-        &lt;/thead&gt;  
-        &lt;tbody&gt;  
-        &lt;tr&gt;  
-        &lt;td&gt;AIB 영역이 LCP인 경우&lt;/td&gt;  
-        &lt;td&gt;4,573ms&lt;/td&gt;  
-        &lt;td&gt;6,921ms&lt;/td&gt;  
-        &lt;/tr&gt;  
-        &lt;tr&gt;  
-        &lt;td&gt;지도 영역이 LCP인 경우&lt;/td&gt;  
-        &lt;td&gt;1,270ms&lt;/td&gt;  
-        &lt;td&gt;3,369ms&lt;/td&gt;  
-        &lt;/tr&gt;  
-        &lt;/tbody&gt;  
-        &lt;/table&gt;
-        
-        &lt;h2 id=&quot;uilcp&quot;&gt;채팅 UI에서 LCP가 실제 사용자 경험을 반영하지 못하는 이유&lt;/h2&gt;
-        
-        &lt;p&gt;AIB 영역의 LCP가 비정상적으로 길게 측정되는 원인을 분석한 결과, 채팅 UI 특유의 DOM 구조와 상호작용 기능이 주요한 영향을 미치는 것을 확인했습니다. AIB는 텍스트가 한 글자 또는 어절 단위로 점진적으로 나타나는 텍스트 애니메이션을 포함하며, 특히 PC 환경에서는 각주에 마우스 포인터를 올리면 해당 텍스트가 하이라이트되는 인터랙션을 제공합니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 하이라이트 기능 구현 과정에서, 텍스트 애니메이션이 모두 끝난 뒤 AIB 영역의 DOM을 한 번 더 재구성하는 로직이 존재했습니다. 초기 렌더링 이후에 하이라이트에 적합한 구조로 DOM이 다시 변경되면서 LCP 후보가 포함된 영역이 뒤늦게 렌더링되어, LCP의 renderTime이 실제 사용자 경험보다 크게 늦춰진 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;텍스트 애니메이션 완료 후 AIB 영역의 텍스트가 재정렬되는 모습&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;하이라이트 인터랙션&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;모바일 환경에서는 하이라이트 기능이 직접적으로 사용되지는 않지만, PC·모바일이 공통 렌더링 로직을 공유했기 때문에 동일한 LCP 지연이 발생했습니다. 즉, AIB 영역의 LCP는 실제로 콘텐츠가 사용자에게 의미 있게 전달된 시점이 아니라, DOM 재구성까지 완료된 시점을 기준으로 측정되고 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;그렇다면 이 DOM 재구성 로직을 제거하거나 수정하면 AIB 영역의 LCP를 의도에 맞게 측정할 수 있을까요? 그렇게 단정하기는 어렵습니다. 일부 개선 효과는 기대할 수 있으나, 채팅 UI 특성상 여전히 주의해야 할 구조적 문제가 남아 있기 때문입니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;lcp&quot;&gt;어절 단위 렌더링에 따른 LCP 후보 분산&lt;/h3&gt;
-        
-        &lt;p&gt;AIB는 서버로부터 텍스트를 스트리밍 방식으로 전달받아, 어절 단위로 DOM에 점진적으로 렌더링하는 방식을 사용합니다. 이 방식은 사용자 입장에서는 자연스러운 대화 흐름을 제공하지만 LCP 측정 관점에서는 새로운 문제를 만들어 냅니다.&lt;/p&gt;
-        
-        &lt;p&gt;LCP는 뷰포트 내에서 ‘가장 큰 텍스트 블록 또는 이미지’를 기준으로 계산됩니다. 텍스트가 어절 단위로 쪼개져 있으면 어절이 개별 후보가 되며, 사용자가 인지하는 ‘하나의 큰 응답 영역’이 아니라 그중 면적이 가장 큰 어절이나 다른 UI 요소가 LCP로 선택될 수 있습니다. 이 경우 AIB가 화면에서 중요한 콘텐츠여도 LCP가 이를 대표하지 못하거나, 상황에 따라 의미가 낮은 요소가 LCP로 선택되는 문제가 생깁니다. 이는 하이라이트 기능을 제거하더라도 피하기 어려운, 렌더링 단위 자체에서 비롯되는 한계라고 볼 수 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;어절 단위 렌더링에서 상대적으로 의미가 적은 요소가 LCP로 선택되는 예&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;h3 id=&quot;chromiumpaintinvalidation&quot;&gt;Chromium 렌더링 파이프라인 특성에 따른 paint invalidation&lt;/h3&gt;
-        
-        &lt;p&gt;또 하나의 문제는 Chromium 기반 브라우저의 렌더링 파이프라인과 LCP 계산 방식이 채팅 UI의 점진적 렌더링 패턴과 잘 맞지 않는다는 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;Chromium에서는 LCP 후보가 포함된 요소가 속한 레이어에서 paint invalidation이 발생하면 레이어가 다시 페인트되고, 그 시점에 LCP 후보의 renderTime이 갱신됩니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;점진적 렌더링에서 paint invalidation이 반복되는 사례&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;채팅 UI처럼 여러 줄의 텍스트가 순차적으로 추가되는 구조에서는, 충분히 인지 가능한 콘텐츠가 이미 화면에 표시된 후에도 하위 텍스트 변경으로 인해 같은 레이어가 반복적으로 다시 그려집니다. 이 과정에서 초기에 그려진 큰 텍스트 블록도 계속해서 ‘다시 그려진 요소’로 인식되며 LCP renderTime이 프레임 단위로 뒤로 밀리게 됩니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 현상은 특정 구현의 버그라기보다, 채팅 UI와 같은 스트리밍·점진적 렌더링 UI가 LCP의 설계 가정과 잘 맞지 않아 발생하는 구조적 한계에 가깝습니다. 관련 배경은 아래 문서를 참고할 수 있습니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;페이지 무효화 관련 설명: &lt;a href=&quot;https://developer.chrome.com/docs/chromium/blinkng?hl=ko&quot;&gt;RenderingNG 심층 분석: BlinkNG&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Chromium core의 prepaint, paint invalidation 설명: &lt;a href=&quot;https://chromium.googlesource.com/chromium/src/+/HEAD/third_party/blink/renderer/core/paint/README.md#PrePaint&quot;&gt;PrePaint&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h2 id=&quot;aib&quot;&gt;AIB를 제외한 네이버 통합검색 성능&lt;/h2&gt;
-        
-        &lt;p&gt;AIB 영역을 제외한 LCP 분포를 보면 Good 비율이 약 96% 수준을 유지하는 것을 확인할 수 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;&lt;span class=&quot;caption&quot;&gt;AIB 영역을 제외한 LCP 분포&lt;/span&gt;&lt;/p&gt;
-        
-        &lt;p&gt;즉, 네이버 통합검색의 기본 성능 품질은 안정적이며, 최근 LCP 악화는 특정 UI(AIB 채팅 UI)의 구조적 요인이 크게 작용했다고 해석할 수 있습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;향후 개선 방향&lt;/h2&gt;
-        
-        &lt;p&gt;네이버 검색은 채팅 UI의 특성 때문에 발생하는 LCP 왜곡 문제를 해결하기 위해, AIB 영역의 성능을 측정·관리하는 독립적인 기준을 도입할 계획입니다. 이는 단순히 특정 지표를 보정하기 위한 조치가 아니라, 서로 다른 UI 패턴을 동일한 성능 지표로 평가해 왔던 기존 방식의 한계를 인식하고, UI 특성에 맞는 측정 체계를 재정립하려는 시도입니다.&lt;/p&gt;
-        
-        &lt;p&gt;특히 채팅 UI에서는 페이지의 ‘완전한 렌더링 시점’보다, 사용자가 첫 번째 의미 있는 응답을 인지하는 시점이 체감 성능과 더 밀접하게 연결됩니다. 실제로 여러 연구와 사례에서도 채팅 UI 환경에서는 LCP보다 첫 번째 토큰이 사용자에게 도달하는 시점, 즉 Time to First Token(TTFT)이 사용자 경험을 설명하는 데 더 적합한 지표임이 제시되고 있습니다. 이러한 배경을 바탕으로, 네이버 검색 역시 AIB 영역에 대해 TTFT를 새로운 핵심 성능 지표로 도입하는 방안을 검토하고 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;LCP가 의미 없는 지표라는 뜻은 아닙니다. 전통적인 검색 결과 페이지나 정적 콘텐츠 중심의 UI에서는 여전히 LCP가 중요한 품질 지표로, 검색 전반의 기본적인 속도와 안정성을 판단하는 데 유효합니다. 중요한 것은 LCP 하나로 모든 UI를 동일하게 평가하려 하기보다, 각 UI의 특성에 맞는 해석과 활용 방식을 함께 고민하는 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;기존의 LCP Good 구간(LCP &amp;lt; 2.5초)을 단순히 합격/불합격 기준으로만 사용하는 대신, 구간을 더 세분화해 사용자 체감 성능을 정밀하게 분석하는 접근도 고려할 수 있습니다. 최근 웹 성능 분야에서는 최적화(optimization) 중심의 사고에서 벗어나, 실제 사용자 경험을 더 잘 예측하고 설명하기 위한 지표 해석과 분포 분석의 중요성이 강조되고 있습니다. 이러한 흐름은 검색 성능 관리에도 시사하는 바가 크다고 생각합니다.(참고: &lt;a href=&quot;https://calendar.perfplanet.com/2025/web-performance-2025-the-shift-from-optimization-to-prediction&quot;&gt;Web Performance 2025: The Shift from Optimization to Prediction&lt;/a&gt;)&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
-        
-        &lt;p&gt;네이버 검색은 앞으로 이러한 고민을 바탕으로, AIB와 같은 새로운 UI 패턴이 기존 성능 지표에 어떤 영향을 미치는지 지속적으로 관찰하고, 지표 설계와 렌더링 구조를 함께 개선해 나갈 계획입니다. 이를 통해 단순히 수치를 개선하는 데 그치지 않고, 사용자 체감 성능과 성능 지표가 보다 일관되게 맞물리는 성능 측정·관리 체계를 고도화해 나가고자 합니다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>FE News 26년 1월 소식을 전해드립니다!</title>
-      <link>https://d2.naver.com/news/5798505</link>
-      <guid>https://d2.naver.com/news/5798505</guid>
-      <pubDate>Sat, 14 Feb 2026 01:44:21 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;주요소식&lt;/h2&gt;
-        
-        &lt;p&gt;&lt;img src=&quot;/content/images/2026/01/image-2026-1-7_10-23-25.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;다음과 같은 유용한 정보들을 만나보실 수 있습니다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;rscexplorerreactservercomponents&quot;&gt;RSC Explorer - React Server Components 시각화 도구&lt;/h4&gt;
-        
-        &lt;p&gt;Dan Abramov가 React Server Components(RSC) 프로토콜을 시각화하는 도구를 공개했다. 브라우저에서 RSC 스트림을 단계별로 재생하고 분해할 수 있으며, 서버·클라이언트·flight·preview 4개 패널로 데이터 흐름을 표시한다. 네트워크 요청 없이 동작하고 React가 제공하는 reader/writer를 그대로 사용하기 때문에 출력 결과는 실제 프로토콜과 동일하다. 스트리밍(Suspense), Client Reference, Server Actions, Router refresh 같은 프레임워크 내부 동작 원리를 이해할 수 있는 RSC 디버깅과 교육 자료로 활용하기 좋은 도구다..&lt;/p&gt;
-        
-        &lt;h4 id=&quot;webaisummit2025ai&quot;&gt;Web AI Summit 2025 - 클라이언트 사이드 AI의 새로운 흐름&lt;/h4&gt;
-        
-        &lt;p&gt;클라이언트 사이드 모델과 에이전트를 주제로 하는 행사다. &quot;웹에서 AI&quot; 흐름이 서버 호출 중심에서 점점 브라우저 실행과 에이전트 상호작용 쪽으로 이동하는 분위기를 보여준다. Transformers.js로 브라우저에서 100% 로컬로 ML 모델을 실행하고, webMCP로 웹 저자가 사이트 기능을 브라우저 에이전트가 사용할 수 있는 도구로 정의하며, Wasm/WebGPU/WebNN을 활용한 클라이언트 사이드 AI 구축 방법 등 WebGPU/온디바이스 추론, 에이전트 UX, 브라우저 API 연동 같은 주제를 탐색하기에 적합한 세션들로 구성되어 있다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;stanfordaiclubjeffdeanonimportantaitrends&quot;&gt;Stanford AI Club: Jeff Dean on Important AI Trends&lt;/h4&gt;
-        
-        &lt;p&gt;Stanford AI Club 스피커 시리즈에서 Jeff Dean이 중요한 AI 트렌드를 연구와 제품 양쪽 관점에서 정리한다. 모델 성능뿐 아니라 시스템·데이터·워크플로 관점의 논의를 포함한다. 프런트엔드 관점에서는 브라우저/클라이언트에서 AI를 적용하는 방법과 제품 UX 변화 지점을 탐색하는 데 힌트를 얻을 수 있다. AI를 단순한 기능 추가가 아니라 제품 구조 전체를 바꾸는 변화로 보는 시각을 정리하는 데 도움이 된다.&lt;/p&gt;
-        
-        &lt;h4 id=&quot;thethinkinggamedeepmind&quot;&gt;The Thinking Game - DeepMind의 여정을 담은 다큐멘터리&lt;/h4&gt;
-        
-        &lt;p&gt;세계에서 가장 저명한 AI 연구소이자 기업 중 하나인 DeepMind 설립과 여정을 담은 영화다. 과학자 Demis Hassabis와 그의 팀이 인공 일반 지능(AGI)의 수수께끼를 풀기 위해 끊임없이 탐구하는 과정을 담고 있다. 5년에 걸쳐 촬영된 이 영화는 Hassabis와 그의 팀이 생물학의 50년 난제를 해결한 획기적인 프로그램인 AlphaFold로 역사를 쓰는 순간을 포착한다. &lt;/p&gt;
-        
-        &lt;h4 id=&quot;ai&quot;&gt;디자인시스템이 AI를 만났을 때&lt;/h4&gt;
-        
-        &lt;p&gt;네이버파이낸셜 디자인시스템과 AI를 활용한 마크업 자동화 경험 공유. Figma Code Connect와 instruction을 활용해 AI가 컴포넌트 기반 마크업을 생성하도록 했다. 디자인 토큰과 컴포넌트 구조를 AI에 학습시켜 FE 개발 시작 가능한 수준의 마크업 생성에 성공했지만, 복잡한 레이아웃이나 반응형 처리는 여전히 사람 개입이 필요. 디자인시스템 문서화와 표준화가 AI 활용 효율을 크게 좌우한다는 인사이트를 제공한다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;fenews261httpsgithubcomnaverfenewsblobmasterissues202601md&quot;&gt;&lt;a href=&quot;https://github.com/naver/fe-news/blob/master/issues/2026-01.md&quot;&gt;&gt;&gt; FE News 26년 1월 소식 보러가기&lt;/a&gt;&lt;/h2&gt;
-        
-        &lt;p&gt;&lt;br/&gt;  &lt;/p&gt;
-        
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;strong&gt;◎ FE News란?&lt;/strong&gt;&lt;br/&gt;
-        네이버 FE 엔지니어들이 엄선한 양질의 FE 및 주요한 기술 소식들을 큐레이션해 공유하는 것을 목표로 하며, 이를 통해 국내 개발자들에게 지식 공유에 대한 가치 인식과 성장에 도움을 주고자 하는 기술소식 공유 프로젝트 입니다.&lt;/p&gt;
-        
-        &lt;p&gt;매월 첫째 주 수요일, 월 1회 발행 되고 있으니 많은 관심 부탁드립니다.&lt;br/&gt;
-        &lt;a href=&quot;https://fenews.substack.com/embed&quot;&gt;▷ 구독하기&lt;/a&gt;&lt;/p&gt;
         &lt;/blockquote&gt;
       </content:encoded>
     </item>
