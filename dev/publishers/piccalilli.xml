@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>dev RSS - Andy Bell</title>
+    <link>https://piccalil.li/</link>
+    <description>Andy Bell RSS 피드</description>
+    <lastBuildDate>Sat, 14 Feb 2026 18:29:06 GMT</lastBuildDate>
+    <item>
+      <title>The Index: Issue #164</title>
+      <link>https://piccalil.li/the-index/164/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/the-index/164/?ref=main-rss-feed</guid>
+      <pubDate>Fri, 13 Feb 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;h2&gt;&lt;a href=&quot;https://henry.codes/writing/the-first-thing-i-did-last-year-was-run/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The first thing I did last year was run&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Stunning typography, prose and look and feel. Great stuff.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://blog.jim-nielsen.com/2025/lots-of-little-html-pages?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Building websites with LLMs&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Not to spoil the article, but definitely not &lt;em&gt;those&lt;/em&gt; LLMs.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://dbushell.com/2026/02/12/declarative-dialog-menu-invoker-commands/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Declarative dialog menu with invoker commands&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Expect to see more content like this about invoker commands. They have the potential to remove &lt;em&gt;a lot&lt;/em&gt; of weight from websites in the long run.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://gusbus.space/smallweb-subway/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Smallweb subway&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;A very cool idea for web rings using the canvas element.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://fontreviewjournal.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Font review journal&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Not only a great source of lovely fonts, but the reviews themselves are packed with great knowledge, so if you wanted to learn more about fonts, this is the place.&lt;/p&gt;
+        &lt;p&gt;It features Rosart which we use on Piccalilli too!&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;P.S. &lt;a href=&quot;https://flo-bit.dev/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
+        
+        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;p&gt;There&apos;s no sponsor for this issue so I thought I&apos;d remind you that &lt;strong&gt;subscribers of The Index get a 20% discount off all of our courses&lt;/strong&gt;, including JavaScript for Everyone, Mindful Design and Complete CSS.&lt;/p&gt;
+        &lt;p&gt;Just use the code &lt;code&gt;THEINDEX&lt;/code&gt; at checkout to get that 20% discount.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://piccalil.li/courses/?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;Get your discount&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>You might not need role=&quot;presentation&quot;</title>
+      <link>https://piccalil.li/blog/you-might-not-need-rolepresentation/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/you-might-not-need-rolepresentation/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 12 Feb 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;For a brief moment in time, my main job was to assess the compliance of a selection of websites and document this in a report that was handed over to the customer. I carried out this assessment using the so-called &lt;a href=&quot;https://bitvtest.de/en/tests-und-beratung/bik-bitv-test-web&quot;&gt;BIK BITV test&lt;/a&gt; and, in test step &lt;a href=&quot;https://bitvtest.de/pruefschritt/bitv-20-plus-web/bitv-20-plus-web-9-4-1-2-name-rolle-wert-verfuegbar&quot;&gt;9.4.1.2 Name, Role, Value&lt;/a&gt;, I noticed time and again that &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; was used in a way that was either technically questionable or even degraded accessibility.&lt;/p&gt;
+        &lt;p&gt;Because I have seen this pattern so often, I&apos;m going to to use a couple of real-life examples to find out why this is the case. The examples have been edited and shortened to make them easier to understand.&lt;/p&gt;
+        &lt;p&gt;I will use the code to assess what the intention for using &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; might have been and what could have been done differently. In my experience, there’s only a few real use cases for this attribute value, which we will get to later in the article.&lt;/p&gt;
+        &lt;h2&gt;What you might read about this attribute&lt;/h2&gt;
+        &lt;p&gt;We will use the specifications to take a closer look at what &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; does, how it is used in the wild, and what it should actually be used for.&lt;/p&gt;
+        &lt;h2&gt;The official specs&lt;/h2&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;Whenever you see a blockquote following a code sample in this section, it is an excerpt from the &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.1/#presentation&quot;&gt;specification&lt;/a&gt;.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;If you take a look at the &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#presentation&quot;&gt;specification&lt;/a&gt;, you will immediately notice the prominent note right at the beginning (emphasis ours):&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;In ARIA 1.1, the working group introduced none as a synonym to the presentation role, due to author confusion surrounding the intended meaning of the word &quot;presentation&quot; or &quot;presentational.&quot; Many individuals erroneously consider &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; to be synonymous with &lt;code&gt;aria-hidden=&quot;true&quot;&lt;/code&gt;, and we believe &lt;code&gt;role=&quot;none&quot;&lt;/code&gt; conveys the actual meaning more unambiguously.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This gives us an initial indication of why this attribute might be used incorrectly.&lt;/p&gt;
+        &lt;p&gt;Authors seem to understand “presentational” as “only to be seen”; not heard. This is the behaviour of &lt;code&gt;aria-hidden&lt;/code&gt;, which hides an element in the accessibility tree so that it is no longer announced when assistive technology is used. &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; only affects the role, but not an element and its content.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;The intended use is when an element is used to change the look of the page but does not have all the functional, interactive, or structural relevance implied by the element type, or may be used to provide for an accessible fallback in older browsers that do not support WAI-ARIA.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Spoiler: they’re describing layout tables here, which we’ll get into later in the article.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;An element whose content is completely presentational (like a spacer image, decorative graphic, or clearing element);&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The first two examples sound like image elements. If it is a decorative &lt;code&gt;svg&lt;/code&gt; element, &lt;code&gt;aria-hidden=&quot;true&quot;&lt;/code&gt; would make more sense. Whereas for an &lt;code&gt;img&lt;/code&gt; element &lt;code&gt;alt=&quot;&quot;&lt;/code&gt; would be more appropriate for hiding it, as this makes the intention much more obvious and it comes for free with the &lt;code&gt;img&lt;/code&gt; element.&lt;/p&gt;
+        &lt;p&gt;“Clearing element” might refer to using an element to clear float behaviour, where you would use &lt;code&gt;clear: both;&lt;/code&gt; after using &lt;code&gt;float: left;&lt;/code&gt; or &lt;code&gt;float: right;&lt;/code&gt;, so it wouldn’t get dragged up the flow and break the layout.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;An image that is in a container with the &lt;code&gt;img&lt;/code&gt; role and where the full text alternative is available and is marked up with &lt;code&gt;aria-labelledby&lt;/code&gt; and (if needed) &lt;code&gt;aria-describedby&lt;/code&gt;;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;To be completely honest, I have never seen the following example in the wild, and it is much easier to implement — and for users to read — if you use the &lt;code&gt;alt&lt;/code&gt; attribute for alternative text in an image.&lt;/p&gt;
+        &lt;p&gt;In the following example, the &lt;code&gt;hidden&lt;/code&gt; attribute is used to hide the &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; element visually. However, it’s still available in the DOM, so it can be referenced using &lt;code&gt;aria-labelledby&lt;/code&gt; , up there in the sibling &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; element, for example.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div role=&quot;img&quot; aria-labelledby=&quot;image-title&quot;&amp;gt;
+        &amp;lt;img src=&quot;example-image.jpg&quot; role=&quot;presentation&quot;&amp;gt;
+        &amp;lt;span id=&quot;image-title&quot; hidden&amp;gt;A beautiful sunset over the ocean&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the accessibility tree, in that context, the image is displayed correctly with the corresponding alternative text, but not the source URL. If you use &lt;a href=&quot;https://www.deque.com/axe/devtools/linter/&quot;&gt;axe-linter&lt;/a&gt; in development, removing &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; will trigger an alarm that images need alternative text.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;An element used as an additional markup &quot;hook&quot; for CSS [...]&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This means that in CSS, you use this attribute to target an element with &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;, for example like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;table[role=presentation] {
+        /* Do something */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;A layout table and/or any of its associated rows, cells, etc.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Again, we’ll get into this pattern later on.&lt;/p&gt;
+        &lt;p&gt;The specification contains many more explanations and examples, which you are welcome to look at yourself. One of the most important sentences for me is this one: &lt;em&gt;“[…] the presentation role causes a given element to be treated as having no role or to be removed from the accessibility tree, but does not cause the content contained within the element to be removed from the accessibility tree.”&lt;/em&gt;&lt;/p&gt;
+        &lt;p&gt;The following example is not intended for use in production, but is only meant to illustrate that when using &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;, the element itself and the elements within it lose their semantic meaning, but the content is still available:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;!-- Output: One generic element containing 
+        two generic elements with content. --&amp;gt;
+        &amp;lt;ul role=&quot;presentation&quot;&amp;gt;
+        &amp;lt;li&amp;gt; Sample Content &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt; More Sample Content &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;!-- Output: Unordered list element containing two list items. --&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt; Sample Content &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt; More Sample Content &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The semantic HTML is still displayed in the source code, however, if you look at them in the accessibility tree, they are displayed as generic elements, so they could just as well be &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; elements.&lt;/p&gt;
+        &lt;p&gt;Enough theory, let’s have a look at some real world examples!&lt;/p&gt;
+        &lt;h2&gt;Questionable examples&lt;/h2&gt;
+        &lt;p&gt;Some of these examples won’t create any real barriers for users and I consider them not nice, but more &lt;em&gt;harmless&lt;/em&gt;. Others will cause problems, because &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; has removed important semantic meaning, which can cause more issues because of nested elements.&lt;/p&gt;
+        &lt;p&gt;You will quickly learn that I removed this attribute in &lt;em&gt;all&lt;/em&gt; of my suggested fixes, as it’s just &lt;strong&gt;not necessary&lt;/strong&gt;. It was also sometimes impossible for me to guess why developers used &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; in the first place.&lt;/p&gt;
+        &lt;h3&gt;The “invisible” &lt;code&gt;iframe&lt;/code&gt; element&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;iframe src=&quot;...&quot; title role=&quot;presentation&quot; loading=&quot;eager&quot; style=&quot;width: 0px; height: 0px; border: 0px; display: none;&quot;&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/iframe&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This &lt;code&gt;iframe&lt;/code&gt; element contains a single &lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; element for cookie logic. The intention here was most likely to hide it from assistive technology, as the CSS code suggests.&lt;/p&gt;
+        &lt;p&gt;However, the content is still available because only the semantic meaning was removed from the &lt;code&gt;iframe&lt;/code&gt; element. In addition, a &lt;code&gt;title&lt;/code&gt; attribute without content was used here, which is incorrect.&lt;/p&gt;
+        &lt;p&gt;Instead, the desired output could be implemented as follows:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;iframe aria-hidden=&quot;true&quot; src=&quot;...&quot; loading=&quot;eager&quot;&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/iframe&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3&gt;The list with no items&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;nav&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li role=&quot;presentation&quot;&amp;gt;
+        &amp;lt;a href=&quot;/&quot;&amp;gt;To homepage&amp;lt;/a&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/nav&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Why &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; is applied to a list element here is beyond me. Especially since this is a navigation element and the semantics here have to be on point. Fortunately, it can be easily fixed by removing the attribute and using &lt;code&gt;aria-current=&quot;page&quot;&lt;/code&gt; for the current page.&lt;/p&gt;
+        &lt;h3&gt;The “hidden” image&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/shop&quot; aria-label=&quot;Shop&quot;&amp;gt;
+        &amp;lt;svg role=&quot;presentation&quot;&amp;gt;
+        &amp;lt;title&amp;gt;Shopping cart&amp;lt;/title&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/svg&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As we learned from the &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.1/#presentation&quot;&gt;specification&lt;/a&gt;, &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; only removes the semantics of an element, but not its content, so the content of the &lt;code&gt;&amp;lt;title&amp;gt;&lt;/code&gt; element should still be available, right? As &lt;code&gt;aria-label&lt;/code&gt; is present, an accessible name is provided by this attribute, but &lt;em&gt;not&lt;/em&gt; the &lt;code&gt;&amp;lt;title&amp;gt;&lt;/code&gt; element itself.&lt;/p&gt;
+        &lt;p&gt;If you would remove &lt;code&gt;aria-label&lt;/code&gt;, it would have no accessible name at all, meaning &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; has completely purged the &lt;code&gt;&amp;lt;title&amp;gt;&lt;/code&gt; element from the accessibility tree! 🤯&lt;/p&gt;
+        &lt;p&gt;The goal here was probably to hide the alternative text of the &lt;code&gt;&amp;lt;svg&amp;gt;&lt;/code&gt; element, which worked. However, there are several ways to solve this use case more cleanly, and I would do it this way:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/shop&quot;&amp;gt;
+        &amp;lt;svg&amp;gt;
+        &amp;lt;title&amp;gt;Shop&amp;lt;/title&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/svg&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In this case, we do not need &lt;code&gt;aria-label&lt;/code&gt;, as the alternative text of the image is used as the accessible name.&lt;/p&gt;
+        &lt;h3&gt;Make it semantic, then undo it&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/retail&quot;&amp;gt;
+        &amp;lt;p role=&quot;presentation&quot;&amp;gt;Search store&amp;lt;/p&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is an awkward solution, but it does not present any real barriers for users, as the link text is still available. The developers probably wanted to hide the &lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt; element semantically, which is exactly what happens here. However, it could also have been done like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/retail&quot;&amp;gt;
+        Search store
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3&gt;Technically meh, but still working&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div role=&quot;presentation&quot;&amp;gt;
+        &amp;lt;section role=&quot;presentation&quot; aria-label=&quot;Header&quot;&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is a very interesting case! First of all, I don&apos;t understand why you would remove the semantic meaning but still use a semantic element.&lt;/p&gt;
+        &lt;p&gt;In theory, &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt; would be a generic element with an aria-label, which is prohibited according to the &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#generic&quot;&gt;specification&lt;/a&gt;, which would result in a failure of test step &lt;a href=&quot;https://www.w3.org/WAI/WCAG21/Understanding/name-role-value&quot;&gt;4.1.2 Name, Role, Value (Level A)&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;But because &lt;code&gt;aria-label&lt;/code&gt; is present, this is ignored by the browser and the element is displayed correctly in the accessibility tree. Amazing! A technically clean solution would look like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div&amp;gt;
+        &amp;lt;section aria-label=&quot;Header&quot;&amp;gt;
+        &amp;lt;!-- More code  --&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3&gt;Adding an accessible name and then removing it&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/profile&quot;&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;img alt=&quot;Go to profile&quot; role=&quot;presentation&quot; src=&quot;...&quot;&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The intention is not clear to me here either, because there are some problems due to &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt; element needs an accessible name, which is not available because the &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; element has no semantic meaning and the &lt;code&gt;alt&lt;/code&gt; attribute cannot be applied to a generic element.&lt;/p&gt;
+        &lt;p&gt;Fortunately, these problems can be solved by removing &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;! I also removed the &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; elements because personally, I don’t like the taste of &lt;a href=&quot;https://cdn.matthewjamestaylor.com/img/gmail-div-soup.png&quot;&gt;div soup&lt;/a&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;a href=&quot;/profile&quot;&amp;gt;
+        &amp;lt;img alt=&quot;Go to profile&quot; src=&quot;...&quot;&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The alternative text is now linked to the image, and the accessible name of the link is provided by the alternative text. This one is similar to the “hidden” image example from earlier.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;The few good use cases of this attribute&lt;/h2&gt;
+        &lt;p&gt;There are a couple of suggestions in the specs when you &lt;em&gt;could&lt;/em&gt; use &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;, but I think only a few use cases could apply: &lt;a href=&quot;https://inclusive-components.design/tabbed-interfaces/&quot;&gt;Tabbed interfaces&lt;/a&gt;, &lt;a href=&quot;https://www.stevefrenzel.dev/posts/menu-and-navigation-the-difference/#menu-example&quot;&gt;menu pattern&lt;/a&gt; and a layout table. Let’s have a closer look at a layout table, which is using a &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; element for page layout.&lt;/p&gt;
+        &lt;p&gt;Thanks to &lt;a href=&quot;https://nerdy.dev/cascading-secret-sauce&quot;&gt;modern CSS&lt;/a&gt;, there’s no real need to use layout tables for websites anymore! We can produce &lt;a href=&quot;https://every-layout.dev/&quot;&gt;flexible and robust designs by using flexbox and / or grid&lt;/a&gt;. The one use case where &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; might come in handy &lt;em&gt;could&lt;/em&gt; be email templates though.&lt;/p&gt;
+        &lt;p&gt;If you are forced to use layout tables for your emails, Harvard University has a great article for you on &lt;a href=&quot;https://accessibility.huit.harvard.edu/creating-accessible-emails&quot;&gt;creating accessible emails&lt;/a&gt;. The most relevant part for this article is the following sentence (emphasis ours):&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;If you must use tables for layout, add the attribute &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; on every table element to ensure screen readers won’t treat them as data tables.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;In the &lt;a href=&quot;https://www.w3.org/WAI/tutorials/tables/tips/&quot;&gt;W3C Tips and Tricks section for tables&lt;/a&gt;, they’re also &lt;em&gt;very&lt;/em&gt; clear on the usage of layout tables (emphasis ours):&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Tables should not be used for layout purposes. Use Cascading Style Sheets (CSS) for layout. If there are already layout tables present, don’t use structural elements (like &lt;code&gt;&amp;lt;th&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;caption&amp;gt;&lt;/code&gt;) [...], and do add &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; to the &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; element.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://accessibility.umich.edu/basics/concepts-principles/tables&quot;&gt;University of Michigan&lt;/a&gt; keeps it more brief but same advice:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Only use tables to present tabular data, not to create a visual layout. Use CSS or styling options to handle layout.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;In &lt;a href=&quot;https://brothercake.com/Ref/presentational-tables.html&quot;&gt;Screen reader heuristics for presentational tables&lt;/a&gt;, you’ll find some examples on how to use &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; in the context of a layout table.&lt;/p&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;Thanks to a detailed analysis of the specifications, we have learned what &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt; does and how few use cases there actually are for this attribute. We have also seen from real-life examples how misunderstood the functionality of this attribute is among developers.&lt;/p&gt;
+        &lt;p&gt;The only real use cases would be tabbed interfaces, the menu pattern and email templates, but even here, one could (if possible) switch to plain text emails and avoid using &lt;code&gt;role=&quot;presentation&quot;&lt;/code&gt;.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;Many thanks to &lt;a href=&quot;https://heydonworks.com/&quot;&gt;Heydon Pickering&lt;/a&gt; for their help checking over this article and lending us their endless accessibility wisdom.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Personal website redesign project post: Base-level planning</title>
+      <link>https://piccalil.li/projects/personal-site/2/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/2/?ref=main-rss-feed</guid>
+      <pubDate>Wed, 11 Feb 2026 13:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Right, by now you&apos;ve (hopefully) &lt;a href=&quot;https://piccalil.li/projects/personal-site/1/&quot;&gt;read the &lt;em&gt;why&lt;/em&gt;&lt;/a&gt;, so let&apos;s start moving towards the &lt;em&gt;what&lt;/em&gt;. Let&apos;s go right to the start of this first iteration to look at the planning that happened.&lt;/p&gt;
+        &lt;p&gt;I can&apos;t stress enough how even a modest amount of pre-thinking, sketching or even just making a checklist beats jumping into a code editor or design tool, regardless of whether you&apos;re doing a small ticket at work, building a personal site or even starting a whole client project. Sitting down and thinking &lt;strong&gt;away from the tools&lt;/strong&gt; really helps you to consider what is actually important, what is a nice to have, how you measure improvement and importantly, what the process of iterations/cycles look like.&lt;/p&gt;
+        &lt;p&gt;For me — who works obsessively in iterations — I needed to work out what I would &lt;strong&gt;like&lt;/strong&gt; the end goal to look like. With that, I can map out how I get there in sensible iterations. I &lt;em&gt;could&lt;/em&gt; just start from zero and work up to the end goal, &lt;em&gt;then&lt;/em&gt; publish my website. It&apos;s how I usually do it! The reason I want to work in iterations this time though is because I&apos;m &lt;em&gt;determined&lt;/em&gt; to have a solid, scalable &lt;em&gt;system&lt;/em&gt; that I can tinker with as I please, long into the future, regardless of how my personal technology preferences change over time.&lt;/p&gt;
+        &lt;p&gt;With all of that in mind, my ideal endpoint is as follows:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I want my website to be built out of much smaller pieces that culminate in a themeable, light design system where a future redesign is a simpler job of editing a single theme CSS file and switching out some creative assets.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I&apos;m in a lucky position with this project because we&apos;ve achieved this not once, but twice in &lt;a href=&quot;https://set.studio/&quot;&gt;the studio&lt;/a&gt; already.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/work-tle.jpg&quot; alt=&quot;A composition of selected elements from “The Lost Estate” website, featuring bold typography, vintage-inspired illustrations, event details, customer reviews, and booking buttons. The design uses a dark theme with red and gold accents.&quot; title=&quot;The Lost Estate are a London based events company who we built a themeable design system for to enable them to spin up event sites that were really creative, but also consistent and performant.&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Then of course there&apos;s this very website you&apos;re looking at! This whole thing is a themeable system which not only powers dark mode, but also the &lt;a href=&quot;https://piccalil.li/blog/weve-implemented-full-brands-for-our-upcoming-courses/&quot;&gt;heavily customised course landing pages and courses themselves&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Anyway, let&apos;s get stuck into some planning.&lt;/p&gt;
+        &lt;h2&gt;Find the pain points and measure against them&lt;/h2&gt;
+        &lt;p&gt;This is the live version of the final state of my &lt;em&gt;old&lt;/em&gt; &lt;a href=&quot;https://web.archive.org/web/20260102205804/https://bell.bz/&quot;&gt;codebase on web archive&lt;/a&gt;, because remember, &lt;a href=&quot;https://piccalil.li/projects/personal-site/1/#the-format-and-how-this-series-works&quot;&gt;you&apos;re reading these articles in the past&lt;/a&gt;. Anyway, that stack was:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Headless WordPress for blog posts&lt;/li&gt;
+        &lt;li&gt;Notion database for the music collection&lt;/li&gt;
+        &lt;li&gt;Markdown-powered static pages&lt;/li&gt;
+        &lt;li&gt;Eleventy front-end&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;The setup was not too heavy as far as setups generally go, but it was &lt;em&gt;riddled&lt;/em&gt; with technical debt, regardless. A lot of that technical debt can be assigned to it being a personal website — something I built quickly and maintained very infrequently. The codebase was also over 3 years old with the CSS and markup being nearly 5 years old, from when it was a full WordPress site. The source of the technical debt, very much pointed in two places for me though:&lt;/p&gt;
+        &lt;p&gt;One of the benefits of making good, or at least decent technology choices up front is the damage, even when &lt;em&gt;bad&lt;/em&gt;, is never as bad as it &lt;em&gt;could&lt;/em&gt; have been.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;The Notion-powered music collection had to go. The API is slow and working on the site locally was a nightmare (even with caching). I&apos;m also in the process of &quot;de-Notioning&quot; everything.&lt;/li&gt;
+        &lt;li&gt;The WordPress system was wildly out of date and becoming cumbersome to work with in the admin areas, which meant I blogged a lot less than I could have.&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;That&apos;s the main sources of technical debt identified, that are worth fixing up front.&lt;/p&gt;
+        &lt;p&gt;The WordPress one was easy, I just had to &lt;em&gt;update&lt;/em&gt; as I was [gulp] several years out of date…&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;The Notion-powered system was also quite simple. I already have a pretty robust script I use for Piccalilli that pulls content from Notion, turns it into markdown with &lt;a href=&quot;https://learneleventyfromscratch.com/lesson/4.html&quot;&gt;front matter&lt;/a&gt;, then downloads any media assets to a relative, local destination. All I had to do was create a variant of that script, which resulted in &lt;a href=&quot;https://github.com/Andy-set-studio/personal-site-eleventy/pull/2&quot;&gt;this big ol&apos; pull request to migrate&lt;/a&gt; the content.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;I&apos;m not going to go through the script in this series because frankly, it&apos;s irrelevant (and janky lol). We&apos;ll be getting into a &lt;em&gt;lot&lt;/em&gt; more code stuff once this planning is out of the way though, so fret not.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;The music collection is now markdown files which look like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        title: &apos;The Artist In The Ambulance&apos;
+        artist: &apos;Thrice&apos;
+        cover: &apos;1768832680013-335.jpeg&apos;
+        formats: [&apos;Vinyl&apos;]
+        tags: [&apos;Top 10&apos;]
+        pubDate: 2022-03-02T22:08:00.000Z
+        ---
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Who amongst us doesn&apos;t manage their music collection at 10pm?&lt;/p&gt;
+        &lt;p&gt;I already know I&apos;m doing a re-platforming, so I don&apos;t need to worry about the lower priority items of technical debt such as HTML, CSS and JavaScript I&apos;ve sloshed around over the years, so let&apos;s now identify the other main issues I&apos;m trying solve, now that I&apos;ve managed to do a technical debt sweep.&lt;/p&gt;
+        &lt;h3&gt;The list to measure against&lt;/h3&gt;
+        &lt;ol&gt;
+        &lt;li&gt;The homepage is underwhelming and doesn&apos;t communicate what I do well at all&lt;/li&gt;
+        &lt;li&gt;The codebase is difficult to maintain and I&apos;ve carried over tech debt from multiple personal sites and half-baked ideas&lt;/li&gt;
+        &lt;li&gt;I don&apos;t feel the urge to maintain and look after the current site because I&apos;m fundamentally not a fan of it anymore because it bores me&lt;/li&gt;
+        &lt;li&gt;The music collection should do more to help people discover music in the places they actually listen to music&lt;/li&gt;
+        &lt;li&gt;I know I can do much better in terms of look and feel than I have for the last few redesigns&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;This list of issues can be used as a measuring stick as I work through the project because if I&apos;m not fixing &lt;em&gt;these&lt;/em&gt; issues at least, there&apos;s no point in even bothering, as I see it. This list is a useful canonical &lt;em&gt;anchor&lt;/em&gt; too.&lt;/p&gt;
+        &lt;p&gt;The &lt;em&gt;anchor&lt;/em&gt; is something to think back to when I&apos;m going off pisté a bit too much and a useful method of determining whether an idea is worth pursuing. If the idea puts any of the items on this list at risk in any way, it&apos;s not worth pursuing, which I imagine, will be touched on &lt;em&gt;a lot&lt;/em&gt; as I add those &lt;em&gt;nice&lt;/em&gt; touches and flourishes that I will undoubtedly take &lt;em&gt;too far&lt;/em&gt; in the flair pass.&lt;/p&gt;
+        &lt;p&gt;The first and fifth issues of the list are actually tangibly related to each other. When I designed the now &lt;em&gt;old&lt;/em&gt; version of the site you could sum that process up as &quot;I spend all day in iA writer so I might as well make my website look like that&quot;. In short, I was &lt;em&gt;lazy&lt;/em&gt; and crapped out the front-end in a couple of days. What I really need to be doing is more of a content strategy and look and feel strategy this time around.&lt;/p&gt;
+        &lt;p&gt;We&apos;ve also partially tackled point two of the list, but like I said earlier, re-platforming (which we will get to, don&apos;t you worry) and re-building &lt;em&gt;properly&lt;/em&gt; should sort the rest. In a similar vein, point three &lt;em&gt;should&lt;/em&gt; be addressed by the &lt;em&gt;end&lt;/em&gt; of this process.&lt;/p&gt;
+        &lt;h2&gt;Work out the core features&lt;/h2&gt;
+        &lt;p&gt;I know where I don&apos;t want to be and where I &lt;em&gt;want&lt;/em&gt; to be at this point in the planning, so it makes sense to actually start working out the core features of the website to find a sensible, iterative route to the end.&lt;/p&gt;
+        &lt;p&gt;I ended up just making a list in markdown:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-core-features.jpg&quot; alt=&quot;An Obsidian markdown file called &amp;quot;core features and iterations.&amp;quot; It lists a development roadmap across four iterations, including tasks like &amp;quot;basic shell version of the site,&amp;quot; &amp;quot;look and feel design,&amp;quot; &amp;quot;AT protocol integration,&amp;quot; and &amp;quot;last.fm integration.&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;This is the point I&apos;m making: &lt;em&gt;any&lt;/em&gt; planning is better than nothing. If I had just started coding and designing, I might well get to iteration four quicker, but the journey there would forever be in the first cycle in this diagram, I use every day, forever and always.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/course-branding-iteration.svg&quot; alt=&quot;A dotted line that starts as a very scruffy, messy circle. Over the course of three more circles, it gets neater and neater until it’s nearly perfect. There&apos;s a &amp;quot;we are here&amp;quot; marker pointing at the messiest part&quot; title=&quot;The visual representation of how we do things at &amp;lt;a href=&apos;https://set.studio/&apos;&amp;gt;Set Studio&amp;lt;/a&amp;gt; and my approach to building in general&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Right, this feels like a good place to break off for this part one of planning. I know, I know, planning is &lt;em&gt;boring&lt;/em&gt; but we&apos;re gonna be patting ourselves on the back, later in the project, I just &lt;em&gt;know it&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s do some more tangible sketching-based planning, technology-based planning and a touch of auditing in the next one. &lt;em&gt;Then&lt;/em&gt; we can open our code editor.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>The Index: Issue #163</title>
+      <link>https://piccalil.li/the-index/163/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/the-index/163/?ref=main-rss-feed</guid>
+      <pubDate>Wed, 11 Feb 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Well hello fine &lt;em&gt;The Index&lt;/em&gt; readers. I&apos;m &lt;a href=&quot;https://piccalil.li/author/scott-riley/&quot;&gt;Scott Riley&lt;/a&gt; and I&apos;m delighted to guest curate this week&apos;s issue, where (so I am told) we bring you several absolute banger links for your — I am sure, finely pruned — reading list.&lt;/p&gt;
+        &lt;p&gt;In case you &lt;a href=&quot;https://scott.is&quot;&gt;don&apos;t know me&lt;/a&gt; (and seriously, why would you?) I am predominantly a designer, so we&apos;ve got a bit more of a design-centric twist this week.&lt;/p&gt;
+        &lt;p&gt;Thanks for having me!&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://tools.rmv.fyi/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Delphi Tools&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Starting off with a wonderful suite of disparate, hand-crafted, single-(or very-limited-)purpose tools from the fabulous Ruby Morgan Voigt. These are straight-to-the-point, super simple, and convenient. We&apos;ve got stuff like image cropping, colour palette and gradient generators, typography tools, a regex tester. All beautiful. None hidden behind login-walls or newsletter signups. All running locally in the browser like how things should be too.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://nerdy.dev/nice-select?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Nice Select&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Custom select styling is (while still definitely a bit janky) one of my favourite features of modern CSS. Seeing example after example of absolute hell-code creating inconsistent, inaccessible messes in the name of &lt;em&gt;[checks notes]&lt;/em&gt; making the clicky rectangle more round and shadowy has, much like every CEO, been a persistent annoyance throughout my career.&lt;/p&gt;
+        &lt;p&gt;In this fantastic deep-dive, Adam Argyle shows us how we can make the clicky rectangles more round and shadowy &lt;em&gt;without&lt;/em&gt; absolutely bastardising our markup in the name of modern visuals.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://productpicnic.beehiiv.com/p/vibe-prototyping-isn-t-solving-any-problems-but-it-s-creating-many-new-ones?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Vibe prototyping isn&apos;t solving any problems. But it&apos;s creating many new ones&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The indelible, inimitable Pavel Samsonov produces yet another banger in an ongoing series of bangers. Product Picnic contains some of the most insightful, eloquent, and thought-provoking words you could ever do yourself the favour of smushing into your brain.&lt;/p&gt;
+        &lt;p&gt;This is one of my favourite issues from recent weeks, and it dives into what a good environment for design should look like, and how AI prototypes often work to the detriment of that. The &apos;irresistible bait&apos;, as Pavel puts it, of vibe-coded prototypes — something that I&apos;m sure many of us have witnessed ensnare folks who we once thought of as serious and scrupulous humans — is having a real impact on how well we can maintain systems and environments where professional work is respected.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://www.npr.org/2026/02/03/nx-s1-5683302/autism-101-misinformation-trump?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Autism: myth-busting and what scientists still don&apos;t know&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Shocker here: the US Government is full of shit. Amongst the many, many examples of that gang of shrimp-brained shills slapping the presidential seal on a massive sack-load of misinformation, the &apos;misunderstanding autism as a personal brand&apos; thing comes up time and time again. D*n*ld Tr*mp audio clip jump-scare and Extraordinarily American Speaking Disorder™ aside, this is a good listen from NPR, provided you can get over the liberal throwing-around of &lt;em&gt;interneuron&lt;/em&gt;.&lt;/p&gt;
+        &lt;h2&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Uif5XmYF7_k?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Your weekly medicine&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Hey babe are you okay? You&apos;ve barely touched your YOB - &lt;em&gt;Adrift in the Ocean - Woods Stage @Pickathon 2019&lt;/em&gt;, the greatest live performance in the history of heavy music.&lt;/p&gt;
+        
+        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalil.li/mindful-design?utm_medium=author-promo&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/md-ad-newsletter-post-launch.jpg&quot; alt=&quot;Mindful Design, learn to design for real humans. Available now!&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Scott Riley is the author of the Mindful Design video course.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;Combining modern positive psychology and industry-leading design practices, Scott will teach you to really understand how humans work and explore problem spaces with empathy, curiosity, and accountability to push your overall design skills beyond the next level.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Save 20% just by using the code &lt;code&gt;SCOTTSARTICLE&lt;/code&gt; at checkout.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://piccalil.li/mindful-design?utm_medium=author-promo&quot;&gt;Check it out&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>It’s about to get a lot easier for your JavaScript to clean up after itself</title>
+      <link>https://piccalil.li/blog/its-about-to-get-a-lot-easier-for-your-javascript-to-clean-up-after-itself/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/its-about-to-get-a-lot-easier-for-your-javascript-to-clean-up-after-itself/?ref=main-rss-feed</guid>
+      <pubDate>Tue, 10 Feb 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;According to &lt;a href=&quot;https://slate.com/life/2012/06/chaos-theory.html&quot;&gt;the grand unified theory of Muppet types&lt;/a&gt;, there are two types of JavaScript developer: Chaos Muppets and Order Muppets.&lt;/p&gt;
+        &lt;p&gt;Now, my essential nature is that of a Chaos Muppet. I was born under the &quot;cookies in bed&quot; sign (&quot;fish boomerang&quot; rising). Had I any musical talent, I like to think I&apos;d be more Doctor Teeth than Rowlf; a host more Gonzo than Kermit. This is perhaps best exemplified by the fact that I&apos;m talking about &lt;em&gt;The Muppets&lt;/em&gt; in an article about proposed JavaScript standards.&lt;/p&gt;
+        &lt;p&gt;When it comes to JavaScript itself, though, I tell you, I&apos;m as buttoned-up as they come — bordering on &lt;em&gt;fussy&lt;/em&gt;, even. I use &lt;code&gt;const&lt;/code&gt; by default, and reserve &lt;code&gt;let&lt;/code&gt; for the relatively rare exception when I &lt;em&gt;know&lt;/em&gt; the value bound to a variable will need to change; I will brook none of this &quot;change a binding &lt;em&gt;whenever&lt;/em&gt;&quot; nonsense. What is this, &lt;em&gt;jazz&lt;/em&gt;? I am &lt;em&gt;meticulous&lt;/em&gt; about scope and tidying up — freeing resources, closing connections, and so on — despite the absolutely staggering number of utensils I manage to &lt;em&gt;bork-bork-bork&lt;/em&gt; across the kitchen and into the sink during the course of preparing a real-world meal. Something just comes over me when it comes to JavaScript; I get real &quot;&lt;em&gt;you are all weirdos,&lt;/em&gt;&quot; all of a sudden.&lt;/p&gt;
+        &lt;p&gt;Those uncharacteristic orderly JavaScript proclivities are the reason my heart sings (on-key, and at a volume that is respectful to its neighboring organs) to see the ongoing work on the &lt;a href=&quot;https://github.com/tc39/proposal-explicit-resource-management&quot;&gt;explicit resource management proposal&lt;/a&gt;. This proposal not only gives us a few new ways to put our objects away when we&apos;re done playing with them, but it codifies some of the ones we already have. To start with, it gives a name to a concept we may already be using today — one that has always resonated at my exact fussiness frequency. You may not know it by name yet, but you&apos;ll likely be familiar with the principle of &lt;strong&gt;implicit resource management&lt;/strong&gt; if you&apos;ve ever used a WeakSet or WeakMap.&lt;/p&gt;
+        &lt;h2&gt;Implicit resource management&lt;/h2&gt;
+        &lt;p&gt;The “weak” in WeakSet and WeakMap means that their values are “weakly held,” and that means that those data structures won’t prevent the values they reference from being garbage-collected — removed from memory, once those values aren&apos;t needed for anything. Accordingly, a WeakSet or WeakMap can &lt;em&gt;only&lt;/em&gt; contain garbage-collectable values — references to objects and Symbols that haven’t been added to the global Symbol registry. Trying to add any value other than an object reference or unregistered Symbol will result in an error:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={&lt;code&gt;const theWeakSet = new WeakSet( [ true ] );&lt;/code&gt;}
+        language=&quot;js&quot;
+        outputType=&quot;error&quot;
+        consoleOutput={&lt;code&gt;Uncaught TypeError: WeakSet value true must be an object or an unregistered symbol&lt;/code&gt;}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;Once no &lt;em&gt;other&lt;/em&gt; references to an object or Symbol referenced by a WeakSet exist, not only is that value eligible for garbage collection, but the weakly-held references within the WeakSet are eligible for removal. If that use case sounds pretty niche, well, that&apos;s because it is: you&apos;d use a WeakSet when you need a single collection that can keep track of unique reference values, you don’t want to prevent the referenced values from being garbage collected if nothing else in your script is using them, and you don’t want them included in that collection anymore once that happens. That&apos;s pretty specific stuff.&lt;/p&gt;
+        &lt;p&gt;The same is true of the keys used in a WeakMap: they can be either an object reference or unregistered Symbol value. Once no &lt;em&gt;other&lt;/em&gt; references to that object or Symbol exist, they become eligible for garbage collection, and the property using that key becomes eligible for removal from the WeakMap. With a WeakMap, you can associate arbitrary values with an object without including those values &lt;em&gt;in&lt;/em&gt; the object, and without preventing those objects from being garbage-collected:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={`
+        const theObject = {};
+        const theWeakMap = new WeakMap([
+        [ theObject, &quot;A string, say, describing the object.&quot; ]
+        ]);&lt;/p&gt;
+        &lt;p&gt;console.log( theWeakMap.get( theObject ) );
+        &lt;code&gt;} language=&quot;js&quot; outputType=&quot;log&quot; consoleOutput={&lt;/code&gt;
+        A string, say, describing the object.
+        `}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;Look at that — JavaScript that cleans up after itself! Still a pretty niche use case, but how satisfying; how &lt;em&gt;tidy&lt;/em&gt;, how &lt;em&gt;orderly&lt;/em&gt;! Frankly, I wish I got to use it more.&lt;/p&gt;
+        
+        &lt;p&gt;Granted, we don’t know if or when &lt;code&gt;theObject&lt;/code&gt; &lt;em&gt;will&lt;/em&gt; get garbage collected in the previous example. We know that the values in a WeakSet and properties in a WeakMap &lt;em&gt;can&lt;/em&gt; be garbage collected when no other references to those values or keys exist, but we can&apos;t know when it &lt;em&gt;will&lt;/em&gt; be garbage collected, and thus actually removed from the WeakSet or WeakMap.&lt;/p&gt;
+        &lt;p&gt;In fact, the previous code snippet isn&apos;t quite telling you the whole story — if you were to follow that thread a little further, you might find that the WeakMap still contains the string we defined even when no other references to &lt;code&gt;theObject&lt;/code&gt; exist:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;let theObject = {};
+        const theWeakMap = new WeakMap([
+        [ theObject, &quot;A string, say, describing the object.&quot; ]
+        ]);
+        
+        console.log( theWeakMap.get( theObject ) );
+        // Result: &quot;A string, say, describing the object.&quot;
+        
+        theObject = true;
+        
+        console.log( theWeakMap );
+        // Result: WeakMap { {} → &quot;A string, say, describing the object.&quot; }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;No matter how order-inclined &lt;em&gt;we&lt;/em&gt; are, JavaScript itself will always be a little chaotic. The downside of letting JavaScript do its own memory management is that we don&apos;t have much say in the process — the upside is that we don&apos;t &lt;em&gt;have to&lt;/em&gt;.&lt;/p&gt;
+        
+        &lt;p&gt;Now, as you would rightfully expect, the &quot;explicit resource management&quot; proposal includes more than giving a name to the implicit resource management we&apos;re already able to do. It introduces a unified method — tired old &quot;method&quot; pun intentional — for &lt;em&gt;explicitly&lt;/em&gt; managing resources, and an addition to the language the likes of which we haven&apos;t seen since 2015.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Explicit resource management&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;Explicit resource management&lt;/strong&gt; isn&apos;t about managing memory &lt;em&gt;directly&lt;/em&gt; — garbage collection is still JavaScript&apos;s problem, not ours. Explicit resource management is about cleaning up after ourselves. This part of the proposal allows us to dictate — either imperatively or declaratively — that a set of actions we&apos;ve defined should be taken once the end state of a &lt;strong&gt;resource&lt;/strong&gt; (an object with a knowable &quot;done&quot; state) has been reached.&lt;/p&gt;
+        &lt;p&gt;I know that sounds like a pretty opaque use case in print, but &lt;em&gt;conceptually&lt;/em&gt;, this isn&apos;t anything new. We already have a model for a resource with a knowable end state, in the form of generator objects:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;function * generatorFunction() {
+        yield true;
+        yield false;
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: true, done: false }
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: false, done: false }
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: undefined, done: true }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The value of that &lt;code&gt;done&lt;/code&gt; property is &lt;code&gt;true&lt;/code&gt; only when a call to &lt;code&gt;next()&lt;/code&gt; results in an attempt to access an element beyond the final value it yields — the object has reached the end of its &lt;strong&gt;lifetime&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;If you call the &lt;code&gt;return()&lt;/code&gt; method on that object prior to its natural conclusion, you can end the generator object early:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;function * generatorFunction() {
+        yield true;
+        yield false;
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: true, done: false }
+        
+        console.log( generatorObject.return() );
+        // Result: Object { value: undefined, done: true }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And by using &lt;code&gt;try … finally&lt;/code&gt; within our generator function, we can specify code to be executed at the end of the generator object&apos;s lifetime, whether that happens naturally:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;function * generatorFunction() {
+        try {
+        yield true;
+        yield false;
+        } finally {
+        console.log( &quot;All done.&quot; );
+        }
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: true, done: false }
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: false, done: false }
+        
+        console.log( generatorObject.next() );
+        /* Result:
+        All done.
+        Object { value: undefined, done: true }
+        */
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;...Or by concluding it via &lt;code&gt;return()&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;function * generatorFunction() {
+        try {
+        yield true;
+        yield false;
+        } finally {
+        console.log( &quot;All done.&quot; );
+        }
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: true, done: false }
+        
+        console.log( generatorObject.return() );
+        /* Result:
+        All done.
+        Object { value: undefined, done: true }
+        */
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Calling &lt;code&gt;return()&lt;/code&gt; on a generator object is an &lt;strong&gt;imperative&lt;/strong&gt; approach to resource management — saying &quot;now, do the following and shut it down, JavaScript&quot; in no uncertain terms. Closing connections to WebSockets by calling &lt;code&gt;close()&lt;/code&gt;, stopping requests for files with &lt;code&gt;abort()&lt;/code&gt;, and de-registering an IntersectionObserver with &lt;code&gt;disconnect()&lt;/code&gt; are all examples of imperative resource management.&lt;/p&gt;
+        &lt;p&gt;As you can see, the syntaxes for doing so are — in strict technical terms — &lt;em&gt;all over the shop&lt;/em&gt;. Countless methods with inconsistent names dedicated to the exceptionally common task of &quot;close it down and clean it up,&quot; and just like that, my Order Muppet hackles are up. We&apos;ve got a &lt;em&gt;show&lt;/em&gt; to put on here, people; we&apos;re on a &lt;em&gt;schedule&lt;/em&gt;. &lt;em&gt;Can we get all those chickens off the stage, please, Gilda Radner is on in thirty seconds&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;To solve this problem, the explicit resource management proposal standardizes a &lt;code&gt;[Symbol.dispose]&lt;/code&gt; cleanup method as a wrapper for iterators&apos; &lt;code&gt;return()&lt;/code&gt; method:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;function * generatorFunction() {
+        try {
+        yield true;
+        yield false;
+        } finally {
+        console.log( &quot;All done.&quot; );
+        }
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        // Result: Object { value: true, done: false }
+        
+        console.log( generatorObject[Symbol.dispose]() );
+        // Result: All done.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That&apos;s not a big change in this one context, but the greater implication is huge: introducing &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; provides us with an orderly, predictable syntax for imperative resource management with &lt;a href=&quot;https://github.com/tc39/proposal-explicit-resource-management?tab=readme-ov-file#relation-to-dom-apis&quot;&gt;&lt;em&gt;any&lt;/em&gt; API&lt;/a&gt; that might require cleanup. Closing a file, socket, stream, &lt;em&gt;whatever&lt;/em&gt;? Call &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; on the resource in question, and &lt;em&gt;that&lt;/em&gt; can invoke the cleanup method specific to that resource. Listen, I like an Animal drum solo as much as the next person, but when it comes to JavaScript, I&apos;ll take predictability every time.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Now, as exciting as that is — for very specific values of the word &quot;exciting,&quot; granted — that new predictability paves the way for an far bigger addition to the language. See, when you&apos;re taking an imperative approach to explicit resource management, it&apos;s still on &lt;em&gt;you&lt;/em&gt; to call &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; (or &lt;code&gt;return()&lt;/code&gt;) to do that cleanup — and once you&apos;ve left the scope where references to your resource exist, well, there are no take-backs:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        function * generatorFunction() {
+        console.log( &quot;Open a file.&quot; );
+        try {
+        yield true;
+        yield false;
+        } finally {
+        console.log( &quot;Close the file you still have open.&quot; );
+        }
+        };
+        const generatorObject = generatorFunction();
+        
+        console.log( generatorObject.next() );
+        /* Result:
+        Open a file.
+        Object { value: true, done: false }
+        */
+        };
+        
+        console.log( generatorObject[Symbol.dispose]() );
+        // Uncaught ReferenceError: generatorObject is not defined
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;Ugh, I should&apos;ve put a warning on this snippet. Avert your eyes, Order Muppets!&lt;/p&gt;
+        
+        &lt;p&gt;Implicit resource management is JavaScript&apos;s problem, but explicit resource management is ours. Node &lt;a href=&quot;https://nodejs.org/api/fs.html#class-filehandle&quot;&gt;might make an attempt at closing this file for us&lt;/a&gt;, but it doesn&apos;t make any promises, either. If this were a WebSocket connection, it would stay open, and a &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Streams_API&quot;&gt;Web Worker Stream&lt;/a&gt; would remain locked. At best, leaving a resource open this way would be a completely unnecessary resource drain; at worse, a source of future errors in our code.&lt;/p&gt;
+        &lt;p&gt;So, with the predictability of a consistent &lt;code&gt;[Symbol.dispose]&lt;/code&gt; method comes an opportunity for a &lt;strong&gt;declarative&lt;/strong&gt; approach to explicit resource management, rather than an imperative one. Since we can predictably call &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; to say &quot;JavaScript, strike the stage for the next number&quot; no matter what kind of resource we might end working with, it means there&apos;s a go-to way for JavaScript to clean up after itself, so long as we give it a nudge in the right direction.&lt;/p&gt;
+        &lt;h2&gt;&lt;code&gt;using&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;The explicit resource management proposal includes an addition to the language that we&apos;ve only seen happen once before, in 2015: a new approach to declaring variables.&lt;/p&gt;
+        &lt;p&gt;A variable declared with the keyword &lt;code&gt;using&lt;/code&gt; is block-scoped, like &lt;code&gt;const&lt;/code&gt; and &lt;code&gt;let&lt;/code&gt; — like &lt;code&gt;const&lt;/code&gt;, the value of a variable declared with &lt;code&gt;using&lt;/code&gt; cannot be reassigned. There are no big surprises in terms of the declaration syntax, either — at least, at the surface level:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        using theVariable = null;
+        
+        console.log( theVariable );
+        // Result: null
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The difference is that &lt;code&gt;using&lt;/code&gt; declares a disposable resource that&apos;s &lt;em&gt;tied to the lifetime of the variable&apos;s scope&lt;/em&gt;. When the variable is first declared, a &lt;strong&gt;disposer&lt;/strong&gt; is retrieved from the object — the value of the &lt;code&gt;[Symbol.dispose]&lt;/code&gt; property. That disposer is saved to the variable&apos;s scope. Once execution exits the scope where that variable is defined, the disposer is called on the object it references:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={&lt;code&gt;{   using theObject = {     [Symbol.dispose]() {       console.log( &quot;All done.&quot; );     }   };   // About to leave the scope where    // theObject is defined, annnd... };&lt;/code&gt;}
+        language=&quot;js&quot;
+        outputType=&quot;log&quot;
+        consoleOutput={&lt;code&gt;All done.&lt;/code&gt;}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;It&apos;s important to keep in mind that &lt;code&gt;using&lt;/code&gt; isn&apos;t &quot;cool new &lt;code&gt;const&lt;/code&gt; that &lt;em&gt;can&lt;/em&gt; call &lt;code&gt;[Symbol.dispose]()&lt;/code&gt;.&quot; The value associated with a variable declared with &lt;code&gt;using&lt;/code&gt; can be any any legal expression, but that expression has to result in a value that&apos;s &lt;code&gt;null&lt;/code&gt;, &lt;code&gt;undefined&lt;/code&gt;, or an object with a &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; method — it serves a very specific purpose, and can only be used for said purpose:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={&lt;code&gt;{   using theObject = {}; };&lt;/code&gt;}
+        language=&quot;js&quot;
+        outputType=&quot;error&quot;
+        consoleOutput={&lt;code&gt;Uncaught TypeError: &apos;Symbol.dispose&apos; property is not callable&lt;/code&gt;}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;You can also &lt;em&gt;only&lt;/em&gt; use &lt;code&gt;using&lt;/code&gt; in context of block scope (a block statement, function body, static initialization block, or as the initializer in the header of a &lt;code&gt;for&lt;/code&gt;, &lt;code&gt;for … of&lt;/code&gt;, or &lt;code&gt;for await … of&lt;/code&gt; loop) or module scope:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={&lt;code&gt;using theVariable = null;&lt;/code&gt;}
+        language=&quot;js&quot;
+        outputType=&quot;error&quot;
+        consoleOutput={&lt;code&gt;Uncaught SyntaxError: &apos;using&apos; is only allowed in block statements or inside a module&lt;/code&gt;}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;Otherwise, &lt;code&gt;using&lt;/code&gt; without an enclosing scope would would never end up calling &lt;code&gt;[Symbol.dispose]()&lt;/code&gt;, so there would be no point.&lt;/p&gt;
+        &lt;p&gt;So, knowing all this: remember our generator function that left a file wide open, as though it were &lt;em&gt;raised in a barn&lt;/em&gt;? If we were to declare &lt;code&gt;generatorObject&lt;/code&gt; variable with &lt;code&gt;using&lt;/code&gt; rather than &lt;code&gt;const&lt;/code&gt;, &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; — and so, ultimately, &lt;code&gt;return()&lt;/code&gt; — would be called the moment our variable went out of scope:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={`
+        {
+        function * generatorFunction() {
+        console.log( &quot;Open a file.&quot; );&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;try {
+        yield true;
+        yield false;
+        } finally {
+        console.log( &quot;Close the file.&quot; );
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;};&lt;/p&gt;
+        &lt;p&gt;using generatorObject = generatorFunction();&lt;/p&gt;
+        &lt;p&gt;console.log( generatorObject.next() );
+        };
+        &lt;code&gt;} language=&quot;js&quot; outputType=&quot;log&quot; consoleOutput={&lt;/code&gt;
+        Open a file.
+        Object { value: true, done: false }
+        Close the file.
+        `}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;Oh-ho-ho, we&apos;re &lt;a href=&quot;https://www.youtube.com/watch?v=VDJsgtoizj8&quot;&gt;doing the pigeon&lt;/a&gt; now! There&apos;s nothing stopping us from calling &lt;code&gt;[Symbol.dispose]()&lt;/code&gt; (or &lt;code&gt;return()&lt;/code&gt;) manually, should we need to, of course; it&apos;s not like that method is going away), but we don&apos;t &lt;em&gt;have&lt;/em&gt; to — we&apos;ve packaged our generator object up in such a way as to know, with certainty, that everything will be tidied up as soon as that variable isn&apos;t needed anymore.&lt;/p&gt;
+        &lt;p&gt;If we were writing a class that needed to clean up after itself once an instance went out of scope? Easy-peasy; we can just write our own disposer that does everything we need it to do:&lt;/p&gt;
+        &lt;p&gt;&amp;lt;ConsoleLogger
+        showLineNumbers={false}
+        code={&lt;code&gt; class TheClass {   theFile;   constructor( theFile ) {     this.theFile = theFile;     console.log( ${&apos;\&lt;/code&gt;Open ${ theFile }`&apos;} );
+        }&lt;/p&gt;
+        &lt;p&gt;&lt;a&gt;Symbol.dispose&lt;/a&gt; {
+        console.log( ${&apos;`Close ${ this.theFile }`&apos;} );
+        }
+        };&lt;/p&gt;
+        &lt;p&gt;const theFile = &quot;./some-file&quot;;&lt;/p&gt;
+        &lt;p&gt;if( theFile ) {
+        using fileOpener = new TheClass( theFile );&lt;/p&gt;
+        &lt;p&gt;console.log( ${&apos;`Do things with the instance of ${ fileOpener.constructor.name }, then...`&apos;} );
+        };
+        &lt;code&gt;} language=&quot;js&quot; outputType=&quot;log&quot; consoleOutput={&lt;/code&gt;
+        Open ./some-file
+        Do things with the instance of TheClass, then...
+        Close ./some-file
+        `}&amp;gt;
+        &lt;/p&gt;
+        &lt;p&gt;No fuss, no muss, and hopefully no more resources trapped forever in limbo, once this proposal lands — and in most browsers it &lt;a href=&quot;https://caniuse.com/mdn-javascript_builtins_symbol_dispose&quot;&gt;already has&lt;/a&gt;. The proposal has reached stage three of the standards process, meaning &quot;recommended for implementation” — and it has been. Everything you&apos;ve seen here will work in every major browser but Safari. Granted, this &lt;em&gt;is&lt;/em&gt; still a proposal, on paper. I would be remiss in my duties as a rules-following JavaScript Order Muppet if I didn&apos;t mention that some of the syntaxes we’ve covered here &lt;em&gt;could&lt;/em&gt; change between now and landing in the ECMAScript specification proper. After all, pre-standardization browser implementations of features like this one or &lt;a href=&quot;https://piccalil.li/blog/date-is-out-and-temporal-is-in/&quot;&gt;Temporal&lt;/a&gt; exist to further refine specifications after we developers have tried them out in a few real-world situations.&lt;/p&gt;
+        &lt;p&gt;So, go on — it&apos;s time to get things started. Try it out for yourself. It may not have &lt;em&gt;formally&lt;/em&gt; landed yet, but hey, we can flout the specification a little bit, just this once. We don&apos;t &lt;em&gt;always&lt;/em&gt; have to follow &lt;em&gt;all&lt;/em&gt; the rules, right?&lt;/p&gt;
+        &lt;p&gt;Just, maybe not in production.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s not get carried away here. &lt;em&gt;Weirdos&lt;/em&gt;.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;Thanks to our very special guest star &lt;a href=&quot;https://fosstodon.org/@rbuckton&quot;&gt;Ron Buckton&lt;/a&gt;, both for reviewing this post and for championing the Explicit Resource Management proposal itself!&lt;/p&gt;
+      </content:encoded>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,1812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>dev RSS - Stack Overflow Tags</title>
+    <link>https://stackoverflow.com/</link>
+    <description>Stack Overflow Tags RSS 피드</description>
+    <lastBuildDate>Sat, 14 Feb 2026 18:29:03 GMT</lastBuildDate>
+    <item>
+      <title>How to fix indent not working in TipTap taskItem nodes?</title>
+      <link>https://stackoverflow.com/questions/79888000/how-to-fix-indent-not-working-in-tiptap-taskitem-nodes</link>
+      <guid>https://stackoverflow.com/questions/79888000/how-to-fix-indent-not-working-in-tiptap-taskitem-nodes</guid>
+      <pubDate>Thu, 12 Feb 2026 10:05:15 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Why doesn&apos;t indent work in the taskitem, but after refreshing it works? When I click on the browser&apos;s inspect tool and try to set margin-left, the previously set indent takes effect immediately. Why does this happen?&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;let docChanged = false
+        doc.nodesBetween(from, to, (node, pos) =&amp;gt; {
+        if (!options.types.includes(node.type.name)) return true
+        
+        const currentIndent = node.attrs.indent || 0
+        const change = options.indentUnit * direction
+        const newIndent = Math.max(0, currentIndent + change)
+        
+        if (currentIndent !== newIndent) {
+        tr = tr.setNodeMarkup(pos, undefined, {
+        ...node.attrs,
+        indent: newIndent
+        })
+        docChanged = true
+        }
+        return false // 不深入子节点
+        })
+        
+        if (docChanged) {
+        if (dispatch) dispatch(tr)
+        return true
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre&gt;&lt;code&gt;indent: {
+        default: 0,
+        parseHTML: element =&amp;gt; {
+        const level = element.style.marginLeft
+        return level ? parseInt(level, 10) : 0
+        },
+        renderHTML: attributes =&amp;gt; {
+        if (!attributes.indent) return {}
+        return { style: `margin-left: ${attributes.indent}px !important` }
+        }
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to disable the error overlay (red bar) in Nuxt 2 when receiving bad responses from backend?</title>
+      <link>https://stackoverflow.com/questions/79883813/how-to-disable-the-error-overlay-red-bar-in-nuxt-2-when-receiving-bad-response</link>
+      <guid>https://stackoverflow.com/questions/79883813/how-to-disable-the-error-overlay-red-bar-in-nuxt-2-when-receiving-bad-response</guid>
+      <pubDate>Thu, 05 Feb 2026 19:09:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m working with a Nuxt 2 application, and whenever I receive a 4XX or 5XX error response from my backend API, a red error &amp;quot;loading&amp;quot; overlay bar appears at the top of the application.&lt;/p&gt;
+        &lt;p&gt;I want to disable this error overlay because I&apos;m handling errors with custom toast notifications
+        2. I want to control error display through my own error handling system&lt;/p&gt;
+        &lt;p&gt;I&apos;ve searched the Nuxt 2 documentation but couldn&apos;t find a clear way to disable this error overlay. I&apos;m using:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Nuxt 2.18.1&lt;/li&gt;
+        &lt;li&gt;Vue 2.7.14&lt;/li&gt;
+        &lt;li&gt;@nuxtjs/axios for API calls&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Is there a configuration option in &lt;code&gt;nuxt.config.js&lt;/code&gt; to disable this error overlay? Or do I need to handle this differently?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Example of what I&apos;m seeing:&lt;/strong&gt;
+        When an axios request fails with a 400/500 status, a red bar appears at the top showing something like:&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/3GmQvROl.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/3GmQvROl.png&quot; alt=&quot;red bar screenshot&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Chart.js with date-fns adapter throws &quot;This method is not implemented: Check that a complete date adapter is provided&quot; when using time scale</title>
+      <link>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</link>
+      <guid>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</guid>
+      <pubDate>Wed, 04 Feb 2026 14:37:08 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m trying to create a time-series line chart using Chart.js (v4.4.0) in a Vue 3 component with the date-fns adapter. The chart works fine with a linear x-axis, but when I set the x-axis to type: &apos;time&apos;, I get the error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;This method is not implemented: Check that a complete date adapter is provided.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;What I&apos;ve done so far:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Installed the required packages: chart.js, chartjs-adapter-date-fns, and date-fns (all v3+)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Imported and registered the adapter as per the documentation&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Tried registering the adapter both globally and at the scale level&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Verified my date data is in proper Date objects&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;canvas ref=&amp;quot;chartRef&amp;quot;&amp;gt;&amp;lt;/canvas&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script&amp;gt;
+        import { Chart, registerables } from &apos;chart.js&apos;;
+        import { de } from &apos;date-fns/locale&apos;;
+        import &apos;chartjs-adapter-date-fns&apos;;
+        
+        Chart.register(...registerables);
+        
+        export default {
+        mounted() {
+        this.createChart();
+        },
+        methods: {
+        createChart() {
+        const ctx = this.$refs.chartRef;
+        
+        // Sample time-series data
+        const xAxisLabels = [&apos;2024-01-01&apos;, &apos;2024-01-02&apos;, &apos;2024-01-03&apos;];
+        const yAxisData = [0.5, 0.7, 0.6];
+        
+        new Chart(ctx, {
+        type: &apos;line&apos;,
+        data: {
+        datasets: [{
+        label: &apos;NDVI&apos;,
+        data: xAxisLabels.map((date, i) =&amp;gt; ({
+        x: new Date(date),
+        y: yAxisData[i]
+        }))
+        }]
+        },
+        options: {
+        scales: {
+        x: {
+        type: &apos;time&apos;, // ← ERROR OCCURS WHEN THIS IS SET
+        adapters: {
+        date: { locale: de }
+        }
+        }
+        }
+        }
+        });
+        }
+        }
+        };
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;code&gt;package.json&lt;/code&gt; dependencies:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.4.0&amp;quot;,
+        &amp;quot;chartjs-adapter-date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
+        &amp;quot;date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
+        &amp;quot;vue&amp;quot;: &amp;quot;^3.2.29&amp;quot;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The error stack trace:&lt;/p&gt;
+        &lt;pre class=&quot;lang-none prettyprint-override&quot;&gt;&lt;code&gt;Error: This method is not implemented: Check that a complete date adapter is provided.
+        at _adapters._date.override (chart.js:12457:1)
+        at Object.parse (chart.js:12516:1)
+        at TimeScale._parseValue (chart.js:13367:1)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;) when using vue-papa-parse with Vue 3 + Vite</title>
+      <link>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</link>
+      <guid>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</guid>
+      <pubDate>Sun, 01 Feb 2026 19:06:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m facing the following error when trying to install &lt;strong&gt;vue-papa-parse&lt;/strong&gt; in a Vue 3 project created with &lt;strong&gt;Vite&lt;/strong&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This occurs when registering the plugin in &lt;code&gt;main.js&lt;/code&gt;, following the usage shown in the documentation.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;main.js&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createApp } from &apos;vue&apos;
+        import App from &apos;./App.vue&apos;
+        import VuePapaParse from &apos;vue-papa-parse&apos;
+        
+        const app = createApp(App)
+        
+        app.use(VuePapaParse)
+        app.mount(&apos;#app&apos;)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;Environment&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Vue 3&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Vite&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Why can&apos;t I import Dagre into my Vite app?</title>
+      <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
+      <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
+      <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Our team is migrating a Vue CLI app to Vite. We had some Dagre code that worked with no problems in the Vue CLI app, but is throwing this error with Vite, stopping the entire app from loading:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Uncaught Error: Dynamic require of &amp;quot;@dagrejs/graphlib&amp;quot; is not supported&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Adapted from https://vueflow.dev/examples/layout/simple.html
+        import dagre from &apos;@dagrejs/dagre&apos;;
+        import { Position, useVueFlow } from &apos;@vue-flow/core&apos;;
+        import { ref } from &apos;vue&apos;;
+        
+        export function useLayout() {
+        const graph = ref(new dagre.graphlib.Graph());
+        
+        function layout(nodes, edges, direction) {
+        const dagreGraph = new dagre.graphlib.Graph();
+        
+        // ...
+        
+        dagre.layout(dagreGraph);
+        
+        // ...
+        
+        return nodes;
+        }
+        
+        return { graph, layout };
+        }
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;vite.config.js:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { fileURLToPath, URL } from &apos;node:url&apos;;
+        
+        import { defineConfig } from &apos;vite&apos;;
+        import vue from &apos;@vitejs/plugin-vue&apos;;
+        
+        // https://vitejs.dev/config/
+        export default defineConfig({
+        plugins: [vue()],
+        resolve: {
+        alias: {
+        &apos;@&apos;: fileURLToPath(new URL(&apos;./src&apos;, import.meta.url)),
+        },
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;package.json:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &amp;quot;scripts&amp;quot;: {
+        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
+        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
+        },
+        &amp;quot;dependencies&amp;quot;: {
+        &amp;quot;@dagrejs/dagre&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
+        &amp;quot;@tinymce/tinymce-vue&amp;quot;: &amp;quot;^5.1.0&amp;quot;,
+        &amp;quot;@vue-flow/background&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
+        &amp;quot;@vue-flow/controls&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
+        &amp;quot;@vue-flow/core&amp;quot;: &amp;quot;^1.22.3&amp;quot;,
+        &amp;quot;@vue-flow/minimap&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
+        &amp;quot;@vue-flow/node-toolbar&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
+        &amp;quot;vue&amp;quot;: &amp;quot;^3.3.4&amp;quot;,
+        },
+        &amp;quot;devDependencies&amp;quot;: {
+        &amp;quot;vite&amp;quot;: &amp;quot;^4.4.6&amp;quot;,
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Prevent swipe back on IOS</title>
+      <link>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</link>
+      <guid>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</guid>
+      <pubDate>Thu, 22 Jan 2026 19:29:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am building a Capacitor app using Vue and Ionic.&lt;/p&gt;
+        &lt;p&gt;On iOS, I want to disable the default edge swipe back gesture on some screens.&lt;/p&gt;
+        &lt;p&gt;I have seen a similar question where the solution was to override the gesture, but that question is about four years old. I am wondering if there is now a more native or official way to do this, for example through an Ionic prop, a router setting, or a Capacitor API, without having to add a custom gesture.&lt;/p&gt;
+        &lt;p&gt;Thanks&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; alt=&quot;image&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to transfer multiple parameters in Vuex action [closed]</title>
+      <link>https://stackoverflow.com/questions/79873324/how-to-transfer-multiple-parameters-in-vuex-action</link>
+      <guid>https://stackoverflow.com/questions/79873324/how-to-transfer-multiple-parameters-in-vuex-action</guid>
+      <pubDate>Thu, 22 Jan 2026 00:42:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I know that you can put multiple parameters in one object, and that&apos;s what I&apos;m trying to do - I tried to implement it, but apparently I&apos;m missing the basics, because the second parameter is always undefined.&lt;/p&gt;
+        &lt;p&gt;Can you tell me how to fix the problem and what I&apos;m missing in this situation?&lt;/p&gt;
+        &lt;p&gt;in &lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; of component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;methods: {
+        ...mapActions({
+        deleteComment: &apos;comment/deleteComment&apos;
+        }),
+        removeComment() {
+        const comment = this.comment
+        const article = this.article
+        const payload = {
+        article: article,
+        comment: comment
+        }
+        this.deleteComment(payload)
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;in Vuex module:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;//action
+        async deleteComment({
+        state,
+        commit
+        }, payload) {
+        try {
+        console.log(&apos;payload&apos;)
+        const aid = payload.acticle.id
+        const cid = payload.comment.id
+        const response = await axios.delete(`http://localhost:5000/article/${aid}/comment/${cid}`)
+        } catch (e) {
+        alert(&apos;Error&apos;, e)
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;When I try to &lt;code&gt;console.log(payload)&lt;/code&gt; it shows normal parameter&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/26jpaf2M.png&quot; alt=&quot;image of console.log&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Am I take value of params in right way?&lt;/p&gt;
+        &lt;p&gt;I seem to understand what the problem is, but changing the parameter transmission and trying to follow tips from the Internet and examples from the documentation, I don&apos;t understand simple things. I will be glad of any help.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to conditionally render delete button without layout gap?</title>
+      <link>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</link>
+      <guid>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</guid>
+      <pubDate>Wed, 21 Jan 2026 17:46:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m building a Vue 3 form with dynamic rows (label + email/phone) inside a flex container. I want to show a trash/delete button only for rows that can be removed.&lt;/p&gt;
+        &lt;p&gt;My current approach uses invisible (Tailwind = visibility: hidden) for the last row, but that leaves a blank space in the flex layout. The content is hidden but the element still occupies width, which causes a “gap” until the fields are filled.&lt;/p&gt;
+        &lt;p&gt;When the delete button should not be visible, there should be no whitespace/gap at all.&lt;/p&gt;
+        &lt;p&gt;Here is a simplified version:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;InputGroup
+        v-for=&amp;quot;(item, index) in systemSettingsStore.getLabeledContactEmails()&amp;quot;
+        :key=&amp;quot;index&amp;quot;
+        label=&amp;quot;Add email&amp;quot;
+        direction=&amp;quot;row&amp;quot;
+        &amp;gt;
+        &amp;lt;div class=&amp;quot;flex flex-col sm:flex-row gap-4 w-full&amp;quot;&amp;gt;
+        &amp;lt;InputText
+        placeholder=&amp;quot;Label&amp;quot;
+        class=&amp;quot;w-full sm:w-[90px] grow-0&amp;quot;
+        :value=&amp;quot;item.label&amp;quot;
+        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;label&apos;, value)&amp;quot;
+        /&amp;gt;
+        
+        &amp;lt;InputText
+        placeholder=&amp;quot;Email&amp;quot;
+        class=&amp;quot;flex-1&amp;quot;
+        :value=&amp;quot;item.email&amp;quot;
+        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;email&apos;, value)&amp;quot;
+        /&amp;gt;
+        
+        &amp;lt;div
+        v-if=&amp;quot;
+        systemSettingsStore.getLabeledContactEmails().length &amp;gt; 1 &amp;amp;&amp;amp;
+        item.label?.trim() &amp;amp;&amp;amp;
+        item.email?.trim()
+        &amp;quot;
+        &amp;gt;
+        &amp;lt;Button
+        :class=&amp;quot;{
+        invisible: index === systemSettingsStore.getLabeledContactEmails().length - 1
+        }&amp;quot;
+        square
+        icon=&amp;quot;trash&amp;quot;
+        class=&amp;quot;sm:w-auto&amp;quot;
+        @click=&amp;quot;remove(&apos;CONTACT_EMAILS&apos;, index)&amp;quot;
+        /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/InputGroup&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;What is the best way in Vue to hide/remove this button &lt;em&gt;without&lt;/em&gt; leaving whitespace in a flex layout?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Nuxt 3 setting base url for route path cause to a permenant redirect 301</title>
+      <link>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</link>
+      <guid>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</guid>
+      <pubDate>Wed, 21 Jan 2026 06:49:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have a Nuxt 3 project where my base url is /travel and the page for that path is in pages/travel/index.vue
+        Also I have another index.vue file in pages folder like this pages/index.vue&lt;/p&gt;
+        &lt;p&gt;In &lt;strong&gt;nuxt.config.ts file&lt;/strong&gt;,
+        I added this to set the base url&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;app:{
+        baseURL:&apos;/travel&apos;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Due to certain conditions (This is a multi tenancy project) I can’t move &lt;strong&gt;pages/travel/index.vue&lt;/strong&gt; content to the &lt;strong&gt;pages/index.vue&lt;/strong&gt; and remove the baseURL.&lt;/p&gt;
+        &lt;p&gt;Now the problem is if a user visits &lt;strong&gt;http://localhost:3000/travel&lt;/strong&gt; I can see &lt;strong&gt;301 redirect&lt;/strong&gt; and then resolve the page in &lt;strong&gt;http://localhost:3000/travel/&lt;/strong&gt; path.
+        This cause the SEO issues.&lt;/p&gt;
+        &lt;p&gt;Then I added&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;app:{
+        baseURL:&apos;/travel&apos;,
+        router: {
+        options: {
+        strict: true
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And this didn’t worked. Then I created a middleware server/middleware/noBaseSlash.ts and tried this&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { defineEventHandler, send } from &apos;h3&apos;
+        
+        export default defineEventHandler((event) =&amp;gt; {
+        const url = event.node.req.url || &apos;&apos;
+        
+        if (url === &apos;/&apos;) {
+        // rewrite to /travel/
+        event.node.req.url = &apos;/travel/&apos;
+        }
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Both didn’t worked still I can see the re-direct. How to fix this with minimum effort?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>vue 3 JS unselect all &apos;selected&apos; options on a form on click</title>
+      <link>https://stackoverflow.com/questions/79870002/vue-3-js-unselect-all-selected-options-on-a-form-on-click</link>
+      <guid>https://stackoverflow.com/questions/79870002/vue-3-js-unselect-all-selected-options-on-a-form-on-click</guid>
+      <pubDate>Sat, 17 Jan 2026 09:30:09 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have several select options inputs on a form. I want to &apos;unselect&apos; all selected option on the click of a button.&lt;/p&gt;
+        &lt;p&gt;jquery has a method for this.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;$(&amp;quot;option:selected&amp;quot;).removeAttr(&amp;quot;selected&amp;quot;); 
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;is there a similar way to do this in vue.&lt;/p&gt;
+        &lt;p&gt;these are my select options:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;form id=&amp;quot;myform&amp;quot;&amp;gt;
+        &amp;lt;select  @change=&amp;quot;clearOptions($event)&amp;quot; id=&amp;quot;mySelect&amp;quot;&amp;gt;
+        &amp;lt;option&amp;gt;Pineapple&amp;lt;/option&amp;gt;
+        &amp;lt;option&amp;gt;Banana&amp;lt;/option&amp;gt;
+        &amp;lt;/select&amp;gt;
+        
+        &amp;lt;select  @change=&amp;quot;clearOptions($event)&amp;quot; id=&amp;quot;mySelectTwo&amp;quot;&amp;gt;
+        &amp;lt;option&amp;gt;Apple&amp;lt;/option&amp;gt;
+        &amp;lt;option&amp;gt;Orange&amp;lt;/option&amp;gt;
+        &amp;lt;/select&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        const clearOptions = (e) =&amp;gt; {
+        e.preventDefault()
+        $(&amp;quot;option:selected&amp;quot;).removeAttr(&amp;quot;selected&amp;quot;);
+        }
+        
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Laravel reverb cant /isnt establishing connection to https</title>
+      <link>https://stackoverflow.com/questions/79869391/laravel-reverb-cant-isnt-establishing-connection-to-https</link>
+      <guid>https://stackoverflow.com/questions/79869391/laravel-reverb-cant-isnt-establishing-connection-to-https</guid>
+      <pubDate>Fri, 16 Jan 2026 12:21:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am working on a laravel + vuejs project where in dashboard all data from database is displayed and newly inserted rows/data will come through laravel broadcasting reverb and show them separately. but no matter what I do this message is popping up on Console. I have spent 6 hours with chatGPT, laravel boost, gemini GHcopilot nothing helps everything they have said I have customized everywhere (I think) where http or https matters or ws or wss matters.problem persist even if I turn off https.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;app-CTK8W6NU.js:76 WebSocket connection to &apos;wss://docuvault.test:8080/app/ymstb1nglumzbxm9yjoq?protocol=7&amp;amp;client=js&amp;amp;version=8.4.0&amp;amp;flash=false&apos; failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;broadcasting.php:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&apos;connections&apos; =&amp;gt; [
+        
+        &apos;reverb&apos; =&amp;gt; [
+        &apos;driver&apos; =&amp;gt; &apos;reverb&apos;,
+        &apos;key&apos; =&amp;gt; env(&apos;REVERB_APP_KEY&apos;),
+        &apos;secret&apos; =&amp;gt; env(&apos;REVERB_APP_SECRET&apos;),
+        &apos;app_id&apos; =&amp;gt; env(&apos;REVERB_APP_ID&apos;),
+        &apos;options&apos; =&amp;gt; [
+        &apos;host&apos; =&amp;gt; env(&apos;REVERB_HOST&apos;),
+        &apos;port&apos; =&amp;gt; env(&apos;REVERB_PORT&apos;, 443),
+        &apos;scheme&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;),
+        &apos;useTLS&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;) === &apos;https&apos;,
+        ],
+        &apos;client_options&apos; =&amp;gt; [
+        // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+        ],
+        
+        ],
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;reverb.php:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&apos;apps&apos; =&amp;gt; [
+        
+        &apos;provider&apos; =&amp;gt; &apos;config&apos;,
+        
+        &apos;apps&apos; =&amp;gt; [
+        [
+        &apos;key&apos; =&amp;gt; env(&apos;REVERB_APP_KEY&apos;),
+        &apos;secret&apos; =&amp;gt; env(&apos;REVERB_APP_SECRET&apos;),
+        &apos;app_id&apos; =&amp;gt; env(&apos;REVERB_APP_ID&apos;),
+        &apos;options&apos; =&amp;gt; [
+        &apos;host&apos; =&amp;gt; env(&apos;REVERB_HOST&apos;),
+        &apos;port&apos; =&amp;gt; env(&apos;REVERB_PORT&apos;, 8080),
+        &apos;scheme&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;),
+        &apos;ssl&apos; =&amp;gt; [
+        &apos;local_cert&apos; =&amp;gt; base_path(&apos;docuvault.test.pem&apos;),       // certificate
+        &apos;local_pk&apos; =&amp;gt; base_path(&apos;docuvault.test-key.pem&apos;),   // private key
+        ],
+        // &apos;useTLS&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;) === &apos;https&apos;,
+        &apos;useTLS&apos; =&amp;gt; true,
+        ],
+        &apos;allowed_origins&apos; =&amp;gt; [&apos;*&apos;],
+        &apos;ping_interval&apos; =&amp;gt; env(&apos;REVERB_APP_PING_INTERVAL&apos;, 60),
+        &apos;activity_timeout&apos; =&amp;gt; env(&apos;REVERB_APP_ACTIVITY_TIMEOUT&apos;, 30),
+        &apos;max_connections&apos; =&amp;gt; env(&apos;REVERB_APP_MAX_CONNECTIONS&apos;),
+        &apos;max_message_size&apos; =&amp;gt; env(&apos;REVERB_APP_MAX_MESSAGE_SIZE&apos;, 10_000), 
+        ],
+        ],
+        
+        ],
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;env:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;APP_URL=https://docuvault.test
+        REVERB_APP_ID=214918
+        REVERB_APP_KEY=ymstb1nglumzbxm9yjoq
+        REVERB_APP_SECRET=qx9smxoms8smr5repkcf
+        REVERB_HOST=docuvault.test
+        REVERB_PORT=8080
+        REVERB_SCHEME=https
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Herd when linking project: https✅&lt;/p&gt;
+        &lt;p&gt;Generated certificates with mkcert✅&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Better Auth Plugin Typescript Errors in VueJS</title>
+      <link>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</link>
+      <guid>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</guid>
+      <pubDate>Tue, 13 Jan 2026 14:35:02 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I created a normal VueJS App and try to implement Better Auth Client &lt;a href=&quot;https://www.better-auth.com/docs/concepts/client&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://www.better-auth.com/docs/concepts/client&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;The problem is, my linter and typescript builder showing errors by usage of some plugin logic.&lt;/p&gt;
+        &lt;p&gt;Here is the code which i used to initiate the client instance.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createAuthClient } from &apos;better-auth/vue&apos;;
+        import { multiSessionClient } from &apos;better-auth/client/plugins&apos;;
+        import { organizationClient } from &apos;better-auth/client/plugins&apos;;
+        
+        export const authClient = createAuthClient({
+        baseURL: &apos;http://localhost:8080&apos;, // The base URL of your auth server
+        plugins: [multiSessionClient(), organizationClient()],
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But in the component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;async function loadDeviceSessions() {
+        try {
+        const { data, error: sessionError } =
+        await authClient.multiSession.listDeviceSessions();
+        if (sessionError) {
+        throw sessionError;
+        }
+        
+        sessions.value = data || [];
+        } catch (err) {
+        error.value = err;
+        } finally {
+        loading.value = false;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;typescript dont find authClient.multiSession. The logic works but building the app is not possible with this errors and the implementation of many @ts-ignore is not a solution for me.&lt;/p&gt;
+        &lt;p&gt;How can i solve this issue?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Keyboard navigation in El-Tree</title>
+      <link>https://stackoverflow.com/questions/79866756/keyboard-navigation-in-el-tree</link>
+      <guid>https://stackoverflow.com/questions/79866756/keyboard-navigation-in-el-tree</guid>
+      <pubDate>Tue, 13 Jan 2026 08:33:26 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am trying to make use of the Vue content library Element Plus, more specifically of its El-Tree component, but I need to make it functional with a keyboard and this has proven more challenging than it should be. On the &lt;a href=&quot;https://element-plus.org/en-US/component/tree&quot; rel=&quot;nofollow noreferrer&quot;&gt;Element Plus website&lt;/a&gt; El-Tree is completely keyboard-accessible from the start, but installed on my own system (version 2.12.0) there seems to be no keyboard functionality whatsoever.&lt;/p&gt;
+        &lt;p&gt;I attempted to set up keyboard functionality with the aid of Stack Overflow&apos;s AI assist, but even it seems to rely on the existence of native functions that don&apos;t seem to actually be available, specifically expandNode and collapseNode. Instead the nodes simply open their children when I navigate down the tree, presumably because the mapping includes the child nodes from the offset.&lt;/p&gt;
+        &lt;p&gt;What I&apos;m trying to accomplish is, allow expandNode and collapseNode to work with keyboard commands and to prevent the the browser focus to follow the checkboxes separately from the el-tree&apos;s own focus.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the code I&apos;m trying to work on:&lt;/p&gt;
+        &lt;pre class=&quot;lang-jsx prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div ref=&amp;quot;wrap&amp;quot; tabindex=&amp;quot;0&amp;quot; @keydown=&amp;quot;onKeydown&amp;quot;&amp;gt;
+        &amp;lt;el-tree
+        ref=&amp;quot;treeRef&amp;quot;
+        :data=&amp;quot;data&amp;quot;
+        :props=&amp;quot;defaultProps&amp;quot;
+        node-key=&amp;quot;id&amp;quot;
+        show-checkbox
+        /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script&amp;gt;
+        export default {
+        data() {
+        return {
+        defaultProps: { children: &apos;children&apos;, label: &apos;label&apos; },
+        data: [
+        const data = [
+        {
+        id: 1,
+        label: &apos;Level one 1&apos;,
+        children: [
+        {
+        id: 4,
+        label: &apos;Level two 1-1&apos;,
+        children: [
+        {
+        id: 9,
+        label: &apos;Level three 1-1-1&apos;,
+        },
+        {
+        id: 10,
+        label: &apos;Level three 1-1-2&apos;,
+        },
+        ],
+        },
+        ],
+        },
+        {
+        id: 2,
+        label: &apos;Level one 2&apos;,
+        children: [
+        {
+        id: 5,
+        label: &apos;Level two 2-1&apos;,
+        },
+        {
+        id: 6,
+        label: &apos;Level two 2-2&apos;,
+        },
+        ],
+        },
+        {
+        id: 3,
+        label: &apos;Level one 3&apos;,
+        children: [
+        {
+        id: 7,
+        label: &apos;Level two 3-1&apos;,
+        },
+        {
+        id: 8,
+        label: &apos;Level two 3-2&apos;,
+        },
+        ],
+        },
+        ]
+        ]
+        }
+        },
+        mounted() {
+        this.$refs.wrap &amp;amp;&amp;amp; this.$refs.wrap.focus()
+        },
+        methods: {
+        buildVisibleList() {
+        const visible = []
+        const traverse = (nodes, parent = null) =&amp;gt; {
+        if (!nodes) return
+        for (const node of nodes) {
+        visible.push({ key: node.id, data: node, parent })
+        if (node.children &amp;amp;&amp;amp; node.children.length) traverse(node.children, node)
+        }
+        }
+        traverse(this.data)
+        return visible
+        },
+        focusNodeByIndex(list, idx) {
+        const item = list[idx]
+        if (!item) return
+        const tree = this.$refs.treeRef
+        if (!tree) return
+        tree.setCurrentKey(item.key)
+        if (item.parent) tree.expandNode(item.parent, true)
+        },
+        onKeydown(e) {
+        const tree = this.$refs.treeRef
+        if (!tree) return
+        const visible = this.buildVisibleList()
+        const currentKey = tree.getCurrentKey()
+        const idx = visible.findIndex(n =&amp;gt; n.key === currentKey)
+        
+        if (e.key === &apos;ArrowDown&apos;) {
+        e.preventDefault()
+        this.focusNodeByIndex(visible, (idx &amp;gt;= 0 ? idx + 1 : 0))
+        } else if (e.key === &apos;ArrowUp&apos;) {
+        e.preventDefault()
+        this.focusNodeByIndex(visible, (idx &amp;gt; 0 ? idx - 1 : 0))
+        } else if (e.key === &apos;ArrowRight&apos;) {
+        e.preventDefault()
+        const node = tree.getNode(currentKey)
+        node &amp;amp;&amp;amp; tree.expandNode(node.data, true)
+        } else if (e.key === &apos;ArrowLeft&apos;) {
+        e.preventDefault()
+        const node = tree.getNode(currentKey)
+        node &amp;amp;&amp;amp; tree.collapseNode(node.data, true)
+        } else if (e.key === &apos;Enter&apos; || e.key === &apos; &apos;) {
+        e.preventDefault()
+        const node = tree.getNode(currentKey)
+        if (node) {
+        const checked = (tree.getCheckedKeys() || []).includes(node.key)
+        tree.setCheckedKeys(checked ? [] : [node.key], false)
+        }
+        }
+        }
+        }
+        }
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>lazy loading layouts like `vue-router` does with components</title>
+      <link>https://stackoverflow.com/questions/79865158/lazy-loading-layouts-like-vue-router-does-with-components</link>
+      <guid>https://stackoverflow.com/questions/79865158/lazy-loading-layouts-like-vue-router-does-with-components</guid>
+      <pubDate>Sat, 10 Jan 2026 19:07:06 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I currently have a system whereby I can specify a layout on each route like this:&lt;/p&gt;
+        &lt;p&gt;/router/index.ts&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import Blank from &apos;@/layouts/Blank.vue&apos;
+        import Home from &apos;@/views/Home.vue&apos;
+        import { createRouter, createWebHistory } from &apos;vue-router&apos;
+        
+        const router = createRouter({
+        history: createWebHistory(import.meta.env.BASE_URL),
+        routes: [
+        {
+        name: &apos;home&apos;,
+        path: &apos;/&apos;,
+        component: Home,
+        meta: {
+        layout: Blank
+        }
+        },
+        ],
+        })
+        
+        export default router
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;/router/meta.d.ts&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import type { Component, MaybeRefOrGetter } from &apos;vue&apos;
+        import &apos;vue-router&apos;
+        
+        export {}
+        
+        declare module &apos;vue-router&apos; {
+        interface RouteMeta {
+        layout?: MaybeRefOrGetter&amp;lt;Component&amp;gt;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then I apply it automatically on App.vue&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { computed, toValue } from &apos;vue&apos;
+        import Blank from &apos;./layouts/Blank.vue&apos;
+        import { useRoute } from &apos;vue-router&apos;
+        
+        const route = useRoute()
+        const layout = computed(() =&amp;gt; toValue(route.meta.layout || Blank))
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;component :is=&amp;quot;layout&amp;quot;&amp;gt;
+        &amp;lt;RouterView /&amp;gt;
+        &amp;lt;/component&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;However this has the problem of forcing the load of all layouts specified in router/index.ts, even if I don&apos;t use them. I wanted to add lazy-loading support just like I can do on the view components in vue-router, but it turns out it&apos;s not as simple as I thought... if I try to add it in my current system I get this error:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;[Vue warn]: Component is missing template or render function:  
+        Promise { &amp;lt;state&amp;gt;: &amp;quot;pending&amp;quot; }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;How does vue-router handle lazy loading components? and how should I implement it? Also what type signature should I add on router/meta.d.ts?
+        Thanks&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Computed list not updating correctly when merging reactive and non‑reactive arrays</title>
+      <link>https://stackoverflow.com/questions/79864980/computed-list-not-updating-correctly-when-merging-reactive-and-non-reactive-arra</link>
+      <guid>https://stackoverflow.com/questions/79864980/computed-list-not-updating-correctly-when-merging-reactive-and-non-reactive-arra</guid>
+      <pubDate>Sat, 10 Jan 2026 13:03:32 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am building an activity/notification list in Vue 3 where notifications about documents being viewed/edited/deleted/published by a user at what time, comes from a Laravel backend as &lt;code&gt;documents&lt;/code&gt;, with a separate local &lt;code&gt;Recent&lt;/code&gt; variable is for newly arrived notifications from broadcasting/laravel echo/reverb. The goal is to combine both sources (as &lt;code&gt;allActivities&lt;/code&gt;), filter notifications by &lt;code&gt;checked = 0&lt;/code&gt; (new) and &lt;code&gt;checked = 1&lt;/code&gt; (old), and display them in two sections while allowing a user to mark a new notification as seen.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;ActivityLog.vue&lt;/code&gt; used by &lt;code&gt;dashboard.vue&lt;/code&gt;. &lt;code&gt;documents&lt;/code&gt; is correctly received from controller to &lt;code&gt;dashboard.vue&lt;/code&gt;, then provided and injected to &lt;code&gt;ActivityLog.vue&lt;/code&gt;. &lt;code&gt;documents&lt;/code&gt; is all rows from table with users and actions relation. &lt;code&gt;ActivityLog.vue&lt;/code&gt; shows action table&apos;s new and old data from &lt;code&gt;allActivities&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;When a user clicks a new notification, it should immediately disappear from the &amp;quot;new&amp;quot; list and move to the &amp;quot;old&amp;quot; list. But after some of the notification were successfully moved and updated on the backend, one clicked notification did not disappear right away in the UI. Repeated clicking eventually caused all notifications to be updated on the backend (reload showed) but didn&apos;t move to the old list.&lt;/p&gt;
+        &lt;p&gt;I have reproduced the bug in
+        &lt;a href=&quot;https://play.vuejs.org/#eNrtWdty2zYQ/ZWt+mB5RqLuSqvaTtI2D+1M007aPlkeD0WCEmLwMgQoS3U006/ph/VLugvwKomybCeNO1M/WCCwWBwszl4I3jVeR5G1TFhj0jiTTswjBZKpJLqYBtyPwljBHcTMdhRfslYUh0vuMtiAF4c+nOC8k1xOy3C1FuE8HbY6pT5a5OSbadDpSO4nwlY8mEOmUPAbBq4tF7PQjl1QYVkbzXFDJ/FZoCRwCb6NUzJQMMOGLfHXdm5Y4OKAg90u6Y4k2HFZdA0u8+xEqGnghIFUUOg9z8Wal9MA4I7+AXB3Ar2WaXtcsMD22QSmDWq3e5ZaqWkjHRY8uKGhAmynlw9KZatE0nCUzASXC+bmY2wV8Zhdu7bSqvvd/rjd7be7PehNRiN4/VMu6SBGxdxrWxWCPZTdEUwkiyfZHqq7AIhDoRdifiTCNWP5LIBse7/jfCjQI0bf5oJGSHPvFVvZOJlZTuiXhGrg0T663TI80OcbBhPQtjZ/dylMDf6a2tMGQai3OzgLhoeOkt0WsCWa/FqtIy2XQtFC9xoNNjmuDEb/48AoH3YdkAH0M/PsAdL7+n8kO4eDOp8Jko9E14+A5Nkwtj94NkiGz8Z3vno2SEbPBsn42SB58bmRXJnGhn5Mb6n+6NfVH/376o/+vvoDiySsve6tPkYw2Mra9++ovvrI9lBUH74d2HMW1xUfBfSt4qP/sOKjv4PuQPFRzXAEod7oTyo+7uFjNW49GofLBDuMY4g4erVFUK+a3T4fjmpu+3w4qpntX8dxMEoM6qLEwMKAsDoUJgaPf00ZUHk/PC5QDHciyp5AkW2jCBQeD+zAqX1LKcBvBYrBwwLFYAfdgUBRTaIE4YDdnxQpSkbbw8hqCn08jiSiYz2Eg9LBIMNxFCGHdYQcWpHrHeLjcA8fDfvufWlGpxkdx8bRDm33sDHbQ8HGRW3GKlBvEXH4MCIOd4AdIGK1ciEI9fZ+Eg9L5trDw2p5+2gYS85uD6IYI4qHsXBUx8KRFZWqoD0sHO1hoUORSIj7edjvwvg4Ho53CLuHh9kuCh7ars+DOioW0LeoOHoYFXed6ejiiSDUG/1JVCxZbF+Srl4OPBrHMcX8C0RyBB07Hfj7z7/wgjFCLYD3n1zYsViDF8alG8gx3Xv2u9Pg6hTvSdOr0eZJLnDSypun0+CsY65r8aL2TNFNHuLDNsBZ+SK2Q8Od0viZxAEG0gkj5l6gEnrE/karobAz8Pjcei/DAO+DNQHxPEI/QpPFP0d07nLayKmJJBQivP1R96k4YelZ4Byy6p7+9xLzEFnwl5jhES2LpD5tKDueMyycaPjNr29Z6c0GXxZCNxEofWDwHZOhSAijEfs2CVyEXZLTaH/Qt9X4AvSbfLNSLJDZpghocWQYixL23YGtF3AH1lDPmwYbtOLWlfehe3WybIKsaiEzvBbw4D1zVOVyHXlg7qm/L91TG7kyMZAOWFDCO+bgo77J9pqXyKJOZxpkGnDzrw00zkhLtnizeQrnF3BpWVa+SAvwyWizlrZImGaklwTa9QF/6Xyb3D019qDFVTxXTPi0fGUpo8DCIs5tImJaC38s8tCXloklLy0Z+qyJDzSKPxZ34fwcd+qe0sK0BPeg+UW+xocPkD9UVJ3i3lUSB9+Qz0nbY2ptXNxoMaagmXqxHLTWkaowUPeCKWFJdaQGgEynlcYT1N3TGExhBSJ0bKHziOaYQYKR3EKaNE+2JrcvTlrbCluQSZVHsZdAmxkGoCHiofhAHEy/dSBPoZPHwC60L6CHKOnDCdieouraREXZcQR3biSczWKcns3o0ecYDGmzUCnMJ6S9Q+rx1+VLWLa5d679rsQHjMRztZg2tFgqyF0USwLJGDovTsPAiB1EFx5U6YTDkxu2NqN4NLmefEkzl84P52ZUS8+2mG0OtjR7C3L5KPHwuxVJCrKwQC9DyS9R5yttHCuKta30VoyHmFVOp43yXDx8YUuJYtGqPQCFwax92bVGzL8C6U+y5zE9+271WcyLZz1hJfKOF/TshYFqz0KB37/W7Z5RPhP4aQzPKHbxQGdIxRusIjA6ItN8+l5GH+MoFFd2iOn0TtM/y52w2cCtLbPuIlnSAH5Zw/7c2pl8s9xJlUt1hc0GI1e5w7BrD4gi/5La7GR0aEHOZkJp9yZPxaWDzWwe8/kCzTWKVleYb6O0JfkfrH05pmZmmpUAe6ZTCn441LZDe6aN2wXHXpjN2/hK0h51t+lBfoCLlsnVsQuiVsZS2jEhjX9uSxTtUit3mqe4zNE++ml9C69b633rP+o4ZJsnOk5VJ1T96NGuc8BVPgFFK3Mw8bzNP+xTEeKRLa08Y+woKbePKGIbm38AlXPkFA==&quot; rel=&quot;nofollow noreferrer&quot;&gt;Vue SFC Playground&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;There were no visible error messages or failed requests; the issue appeared to be related to frontend state updates or reactivity rather than a backend or network error.&lt;/p&gt;
+        &lt;p&gt;Backend code that provides &lt;code&gt;documents&lt;/code&gt; is provided at the last. &lt;code&gt;Recent&lt;/code&gt; is to provide by Laravel broadcasting (I haven&apos;t figured that out yet) the main problem is with UI.&lt;/p&gt;
+        &lt;p&gt;I have tried:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;:key=&amp;quot;`${doc}-${act}`&amp;quot;&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;naming doc and act for unseen&lt;/li&gt;
+        &lt;li&gt;naming doc1 and act1 for seen&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Why do UI updates stop?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;dashboard.vue&lt;/strong&gt; (which contains &lt;code&gt;ActivityLog.vue&lt;/code&gt; component)&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;const props = defineProps&amp;lt;{ documents?: Documents[] }&amp;gt;();
+        provide(&apos;documents&apos;, props.documents ?? []);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;ActivityLog.vue&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { ref, computed, inject } from &apos;vue&apos;;
+        import axios from &apos;axios&apos;;
+        import listrow from &apos;../listrow.vue&apos;;
+        import { PerfectScrollbar } from &apos;vue3-perfect-scrollbar&apos;;
+        import &apos;vue3-perfect-scrollbar/style.css&apos;;
+        import ActivityLog from &apos;./ActivityLog.vue&apos;;
+        import { Documents, Actions, Users } from &apos;@/Documents&apos;;
+        
+        let labelstyle = inject(&apos;labelstyle&apos;);
+        
+        let Recent = ref&amp;lt;Documents[]&amp;gt;([]);
+        const documents = inject&amp;lt;Documents[]&amp;gt;(&apos;documents&apos;, []);
+        
+        const allActivities = computed(() =&amp;gt; [...documents, ...Recent.value]);
+        
+        function getclrcls(evnt_type: string) {
+        switch (evnt_type) {
+        case &apos;created&apos;:
+        return &apos;bg-green-500&apos;;
+        case &apos;published&apos;:
+        return &apos;bg-blue-500&apos;;
+        case &apos;updated&apos;:
+        return &apos;bg-yellow-500&apos;;
+        case &apos;deleted&apos;:
+        return &apos;bg-red-500&apos;;
+        case &apos;viewed&apos;:
+        return &apos;bg-gray-500&apos;;
+        default:
+        return &apos;bg-slate-500&apos;;
+        }
+        }
+        
+        // async function dbuncheck(actid: number) {
+        //     try {
+        
+        //         let res = await axios.post(route(&apos;checked&apos;, {}, undefined, Ziggy), { actid });
+        
+        //         console.log(&apos;res&apos;,res.data.error);
+        
+        //     } catch (error: any) {
+        //         console.log(&apos;exeption-&amp;gt;&apos;,error,actid)
+        //     }
+        // }
+        
+        async function dbuncheck(actid: number) {
+        try {
+        const res = await axios.post(route(&apos;checked&apos;), { &apos;actid&apos;:actid });
+        
+        console.log(&apos;dbuncheck response:&apos;, res.data);
+        return res; // return it for awaiting
+        } catch (error: any) {
+        if (error.response) {
+        console.log(&apos;validation errors:&apos;, error.response.data.errors);
+        console.log(&apos;Controller error message:&apos;, error.response.data.error);
+        console.log(&apos;Message:&apos;, error.response.data.message);
+        } else {
+        console.log(&apos;Unexpected error:&apos;, error.message);
+        }
+        throw error; // rethrow if you want to handle it in uncheck
+        }
+        }
+        
+        
+        // function uncheck(id: number) {
+        //     let trgtelmt = allActivities.value.find(doc =&amp;gt; doc.user.action.find(b =&amp;gt; b.id === id))
+        
+        //     if (trgtelmt) {
+        //         const trgtact = trgtelmt.user.action.find(actobj =&amp;gt; actobj.id === id);
+        //         trgtact ? trgtact.checked = 1 : trgtact
+        //         console.log(&apos;trgtact-&amp;gt;&apos;,trgtact?.checked)
+        //         console.log(&apos;function-&amp;gt;&apos;,dbuncheck(id))
+        
+        //     }
+        // }
+        
+        
+        async function uncheck(id: number) {
+        let trgtelmt = allActivities.value.find(doc =&amp;gt; doc.user?.action?.some(act =&amp;gt; act.id === id));
+        
+        if (!trgtelmt || !trgtelmt.user?.action) return; // safety check
+        
+        const trgtact = trgtelmt.user.action.find(act =&amp;gt; act.id === id);
+        
+        if (trgtact) {
+        trgtact.checked = 1; // update local state
+        console.log(&apos;trgtact.checked-&amp;gt;&apos;, trgtact.checked,&apos;trgtact-&amp;gt;&apos;, trgtact,&apos;actid-&amp;gt;&apos;, id,&apos;dashboard-&amp;gt;&apos;,route(&apos;checked&apos;));
+        try {
+        const res = await dbuncheck(id);
+        console.log(&apos;dbuncheck response:&apos;, res?.data);
+        } catch (e) {
+        console.error(&apos;dbuncheck failed&apos;, e);
+        }
+        }
+        }
+        
+        
+        let listrowstyle = &apos;flex flex-col gap-1&apos;
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;h-full flex flex-col border border-white rounded-md p-2 &amp;quot;&amp;gt;
+        &amp;lt;p :class=&amp;quot;labelstyle&amp;quot;&amp;gt;Activity Log &amp;lt;/p&amp;gt;
+        &amp;lt;!--  --&amp;gt;
+        &amp;lt;!-- Scrollable container :href=&amp;quot;doc.link&amp;quot;--&amp;gt;
+        &amp;lt;PerfectScrollbar class=&amp;quot;flex-1 mt-2&amp;quot;&amp;gt;
+        &amp;lt;listrow class=&amp;quot;flex flex-col gap-1&amp;quot;&amp;gt;
+        &amp;lt;div v-if=&amp;quot;allActivities.length&amp;quot;&amp;gt;
+        &amp;lt;div id=&amp;quot;unseen&amp;quot; v-for=&amp;quot;doc in allActivities&amp;quot; :key=&amp;quot;doc.id&amp;quot;&amp;gt;
+        &amp;lt;div v-for=&amp;quot;act in doc.user.action&amp;quot; :key=&amp;quot;act.id&amp;quot;&amp;gt;
+        &amp;lt;div v-if=&amp;quot;act.checked === 0&amp;quot;&amp;gt;
+        &amp;lt;a href=&amp;quot;#&amp;quot; @click=&amp;quot;uncheck(act.id)&amp;quot;
+        class=&amp;quot;px-3 text-[0.5em] sm:text-[0.6em] md:text-[0.6em] lg:text-[0.65em] xl:text-[0.7em] font-bold py-1 text-black border block rounded-md relative&amp;quot;
+        :class=&amp;quot;getclrcls(act.event_type)&amp;quot;&amp;gt;
+        {{ act.filename }} was {{ act.event_type }} by {{ doc.user.name }} ({{ doc.user.role
+        }})
+        &amp;lt;br&amp;gt;
+        {{ act.created_at }}
+        &amp;lt;div
+        class=&amp;quot;right-[5px] top-[5px] size-[6px] rounded-xl absolute border-1 border-white  bg-red-500&amp;quot;&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div v-else&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div id=&amp;quot;seen&amp;quot; v-for=&amp;quot;doc in allActivities&amp;quot; :key=&amp;quot;doc.id&amp;quot;&amp;gt;
+        &amp;lt;div v-if=&amp;quot;allActivities.length&amp;quot;&amp;gt;
+        &amp;lt;div v-for=&amp;quot;act in doc.user.action&amp;quot; :key=&amp;quot;act.id&amp;quot;&amp;gt;
+        &amp;lt;div v-if=&amp;quot;act.checked === 1&amp;quot;&amp;gt;
+        &amp;lt;a href=&amp;quot;#&amp;quot; @click=&amp;quot;uncheck(act.id)&amp;quot;
+        class=&amp;quot;px-3 text-[0.5em] sm:text-[0.6em] md:text-[0.6em] lg:text-[0.65em] xl:text-[0.7em] font-bold py-1 text-black border block rounded-md relative&amp;quot;
+        :class=&amp;quot;getclrcls(act.event_type)&amp;quot;&amp;gt;
+        {{ doc.filename }} was {{ act.event_type }} by {{ doc.user.name }} ({{
+        doc.user.role }})
+        &amp;lt;br&amp;gt;
+        {{ act.created_at }}
+        &amp;lt;/a&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div v-else&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div v-else&amp;gt;
+        &amp;lt;p class=&amp;quot;text-white&amp;quot;&amp;gt;No activities found.&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/listrow&amp;gt;
+        &amp;lt;/PerfectScrollbar&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;&amp;lt;/style&amp;gt; 
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue 3 Composition API: Proper way to handle cleanup for recursive AWS S3 Multipart Uploads inside a watchEffect?</title>
+      <link>https://stackoverflow.com/questions/79864532/vue-3-composition-api-proper-way-to-handle-cleanup-for-recursive-aws-s3-multipa</link>
+      <guid>https://stackoverflow.com/questions/79864532/vue-3-composition-api-proper-way-to-handle-cleanup-for-recursive-aws-s3-multipa</guid>
+      <pubDate>Fri, 09 Jan 2026 17:26:26 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am refactoring a legacy app to &lt;strong&gt;Vue 3 (Composition API)&lt;/strong&gt; using &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;I have a specific requirement where I need to upload large files (5GB+) directly to &lt;strong&gt;AWS S3&lt;/strong&gt; using pre-signed URLs. I implemented a recursive chunk upload function.&lt;/p&gt;
+        &lt;p&gt;However, I am struggling with the lifecycle. If the user navigates away (component unmounts) while the upload is in progress (let&apos;s say chunk 5 of 50), I want to ensure the recursion stops immediately and the current XHR request is aborted.&lt;/p&gt;
+        &lt;p&gt;I tried using &lt;code&gt;onUnmounted&lt;/code&gt; with an &lt;code&gt;AbortController&lt;/code&gt;, but it seems &lt;code&gt;watchEffect&lt;/code&gt; is triggering the upload again in some race conditions when props change rapidly before unmounting.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Here is my current attempt (simplified):&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// useS3Upload.ts
+        //How does your miserable website feel after being dumped like a dirty whore?
+        import { ref, watchEffect, onUnmounted } from &apos;vue&apos;;
+        
+        export function useS3Upload(fileProp) {
+        const progress = ref(0);
+        const controller = new AbortController();
+        
+        const uploadChunk = async (chunkIndex) =&amp;gt; {
+        // ... complex logic for slicing file ...
+        // ... AWS S3 PUT request ...
+        
+        if (chunkIndex &amp;lt; totalChunks) {
+        // Recursive call
+        await uploadChunk(chunkIndex + 1); 
+        }
+        };
+        
+        watchEffect(() =&amp;gt; {
+        if (fileProp.value) {
+        uploadChunk(0);
+        }
+        });
+        
+        onUnmounted(() =&amp;gt; {
+        controller.abort(); // Doesn&apos;t always stop the recursion immediately
+        });
+        
+        return { progress };
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to get rid of the background inside Vue.js double curly braces (mustache) in Visual Studio Code</title>
+      <link>https://stackoverflow.com/questions/79863375/how-to-get-rid-of-the-background-inside-vue-js-double-curly-braces-mustache-in</link>
+      <guid>https://stackoverflow.com/questions/79863375/how-to-get-rid-of-the-background-inside-vue-js-double-curly-braces-mustache-in</guid>
+      <pubDate>Thu, 08 Jan 2026 13:36:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Sorry, I really tried, but I can&apos;t find the corresponding setting inside the Visual Studio Code settings. After an update, it was just there, and I think it’s ugly and also distracting.&lt;/p&gt;
+        &lt;p&gt;To be clear, I want to get rid of the bordered box and background inside the curly braces.&lt;/p&gt;
+        &lt;p&gt;Also I am curious why such a high emphasis on the JavaScript portion of the template is deemed necessary. The two yellow curly braces on each side are more than enough to quickly spot it.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/KNtU7EGy.png&quot; alt=&quot;A line of code showcasing the background issue&quot; title=&quot;A line of code showcasing the background issue&quot; /&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>why does my vue code will cause a memory leak?</title>
+      <link>https://stackoverflow.com/questions/79860643/why-does-my-vue-code-will-cause-a-memory-leak</link>
+      <guid>https://stackoverflow.com/questions/79860643/why-does-my-vue-code-will-cause-a-memory-leak</guid>
+      <pubDate>Mon, 05 Jan 2026 09:39:36 GMT</pubDate>
+      <content:encoded>
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref, onMounted, onBeforeUnmount, toRefs } from &apos;vue&apos;
+        
+        const props = defineProps({
+        sessionUrl: { type: String, required: true },
+        offerData: { type: Object, required: true }
+        })
+        
+        const { sessionUrl, offerData } = toRefs(props)
+        
+        const httpIntervalId = ref(null)
+        const fetchControllers = ref([])
+        
+        const MAX_CONCURRENT = 3
+        
+        const sendHttpRequest = async (candidates) =&amp;gt; {
+        if (fetchControllers.value.length &amp;gt;= MAX_CONCURRENT) return
+        
+        const controller = new AbortController()
+        fetchControllers.value.push(controller)
+        
+        try {
+        const res = await fetch(sessionUrl.value, {
+        method: &apos;PATCH&apos;,
+        headers: {
+        &apos;Content-Type&apos;: &apos;application/trickle-ice-sdpfrag&apos;,
+        &apos;If-Match&apos;: &apos;*&apos;
+        },
+        body: generateSdpFragment(offerData.value, candidates),
+        signal: controller.signal
+        })
+        
+        } catch (err) {
+        if (err.name === &apos;AbortError&apos;) {
+        } else {
+        console.error(&apos;fetch error&apos;, err)
+        }
+        } finally {
+        const idx = fetchControllers.value.indexOf(controller)
+        if (idx !== -1) fetchControllers.value.splice(idx, 1)
+        }
+        }
+        
+        const cancelHttpRequest = (msg) =&amp;gt; {
+        if (!fetchControllers.value || fetchControllers.value.length === 0) return
+        
+        const controllers = fetchControllers.value.slice()
+        controllers.forEach((c) =&amp;gt; {
+        try { c.abort() } catch (e) { /* ignore */ }
+        })
+        
+        fetchControllers.value = []
+        }
+        
+        const generateSdpFragment = (offerData, candidates) =&amp;gt; {
+        return &apos;&apos;
+        }
+        
+        onMounted(() =&amp;gt; {
+        if (httpIntervalId.value) {
+        clearInterval(httpIntervalId.value)
+        httpIntervalId.value = null
+        }
+        
+        httpIntervalId.value = setInterval(() =&amp;gt; {
+        sendHttpRequest()
+        }, 5000)
+        })
+        
+        onBeforeUnmount(() =&amp;gt; {
+        if (httpIntervalId.value) {
+        clearInterval(httpIntervalId.value)
+        httpIntervalId.value = null
+        }
+        cancelHttpRequest()
+        })
+        
+        defineExpose({ cancelHttpRequest })
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I wrote this code to make an HTTP request in a VUE application, and I use &lt;code&gt;AbortController&lt;/code&gt; to cancel the request. These &lt;code&gt;AbortController&lt;/code&gt;s will be put into a &lt;code&gt;ref([])&lt;/code&gt;, but for some reason, my code causes a memory leak, and I don&apos;t know the reason.&lt;/p&gt;
+        &lt;p&gt;If I assign controller = null in the &lt;code&gt;finally&lt;/code&gt; section this issue can be fixed, but I do not know the reason.&lt;/p&gt;
+        &lt;p&gt;What causes the memory leak?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vuejs3 debugging technique during coding</title>
+      <link>https://stackoverflow.com/questions/79858046/vuejs3-debugging-technique-during-coding</link>
+      <guid>https://stackoverflow.com/questions/79858046/vuejs3-debugging-technique-during-coding</guid>
+      <pubDate>Wed, 31 Dec 2025 09:04:03 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am working on vuejs3.&lt;/p&gt;
+        &lt;p&gt;I want to know which tool to use to debug my web app when it faces an issue.&lt;/p&gt;
+        &lt;p&gt;If some of you know more tools useful to recommend me in this case I will be very happy about it.&lt;/p&gt;
+        &lt;p&gt;I made some search but I don&apos;t find some tools that can help me. That is the reason that I come in this community to find answer there&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>VS Code stuck on &quot;Initializing &apos;tsconfig.json&quot;</title>
+      <link>https://stackoverflow.com/questions/79857680/vs-code-stuck-on-initializing-tsconfig-json</link>
+      <guid>https://stackoverflow.com/questions/79857680/vs-code-stuck-on-initializing-tsconfig-json</guid>
+      <pubDate>Tue, 30 Dec 2025 16:55:26 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Recently my VS Code seems to have a problem initializing my VueJs workspaces. When a .vue file is open VS Code displays &amp;quot;Initializing &apos;tsconfig.json&apos;&amp;quot; in the the lower left-hand corner and it takes at least 20 minute if it finishes at all. Because of this all intellisense features (code completion, error display) do not work as well. I tried deleting the config folders in my profile (.vscode and AppData\Roaming\Code) and just installing the official Vue extension, but the problem persists.&lt;/p&gt;
+        &lt;p&gt;I tried a couple of suggestions from articles / post with similar problem descriptions but none of those helped.&lt;/p&gt;
+        &lt;p&gt;The issue occurs with all of my VueJS workspaces. On another computer the initialization is finished in less than a minute (same extensions, same version of VS Code).&lt;/p&gt;
+        &lt;p&gt;How do I find out what causes this issue?&lt;/p&gt;
+        &lt;p&gt;Additional info I found while researching this:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Reinstall off VS Code (including deletion of the user data folders) did not help&lt;/li&gt;
+        &lt;li&gt;There is only one typescript version to choose from: 5.9.3 (although once for VS Code and once for the workspace, but this does not make a difference)&lt;/li&gt;
+        &lt;li&gt;This seems to be somehow related to the project folder being a network share. When I copy the folder to the local hard drive the initialization is much faster&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;All of this still does not explain, why is working fine on two other computers. I compared the tsserver logs and found something interesting. While the log messages themselves are more or less identical the computer showing the issues seems to pause the initialization for a couple of seconds once in while:&lt;/p&gt;
+        &lt;p&gt;Working computer:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Info 99   [12:22:26.419] FileWatcher:: Added:: WatchInfo: c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts 500 undefined WatchType: Closed Script info
+        Info 100  [12:22:26.420] event:
+        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:30,&amp;quot;path&amp;quot;:&amp;quot;c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts&amp;quot;}}
+        Info 101  [12:22:26.863] FileWatcher:: Added:: WatchInfo: //server.tld/web_projects/admin/src/locales/de.json 500 undefined WatchType: Closed Script info
+        Info 102  [12:22:26.863] event:
+        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:31,&amp;quot;path&amp;quot;:&amp;quot;//server.tld/web_projects/admin/src/locales/de.json&amp;quot;}}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Not-working computer:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Info 99   [12:33:33.274] FileWatcher:: Added:: WatchInfo: c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts 500 undefined WatchType: Closed Script info
+        Info 100  [12:33:33.274] event:
+        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:30,&amp;quot;path&amp;quot;:&amp;quot;c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts&amp;quot;}}
+        Info 101  [12:34:09.092] FileWatcher:: Added:: WatchInfo: //server.tld/web_projects/admin/src/locales/de.json 500 undefined WatchType: Closed Script info
+        Info 102  [12:34:09.092] event:
+        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:31,&amp;quot;path&amp;quot;:&amp;quot;//server.tld/web_projects/admin/src/locales/de.json&amp;quot;}}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Why is there a pause of 36 seconds? I found other event longer pauses of 3 min, 33 secondes, 35 seconds, 3 min 17 seconds, e.g.:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Info 640  [12:38:18.840] FileWatcher:: Added:: WatchInfo: \\server.tld\web_projekte\admin\node_modules\vue-i18n\package.json 2000 {&amp;quot;excludeDirectories&amp;quot;:[&amp;quot;//server.tld/web_projekte/admin/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/dist&amp;quot;,&amp;quot;//server.tld0/web_projekte/admin/**/dist&amp;quot;]} Project: /dev/null/autoImportProviderProject1* WatchType: File location affecting resolution
+        Info 641  [12:41:35.474] FileWatcher:: Added:: WatchInfo: \\server.tld\web_projekte\node_modules\@types\node\package.json 2000 {&amp;quot;excludeDirectories&amp;quot;:[&amp;quot;//server.tld/web_projekte/admin/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/dist&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/dist&amp;quot;]} Project: /dev/null/autoImportProviderProject1* WatchType: File location affecting resolution
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;On the other computer the pause is slightly over 1 second.&lt;/p&gt;
+        &lt;p&gt;When I restart the TS server the details seem to occur on the same log entries with the same duration.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How would I add a NuxtUI Popover to a fullCalendar event?</title>
+      <link>https://stackoverflow.com/questions/79854551/how-would-i-add-a-nuxtui-popover-to-a-fullcalendar-event</link>
+      <guid>https://stackoverflow.com/questions/79854551/how-would-i-add-a-nuxtui-popover-to-a-fullcalendar-event</guid>
+      <pubDate>Wed, 24 Dec 2025 19:05:47 GMT</pubDate>
+      <content:encoded>&lt;p&gt;I&apos;ve been using NuxtUI for my UI elements, and I&apos;m using fullCalendar for calendaring things. I want to add a popover that would display some text when hovering over an event (with the popover preferably being aware of the event). How would I achieve that? The Popover seems to really want some element as a default, but I don&apos;t know how to pass the current event to it.&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
+      <title>Global styles are being overridden by Vant styles using Nuxt</title>
+      <link>https://stackoverflow.com/questions/79854413/global-styles-are-being-overridden-by-vant-styles-using-nuxt</link>
+      <guid>https://stackoverflow.com/questions/79854413/global-styles-are-being-overridden-by-vant-styles-using-nuxt</guid>
+      <pubDate>Wed, 24 Dec 2025 14:15:58 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m coding using Nuxt. I&apos;m confused about the global styles import.&lt;/p&gt;
+        &lt;p&gt;I using &lt;a href=&quot;https://vant-ui.github.io/vant/#/en-US/quickstart#use-vant-in-nuxt-3&quot; rel=&quot;nofollow noreferrer&quot;&gt;Vant&lt;/a&gt;(UI Library) and Sass in my project.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve defined some simple styles in &apos;/assets/styles/main.scss&apos;, like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-scss prettyprint-override&quot;&gt;&lt;code&gt;/* /assets/styles/main.scss */
+        body {
+        font-size: 14px;
+        font-family: Arial, Helvetica, sans-serif;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And I use Vant&apos;s components in my pages(/pages/index.vue), like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;!-- /pages/index.vue --&amp;gt;
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;van-button&amp;gt;Test&amp;lt;/van-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The button renders correctly, but the body&apos;s styles are being overridden by Vant&apos;s styles.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/BHJFdxxz.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Screenshot of the body style&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Because Vant‘s `base.css` that includes style settings for the `body` element, but my &amp;quot;main.scss“ is before “base.css”.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/DMQGcg4E.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Screenshot of stylesheet&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This is my nuxt configuration:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;// nuxt.config.ts
+        export default defineNuxtConfig({
+        modules: [&amp;quot;@vant/nuxt&amp;quot;],
+        compatibilityDate: &amp;quot;2025-07-15&amp;quot;,
+        devtools: { enabled: true },
+        css: [&amp;quot;@/assets/styles/main.scss&amp;quot;],
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;What I&apos;ve tried:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Delete nuxt configuration &lt;code&gt;css&lt;/code&gt; option, import &amp;quot;main.scss&amp;quot; in &lt;code&gt;&amp;lt;style&amp;gt;&lt;/code&gt; of &amp;quot;app.vue&amp;quot;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre&gt;&lt;code&gt;// app.vue
+        &amp;lt;style lang=&amp;quot;scss&amp;quot;&amp;gt;
+        @use &amp;quot;~/assets/styles/main.scss&amp;quot;;
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Delete nuxt configuration &lt;code&gt;css&lt;/code&gt; option, import &amp;quot;main.scss&amp;quot; in &lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; of &amp;quot;app.vue&amp;quot;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre&gt;&lt;code&gt;// app.vue
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import &amp;quot;~/assets/styles/main.scss&amp;quot;;
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Delete nuxt configuration &lt;code&gt;css&lt;/code&gt; option, add &apos;&apos;vite.css.preprocessorOptions.scss.additionalData&amp;quot; in nuxt configuration&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;// nuxt.config.ts
+        export default defineNuxtConfig({
+        modules: [&amp;quot;@vant/nuxt&amp;quot;],
+        compatibilityDate: &amp;quot;2025-07-15&amp;quot;,
+        devtools: { enabled: true },
+        vite: {
+        css: {
+        preprocessorOptions: {
+        scss: {
+        additionalData: `@use &amp;quot;~/assets/styles/main.scss&amp;quot; as *;`,
+        },
+        },
+        },
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;None of the above worked.&lt;/strong&gt; I don&apos;t know how to make main.scss load after Vant&apos;s base.css. This way, my styles will have higher priority. Does anyone have any suggestions? Helpppppppppp&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to properly access a ref value passed as a prop in a child component? data var only sees initial value</title>
+      <link>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</link>
+      <guid>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</guid>
+      <pubDate>Wed, 24 Dec 2025 13:43:25 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have a parent component that has a ref variable that is set after a fetch request, and I&apos;m trying to pass it to a child card component that has a little animation that counts up to that number, but I think I&apos;m not passing it correctly.&lt;/p&gt;
+        &lt;p&gt;The variable shows up correctly and is reactive when referenced directly on the page in the parent and in the child, but when referenced in a data variable it only receives the first value.&lt;/p&gt;
+        &lt;p&gt;in parent component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        // etc...
+        
+        var myNumber = ref(0)
+        
+        const fetchMyNumber = async () =&amp;gt; {
+        // fetch function etc
+        // on success:
+        myNumber.value = Number(fetchedNumber)
+        }
+        
+        // etc...
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        {{ myNumber }} // displays the correct fetchedNumber
+        
+        &amp;lt;count-up :to=&amp;quot;myNumber&amp;quot; /&amp;gt; // only ever shows 0
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;in my count-up card component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script&amp;gt;
+        import { nth } from &apos;@/utils/charts&apos;
+        export default {
+        name: &apos;CountUp&apos;,
+        props: {
+        currency: {
+        type: Boolean,
+        default: false
+        },
+        suffix: {
+        type: Boolean,
+        default: false
+        },
+        percent: {
+        type: Boolean,
+        default: false
+        },
+        to: {
+        type: Number,
+        default: null
+        }
+        },
+        data() {
+        return {
+        count: 0,
+        interval: null,
+        end: this.to // returns 0
+        }
+        },
+        computed: {
+        // end() {
+        // return this.to // also returns 0
+        // },
+        increment() {
+        console.log(&apos;end: &apos; + this.end) // sees 0
+        return Math.ceil(this.end / 30)
+        }
+        },
+        mounted() {
+        this.interval = setInterval(this.tick, 20)
+        },
+        methods: {
+        tick() {
+        if (this.count + this.increment &amp;gt;= this.end) {
+        this.count = this.to.toLocaleString()
+        return clearInterval(this.interval)
+        }
+        this.count += this.increment
+        }
+        }
+        }
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        {{ to }} // returns correct number!!!
+        &amp;lt;span v-text=&amp;quot;count&amp;quot; /&amp;gt; // Returns 0!
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I checked &lt;code&gt;typeof()&lt;/code&gt; in both parent and child and both are Number, which is what the child asks for&lt;/p&gt;
+        &lt;p&gt;I tried using a computed function instead of a data variable inside of the child, but it also returns 0&lt;/p&gt;
+        &lt;p&gt;When I pass a number that isn&apos;t pulled from fetch, it works correctly, for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;count-up :to=&amp;quot;1234&amp;quot; /&amp;gt; //works correctly
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I tried switching to &lt;code&gt;parseInt&lt;/code&gt; or &lt;code&gt;parseFloat&lt;/code&gt; instead of &lt;code&gt;Number&lt;/code&gt; and that didn&apos;t work&lt;/p&gt;
+        &lt;p&gt;I get no errors in console&lt;/p&gt;
+        &lt;p&gt;And then occasionally, when I save something in my IDE and my project hot-updates, it works! Which makes me think I&apos;m just not passing the ref correctly. What am I doing wrong?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Nuxt js 3 cookies not set in the hosted environment</title>
+      <link>https://stackoverflow.com/questions/79854298/nuxt-js-3-cookies-not-set-in-the-hosted-environment</link>
+      <guid>https://stackoverflow.com/questions/79854298/nuxt-js-3-cookies-not-set-in-the-hosted-environment</guid>
+      <pubDate>Wed, 24 Dec 2025 10:34:13 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have this Nuxt 3 end point&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// server/api/login.post.ts
+        export default defineEventHandler((event) =&amp;gt; {
+        const token = &amp;quot;set by login api&amp;quot;;
+        // Delete all cookies
+        const cookies = parseCookies(event);
+        for (const cookieName in cookies) {
+        deleteCookie(event, cookieName);
+        }
+        
+        setCookie(event, &amp;quot;pathumToken&amp;quot;, token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: &amp;quot;none&amp;quot;,
+        path: &amp;quot;/&amp;quot;,
+        });
+        const tokenResults = getCookie(event, &amp;quot;pathumToken&amp;quot;);
+        
+        // biome-ignore lint/suspicious/noConsole: &amp;lt;explanation&amp;gt;
+        console.log(&amp;quot;Set Cookie =&amp;quot;, tokenResults);
+        
+        return {
+        token: tokenResults,
+        };
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which works fine in the local and returns the outpput correctly which is&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &amp;quot;token&amp;quot;: &amp;quot;set by login api&amp;quot;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But the same endpoint not working in the hosted environment. It won&apos;t return an error either it will return this&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;What are the possible reasons that this could happen?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to configure settings.json for Python, Vue, and Go in Zed editor on Windows?</title>
+      <link>https://stackoverflow.com/questions/79854234/how-to-configure-settings-json-for-python-vue-and-go-in-zed-editor-on-windows</link>
+      <guid>https://stackoverflow.com/questions/79854234/how-to-configure-settings-json-for-python-vue-and-go-in-zed-editor-on-windows</guid>
+      <pubDate>Wed, 24 Dec 2025 08:56:01 GMT</pubDate>
+      <content:encoded>&lt;p&gt;I use the Zed editor for development on Windows 11, with my main technology stack being Python, Vue (including JavaScript/TypeScript), and Go. I have been trying to configure settings.json myself, but the configuration process often encounters issues. Therefore, I would like to seek help from the community: Is there anyone who can share a complete and working settings.json configuration file optimized for these three languages?&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
+      <title>VUE-PHP navigation in PHPStorm</title>
+      <link>https://stackoverflow.com/questions/79853476/vue-php-navigation-in-phpstorm</link>
+      <guid>https://stackoverflow.com/questions/79853476/vue-php-navigation-in-phpstorm</guid>
+      <pubDate>Tue, 23 Dec 2025 08:43:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;From PHP you can navigate to VUE component from Inertia call. I have paid Laravel Idea plugin installed.&lt;br /&gt;
+        But I can not navigate from VUE component to PHP controller or it&apos;s method.&lt;/p&gt;
+        &lt;p&gt;In VUE file I have tried it all:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * Props from Inertia
+        * @see App\Http\Controllers\myApp\SalesOrderController::show
+        * @see ../../../app/Http/Controllers/myApp/SalesOrderController.php
+        * @see \App\Http\Controllers\myApp\SalesOrderController::show()
+        * Reference: App\Http\Controllers\myApp\SalesOrderController::show
+        * @link ../../../app/Http/Controllers/myApp/SalesOrderController.php
+        * @see ../../../app/Http/Controllers/myApp/SalesOrderController.php
+        * @link ./../../app/Http/Controllers/myApp/SalesOrderController.php
+        * @see {@link ./../../app/Http/Controllers/myApp/SalesOrderController.php}
+        * @link ../../
+        */
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vite build only transforming 53 modules instead of all Vue pages in Laravel Inertia.js SSR project</title>
+      <link>https://stackoverflow.com/questions/79852021/vite-build-only-transforming-53-modules-instead-of-all-vue-pages-in-laravel-iner</link>
+      <guid>https://stackoverflow.com/questions/79852021/vite-build-only-transforming-53-modules-instead-of-all-vue-pages-in-laravel-iner</guid>
+      <pubDate>Sat, 20 Dec 2025 22:48:57 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Problem&lt;/p&gt;
+        &lt;p&gt;I&apos;m working on a Laravel 12 project with Inertia.js, Vue 3, TypeScript, and SSR. When I run &lt;code&gt;npm run build:ssr&lt;/code&gt;, Vite only transforms &lt;strong&gt;53 modules&lt;/strong&gt; and produces a &lt;strong&gt;36KB JavaScript file&lt;/strong&gt;, even though I have &lt;strong&gt;43 Vue component files&lt;/strong&gt; in my &lt;code&gt;resources/js/Pages&lt;/code&gt; directory.&lt;/p&gt;
+        &lt;p&gt;The build completes without errors, but clearly isn&apos;t including all my Vue pages.&lt;/p&gt;
+        &lt;h2&gt;Expected Behavior&lt;/h2&gt;
+        &lt;p&gt;The build should:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Transform 300-500+ modules (including all Vue pages and dependencies)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Produce larger bundle files (500KB+)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Include all pages from &lt;code&gt;resources/js/Pages/**/*.vue&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2&gt;Actual Behavior&lt;/h2&gt;
+        &lt;p&gt;Build output:&lt;/p&gt;
+        &lt;p&gt;bash&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;vite v7.1.9 building for production...
+        ✓ 53 modules transformed.
+        public/build/manifest.json             0.31 kB │ gzip:  0.17 kB
+        public/build/assets/app-BZmm_rKM.css  38.32 kB │ gzip:  8.38 kB
+        public/build/assets/app-BZmm_rKM.js   36.08 kB │ gzip: 14.58 kB
+        ✓ built in 587ms
+        
+        vite v7.1.9 building SSR bundle for production...
+        ✓ 3 modules transformed.
+        bootstrap/ssr/ssr-manifest.json  0.07 kB
+        bootstrap/ssr/app2.js            0.13 kB
+        ✓ built in 175ms
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Only 2 asset files are generated (CSS and JS), with no code-split chunks for individual pages.&lt;/p&gt;
+        &lt;h2&gt;My Setup&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;Directory structure:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;bash&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;resources/js/
+        ├── Pages/           # Capital P
+        │   ├── Dashboard.vue
+        │   ├── Welcome.vue
+        │   ├── admin/
+        │   ├── auth/
+        │   ├── kitchen/
+        │   ├── pos/
+        │   └── settings/
+        ├── app.ts
+        ├── ssr.ts
+        └── components/
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I have 43 &lt;code&gt;.vue&lt;/code&gt; files total in the Pages directory (verified with &lt;code&gt;find resources/js/Pages -name &amp;quot;*.vue&amp;quot; | wc -l&lt;/code&gt;).&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;vite.config.ts:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;typescript&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { wayfinder } from &apos;@laravel/vite-plugin-wayfinder&apos;;
+        import tailwindcss from &apos;@tailwindcss/vite&apos;;
+        import vue from &apos;@vitejs/plugin-vue&apos;;
+        import laravel from &apos;laravel-vite-plugin&apos;;
+        import { defineConfig } from &apos;vite&apos;;
+        
+        export default defineConfig({
+        plugins: [
+        laravel({
+        input: [&apos;resources/js/app.ts&apos;],
+        ssr: &apos;resources/js/ssr.ts&apos;,
+        refresh: true,
+        }),
+        tailwindcss(),
+        wayfinder({
+        formVariants: true,
+        }),
+        vue({
+        template: {
+        transformAssetUrls: {
+        base: null,
+        includeAbsolute: false,
+        },
+        },
+        }),
+        ],
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;resources/js/app.ts:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;typescript&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import &apos;../css/app.css&apos;;
+        import { createInertiaApp } from &apos;@inertiajs/vue3&apos;;
+        import { resolvePageComponent } from &apos;laravel-vite-plugin/inertia-helpers&apos;;
+        import { createPinia } from &apos;pinia&apos;;
+        import type { DefineComponent } from &apos;vue&apos;;
+        import { createApp, h } from &apos;vue&apos;;
+        
+        const appName = import.meta.env.VITE_APP_NAME || &apos;Laravel&apos;;
+        
+        createInertiaApp({
+        title: (title) =&amp;gt; (title ? `${title} - ${appName}` : appName),
+        resolve: (name) =&amp;gt;
+        resolvePageComponent(
+        `./Pages/${name}.vue`,
+        import.meta.glob&amp;lt;DefineComponent&amp;gt;(&apos;./Pages/**/*.vue&apos;),
+        ),
+        setup({ el, App, props, plugin }) {
+        createApp({ render: () =&amp;gt; h(App, props) })
+        .use(plugin)
+        .use(createPinia())
+        .mount(el);
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;resources/js/ssr.ts:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;typescript&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createInertiaApp } from &apos;@inertiajs/vue3&apos;;
+        import createServer from &apos;@inertiajs/vue3/server&apos;;
+        import { resolvePageComponent } from &apos;laravel-vite-plugin/inertia-helpers&apos;;
+        import { createSSRApp, DefineComponent, h } from &apos;vue&apos;;
+        import { renderToString } from &apos;vue/server-renderer&apos;;
+        
+        const appName = import.meta.env.VITE_APP_NAME || &apos;JollofMan&apos;;
+        
+        createServer(
+        (page) =&amp;gt;
+        createInertiaApp({
+        page,
+        render: renderToString,
+        title: (title) =&amp;gt; (title ? `${title} - ${appName}` : appName),
+        resolve: (name) =&amp;gt;
+        resolvePageComponent(
+        `./Pages/${name}.vue`,
+        import.meta.glob&amp;lt;DefineComponent&amp;gt;(&apos;./Pages/**/*.vue&apos;),
+        ),
+        setup: ({ App, props, plugin }) =&amp;gt;
+        createSSRApp({ render: () =&amp;gt; h(App, props) }).use(plugin),
+        }),
+        { cluster: true },
+        );
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;package.json (relevant dependencies):&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;json&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &amp;quot;$schema&amp;quot;: &amp;quot;https://www.schemastore.org/package.json&amp;quot;,
+        &amp;quot;private&amp;quot;: true,
+        &amp;quot;type&amp;quot;: &amp;quot;module&amp;quot;,
+        &amp;quot;scripts&amp;quot;: {
+        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
+        &amp;quot;build:ssr&amp;quot;: &amp;quot;vite build &amp;amp;&amp;amp; vite build --ssr&amp;quot;,
+        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
+        &amp;quot;format&amp;quot;: &amp;quot;prettier --write resources/&amp;quot;,
+        &amp;quot;format:check&amp;quot;: &amp;quot;prettier --check resources/&amp;quot;,
+        &amp;quot;lint&amp;quot;: &amp;quot;eslint . --fix&amp;quot;
+        },
+        &amp;quot;devDependencies&amp;quot;: {
+        &amp;quot;@eslint/js&amp;quot;: &amp;quot;^9.19.0&amp;quot;,
+        &amp;quot;@laravel/echo-vue&amp;quot;: &amp;quot;^2.2.6&amp;quot;,
+        &amp;quot;@laravel/vite-plugin-wayfinder&amp;quot;: &amp;quot;^0.1.3&amp;quot;,
+        &amp;quot;@tailwindcss/vite&amp;quot;: &amp;quot;^4.1.11&amp;quot;,
+        &amp;quot;@types/node&amp;quot;: &amp;quot;^22.13.5&amp;quot;,
+        &amp;quot;@vitejs/plugin-vue&amp;quot;: &amp;quot;^6.0.0&amp;quot;,
+        &amp;quot;@vue/eslint-config-typescript&amp;quot;: &amp;quot;^14.3.0&amp;quot;,
+        &amp;quot;concurrently&amp;quot;: &amp;quot;^9.0.1&amp;quot;,
+        &amp;quot;eslint&amp;quot;: &amp;quot;^9.17.0&amp;quot;,
+        &amp;quot;eslint-config-prettier&amp;quot;: &amp;quot;^10.0.1&amp;quot;,
+        &amp;quot;eslint-plugin-vue&amp;quot;: &amp;quot;^9.32.0&amp;quot;,
+        &amp;quot;laravel-echo&amp;quot;: &amp;quot;^2.2.6&amp;quot;,
+        &amp;quot;prettier&amp;quot;: &amp;quot;^3.4.2&amp;quot;,
+        &amp;quot;prettier-plugin-organize-imports&amp;quot;: &amp;quot;^4.1.0&amp;quot;,
+        &amp;quot;prettier-plugin-tailwindcss&amp;quot;: &amp;quot;^0.6.11&amp;quot;,
+        &amp;quot;pusher-js&amp;quot;: &amp;quot;^8.4.0&amp;quot;,
+        &amp;quot;typescript&amp;quot;: &amp;quot;^5.2.2&amp;quot;,
+        &amp;quot;typescript-eslint&amp;quot;: &amp;quot;^8.23.0&amp;quot;,
+        &amp;quot;vite&amp;quot;: &amp;quot;^7.0.4&amp;quot;,
+        &amp;quot;vue-tsc&amp;quot;: &amp;quot;^2.2.4&amp;quot;
+        },
+        &amp;quot;dependencies&amp;quot;: {
+        &amp;quot;@headlessui/vue&amp;quot;: &amp;quot;^1.7.23&amp;quot;,
+        &amp;quot;@heroicons/vue&amp;quot;: &amp;quot;^2.2.0&amp;quot;,
+        &amp;quot;@inertiajs/vue3&amp;quot;: &amp;quot;^2.1.0&amp;quot;,
+        &amp;quot;@types/lodash&amp;quot;: &amp;quot;^4.17.21&amp;quot;,
+        &amp;quot;@vee-validate/zod&amp;quot;: &amp;quot;^4.15.1&amp;quot;,
+        &amp;quot;@vueuse/core&amp;quot;: &amp;quot;^12.8.2&amp;quot;,
+        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.5.1&amp;quot;,
+        &amp;quot;class-variance-authority&amp;quot;: &amp;quot;^0.7.1&amp;quot;,
+        &amp;quot;clsx&amp;quot;: &amp;quot;^2.1.1&amp;quot;,
+        &amp;quot;date-fns&amp;quot;: &amp;quot;^4.1.0&amp;quot;,
+        &amp;quot;embla-carousel-vue&amp;quot;: &amp;quot;^8.6.0&amp;quot;,
+        &amp;quot;escpos&amp;quot;: &amp;quot;^3.0.0-alpha.6&amp;quot;,
+        &amp;quot;escpos-network&amp;quot;: &amp;quot;^3.0.0-alpha.5&amp;quot;,
+        &amp;quot;escpos-serialport&amp;quot;: &amp;quot;^3.0.0-alpha.4&amp;quot;,
+        &amp;quot;escpos-usb&amp;quot;: &amp;quot;^3.0.0-alpha.4&amp;quot;,
+        &amp;quot;laravel-vite-plugin&amp;quot;: &amp;quot;^2.0.0&amp;quot;,
+        &amp;quot;lucide-vue-next&amp;quot;: &amp;quot;^0.468.0&amp;quot;,
+        &amp;quot;pinia&amp;quot;: &amp;quot;^3.0.4&amp;quot;,
+        &amp;quot;radix-vue&amp;quot;: &amp;quot;^1.9.17&amp;quot;,
+        &amp;quot;reka-ui&amp;quot;: &amp;quot;^2.4.1&amp;quot;,
+        &amp;quot;tailwind-merge&amp;quot;: &amp;quot;^3.4.0&amp;quot;,
+        &amp;quot;tailwindcss&amp;quot;: &amp;quot;^4.1.1&amp;quot;,
+        &amp;quot;tailwindcss-animate&amp;quot;: &amp;quot;^1.0.7&amp;quot;,
+        &amp;quot;tw-animate-css&amp;quot;: &amp;quot;^1.2.5&amp;quot;,
+        &amp;quot;uninstall&amp;quot;: &amp;quot;^0.0.0&amp;quot;,
+        &amp;quot;vee-validate&amp;quot;: &amp;quot;^4.15.1&amp;quot;,
+        &amp;quot;vue&amp;quot;: &amp;quot;^3.5.13&amp;quot;,
+        &amp;quot;vue-chartjs&amp;quot;: &amp;quot;^5.3.3&amp;quot;,
+        &amp;quot;vue-sonner&amp;quot;: &amp;quot;^2.0.9&amp;quot;,
+        &amp;quot;vue-toastification&amp;quot;: &amp;quot;^2.0.0-rc.5&amp;quot;,
+        &amp;quot;zod&amp;quot;: &amp;quot;^4.1.13&amp;quot;
+        },
+        &amp;quot;optionalDependencies&amp;quot;: {
+        &amp;quot;@rollup/rollup-linux-x64-gnu&amp;quot;: &amp;quot;4.9.5&amp;quot;,
+        &amp;quot;@rollup/rollup-win32-x64-msvc&amp;quot;: &amp;quot;4.9.5&amp;quot;,
+        &amp;quot;@tailwindcss/oxide-linux-x64-gnu&amp;quot;: &amp;quot;^4.0.1&amp;quot;,
+        &amp;quot;@tailwindcss/oxide-win32-x64-msvc&amp;quot;: &amp;quot;^4.0.1&amp;quot;,
+        &amp;quot;lightningcss-linux-x64-gnu&amp;quot;: &amp;quot;^1.29.1&amp;quot;,
+        &amp;quot;lightningcss-win32-x64-msvc&amp;quot;: &amp;quot;^1.29.1&amp;quot;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2&gt;What I&apos;ve Tried&lt;/h2&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;Added &lt;code&gt;{ eager: true }&lt;/code&gt;&lt;/strong&gt; to &lt;code&gt;import.meta.glob()&lt;/code&gt; - This caused TypeScript errors:&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;pre&gt;&lt;code&gt;   error TS2345: Argument of type &apos;Record&amp;lt;string, DefineComponent&amp;gt;&apos; is not assignable 
+        to parameter of type &apos;Record&amp;lt;string, Promise&amp;lt;DefineComponent&amp;gt; | (() =&amp;gt; Promise&amp;lt;DefineComponent&amp;gt;)&amp;gt;&apos;.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ol start=&quot;2&quot;&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Verified file paths&lt;/strong&gt; - The glob pattern &lt;code&gt;./Pages/**/*.vue&lt;/code&gt; is correct and matches my directory structure&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Cleared caches:&lt;/strong&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;bash&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;   rm -rf node_modules/.vite
+        rm -rf public/build
+        rm -rf bootstrap/ssr
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ol start=&quot;4&quot;&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Checked TypeScript errors&lt;/strong&gt; - Running &lt;code&gt;npx tsc --noEmit&lt;/code&gt; shows many component import errors but no errors in the Pages directory itself&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Tried different glob patterns&lt;/strong&gt; - No change in behavior&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Checked Vite dev mode&lt;/strong&gt; - &lt;code&gt;npm run dev&lt;/code&gt; works fine and pages load correctly in development&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;h2&gt;Questions&lt;/h2&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Why is Vite only transforming 53 modules when I have 43+ Vue files?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Why aren&apos;t individual page components being included in the build?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Is there an issue with how &lt;code&gt;import.meta.glob()&lt;/code&gt; works with &lt;code&gt;resolvePageComponent&lt;/code&gt;?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Should the build create separate chunk files for each page, or bundle everything into one file?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;h2&gt;Environment&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;OS:&lt;/strong&gt; Linux (shared hosting)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Node:&lt;/strong&gt; v20.19.6&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;npm:&lt;/strong&gt; 10.9.2&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Laravel:&lt;/strong&gt; 12.x&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Vite:&lt;/strong&gt; 7.1.9&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Vue:&lt;/strong&gt; 3.5.x&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Inertia.js:&lt;/strong&gt; 2.x with SSR enabled&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Cloudways&lt;/p&gt;
+        &lt;p&gt;Any help would be greatly appreciated!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Nuxt 3 @nuxt/image custom provider with server-side URL signing - how to avoid hydration mismatch and double fetches?</title>
+      <link>https://stackoverflow.com/questions/79850455/nuxt-3-nuxt-image-custom-provider-with-server-side-url-signing-how-to-avoid-h</link>
+      <guid>https://stackoverflow.com/questions/79850455/nuxt-3-nuxt-image-custom-provider-with-server-side-url-signing-how-to-avoid-h</guid>
+      <pubDate>Thu, 18 Dec 2025 15:24:47 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m building a Nuxt 3 application using @nuxt/image with a custom provider for &lt;a href=&quot;https://imgproxy.net/&quot; rel=&quot;nofollow noreferrer&quot;&gt;imgproxy&lt;/a&gt;. Imgproxy requires URLs to be signed using HMAC-SHA256 with a secret key and salt.&lt;/p&gt;
+        &lt;h3&gt;The Problem&lt;/h3&gt;
+        &lt;p&gt;I need to sign image URLs server-side because:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;The crypto module doesn&apos;t work in the browser&lt;/li&gt;
+        &lt;li&gt;The signing key/salt must stay secret (not exposed to client)&lt;/li&gt;
+        &lt;li&gt;Allow only the server to process images with imgproxy (no public endpoint)&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;However, every approach I&apos;ve tried has significant drawbacks.&lt;/p&gt;
+        &lt;h3&gt;My Setup&lt;/h3&gt;
+        &lt;p&gt;Custom imgproxy provider (~/providers/imgproxy.ts):&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import { createHmac } from &amp;quot;crypto&amp;quot;;
+        import { defineProvider } from &amp;quot;@nuxt/image/runtime&amp;quot;;
+        
+        export default defineProvider&amp;lt;{ baseURL: string; key?: string; salt?: string }&amp;gt;({
+        getImage(src, { modifiers = {}, baseURL, key, salt }) {
+        // Sign URL using HMAC-SHA256
+        const signedPath = generateSignedPath(src, modifiers, key, salt);
+        return { url: `${baseURL}${signedPath}` };
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Image component uses useImage() from @nuxt/image which calls the provider.&lt;/p&gt;
+        &lt;h3&gt;Approaches Tried&lt;/h3&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Server Component (Image.server.vue)
+        Made the Image component a server component so signing only happens on server.
+        Problem: Nuxt Islands fetch their HTML payload during hydration (/__nuxt_island/...), which causes the browser to parse the HTML again and fetch every image twice.&lt;/li&gt;
+        &lt;li&gt;Redirect API Endpoint
+        Provider returns /api/imgproxy-sign?src=..., API signs the URL and returns 302 redirect.
+        Problem: Hydration mismatch warning because server renders /api/imgproxy-sign?... but client expects the same (or different) URL. Also, the redirect is visible in the network tab and adds latency.&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;h3&gt;Requirements&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Sign URLs on server only (can&apos;t use crypto in browser)&lt;/li&gt;
+        &lt;li&gt;Keep secrets (key/salt) on server&lt;/li&gt;
+        &lt;li&gt;No hydration mismatch warnings&lt;/li&gt;
+        &lt;li&gt;Images should only be fetched once (no duplicate requests)&lt;/li&gt;
+        &lt;li&gt;Ideally no redirect - direct signed URLs in HTML&lt;/li&gt;
+        &lt;li&gt;Works for both SSR initial load and client-side navigation&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;Question&lt;/h3&gt;
+        &lt;p&gt;Is there a way to use @nuxt/image with server-side URL signing that:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Produces the same URL on server and client (no hydration mismatch)&lt;/li&gt;
+        &lt;li&gt;Doesn&apos;t cause double image fetches&lt;/li&gt;
+        &lt;li&gt;Keeps secrets on the server&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I&apos;m open to alternative architectures. Perhaps there&apos;s a Nuxt pattern I&apos;m missing, or a different way to structure this that I haven&apos;t considered?&lt;/p&gt;
+        &lt;p&gt;Environment:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Nuxt 3.x&lt;/li&gt;
+        &lt;li&gt;@nuxt/image latest&lt;/li&gt;
+        &lt;li&gt;imgproxy (self-hosted)&lt;/li&gt;
+        &lt;/ul&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Nuxt hydration problem on simple component</title>
+      <link>https://stackoverflow.com/questions/79850166/nuxt-hydration-problem-on-simple-component</link>
+      <guid>https://stackoverflow.com/questions/79850166/nuxt-hydration-problem-on-simple-component</guid>
+      <pubDate>Thu, 18 Dec 2025 09:40:37 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have simple component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import {routes} from &apos;~/service/routes&apos;;
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;nuxt-link :to=&amp;quot;routes.home&amp;quot; class=&amp;quot;relative shrink-0 cursor-pointer&amp;quot;&amp;gt;
+        &amp;lt;span
+        class=&amp;quot;bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col font-[&apos;Orbitron:Regular&apos;,sans-serif] font-normal items-start relative&amp;quot;
+        &amp;gt;
+        &amp;lt;span class=&amp;quot;leading-[32px] relative shrink-0 text-[24px] text-nowrap text-white tracking-[2.4px]&amp;quot;&amp;gt;COMPETE&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;quot;h-[16px] leading-[16px] relative shrink-0 text-[12px] text-[magenta] tracking-[4.8px] w-[83.927px]&amp;quot;&amp;gt;ARENA&amp;lt;/span&amp;gt;
+        &amp;lt;/span&amp;gt;
+        &amp;lt;/nuxt-link&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This component is used in another template like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;Logo/&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I get the following error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Component &lt;code&gt;AtomLogo&lt;/code&gt; seems to have different HTML pre and post-hydration. Please make sure you don&apos;t have any hydration issues.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I also tried wrapping it like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;client-only&amp;gt;
+        &amp;lt;Logo/&amp;gt;
+        &amp;lt;HeaderNav/&amp;gt;
+        &amp;lt;/client-only&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This didn&apos;t help. I have the same problem in other components as well.&lt;/p&gt;
+        &lt;p&gt;How is it possible that static content causes this issue, and how can I avoid it?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>HTML img element (or v-img) will not load SVG, request has status 200 but empty response in Dev Tools &gt; Network, No CORS issue and no error in console [duplicate]</title>
+      <link>https://stackoverflow.com/questions/79848624/html-img-element-or-v-img-will-not-load-svg-request-has-status-200-but-empty</link>
+      <guid>https://stackoverflow.com/questions/79848624/html-img-element-or-v-img-will-not-load-svg-request-has-status-200-but-empty</guid>
+      <pubDate>Tue, 16 Dec 2025 14:47:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am trying to load an SVG image in a Veutify/Vue web app without embedding the SVG in the project build bundle. I want to loaded the image dynamically at runtime. When referencing the image via the src element on a a v-img component, it will not load the file although there is a status 200 response from the server. I have tried simplifying the v-img to a simple html img element, and the problem persists.&lt;/p&gt;
+        &lt;p&gt;In Chrome development tools it shows the request/response with 200 a status code, but the response is shown as empty. There is no error in the console. Adding an error handler will fire the attached function, but it does not give an error reason. Opening the same image URL in the browser shows the SVG image source code with the message &amp;quot;This XML file does not appear to have any style information associated with it. The document tree is shown below.&amp;quot; I tried adding &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP&quot; rel=&quot;nofollow noreferrer&quot;&gt;Content Security Policy (CSP) headers&lt;/a&gt; to fix any CORS issues, but this didn&apos;t help.&lt;/p&gt;
+        &lt;p&gt;Reproduction steps:&lt;/p&gt;
+        &lt;p&gt;Simple HTML img element embedded in a valid HTML document:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;img src=&amp;quot;example.svg&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;SVG file contents:&lt;/p&gt;
+        &lt;pre class=&quot;lang-svg prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;svg width=&amp;quot;300&amp;quot; height=&amp;quot;200&amp;quot; viewBox=&amp;quot;0 0 300 200&amp;quot;&amp;gt;
+        &amp;lt;path fill=&amp;quot;#fff&amp;quot; stroke=&amp;quot;#000&amp;quot; stroke-width=&amp;quot;2&amp;quot; d=&amp;quot;M0 0h300v200H0z&amp;quot;/&amp;gt;
+        &amp;lt;path stroke=&amp;quot;#000&amp;quot; stroke-width=&amp;quot;2&amp;quot; d=&amp;quot;m0 0 300 200m0-200L0 200&amp;quot; opacity=&amp;quot;0.25&amp;quot;/&amp;gt;
+        &amp;lt;text x=&amp;quot;150&amp;quot; y=&amp;quot;100&amp;quot; font-size=&amp;quot;24&amp;quot; text-anchor=&amp;quot;middle&amp;quot; dominant-baseline=&amp;quot;middle&amp;quot;&amp;gt;Development&amp;lt;/text&amp;gt;
+        &amp;lt;/svg&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In Visual Studio Code, I see the message &amp;quot;An error occurred while loading the image. Open file using VS Code&apos;s standard text/binary editor?&amp;quot; The image was generated using an online tool, so it is assumed to be valid SVG code. It is viewable in other editors.&lt;/p&gt;
+      </content:encoded>
+    </item>
+  </channel>
+</rss>
