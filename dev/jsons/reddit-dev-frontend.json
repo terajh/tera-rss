@@ -7,10 +7,23 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Announcement: OxideDock Rust + Vue 3 desktop starter built on Tauri v2",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I built a Tauri v2 + Vue 3 desktop starter so you don&#39;t have to wire up the boring stuff</p> <p>I got tired of setting up the same thing every time I wanted to build a desktop app. Routing, state management, testing, linting, CI/CD, release</p> <p>pipelines — it&#39;s always the same dance before you can write a single line of actual app code.</p> <p>So I put together <a href=\"https://github.com/fridzema/oxide-dock\"> https://github.com/fridzema/oxide-dock </a>. It&#39;s a starter template that gives you:</p> <p>- Tauri v2 + Vue 3 + TypeScript + Tailwind CSS v4</p> <p>- Vitest and Playwright already configured</p> <p>- ESLint, Prettier, Oxlint, Clippy, Rustfmt — all wired up with pre-commit hooks</p> <p>- GitHub Actions CI that lints, tests, and builds on all three platforms</p> <p>- Push a version tag and you get .dmg, .deb, .AppImage, .msi, and .exe automatically</p> <p>Run make setup &amp;&amp; make dev and you&#39;re building your actual app.</p> <p>It&#39;s MIT licensed. Fork it, gut it, make it yours. If you&#39;ve been meaning to try Tauri but kept putting it off because of the setup overhead, maybe this saves you a weekend.</p> <p>Would love to hear what you think or what you&#39;d add.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/fridzel\"> /u/fridzel </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/\">[comments]</a></span>",
-    "date": "2026-02-13T19:10:52.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/"
+    "title": "I recorded a guide on building multi-language Vue 3 apps with vue-i18n plugin.",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey folks,</p> <p>I recently finished putting together a guide on building multi-language apps in Vue 3 using the vue-i18n plugin. *Full disclosure, I work at Lokalise*, but this isn’t a promo post. I mess around with a bunch of side projects in my spare time, and I’ve run into the same i18n issues more times than I can count. This might help if you’re in the same boat.</p> <p>Internationalization is one of those things that always sounds simpler than it turns out once you dive into stuff like pluralization rules, URL-based locales, or dealing with bloated bundle sizes because you loaded every language file upfront.</p> <p>Here’s what I covered in the guide:</p> <ul> <li>Setting up Vue I18n – Basic setup is straightforward, and I walk through it step-by-step.</li> <li>Handling complex plurals – Not all languages are as simple as singular/plural. I wrote an example for Latvian to show how custom plural rules work.</li> <li>Formatting numbers and dates – Vue I18n makes it easy to format currencies and dates with the Intl API based on the active locale.</li> <li>URL-based routing – I show how to detect locales from URLs (e.g., /en/about), redirect users if needed, and persist their preferences.</li> <li>Lazy loading translations – Preloading all language files is bad for performance. I used a pretty interesting approach to make it work smoothly</li> </ul> <p>I also added some tips on managing translations in production, but the code examples are TMS-agnostic and should work regardless of your setup. Would love to know how you’re handling i18n in your projects or if you’ve found a better way to deal with routing.</p> <p>Here&#39;s the blog: <a href=\"https://lokalise.com/blog/vue-i18n/\">https://lokalise.com/blog/vue-i18n/</a></p> <p>Or the YT walk through if you prefer visual learning: <a href=\"https://www.youtube.com/watch?v=nTw93uVA18E\">https://www.youtube.com/watch?v=nTw93uVA18E</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/IlyaAtLokalise\"> /u/IlyaAtLokalise </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r6aqlk/i_recorded_a_guide_on_building_multilanguage_vue/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r6aqlk/i_recorded_a_guide_on_building_multilanguage_vue/\">[comments]</a></span>",
+    "date": "2026-02-16T14:15:39.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1r6aqlk/i_recorded_a_guide_on_building_multilanguage_vue/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Vue patterns for a local-only PDF tool: debounce + “latest wins” + canvas rendering. Feedback?",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I built a local-only PDF/image watermarking app in Nuxt/Vue where everything runs in the browser. Preview uses a canvas renderer (pdf.js) and watermarking uses pdf-lib.</p> <p>What I&#39;m curious about from a Vue perspective:</p> <ul> <li>I implemented live preview with debounce plus a “latest wins” guard so rapid changes don&#39;t cause stale renders to overwrite newer ones.</li> <li>PDF rendering is a single-page canvas with navigation and ResizeObserver-based rerenders.</li> <li>Presets and templates are stored locally.</li> </ul> <p>If you&#39;ve built canvas-heavy Vue apps:</p> <ul> <li>Any patterns you prefer for cancellation, concurrency control, and preventing UI jank?</li> <li>UX ideas for “trust” in tools that deal with sensitive docs?</li> <li>Anything you&#39;d refactor or structure differently?</li> </ul> <p>Link: <a href=\"https://watermark.page?utm_source=reddit&amp;utm_medium=post&amp;utm_campaign=launch_v1&amp;utm_content=r_vuejs\">https://watermark.page</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/prvashisht\"> /u/prvashisht </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r64mfk/vue_patterns_for_a_localonly_pdf_tool_debounce/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r64mfk/vue_patterns_for_a_localonly_pdf_tool_debounce/\">[comments]</a></span>",
+    "date": "2026-02-16T08:54:48.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1r64mfk/vue_patterns_for_a_localonly_pdf_tool_debounce/"
   },
   {
     "publisherId": "reddit-dev",
@@ -33,10 +46,10 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/\"> <img src=\"https://external-preview.redd.it/ZsL-4FR0iu6BGBCwpSG7cfcRvwEVUdTToLXqJpu4ZCQ.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=2af40f3d3fb05c65a49970dae105c27ded0c16df\" alt=\"Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping\" title=\"Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Direct-Attention8597\"> /u/Direct-Attention8597 </a> <br/> <span><a href=\"https://github.com/Khalidabdi1/console-sanitizer\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-02-14T14:21:46.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/"
+    "title": "Announcement: OxideDock Rust + Vue 3 desktop starter built on Tauri v2",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I built a Tauri v2 + Vue 3 desktop starter so you don&#39;t have to wire up the boring stuff</p> <p>I got tired of setting up the same thing every time I wanted to build a desktop app. Routing, state management, testing, linting, CI/CD, release</p> <p>pipelines — it&#39;s always the same dance before you can write a single line of actual app code.</p> <p>So I put together <a href=\"https://github.com/fridzema/oxide-dock\"> https://github.com/fridzema/oxide-dock </a>. It&#39;s a starter template that gives you:</p> <p>- Tauri v2 + Vue 3 + TypeScript + Tailwind CSS v4</p> <p>- Vitest and Playwright already configured</p> <p>- ESLint, Prettier, Oxlint, Clippy, Rustfmt — all wired up with pre-commit hooks</p> <p>- GitHub Actions CI that lints, tests, and builds on all three platforms</p> <p>- Push a version tag and you get .dmg, .deb, .AppImage, .msi, and .exe automatically</p> <p>Run make setup &amp;&amp; make dev and you&#39;re building your actual app.</p> <p>It&#39;s MIT licensed. Fork it, gut it, make it yours. If you&#39;ve been meaning to try Tauri but kept putting it off because of the setup overhead, maybe this saves you a weekend.</p> <p>Would love to hear what you think or what you&#39;d add.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/fridzel\"> /u/fridzel </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/\">[comments]</a></span>",
+    "date": "2026-02-13T19:10:52.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1r3y51p/announcement_oxidedock_rust_vue_3_desktop_starter/"
   },
   {
     "publisherId": "reddit-dev",
@@ -50,6 +63,19 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1r3roxn/vue_toast_libs_are_easy_until_you_need_real/\"> <img src=\"https://preview.redd.it/4fvmsuou0ajg1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=c00ca1b00ba38472de3c5c3793f2ac9427431aa8\" alt=\"Vue toast libs are easy until you need real control (live REPL demos + comparison)\" title=\"Vue toast libs are easy until you need real control (live REPL demos + comparison)\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I kept hitting the same wall with Vue toast libraries: they’re great for <code>toast(&quot;Saved&quot;)</code>, but harder when you need real control (queue bursts, headless rendering, multi-stacks, updates, event/state hooks, etc.).</p> <p>So I built <strong>Toastflow</strong> and documented it in two ways:</p> <p><strong>Live Examples</strong> (fully editable, not screenshots)<br/> 🔗 <a href=\"https://docs.toastflow.top/guide/live-examples\">https://docs.toastflow.top/guide/live-examples</a></p> <p>What you can test there:</p> <ul> <li><code>show()</code> overloads + typed helpers + <code>update(id, ...)</code></li> <li>loading lifecycle (<code>loading -&gt; success/error</code>) on a single toast id</li> <li>queue + maxVisible + backpressure</li> <li>state/event subscriptions (<code>subscribe</code>, <code>subscribeEvents</code>)</li> <li>headless rendering with <code>&lt;ToastContainer v-slot&gt;</code></li> <li>rendering via <code>&lt;Toast /&gt;</code> (store-driven feed/history)</li> <li>core store usage without Vue plugin</li> </ul> <p><strong>Comparison page</strong> (what this solves vs typical tradeoffs)<br/> 🔗 <a href=\"https://docs.toastflow.top/comparisons/overview\">https://docs.toastflow.top/comparisons/overview</a></p> <p>Previous posts for context:</p> <ol> <li><a href=\"https://www.reddit.com/r/vuejs/comments/1pgfoey/tired_of_vue_toast_libraries_so_i_built_my_own/\">https://www.reddit.com/r/vuejs/comments/1pgfoey/tired_of_vue_toast_libraries_so_i_built_my_own/</a></li> <li><a href=\"https://www.reddit.com/r/vuejs/comments/1pravgx/update_vue_toasts_now_have_actions_alignment_and/\">https://www.reddit.com/r/vuejs/comments/1pravgx/update_vue_toasts_now_have_actions_alignment_and/</a></li> <li><a href=\"https://www.reddit.com/r/vuejs/comments/1qye9ua/is_this_the_most_flexible_opensource_toast_api_in/\">https://www.reddit.com/r/vuejs/comments/1qye9ua/is_this_the_most_flexible_opensource_toast_api_in/</a></li> </ol> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Ill_Swan_4265\"> /u/Ill_Swan_4265 </a> <br/> <span><a href=\"https://i.redd.it/4fvmsuou0ajg1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r3roxn/vue_toast_libs_are_easy_until_you_need_real/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-02-13T15:11:20.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1r3roxn/vue_toast_libs_are_easy_until_you_need_real/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/\"> <img src=\"https://external-preview.redd.it/ZsL-4FR0iu6BGBCwpSG7cfcRvwEVUdTToLXqJpu4ZCQ.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=2af40f3d3fb05c65a49970dae105c27ded0c16df\" alt=\"Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping\" title=\"Open Source Tool — Clean Your JS/TS Console Logs Safely Before Shipping\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Direct-Attention8597\"> /u/Direct-Attention8597 </a> <br/> <span><a href=\"https://github.com/Khalidabdi1/console-sanitizer\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-02-14T14:21:46.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1r4luc5/open_source_tool_clean_your_jsts_console_logs/"
   },
   {
     "publisherId": "reddit-dev",
@@ -167,19 +193,6 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey folks, could you please advise?</p> <p>I’m wondering about the minimum MacBook specs for Vue development.</p> <p>I’ve been working on Windows for many years and am planning to switch to a MacBook M4 with 16GB RAM / 256GB SSD + an external SSD.<br/> Will this be enough for productive development on large, heavy enterprise projects?</p> <p>If not, what would you consider the minimum required configuration based on your experience?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Person556677\"> /u/Person556677 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qz7k1b/minimum_macbook_specs_for_vue_development_could/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qz7k1b/minimum_macbook_specs_for_vue_development_could/\">[comments]</a></span>",
     "date": "2026-02-08T12:21:40.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1qz7k1b/minimum_macbook_specs_for_vue_development_could/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "My component's state keeps getting out of sync with my store after being reordered using the Drag and Drop API. Seeking help!",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I am working on my first Vue app that allows users to reorder components on the page using the Drag and Drop API. I am currently stuck trying to debug an issue where reordering an element on the page seems to break the sync between the list rendering and store state. If you load the JSFiddle I&#39;ve put together below and follow the steps I&#39;ve listed, you should be able to reproduce the bug on your end:</p> <p>JSFiddle Link</p> <p>Steps:</p> <ol> <li>After the fiddle is loaded, drag the first component titled &quot;First Element&quot; to be ordered second in the list, so that the new order is &quot;Second Element&quot; → &quot;First Element&quot; → &quot;Third Element&quot;.</li> <li>Once reordered, try changing either the title or category fields in either of the components that you didn&#39;t reorder (so either &quot;Second Element&quot; or &quot;Third Element&quot;). As you change their titles or categories, you should notice that it updates the wrong component&#39;s state in the store, which you can see on the page itself. The more you reorder elements and their change values afterward, the more it seems to break. I&#39;m not sure if it&#39;s the default patch in place functionality or something else I&#39;ve done that&#39;s causing it.</li> </ol> <p>I&#39;d appreciate anybody who is able to help! My goal is to understand why this implementation is breaking first before I make any fixes or using a library if needed. I chose to build the drag and drop functionality from scratch (instead of relying on an existing library like VueDraggable) for learning purposes.</p> <p><em>Please note that I had to change a lot of things from my actual code to get it to work and be concise in the JSFiddle, so I removed things that didn&#39;t seem to affect the issue</em></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/vaporizers123reborn\"> /u/vaporizers123reborn </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qy6iw1/my_components_state_keeps_getting_out_of_sync/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qy6iw1/my_components_state_keeps_getting_out_of_sync/\">[comments]</a></span>",
-    "date": "2026-02-07T06:30:43.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1qy6iw1/my_components_state_keeps_getting_out_of_sync/"
   },
   {
     "publisherId": "reddit-dev",
@@ -310,18 +323,5 @@
     "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/snapmotion\"> /u/snapmotion </a> <br/> <span><a href=\"https://openvideo.dev/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qwuz4r/created_open_source_alternative_to_remotion_but/\">[comments]</a></span>",
     "date": "2026-02-05T19:29:18.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1qwuz4r/created_open_source_alternative_to_remotion_but/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Animated Heroicons for Vue",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hello everyone,</p> <p>I built a library of animated Heroicons for Vue: <a href=\"https://vue.heroicons-animated.com/\">heroicons-animated.com</a></p> <p>I came across the <a href=\"https://imfenghuang.github.io/icons/\">lucide animated</a> icons for Vue and liked them so much that I decided to create something similar for Heroicons.</p> <p>The animations are built using <a href=\"https://motion.dev/docs/vue\">motion-v</a> library which is basically to Motion for Vue.</p> <p>Looking forward to your feedback and suggestions! :)</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/dank_clover\"> /u/dank_clover </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qwdcxs/animated_heroicons_for_vue/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1qwdcxs/animated_heroicons_for_vue/\">[comments]</a></span>",
-    "date": "2026-02-05T06:01:49.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1qwdcxs/animated_heroicons_for_vue/"
   }
 ]

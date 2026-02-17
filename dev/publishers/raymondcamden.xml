@@ -4,12 +4,182 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 16 Feb 2026 02:21:47 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 17 Feb 2026 02:22:22 GMT</lastBuildDate>
+    <item>
+      <title>Three Plug-N-Play CSS Libraries</title>
+      <link>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</link>
+      <guid>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</guid>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;For probably over a decade, when I wanted to make a demo/site look nice and didn&apos;t really care about making it unique, I&apos;d go to &lt;a href=&quot;https://getbootstrap.com/&quot;&gt;Bootstrap&lt;/a&gt;. Bootstrap had a nice, clean look and as I was usually employing it for demos, or admin screens, I didn&apos;t care if it looked like every other Bootstrap site. While Bootstrap was &lt;em&gt;mostly&lt;/em&gt; simple, it&apos;s also wordy as heck. Bootstrap has an insane love affair with div tags and even a simple Bootstrap page feels like the line number goes up 4X. Again, that&apos;s &lt;em&gt;fine&lt;/em&gt;, but I found myself wishing for something a bit simpler. That&apos;s where the frameworks I&apos;m sharing today come in. For the most part, these libraries require little to no work on your part. You add a CSS library (or two), and everything just gets better. You &lt;em&gt;can&lt;/em&gt; optionally update your markup a bit, but in general, these libraries are great for the &amp;quot;I don&apos;t care, just make it nice and clean&amp;quot; approach that works great for demos and POCs.&lt;/p&gt;
+        &lt;p&gt;As an example of what I would &lt;em&gt;not&lt;/em&gt; consider to be &amp;quot;plug-n-play&amp;quot;, is the excellent &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; library, which requires you to use web components to make use of the library. I really like Shoelace, but the options I&apos;m sharing below are even simpler to use.&lt;/p&gt;
+        &lt;p&gt;To demonstrate what these libraries do out of the box, I&apos;ll use this HTML as a template:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;html&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;/head&amp;gt;
+        
+        &amp;lt;body&amp;gt;
+        &amp;lt;h1&amp;gt;Sample Page&amp;lt;/h1&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        This is some content. There is other content like my content, but this is my content.
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;form&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Your Name:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Your Email:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;comments&amp;quot;&amp;gt;Your Comments:&amp;lt;/label&amp;gt;
+        &amp;lt;textarea id=&amp;quot;comments&amp;quot;&amp;gt;&amp;lt;/textarea&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/form&amp;gt;
+        
+        &amp;lt;h2&amp;gt;Cats&amp;lt;/h2&amp;gt;
+        &amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Gender&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Age (Years)&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Luna&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;13&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Grace&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;12&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Pig&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;10&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Zelda&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;Wednesday&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;1&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It&apos;s got a few headers, text, a form, and a table. For comparison&apos;s sake with the libraries below, here&apos;s how this is rendered:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;OPXYRjM&quot; data-pen-title=&quot;CSS PNP - Milligram&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/OPXYRjM&quot;&gt;
+        CSS PNP - Milligram&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;milligram&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#milligram&quot;&gt;Milligram&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;First one up is also the simplest, &lt;a href=&quot;https://milligram.io/&quot;&gt;Milligram&lt;/a&gt;. The most difficult thing about using it is remembering that it has 2 &amp;quot;L&amp;quot;s in the name, not one. Thanks go to &lt;a href=&quot;https://recursive.codes/&quot;&gt;Todd Sharp&lt;/a&gt; for sharing this one. Installation is really simple for this library, three CSS links:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css&amp;quot;&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;After that, there&apos;s nothing else to do. Customization options exist, for example, changing the type of button, but there&apos;s not much else to it. Here&apos;s an example of my default HTML template using the library:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;vEKwXLM&quot; data-pen-title=&quot;CSS PNP - Miligram&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/vEKwXLM&quot;&gt;
+        CSS PNP - Miligram&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;One thing you&apos;ll notice is a lack of padding on the sides. In the past I&apos;ve added a quick &lt;code&gt;body&lt;/code&gt; style with padding, but if you look at the docs for their &lt;a href=&quot;https://milligram.io/#grids&quot;&gt;grid&lt;/a&gt; system, you can see that wrapping the content with &lt;code&gt;&amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;&lt;/code&gt; is enough to add padding and center the content. I&apos;ve made that tweak below:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;ogLRzWm&quot; data-pen-title=&quot;CSS PNP - Milligram (2)&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/ogLRzWm&quot;&gt;
+        CSS PNP - Milligram (2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;All in all, a good update with just two lines of code added.&lt;/p&gt;
+        &lt;h2 id=&quot;simple.css&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#simple.css&quot;&gt;Simple.css&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Next up is an option I found about a month or so ago and it&apos;s currently my favorite, &lt;a href=&quot;https://simplecss.org/&quot;&gt;Simple.css&lt;/a&gt;. Like Milligram, you simply drop in a CSS link:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- Minified version --&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There&apos;s both a minified and un-minified version. Here&apos;s our default HTML with the library applied:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;WbxBGMp&quot; data-pen-title=&quot;CSS PNP - Naked&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/WbxBGMp&quot;&gt;
+        CSS PNP - Naked&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Gorgeous. Notice it has dark mode support built-in, but if you want, you can force one mode only. There are a few additional things you can do if you want some additional formatting, for example, adding a header or footer will get you a nicely formatted, well, header and footer. In the embed below, I wrapped the &lt;code&gt;h1&lt;/code&gt; on top:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;header&amp;gt;
+        &amp;lt;h1&amp;gt;Sample Page&amp;lt;/h1&amp;gt;
+        &amp;lt;/header&amp;gt;		
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And added a footer:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;footer&amp;gt;
+        &amp;lt;p&amp;gt;Copy &amp;amp;copy; 2026 Raymond Camden&amp;lt;/p&amp;gt;
+        &amp;lt;/footer&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And here&apos;s how that renders:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;NPrVRYd&quot; data-pen-title=&quot;CSS PNP - Simple.css&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/NPrVRYd&quot;&gt;
+        CSS PNP - Simple.css&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;oat&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#oat&quot;&gt;Oat&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Last up is an option that literally came to my attention three or four hours ago (and when I realized this was a good third option, it motivated this post), &lt;a href=&quot;https://oat.ink/&quot;&gt;Oat&lt;/a&gt;. As an aside, the link there (in case you don&apos;t click) is &lt;a href=&quot;https://oat.ink/&quot;&gt;https://oat.ink/&lt;/a&gt;. I don&apos;t think I&apos;ve ever seen a &lt;code&gt;.ink&lt;/code&gt; TLD before. Unlike the other two options, this one requires one CSS and one JavaScript library:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://unpkg.com/@knadh/oat/oat.min.css&amp;quot;&amp;gt;
+        &amp;lt;script src=&amp;quot;https://unpkg.com/@knadh/oat/oat.min.js&amp;quot; defer&amp;gt;&amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Initially, this looks a lot like Milligram, including the lack of spacing:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;NPrVREj&quot; data-pen-title=&quot;CSS PNP - Naked&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/NPrVREj&quot;&gt;
+        CSS PNP - Naked&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;As with Milligram, and heck, using the same HTML, you can quickly fix this with their grid system by wrapping your content with &lt;code&gt;&amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;&lt;/code&gt;. Their &lt;a href=&quot;https://oat.ink/components/&quot;&gt;docs&lt;/a&gt; demonstrate all the various modifications the library adds to a page, including a few web components you get via the JavaScript library, for example, here&apos;s a basic &lt;a href=&quot;https://oat.ink/components/#tabs&quot;&gt;tabs&lt;/a&gt; component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;ot-tabs&amp;gt;
+        &amp;lt;div role=&amp;quot;tablist&amp;quot;&amp;gt;
+        &amp;lt;button role=&amp;quot;tab&amp;quot;&amp;gt;Account&amp;lt;/button&amp;gt;
+        &amp;lt;button role=&amp;quot;tab&amp;quot;&amp;gt;Password&amp;lt;/button&amp;gt;
+        &amp;lt;button role=&amp;quot;tab&amp;quot;&amp;gt;Notifications&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div role=&amp;quot;tabpanel&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Account Settings&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Manage your account information here.&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div role=&amp;quot;tabpanel&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Password Settings&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Change your password here.&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div role=&amp;quot;tabpanel&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Notification Settings&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Configure your notification preferences.&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/ot-tabs&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As one more example, I added tabs to the page, the grid system, and added dark mode support by including &lt;code&gt;data-theme=&amp;quot;dark&amp;quot;&lt;/code&gt; to the &lt;code&gt;body&lt;/code&gt; tag:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;qENGaLG&quot; data-pen-title=&quot;CSS PNP - Oak&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/qENGaLG&quot;&gt;
+        CSS PNP - Oak&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;more%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#more%3F&quot;&gt;More?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;If any of yall know of more options like this, I&apos;d love to hear about them. Just drop me a comment below. As I mentioned, Simple.css is my favorite now, but I&apos;m going to give Oat a try in the next demo I build.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://creativecommons.org/publicdomain/zero/1.0/&quot;&gt;CC0&lt;/a&gt; licensed &lt;a href=&quot;https://wordpress.org/photos/photo/8636531357/&quot;&gt;photo&lt;/a&gt; by &lt;a href=&quot;https://wordpress.org/photos/author/benimub/&quot;&gt;Umesh Balayar&lt;/a&gt; from the &lt;a href=&quot;https://wordpress.org/photos/&quot;&gt;WordPress Photo Directory&lt;/a&gt;.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>I threw thousands of files at Astro and you won&apos;t believe what happened next...</title>
       <link>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</link>
       <guid>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, forgive me for the &lt;em&gt;incredibly&lt;/em&gt; over the top title there. Yes, it&apos;s clickbait, but I&apos;m also tired after a &lt;em&gt;very&lt;/em&gt; long week and feeling a little crazy, so just go with me here a bit, I promise it will be worth it. I was curious how well &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; could handle a large amount of data and I thought - what happens if I threw this blog (well, the Markdown files) at it and tried to render out a site? Here&apos;s what I did wrong and what eventually worked (better than I expected).&lt;/p&gt;
         &lt;h2 id=&quot;round-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-one&quot;&gt;Round One&lt;/a&gt;&lt;/h2&gt;
@@ -126,7 +296,7 @@
       <title>Creating Reddit Summaries with URL Context and Gemini</title>
       <link>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</link>
       <guid>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A while ago, the &lt;a href=&quot;https://ai.google.dev/gemini-api/docs&quot;&gt;Gemini API&lt;/a&gt; added a feature to help work with URL content, &lt;a href=&quot;https://ai.google.dev/gemini-api/docs/url-context&quot;&gt;URL Context&lt;/a&gt;. Previously you had to fetch and download the HTML of the page and pass it to the API. This feature allows Gemini to request content (with limits) from public web pages. I thought it would be interesting to test this against Reddit. In the past I&apos;ve made use of Reddit&apos;s APIs, but as they&apos;ve pretty much destroyed access to those APIs, I thought this could be a good work around. Here&apos;s a simple demo I built.&lt;/p&gt;
         &lt;p&gt;My demo parses the &lt;a href=&quot;https://www.reddit.com/r/astrojs&quot;&gt;Astro&lt;/a&gt; subreddit, specifically the &lt;code&gt;new&lt;/code&gt; feed, and asks for a summary of items that seem to require a developer&apos;s help, as well as items that may be critical of Astro.&lt;/p&gt;
@@ -305,7 +475,7 @@
       <title>Links For You (2/8/26)</title>
       <link>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</link>
       <guid>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Superb Owl Day! As my team didn&apos;t even get close to the playoffs, I&apos;ll be rooting for the Seahawks, but even more so, hoping for a fun game. Tomorrow I head out to Vegas for my first offsite with Webflow, and the first in-person company event I&apos;ve been too since Auth0 nearly a decade ago. I&apos;m looking forward to meeting my teammates in person and meeting new people. Now - to the links!&lt;/p&gt;
         &lt;h2 id=&quot;adding-touch-to-powershell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-touch-to-powershell&quot;&gt;Adding Touch to PowerShell&lt;/a&gt;&lt;/h2&gt;
@@ -324,7 +494,7 @@
       <title>Building a Bluesky Sentiment Dashboard with Alpine and Chrome AI</title>
       <link>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</link>
       <guid>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs! Today I&apos;m sharing yet another example of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; features, this time to demonstrate a &amp;quot;Bluesky Sentiment Dashboard&amp;quot;. In other words, a tool that lets you enter terms and then get a report on the average sentiment for posts using that word. I actually did this before (and yes, I forgot until about a minute ago) last year using Transformers.js: &lt;a href=&quot;https://www.raymondcamden.com/2025/01/03/building-a-bluesky-ai-sentiment-analysis-dashboard&quot;&gt;Building a Bluesky AI Sentiment Analysis Dashboard&lt;/a&gt;. I also built this for Twitter, before it went down the toilet, killed off API access, etc. etc., but I can&apos;t seem to find it in my archives so maybe I&apos;m hallucinating. That being said, earlier this week I thought I&apos;d try building this because honestly I had forgotten about my previous demo, but it gave me a chance to play more with Chrome&apos;s AI tooling. Interesting enough, in that post from last year I mentioned possibly adding &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; for UI which I actually did for &lt;em&gt;this&lt;/em&gt; demo... so not a total waste of time, right? Let&apos;s get into it!&lt;/p&gt;
         &lt;h2 id=&quot;bluesky&apos;s-search-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#bluesky&apos;s-search-api&quot;&gt;Bluesky&apos;s Search API&lt;/a&gt;&lt;/h2&gt;
@@ -488,7 +658,7 @@
       <title>Building an RSS Aggregator with Astro</title>
       <link>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</link>
       <guid>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This weekend I had some fun building a little Astro site for RSS aggregation. It works by the individual user defining a set of feeds they care about and works with a server-side Astro route to handle getting and parsing the feeds. Here&apos;s a quick example. On hitting the site, it notices you haven&apos;t defined any feeds and prompts you to do so:&lt;/p&gt;
         &lt;p&gt;
@@ -811,7 +981,7 @@
       <title>Interrogate Your PDFs with Chrome AI</title>
       <link>https://www.raymondcamden.com/2026/01/29/interrogate-your-pdfs-with-chrome-ai</link>
       <guid>https://www.raymondcamden.com/2026/01/29/interrogate-your-pdfs-with-chrome-ai</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;blogged&lt;/a&gt; about using &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; and Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; to create summaries of PDF documents, all within the browser, for free. In that post I mentioned it would be possible to build a Q and A system so users could ask questions about the document, and like a dog with a bone, I couldn&apos;t let it go. Last I built not one, but two demos of this. Check it out.&lt;/p&gt;
         &lt;h2 id=&quot;version-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#version-one&quot;&gt;Version One&lt;/a&gt;&lt;/h2&gt;
@@ -940,7 +1110,7 @@
       <title>Summarizing PDFs with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;You can take the man out of the PDFs, but you can&apos;t take the PDFs out of the man. Ok, I&apos;m not sure that exactly makes sense, but with a couple years in me of working with PDFs, I find myself using them quite often with my AI demos. For today, I&apos;m going to demonstrate something that&apos;s been on my mind in a while - doing summarizing of PDFs completely in the browser, with Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt;. Unlike the Prompt API, summarization has been released since Chrome 138, so most likely those of you on Chrome can run these demos without problem. (You can see more about the AI API &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in-apis&quot;&gt;statuses&lt;/a&gt; if you&apos;re curious.)&lt;/p&gt;
         &lt;h2 id=&quot;getting-pdf-text---client-side&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-pdf-text---client-side&quot;&gt;Getting PDF Text - Client-Side&lt;/a&gt;&lt;/h2&gt;
@@ -1100,7 +1270,7 @@
       <title>Links For You (1/25/26)</title>
       <link>https://www.raymondcamden.com/2026/01/25/links-for-you-12526</link>
       <guid>https://www.raymondcamden.com/2026/01/25/links-for-you-12526</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I write this in the midst of a huge ice event - which thankfully isn&apos;t so bad here in south Louisiana. We&apos;re very cold and rainy, but no real ice yet, which is good. The worst is coming in later tonight and the schools have already shut down, but thankfully I work at home so there&apos;s no need to get on the roads. Today is also the 26th birthday of my eldest child, which makes the age ranges of my little army (8 kids total) go from 10 to 26. Wow.&lt;/p&gt;
         &lt;h2 id=&quot;temporal-is-coming...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#temporal-is-coming...&quot;&gt;Temporal is Coming...&lt;/a&gt;&lt;/h2&gt;
@@ -1129,7 +1299,7 @@
       <title>Building a UI for Gemini File Stores</title>
       <link>https://www.raymondcamden.com/2026/01/22/building-a-ui-for-gemini-file-stores</link>
       <guid>https://www.raymondcamden.com/2026/01/22/building-a-ui-for-gemini-file-stores</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
+      <pubDate>Tue, 17 Feb 2026 02:00:36 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Back in November of last year I wrote up a blog post talking about a new (at the time) Google Gemini feature, File Stores: &lt;a href=&quot;https://www.raymondcamden.com/2025/11/17/gemini-file-search-file-stores-for-easy-rag&quot;&gt;&amp;quot;Gemini File Search and File Stores for Easy RAG&amp;quot;&lt;/a&gt;. In that post I discussed what it was, how it worked, and built up a simple example. You should definitely read that post first, but if you want the TLDR, here ya go:&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://ai.google.dev/gemini-api/docs/file-search&quot;&gt;File Stores&lt;/a&gt; (referred to as &amp;quot;File Search&amp;quot;) expands on Gemini&apos;s previous ability to work on files in a temporary fashion by allowing you to create a permanent &amp;quot;store&amp;quot; of folders. You can use this for RAG systems and use flexible metadata filter for complex queries.&lt;/p&gt;
@@ -1171,676 +1341,6 @@
         &lt;p&gt;I &lt;em&gt;really&lt;/em&gt; dug this approach. I let the AI agent the more rote, boring aspects and I focused on getting the UI/UX just right. This AI thing might have a future. Maybe.&lt;/p&gt;
         &lt;p&gt;Anyway, let me know if this is useful!&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@omar_hassan?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Omar Hassan&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/text-9YBh_HSfplc?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Using Chrome AI to Rewrite Monstrous JSON</title>
-      <link>https://www.raymondcamden.com/2026/01/17/using-chrome-ai-to-rewrite-monstrous-json</link>
-      <guid>https://www.raymondcamden.com/2026/01/17/using-chrome-ai-to-rewrite-monstrous-json</guid>
-      <pubDate>Mon, 16 Feb 2026 02:00:48 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Happy Saturday folks, and while this is a topic I&apos;ve covered many times here, I was bored and wanting to write some code, so I whipped up a quick demo. One of my favorite uses of AI is to take abstract data and write a human readable form of it. Now to be clear, this is not something you need AI for. Given that you know the shape of your data, you can create your own summary using hard-coded rules about what values to show, how to present them, and so forth. What I like about the Gen AI use-case for this is the amount of randomness and creativity you get in the responses. In the past I&apos;ve done this with weather forecasts and chart data, but today I thought I&apos;d try something different - monsters.&lt;/p&gt;
-        &lt;p&gt;A lot of Dungeons and Dragons content is available, legally even, online in API and JSON formats. The &lt;a href=&quot;https://www.dnd5eapi.co/&quot;&gt;D&amp;amp;D 5e API&lt;/a&gt; includes information on all aspects of the game, from classes to spells to monsters. While the API is handy, I knew I wanted the raw data as is so I headed over to the &lt;a href=&quot;https://github.com/5e-bits/5e-srd-api&quot;&gt;repo&lt;/a&gt; and grabbed the raw &lt;a href=&quot;https://github.com/5e-bits/5e-database/blob/main/src/2014/5e-SRD-Monsters.json&quot;&gt;monsters json file&lt;/a&gt;. This JSON file contains information on every known monster. Here&apos;s an example, an you can see it is quite extensive (I won&apos;t be offended if you just skim this):&lt;/p&gt;
-        &lt;textarea style=&quot;width:100%; height: 300px&quot;&gt;{
-        &quot;index&quot;: &quot;unicorn&quot;,
-        &quot;name&quot;: &quot;Unicorn&quot;,
-        &quot;size&quot;: &quot;Large&quot;,
-        &quot;type&quot;: &quot;celestial&quot;,
-        &quot;alignment&quot;: &quot;lawful good&quot;,
-        &quot;armor_class&quot;: [
-        {
-        &quot;type&quot;: &quot;dex&quot;,
-        &quot;value&quot;: 12
-        }
-        ],
-        &quot;hit_points&quot;: 67,
-        &quot;hit_dice&quot;: &quot;9d10&quot;,
-        &quot;hit_points_roll&quot;: &quot;9d10+18&quot;,
-        &quot;speed&quot;: {
-        &quot;walk&quot;: &quot;50 ft.&quot;
-        },
-        &quot;strength&quot;: 18,
-        &quot;dexterity&quot;: 14,
-        &quot;constitution&quot;: 15,
-        &quot;intelligence&quot;: 11,
-        &quot;wisdom&quot;: 17,
-        &quot;charisma&quot;: 16,
-        &quot;proficiencies&quot;: [],
-        &quot;damage_vulnerabilities&quot;: [],
-        &quot;damage_resistances&quot;: [],
-        &quot;damage_immunities&quot;: [
-        &quot;poison&quot;
-        ],
-        &quot;condition_immunities&quot;: [
-        {
-        &quot;index&quot;: &quot;charmed&quot;,
-        &quot;name&quot;: &quot;Charmed&quot;,
-        &quot;url&quot;: &quot;/api/2014/conditions/charmed&quot;
-        },
-        {
-        &quot;index&quot;: &quot;paralyzed&quot;,
-        &quot;name&quot;: &quot;Paralyzed&quot;,
-        &quot;url&quot;: &quot;/api/2014/conditions/paralyzed&quot;
-        },
-        {
-        &quot;index&quot;: &quot;poisoned&quot;,
-        &quot;name&quot;: &quot;Poisoned&quot;,
-        &quot;url&quot;: &quot;/api/2014/conditions/poisoned&quot;
-        }
-        ],
-        &quot;senses&quot;: {
-        &quot;darkvision&quot;: &quot;60 ft.&quot;,
-        &quot;passive_perception&quot;: 13
-        },
-        &quot;languages&quot;: &quot;Celestial, Elvish, Sylvan, telepathy 60 ft.&quot;,
-        &quot;challenge_rating&quot;: 5,
-        &quot;proficiency_bonus&quot;: 3,
-        &quot;xp&quot;: 1800,
-        &quot;special_abilities&quot;: [
-        {
-        &quot;name&quot;: &quot;Charge&quot;,
-        &quot;desc&quot;: &quot;If the unicorn moves at least 20 ft. straight toward a target and then hits it with a horn attack on the same turn, the target takes an extra 9 (2d8) piercing damage. If the target is a creature, it must succeed on a DC 15 Strength saving throw or be knocked prone.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Innate Spellcasting&quot;,
-        &quot;desc&quot;: &quot;The unicorn&apos;s innate spellcasting ability is Charisma (spell save DC 14). The unicorn can innately cast the following spells, requiring no components:\n\nAt will: detect evil and good, druidcraft, pass without trace\n1/day each: calm emotions, dispel evil and good, entangle&quot;,
-        &quot;spellcasting&quot;: {
-        &quot;ability&quot;: {
-        &quot;index&quot;: &quot;cha&quot;,
-        &quot;name&quot;: &quot;CHA&quot;,
-        &quot;url&quot;: &quot;/api/2014/ability-scores/cha&quot;
-        },
-        &quot;dc&quot;: 14,
-        &quot;components_required&quot;: [],
-        &quot;spells&quot;: [
-        {
-        &quot;name&quot;: &quot;Detect Evil and Good&quot;,
-        &quot;level&quot;: 1,
-        &quot;url&quot;: &quot;/api/2014/spells/detect-evil-and-good&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;at will&quot;
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Druidcraft&quot;,
-        &quot;level&quot;: 0,
-        &quot;url&quot;: &quot;/api/2014/spells/druidcraft&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;at will&quot;
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Pass Without Trace&quot;,
-        &quot;level&quot;: 2,
-        &quot;url&quot;: &quot;/api/2014/spells/pass-without-trace&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;at will&quot;
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Calm Emotions&quot;,
-        &quot;level&quot;: 2,
-        &quot;url&quot;: &quot;/api/2014/spells/calm-emotions&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 1
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Dispel Evil and Good&quot;,
-        &quot;level&quot;: 5,
-        &quot;url&quot;: &quot;/api/2014/spells/dispel-evil-and-good&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 1
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Entangle&quot;,
-        &quot;level&quot;: 1,
-        &quot;url&quot;: &quot;/api/2014/spells/entangle&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 1
-        }
-        }
-        ]
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Magic Resistance&quot;,
-        &quot;desc&quot;: &quot;The unicorn has advantage on saving throws against spells and other magical effects.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Magic Weapons&quot;,
-        &quot;desc&quot;: &quot;The unicorn&apos;s weapon attacks are magical.&quot;
-        }
-        ],
-        &quot;actions&quot;: [
-        {
-        &quot;name&quot;: &quot;Multiattack&quot;,
-        &quot;multiattack_type&quot;: &quot;actions&quot;,
-        &quot;desc&quot;: &quot;The unicorn makes two attacks: one with its hooves and one with its horn.&quot;,
-        &quot;actions&quot;: [
-        {
-        &quot;action_name&quot;: &quot;Hooves&quot;,
-        &quot;count&quot;: 1,
-        &quot;type&quot;: &quot;melee&quot;
-        },
-        {
-        &quot;action_name&quot;: &quot;Horn&quot;,
-        &quot;count&quot;: 1,
-        &quot;type&quot;: &quot;melee&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Hooves&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 11 (2d6 + 4) bludgeoning damage.&quot;,
-        &quot;attack_bonus&quot;: 7,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;bludgeoning&quot;,
-        &quot;name&quot;: &quot;Bludgeoning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/bludgeoning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d6+4&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Horn&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 8 (1d8 + 4) piercing damage.&quot;,
-        &quot;attack_bonus&quot;: 7,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;piercing&quot;,
-        &quot;name&quot;: &quot;Piercing&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/piercing&quot;
-        },
-        &quot;damage_dice&quot;: &quot;1d8+4&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Healing Touch&quot;,
-        &quot;desc&quot;: &quot;The unicorn touches another creature with its horn. The target magically regains 11 (2d8 + 2) hit points. In addition, the touch removes all diseases and neutralizes all poisons afflicting the target.&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 3
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Teleport&quot;,
-        &quot;desc&quot;: &quot;The unicorn magically teleports itself and up to three willing creatures it can see within 5 ft. of it, along with any equipment they are wearing or carrying, to a location the unicorn is familiar with, up to 1 mile away.&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 1
-        }
-        }
-        ],
-        &quot;legendary_actions&quot;: [
-        {
-        &quot;name&quot;: &quot;Hooves&quot;,
-        &quot;desc&quot;: &quot;The unicorn makes one attack with its hooves.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Shimmering Shield (Costs 2 Actions)&quot;,
-        &quot;desc&quot;: &quot;The unicorn creates a shimmering, magical field around itself or another creature it can see within 60 ft. of it. The target gains a +2 bonus to AC until the end of the unicorn&apos;s next turn.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Heal Self (Costs 3 Actions)&quot;,
-        &quot;desc&quot;: &quot;The unicorn magically regains 11 (2d8 + 2) hit points.&quot;
-        }
-        ],
-        &quot;image&quot;: &quot;/api/images/monsters/unicorn.png&quot;,
-        &quot;url&quot;: &quot;/api/2014/monsters/unicorn&quot;
-        }
-        &lt;/textarea&gt;
-        &lt;p&gt;Ok, so given this, I built a little demo of turning this into something a bit more manageable.&lt;/p&gt;
-        &lt;h2 id=&quot;the-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-demo&quot;&gt;The Demo&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;My demo is pretty straight-forward. I&apos;m going to load in the big JSON file (it&apos;s a bit over a meg so not &lt;em&gt;too&lt;/em&gt; bad, but I would consider client-side storage in a real app) and then let the user click a button to:&lt;/p&gt;
-        &lt;p&gt;a) select a random monster and display the raw JSON
-        b) use &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome AI&lt;/a&gt; to turn this into a paragraph of text.&lt;/p&gt;
-        &lt;p&gt;At the time I&apos;m writing this, the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt; is still behind a flag, so even if you&apos;re on Chrome, you&apos;ll need to either enable the flag or... just wait. ;) I&apos;m going to include examples at the end, so don&apos;t fret.&lt;/p&gt;
-        &lt;p&gt;Alright, so the HTML first:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;h2&amp;gt;D&amp;amp;amp;D Monster to Text&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;
-        This CodePen demonstrates using Chrome AI to rewrite JSON describing content into a paragraph of text for easier consumption. In this case the JSON describes a D&amp;amp;amp;D monster. (JSON source from &amp;lt;a href=&amp;quot;https://github.com/5e-bits/5e-database/blob/main/src/2014/5e-SRD-Monsters.json&amp;quot;&amp;gt;5e-bits&amp;lt;/a&amp;gt; on Github.)
-        &amp;lt;/p&amp;gt;
-        &amp;lt;div class=&amp;quot;twocol&amp;quot;&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;textarea id=&amp;quot;input&amp;quot;&amp;gt;&amp;lt;/textarea&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;button disabled id=&amp;quot;runBtn&amp;quot;&amp;gt;New Random Monster&amp;lt;/button&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div id=&amp;quot;result&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Nothing too fancy here, just a textarea for the JSON and an empty div for the result. Do note the button that kicks off the process.&lt;/p&gt;
-        &lt;p&gt;Now let&apos;s look at the JavaScript:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const MONSTERS_JSON = &apos;https://assets.codepen.io/74045/5e-SRD-Monsters.json&apos;;
-        let monsters;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, init, false);
-        
-        let $input, $runBtn, $result;
-        let session;
-        
-        async function init() {
-        
-        if(!(&apos;LanguageModel&apos; in window)) {
-        alert(&apos;Sorry, but you can\&apos;t use this demo.&apos;);
-        return;
-        }
-        
-        let available = (await window.LanguageModel.availability());
-        
-        if (available === &apos;unavailable&apos;) {
-        alert(&apos;Sorry, but you can\&apos;t use this demo.&apos;);
-        return;
-        }
-        
-        let dataReq = await fetch(MONSTERS_JSON);
-        monsters = await dataReq.json();
-        $result = document.querySelector(&apos;#result&apos;);
-        $runBtn = document.querySelector(&apos;#runBtn&apos;);
-        $input = document.querySelector(&apos;#input&apos;);
-        
-        
-        $runBtn.addEventListener(&apos;click&apos;, runPrompt, false);
-        $runBtn.disabled = false;
-        }
-        
-        async function runPrompt() {
-        
-        // first, get a random monster
-        let monster = monsters[getRandomIntInclusive(0,monsters.length-1)];
-        
-        $input.value = JSON.stringify(monster,null,&apos;\t&apos;);
-        $result.innerHTML = &apos;&amp;lt;i&amp;gt;Working...&amp;lt;/i&amp;gt;&apos;;
-        
-        if(!session) {
-        session = await window.LanguageModel.create({
-        initialPrompts: [
-        { role: &apos;system&apos;, content: &apos;Given a JSON description of an Dungeons and Dragon monster, turn the raw JSON into a paragraph of 4-5 sentences that describes the monster at a high level.&apos; },			
-        ],
-        monitor(m) {
-        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
-        console.log(`Downloaded ${e.loaded * 100}%`);
-        /*
-        why this? the download event _always_ runs at
-        least once, so this prevents the msg showing up
-        when its already done. I&apos;ve seen it report 0 and 1
-        in this case, so we skip both
-        */
-        if(e.loaded === 0 || e.loaded === 1) return;
-        $result.innerHTML = `Downloading, currently at ${Math.floor(e.loaded * 100)}%`;
-        });
-        }			
-        });
-        }
-        
-        $runBtn.disabled = true;
-        
-        // thanks to Thomas Steiner!
-        // not sure if we need to clone though...
-        let thisSession = await session.clone();
-        let result = await thisSession.prompt($input.value);
-        $result.innerHTML = result + `&amp;lt;p&amp;gt;&amp;lt;img src=&amp;quot;https://www.dnd5eapi.co${monster.image}&amp;quot;&amp;gt;&amp;lt;/p&amp;gt;`;
-        $runBtn.disabled = false;
-        }
-        
-        function getRandomIntInclusive(min, max) { 
-        min = Math.ceil(min); 
-        max = Math.floor(max); 
-        return Math.floor(Math.random() * (max - min + 1) + min);  
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;So outside of variable declarations and stuff, the initial part of the code does the feature detection required and aborts if anything isn&apos;t going to work. As a reminder, &lt;em&gt;generally&lt;/em&gt; I&apos;m recommending Chrome&apos;s AI tools in progressive enhancement cases. This demo is an exception as it won&apos;t do &lt;em&gt;anything&lt;/em&gt; without the feature. I could absolutely fall back to a static simple description instead.&lt;/p&gt;
-        &lt;p&gt;When the button is clicked, I grab one random item, add the JSON to the textarea, and then begin my AI usage. My session sets up a system instruction that clearly defines what it is doing:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Given a JSON description of an Dungeons and Dragon monster, turn the raw 
-        JSON into a paragraph of 4-5 sentences that describes the monster at a 
-        high level.
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Which then leaves the prompt to simply taking the JSON and working on it:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let result = await thisSession.prompt($input.value);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I then display the result, and as I noticed the API supported images, I go ahead and render it as well.&lt;/p&gt;
-        &lt;h2 id=&quot;examples&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#examples&quot;&gt;Examples&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, so given that most of you probably &lt;em&gt;can&apos;t&lt;/em&gt; run it, here are a few examples. First up, a lovely ancient-blue dragon. Here&apos;s the JSON:&lt;/p&gt;
-        &lt;textarea style=&quot;width:100%; height: 300px&quot;&gt;{
-        &quot;index&quot;: &quot;ancient-blue-dragon&quot;,
-        &quot;name&quot;: &quot;Ancient Blue Dragon&quot;,
-        &quot;size&quot;: &quot;Gargantuan&quot;,
-        &quot;type&quot;: &quot;dragon&quot;,
-        &quot;alignment&quot;: &quot;lawful evil&quot;,
-        &quot;armor_class&quot;: [
-        {
-        &quot;type&quot;: &quot;natural&quot;,
-        &quot;value&quot;: 22
-        }
-        ],
-        &quot;hit_points&quot;: 481,
-        &quot;hit_dice&quot;: &quot;26d20&quot;,
-        &quot;hit_points_roll&quot;: &quot;26d20+208&quot;,
-        &quot;speed&quot;: {
-        &quot;walk&quot;: &quot;40 ft.&quot;,
-        &quot;burrow&quot;: &quot;40 ft.&quot;,
-        &quot;fly&quot;: &quot;80 ft.&quot;
-        },
-        &quot;strength&quot;: 29,
-        &quot;dexterity&quot;: 10,
-        &quot;constitution&quot;: 27,
-        &quot;intelligence&quot;: 18,
-        &quot;wisdom&quot;: 17,
-        &quot;charisma&quot;: 21,
-        &quot;proficiencies&quot;: [
-        {
-        &quot;value&quot;: 7,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;saving-throw-dex&quot;,
-        &quot;name&quot;: &quot;Saving Throw: DEX&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/saving-throw-dex&quot;
-        }
-        },
-        {
-        &quot;value&quot;: 15,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;saving-throw-con&quot;,
-        &quot;name&quot;: &quot;Saving Throw: CON&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/saving-throw-con&quot;
-        }
-        },
-        {
-        &quot;value&quot;: 10,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;saving-throw-wis&quot;,
-        &quot;name&quot;: &quot;Saving Throw: WIS&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/saving-throw-wis&quot;
-        }
-        },
-        {
-        &quot;value&quot;: 12,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;saving-throw-cha&quot;,
-        &quot;name&quot;: &quot;Saving Throw: CHA&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/saving-throw-cha&quot;
-        }
-        },
-        {
-        &quot;value&quot;: 17,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;skill-perception&quot;,
-        &quot;name&quot;: &quot;Skill: Perception&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/skill-perception&quot;
-        }
-        },
-        {
-        &quot;value&quot;: 7,
-        &quot;proficiency&quot;: {
-        &quot;index&quot;: &quot;skill-stealth&quot;,
-        &quot;name&quot;: &quot;Skill: Stealth&quot;,
-        &quot;url&quot;: &quot;/api/2014/proficiencies/skill-stealth&quot;
-        }
-        }
-        ],
-        &quot;damage_vulnerabilities&quot;: [],
-        &quot;damage_resistances&quot;: [],
-        &quot;damage_immunities&quot;: [
-        &quot;lightning&quot;
-        ],
-        &quot;condition_immunities&quot;: [],
-        &quot;senses&quot;: {
-        &quot;blindsight&quot;: &quot;60 ft.&quot;,
-        &quot;darkvision&quot;: &quot;120 ft.&quot;,
-        &quot;passive_perception&quot;: 27
-        },
-        &quot;languages&quot;: &quot;Common, Draconic&quot;,
-        &quot;challenge_rating&quot;: 23,
-        &quot;proficiency_bonus&quot;: 7,
-        &quot;xp&quot;: 50000,
-        &quot;special_abilities&quot;: [
-        {
-        &quot;name&quot;: &quot;Legendary Resistance&quot;,
-        &quot;desc&quot;: &quot;If the dragon fails a saving throw, it can choose to succeed instead.&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;per day&quot;,
-        &quot;times&quot;: 3
-        }
-        }
-        ],
-        &quot;actions&quot;: [
-        {
-        &quot;name&quot;: &quot;Multiattack&quot;,
-        &quot;multiattack_type&quot;: &quot;actions&quot;,
-        &quot;desc&quot;: &quot;The dragon can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws.&quot;,
-        &quot;actions&quot;: [
-        {
-        &quot;action_name&quot;: &quot;Frightful Presence&quot;,
-        &quot;count&quot;: 1,
-        &quot;type&quot;: &quot;ability&quot;
-        },
-        {
-        &quot;action_name&quot;: &quot;Bite&quot;,
-        &quot;count&quot;: 1,
-        &quot;type&quot;: &quot;melee&quot;
-        },
-        {
-        &quot;action_name&quot;: &quot;Claw&quot;,
-        &quot;count&quot;: 2,
-        &quot;type&quot;: &quot;melee&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Bite&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +16 to hit, reach 15 ft., one target. Hit: 20 (2d10 + 9) piercing damage plus 11 (2d10) lightning damage.&quot;,
-        &quot;attack_bonus&quot;: 16,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;piercing&quot;,
-        &quot;name&quot;: &quot;Piercing&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/piercing&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d10+9&quot;
-        },
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;lightning&quot;,
-        &quot;name&quot;: &quot;Lightning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/lightning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d10&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Claw&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +16 to hit, reach 10 ft., one target. Hit: 16 (2d6 + 9) slashing damage.&quot;,
-        &quot;attack_bonus&quot;: 16,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;slashing&quot;,
-        &quot;name&quot;: &quot;Slashing&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/slashing&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d6+9&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Tail&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +16 to hit, reach 20 ft., one target. Hit: 18 (2d8 + 9) bludgeoning damage.&quot;,
-        &quot;attack_bonus&quot;: 16,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;bludgeoning&quot;,
-        &quot;name&quot;: &quot;Bludgeoning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/bludgeoning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d8+9&quot;
-        }
-        ]
-        },
-        {
-        &quot;name&quot;: &quot;Frightful Presence&quot;,
-        &quot;desc&quot;: &quot;Each creature of the dragon&apos;s choice that is within 120 feet of the dragon and aware of it must succeed on a DC 20 Wisdom saving throw or become frightened for 1 minute. A creature can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. If a creature&apos;s saving throw is successful or the effect ends for it, the creature is immune to the dragon&apos;s Frightful Presence for the next 24 hours.&quot;,
-        &quot;dc&quot;: {
-        &quot;dc_type&quot;: {
-        &quot;index&quot;: &quot;wis&quot;,
-        &quot;name&quot;: &quot;WIS&quot;,
-        &quot;url&quot;: &quot;/api/2014/ability-scores/wis&quot;
-        },
-        &quot;dc_value&quot;: 20,
-        &quot;success_type&quot;: &quot;none&quot;
-        }
-        },
-        {
-        &quot;name&quot;: &quot;Lightning Breath&quot;,
-        &quot;desc&quot;: &quot;The dragon exhales lightning in a 120-foot line that is 10 feet wide. Each creature in that line must make a DC 23 Dexterity saving throw, taking 88 (16d10) lightning damage on a failed save, or half as much damage on a successful one.&quot;,
-        &quot;usage&quot;: {
-        &quot;type&quot;: &quot;recharge on roll&quot;,
-        &quot;dice&quot;: &quot;1d6&quot;,
-        &quot;min_value&quot;: 5
-        },
-        &quot;dc&quot;: {
-        &quot;dc_type&quot;: {
-        &quot;index&quot;: &quot;dex&quot;,
-        &quot;name&quot;: &quot;DEX&quot;,
-        &quot;url&quot;: &quot;/api/2014/ability-scores/dex&quot;
-        },
-        &quot;dc_value&quot;: 23,
-        &quot;success_type&quot;: &quot;half&quot;
-        },
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;lightning&quot;,
-        &quot;name&quot;: &quot;Lightning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/lightning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;16d10&quot;
-        }
-        ]
-        }
-        ],
-        &quot;legendary_actions&quot;: [
-        {
-        &quot;name&quot;: &quot;Detect&quot;,
-        &quot;desc&quot;: &quot;The dragon makes a Wisdom (Perception) check.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Tail Attack&quot;,
-        &quot;desc&quot;: &quot;The dragon makes a tail attack.&quot;
-        },
-        {
-        &quot;name&quot;: &quot;Wing Attack (Costs 2 Actions)&quot;,
-        &quot;desc&quot;: &quot;The dragon beats its wings. Each creature within 15 ft. of the dragon must succeed on a DC 24 Dexterity saving throw or take 16 (2d6 + 9) bludgeoning damage and be knocked prone. The dragon can then fly up to half its flying speed.&quot;,
-        &quot;dc&quot;: {
-        &quot;dc_type&quot;: {
-        &quot;index&quot;: &quot;dex&quot;,
-        &quot;name&quot;: &quot;DEX&quot;,
-        &quot;url&quot;: &quot;/api/2014/ability-scores/dex&quot;
-        },
-        &quot;dc_value&quot;: 24,
-        &quot;success_type&quot;: &quot;none&quot;
-        },
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;bludgeoning&quot;,
-        &quot;name&quot;: &quot;Bludgeoning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/bludgeoning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d6+9&quot;
-        }
-        ]
-        }
-        ],
-        &quot;image&quot;: &quot;/api/images/monsters/ancient-blue-dragon.png&quot;,
-        &quot;url&quot;: &quot;/api/2014/monsters/ancient-blue-dragon&quot;
-        }
-        &lt;/textarea&gt;
-        &lt;p&gt;And here&apos;s how Chrome AI described it:&lt;/p&gt;
-        &lt;p&gt;The Ancient Blue Dragon is a gargantuan lawful evil creature known for its immense power and cunning. Possessing a formidable armor class and a massive hit point total of 481, it is a terrifying foe to encounter. This dragon boasts impressive physical capabilities, including a powerful bite, razor-sharp claws, and a devastating lightning breath attack, complemented by legendary resistance to damage. With a challenge rating of 23, it is a truly epic monster, capable of wreaking havoc and instilling fear in all who cross its path, and its innate abilities allow it to control the battlefield with Frightful Presence.&lt;/p&gt;
-        &lt;img src=&quot;https://www.dnd5eapi.co/api/images/monsters/ancient-blue-dragon.png&quot; loading=&quot;lazy&quot; style=&quot;max-width:500px&quot;&gt;
-        &lt;p&gt;And how about something on the completely other side of the fence... a pony.&lt;/p&gt;
-        &lt;textarea style=&quot;width:100%; height: 300px&quot;&gt;
-        {
-        &quot;index&quot;: &quot;pony&quot;,
-        &quot;name&quot;: &quot;Pony&quot;,
-        &quot;size&quot;: &quot;Medium&quot;,
-        &quot;type&quot;: &quot;beast&quot;,
-        &quot;alignment&quot;: &quot;unaligned&quot;,
-        &quot;armor_class&quot;: [
-        {
-        &quot;type&quot;: &quot;dex&quot;,
-        &quot;value&quot;: 10
-        }
-        ],
-        &quot;hit_points&quot;: 11,
-        &quot;hit_dice&quot;: &quot;2d8&quot;,
-        &quot;hit_points_roll&quot;: &quot;2d8+2&quot;,
-        &quot;speed&quot;: {
-        &quot;walk&quot;: &quot;40 ft.&quot;
-        },
-        &quot;strength&quot;: 15,
-        &quot;dexterity&quot;: 10,
-        &quot;constitution&quot;: 13,
-        &quot;intelligence&quot;: 2,
-        &quot;wisdom&quot;: 11,
-        &quot;charisma&quot;: 7,
-        &quot;proficiencies&quot;: [],
-        &quot;damage_vulnerabilities&quot;: [],
-        &quot;damage_resistances&quot;: [],
-        &quot;damage_immunities&quot;: [],
-        &quot;condition_immunities&quot;: [],
-        &quot;senses&quot;: {
-        &quot;passive_perception&quot;: 10
-        },
-        &quot;languages&quot;: &quot;&quot;,
-        &quot;challenge_rating&quot;: 0.125,
-        &quot;proficiency_bonus&quot;: 2,
-        &quot;xp&quot;: 25,
-        &quot;actions&quot;: [
-        {
-        &quot;name&quot;: &quot;Hooves&quot;,
-        &quot;desc&quot;: &quot;Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) bludgeoning damage.&quot;,
-        &quot;attack_bonus&quot;: 4,
-        &quot;damage&quot;: [
-        {
-        &quot;damage_type&quot;: {
-        &quot;index&quot;: &quot;bludgeoning&quot;,
-        &quot;name&quot;: &quot;Bludgeoning&quot;,
-        &quot;url&quot;: &quot;/api/2014/damage-types/bludgeoning&quot;
-        },
-        &quot;damage_dice&quot;: &quot;2d4+2&quot;
-        }
-        ]
-        }
-        ],
-        &quot;image&quot;: &quot;/api/images/monsters/pony.png&quot;,
-        &quot;url&quot;: &quot;/api/2014/monsters/pony&quot;
-        }
-        &lt;/textarea&gt;
-        &lt;p&gt;The Pony is a medium-sized beast with an unaligned nature. It possesses a decent strength score of 15 and a speed of 40 feet, making it relatively agile. It has a Challenge Rating of 0.125, suggesting it poses a minor threat. The Pony primarily attacks with its hooves, dealing bludgeoning damage. It has a passive perception of 10, allowing it to notice things around it.&lt;/p&gt;
-        &lt;img src=&quot;https://www.dnd5eapi.co/api/images/monsters/pony.png&quot; loading=&quot;lazy&quot; style=&quot;max-width:500px&quot;&gt;
-        &lt;h2 id=&quot;try-it-yourself&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#try-it-yourself&quot;&gt;Try it Yourself&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;If you want to try it yourself, or see all of the code, you can see the embed below:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;html,result&quot; data-slug-hash=&quot;qENrxOE&quot; data-pen-title=&quot;DD Monster to Text&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/qENrxOE&quot;&gt;
-        DD Monster to Text&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@procopiopi?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Omar:. Lopez-Rincon&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cartoon-vampire-with-pointy-ears-and-a-bow-tie-1CSyvXoeO98?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
