@@ -1,8 +1,8 @@
 # tera-rss
 
-한국어/글로벌 뉴스 RSS 피드를 그룹 단위로 수집해서, 통합 RSS XML(`all.xml`)과 신문사별/카테고리별 RSS XML을 생성하는 Deno 프로젝트입니다.
+한국어/글로벌 RSS 피드를 그룹 단위로 수집해서, 통합 RSS XML(`all.xml`)과 발행사별/카테고리별 RSS XML을 생성하는 Deno 프로젝트입니다.
 
-[akngs/knews-rss](https://github.com/akngs/knews-rss) 구조를 참고해 제작되었습니다.
+개인용 RSS 리더(예: 이노리더)에서 구독 소스를 한 번에 묶어 관리하기 쉽게 만드는 **개인용 RSS 병합 모듈**을 목표로 합니다.
 
 ## 핵심 동작
 
