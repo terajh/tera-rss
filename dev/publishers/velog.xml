@@ -4,697 +4,7 @@
     <title>dev RSS - Velog</title>
     <link>https://velog.io</link>
     <description>Velog RSS 피드</description>
-    <lastBuildDate>Wed, 18 Feb 2026 16:30:18 GMT</lastBuildDate>
-    <item>
-      <title>예제 연습하기-3</title>
-      <link>https://velog.io/@kometale/%EC%98%88%EC%A0%9C-%EC%97%B0%EC%8A%B5%ED%95%98%EA%B8%B0-3</link>
-      <guid>https://velog.io/@kometale/%EC%98%88%EC%A0%9C-%EC%97%B0%EC%8A%B5%ED%95%98%EA%B8%B0-3</guid>
-      <pubDate>Wed, 18 Feb 2026 15:54:56 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;strong&gt;데이터를 담고(입력, List/Map) -&amp;gt; 검증(유틸리티, if) -&amp;gt; 함수로 쪼개서 분류/연산(출력)&lt;/strong&gt;하는 흐름을 이해하는 예제를 다시 풀어보자&lt;/p&gt;
-        &lt;p&gt;실제 앱 프로젝트에서 가장 흔하게 쓰이는 
-        &lt;strong&gt;&amp;quot;재고 관리(Inventory) 또는 장바구니&amp;quot; 예제&lt;/strong&gt;
-        데이터의 유무 확인, 수량 증감, 총액 계산 등 실제 앱의 핵심 로직을 모두 포함하고 있음&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;h2 id=&quot;📌-과제-콘솔-기반-간단-가계부-프로그램-만들기-난이도-초급&quot;&gt;📌 과제: 콘솔 기반 &amp;quot;간단 가계부&amp;quot; 프로그램 만들기 (난이도: 초급+)&lt;/h2&gt;
-        &lt;p&gt;🎯 목표&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;수입/지출 내역을 입력받아 저장한다.&lt;/li&gt;
-        &lt;li&gt;저장된 내역을 목록으로 확인한다.&lt;/li&gt;
-        &lt;li&gt;총 수입/총 지출/잔액을 계산해서 보여준다.&lt;/li&gt;
-        &lt;li&gt;카테고리별(예: 식비/교통/쇼핑) 지출 합계를 보여준다.  ← (난이도 +1)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;hr&gt;
-        &lt;p&gt;🧩 프로그램 동작 방식&lt;/p&gt;
-        &lt;p&gt;메뉴를 반복해서 보여준다.&lt;/p&gt;
-        &lt;p&gt;========== 가계부 ==========&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;내역 추가 (수입/지출)&lt;/li&gt;
-        &lt;li&gt;전체 내역 보기&lt;/li&gt;
-        &lt;li&gt;요약 보기 (총 수입/총 지출/잔액)&lt;/li&gt;
-        &lt;li&gt;카테고리별 지출 합계 보기&lt;/li&gt;
-        &lt;li&gt;&lt;h1 id=&quot;종료&quot;&gt;종료&lt;/h1&gt;
-        &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;hr&gt;
-        &lt;p&gt;📦 저장 구조 (클래스 없이! 난이도는 조금만 올림)&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;내역 1개는 Map&amp;lt;String, dynamic&amp;gt; 로 표현한다.&lt;/li&gt;
-        &lt;li&gt;모든 내역은 List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; 에 저장한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;각 내역(Map)은 아래 키를 반드시 가진다:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&amp;#39;type&amp;#39;      : String  (&amp;#39;income&amp;#39; 또는 &amp;#39;expense&amp;#39;)&lt;/li&gt;
-        &lt;li&gt;&amp;#39;title&amp;#39;     : String  (예: &amp;quot;월급&amp;quot;, &amp;quot;점심&amp;quot;, &amp;quot;지하철&amp;quot;)&lt;/li&gt;
-        &lt;li&gt;&amp;#39;amount&amp;#39;    : int     (예: 12000)&lt;/li&gt;
-        &lt;li&gt;&amp;#39;category&amp;#39;  : String  (예: &amp;quot;식비&amp;quot;, &amp;quot;교통&amp;quot;, &amp;quot;쇼핑&amp;quot;)&lt;/li&gt;
-        &lt;li&gt;&amp;#39;createdAt&amp;#39; : String  (예: &amp;quot;2026-02-13 14:20&amp;quot;)  // 간단히 문자열로 저장&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;※ 날짜는 실제 DateTime을 써도 되지만, 초급+라서 문자열로 저장해도 OK&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;p&gt;1️⃣ 내역 추가 (수입/지출)&lt;/p&gt;
-        &lt;p&gt;입력 흐름:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;유형을 입력: 1) 수입  2) 지출&lt;/li&gt;
-        &lt;li&gt;제목(title) 입력 (빈 값 불가)&lt;/li&gt;
-        &lt;li&gt;금액(amount) 입력 (양수 정수만 허용)&lt;/li&gt;
-        &lt;li&gt;카테고리(category) 입력 (빈 값 불가)&lt;/li&gt;
-        &lt;li&gt;createdAt 은 현재 시간으로 자동 저장&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;예시:
-        유형을 선택하세요 (1:수입, 2:지출): 2
-        제목을 입력하세요: 점심
-        금액을 입력하세요: 9000
-        카테고리를 입력하세요(예: 식비/교통/쇼핑): 식비
-        저장 완료!&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;p&gt;2️⃣ 전체 내역 보기&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;저장된 모든 내역을 번호와 함께 출력한다.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;예시 출력 포맷(자유):
-        1) [지출] 점심 - 9000원 (식비) / 2026-02-13 14:20&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;내역이 없으면:
-        &amp;quot;저장된 내역이 없습니다.&amp;quot;&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;hr&gt;
-        &lt;p&gt;3️⃣ 요약 보기&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;총 수입 합계&lt;/li&gt;
-        &lt;li&gt;총 지출 합계&lt;/li&gt;
-        &lt;li&gt;잔액 = 총 수입 - 총 지출&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;예시:
-        총 수입: 3000000원
-        총 지출: 45000원
-        잔액: 2955000원&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;p&gt;4️⃣ 카테고리별 지출 합계 보기  (난이도 쪼~끔 업!)&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;지출(expense)만 대상으로 한다.&lt;/li&gt;
-        &lt;li&gt;category 별로 금액을 합산해서 출력한다.&lt;/li&gt;
-        &lt;li&gt;Map&amp;lt;String, int&amp;gt; 형태로 합계를 만들어도 된다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;예시:
-        [카테고리별 지출]
-        식비: 18000원
-        교통: 2500원
-        쇼핑: 15000원&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;p&gt;📌 구현 조건&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;모든 코드는 이 main.dart 파일 하나에 작성&lt;/li&gt;
-        &lt;li&gt;클래스 금지 (이번 과제는 Map/List로 연습)&lt;/li&gt;
-        &lt;li&gt;반드시 List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; 사용&lt;/li&gt;
-        &lt;li&gt;반드시 Map&amp;lt;String, int&amp;gt; (카테고리 합계) 사용&lt;/li&gt;
-        &lt;li&gt;반복문(while) + switch 사용&lt;/li&gt;
-        &lt;li&gt;함수 5개 이상으로 분리&lt;/li&gt;
-        &lt;li&gt;int.tryParse 사용&lt;/li&gt;
-        &lt;li&gt;null 처리 반드시 포함&lt;/li&gt;
-        &lt;li&gt;금액은 0 이하 입력 시 다시 입력받기&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;hr&gt;
-        &lt;p&gt;📌 main 함수에는 흐름만 작성할 것&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void main() {
-        final List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList = [];
-        
-        runLedgerProgram(ledgerEntryList);
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 프로그램 루프 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;메뉴 출력&lt;/li&gt;
-        &lt;li&gt;사용자 입력 처리&lt;/li&gt;
-        &lt;li&gt;switch로 기능 분기&lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void runLedgerProgram(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;📌 메뉴 출력 함수&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printMenu() {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 내역 추가 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;수입/지출 선택&lt;/li&gt;
-        &lt;li&gt;title 입력&lt;/li&gt;
-        &lt;li&gt;amount 입력&lt;/li&gt;
-        &lt;li&gt;category 입력&lt;/li&gt;
-        &lt;li&gt;createdAt 저장&lt;/li&gt;
-        &lt;li&gt;ledgerEntryList에 Map으로 추가&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void addLedgerEntry(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 전체 내역 출력 함수&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printAllEntries(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 요약 출력 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;총 수입, 총 지출, 잔액 계산 및 출력&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printSummary(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 카테고리별 지출 합계 출력 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;지출(expense)만 대상으로 category별 합산 후 출력&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printExpenseSummaryByCategory(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; ledgerEntryList) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 (유틸) 문자열 입력 받기&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;prompt 출력&lt;/li&gt;
-        &lt;li&gt;null/빈 문자열이면 다시 입력받기 옵션 처리&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;String readNonEmptyString({required String prompt}) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 (유틸) 양수 정수 입력 받기&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;prompt 출력&lt;/li&gt;
-        &lt;li&gt;숫자 변환 실패 or 0 이하이면 다시 입력받기&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;int readPositiveInt({required String prompt}) {
-        // TODO: 구현
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 (유틸) 현재 시간을 문자열로 만드는 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;예: &amp;quot;2026-02-13 14:20&amp;quot;&lt;/li&gt;
-        &lt;li&gt;DateTime.now()를 사용해서 직접 포맷팅(패딩 포함)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;String buildNowTimestampString() {
-        // TODO: 구현
-        throw UnimplementedError();
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;hr&gt;
-        &lt;p&gt;📌 과제: 콘솔 기반 &amp;quot;스마트 키오스크(장바구니) 프로그램&amp;quot;
-        🎯 목표&lt;/p&gt;
-        &lt;p&gt;상품 목록에서 메뉴를 골라 장바구니에 담는다.&lt;/p&gt;
-        &lt;p&gt;장바구니에 담긴 상품의 수량을 조절하거나 삭제한다.&lt;/p&gt;
-        &lt;p&gt;최종 주문 시 총액을 계산하고 할인 혜택을 적용한다.&lt;/p&gt;
-        &lt;p&gt;🧩 프로그램 동작 방식
-        메뉴를 반복해서 보여줍니다.&lt;/p&gt;
-        &lt;p&gt;Plaintext&lt;/p&gt;
-        &lt;p&gt;========== 🍔 SMART KIOSK ==========&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;메뉴 보기 (상품 목록)&lt;/li&gt;
-        &lt;li&gt;장바구니 담기&lt;/li&gt;
-        &lt;li&gt;장바구니 보기 및 수량 조절&lt;/li&gt;
-        &lt;li&gt;주문하기 (최종 결제)&lt;/li&gt;
-        &lt;li&gt;&lt;h1 id=&quot;종료-1&quot;&gt;종료&lt;/h1&gt;
-        📦 데이터 구조 (Map/List 활용)
-        1️⃣ 상품 목록 (고정 데이터)&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;프로그램 시작 시 아래 3개 이상의 상품을 List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt;에 넣어둡니다.&lt;/p&gt;
-        &lt;p&gt;키: &amp;#39;id&amp;#39;(int), &amp;#39;name&amp;#39;(String), &amp;#39;price&amp;#39;(int)&lt;/p&gt;
-        &lt;p&gt;2️⃣ 장바구니 (사용자 입력 데이터)&lt;/p&gt;
-        &lt;p&gt;List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList에 저장합니다.&lt;/p&gt;
-        &lt;p&gt;각 아이템은 아래 키를 가집니다:&lt;/p&gt;
-        &lt;p&gt;&amp;#39;name&amp;#39; : 상품명&lt;/p&gt;
-        &lt;p&gt;&amp;#39;price&amp;#39; : 단가&lt;/p&gt;
-        &lt;p&gt;&amp;#39;count&amp;#39; : 수량 (기본 1)&lt;/p&gt;
-        &lt;p&gt;🛠 주요 기능 요구사항
-        1️⃣ 메뉴 보기&lt;/p&gt;
-        &lt;p&gt;준비된 상품 목록을 번호와 함께 출력합니다.&lt;/p&gt;
-        &lt;p&gt;2️⃣ 장바구니 담기&lt;/p&gt;
-        &lt;p&gt;상품 번호를 입력받아 cartList에 추가합니다.&lt;/p&gt;
-        &lt;p&gt;(중요) 이미 장바구니에 있는 상품이라면 새로 추가하지 않고, 기존 항목의 &amp;#39;count&amp;#39;(수량)만 1 증가시킵니다. (데이터 흐름 이해의 핵심!)&lt;/p&gt;
-        &lt;p&gt;3️⃣ 장바구니 보기 및 수량 조절&lt;/p&gt;
-        &lt;p&gt;현재 담긴 상품명, 단가, 수량, 소계(단가 * 수량)를 출력합니다.&lt;/p&gt;
-        &lt;p&gt;추가로 &amp;quot;수량을 변경하시겠습니까? (y/n)&amp;quot;를 물어보고, &amp;#39;y&amp;#39;인 경우 상품 번호와 새 수량을 입력받아 업데이트합니다.&lt;/p&gt;
-        &lt;p&gt;수량을 0으로 입력하면 해당 항목을 삭제합니다.&lt;/p&gt;
-        &lt;p&gt;4️⃣ 주문하기 (최종 결제)&lt;/p&gt;
-        &lt;p&gt;모든 상품의 총액을 계산합니다.&lt;/p&gt;
-        &lt;p&gt;할인 조건: 총액이 30,000원 이상이면 10% 할인을 적용합니다.&lt;/p&gt;
-        &lt;p&gt;최종 결제 금액을 출력하고 장바구니를 비웁니다.&lt;/p&gt;
-        &lt;p&gt;📌 구현 조건
-        모든 코드는 main.dart 파일 하나에 작성합니다.&lt;/p&gt;
-        &lt;p&gt;클래스 사용 금지 (Map과 List의 구조에 익숙해지는 것이 목적입니다).&lt;/p&gt;
-        &lt;p&gt;함수를 6개 이상으로 분리하세요.&lt;/p&gt;
-        &lt;p&gt;int.tryParse를 사용하여 잘못된 입력(문자 등) 시 예외 처리를 반드시 포함하세요.&lt;/p&gt;
-        &lt;p&gt;main 함수에는 프로그램 전체 흐름만 작성하세요.&lt;/p&gt;
-        &lt;p&gt;💻 시작 코드 (스켈레톤)
-        이 구조를 복사해서 // TODO 부분을 채워보세요.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;import &amp;#39;dart:io&amp;#39;;
-        
-        void main() {
-        // 상품 목록 데이터 (초기 세팅)
-        final List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products = [
-        {&amp;#39;id&amp;#39;: 1, &amp;#39;name&amp;#39;: &amp;#39;불고기버거&amp;#39;, &amp;#39;price&amp;#39;: 6500},
-        {&amp;#39;id&amp;#39;: 2, &amp;#39;name&amp;#39;: &amp;#39;치즈버거&amp;#39;, &amp;#39;price&amp;#39;: 5500},
-        {&amp;#39;id&amp;#39;: 3, &amp;#39;name&amp;#39;: &amp;#39;감자튀김&amp;#39;, &amp;#39;price&amp;#39;: 2500},
-        {&amp;#39;id&amp;#39;: 4, &amp;#39;name&amp;#39;: &amp;#39;콜라&amp;#39;, &amp;#39;price&amp;#39;: 2000},
-        ];
-        
-        // 장바구니 데이터
-        List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList = [];
-        
-        runKioskProgram(products, cartList);
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 프로그램 전체 루프&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void runKioskProgram(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products, List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // TODO: while문과 switch-case를 사용하여 메뉴를 구성하세요.
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 메뉴(상품 목록) 출력 함수&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printProductList(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products) {
-        // TODO: products 리스트를 순회하며 상품 정보를 출력하세요.
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 장바구니 담기 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;상품 번호 입력 받기&lt;/li&gt;
-        &lt;li&gt;이미 있다면 수량만 증가, 없다면 새로 추가&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void addToCart(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products, List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // TODO: 상품 번호를 입력받아 cartList를 업데이트하세요.
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 장바구니 보기 및 수량 변경 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;현재 장바구니 내용 출력&lt;/li&gt;
-        &lt;li&gt;수량 변경 로직 (0이면 삭제)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void showCart(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // TODO: 장바구니 목록을 보여주고 수량 수정 여부를 물어보세요.
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 주문 및 결제 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;총액 계산 -&amp;gt; 할인 적용 -&amp;gt; 장바구니 비우기&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void processOrder(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // TODO: 결제 로직을 구현하세요.
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;📌 (유틸) 숫자 입력 함수&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;숫자 이외의 값 입력 시 재입력 요청&lt;/li&gt;
-        &lt;li&gt;양수만 허용 등의 조건 추가 가능&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;int readIntInput(String prompt) {
-        // TODO: 사용자로부터 숫자를 안전하게 입력받으세요.
-        throw UnimplementedError();
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;💡 힌트 및 응원
-        수량 증가 로직: cartList를 for문으로 돌면서 사용자가 선택한 상품 이름이 이미 존재하는지 먼저 확인하는 것이 포인트입니다.&lt;/p&gt;
-        &lt;p&gt;ToDo 앱과의 연결: ToDo 앱에서 &amp;#39;완료 여부(isDone)&amp;#39;를 바꾸는 것이나, 이 예제에서 &amp;#39;수량(count)&amp;#39;을 바꾸는 것이나 결국 &lt;strong&gt;&amp;quot;리스트 안의 특정 맵(Map) 데이터에 접근해 값을 수정하는 것&amp;quot;&lt;/strong&gt;으로 원리는 같습니다.&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;ol&gt;
-        &lt;li&gt;메뉴를 출력하는 함수&lt;h4 id=&quot;-문제점-&quot;&gt;[ 문제점 ]&lt;/h4&gt;
-        상품리스트를 출력할 때 id의 값을 따로 주고 반복해서 출력할 방법을 생각하다가 2중으로 작성했다. &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;h4 id=&quot;-원인-&quot;&gt;[ 원인 ]&lt;/h4&gt;
-        &lt;p&gt;이중으로 반복문을 사용하면 상품이 4개일 경우 4*4 총 16번이 출력이 된게 된다!
-        상품 하나당 전체 리스트 길이만큼 출력이 되기 때문
-        for 반복문이 작동하는 방식의 이해도 부족&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;// 이미 있는 메뉴(상품 목록) 출력 함수
-        void printProductList(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products) {
-        // products 리스트를 순회하며 상품 정보를 출력하세요.
-        // 리스트 안의 상품 정보를 하나씩 꺼내서 출력을 해야됨
-        int id = 0;
-        
-        for (var prd in products) {
-        for (var id = 0; id &amp;lt;= products.length; id++) {
-        // 리스트 순회하는 함수 사용?
-        print(
-        &amp;#39;${prd[&amp;#39;id&amp;#39;] + 1}번: ${prd[&amp;#39;name&amp;#39;]} ${prd[&amp;#39;price&amp;#39;]}원, ${prd[&amp;#39;count&amp;#39;]}개&amp;#39;,
-        );
-        }
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;h4 id=&quot;-해결방법-&quot;&gt;[ 해결방법 ]&lt;/h4&gt;
-        &lt;p&gt;이중 반복문을 삭제하고 코드를 더 간결하게 변경했다.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void printProductList(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products) {
-        for (var prd in products) {
-        print(&amp;#39;${prd[&amp;#39;id&amp;#39;]}번: ${prd[&amp;#39;name&amp;#39;]} ${prd[&amp;#39;price&amp;#39;]}원&amp;#39;);
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;hr&gt;
-        &lt;h4 id=&quot;장바구니-담기-함수&quot;&gt;장바구니 담기 함수&lt;/h4&gt;
-        &lt;p&gt;흐름이해를 위해 구조를 어떻게 짜야할지 많이 참고해서 작성을 해보았다.
-        ! if (selectProduct == null) {}을 for문 안쪽에서 작성 시 첫번째 상품만 검사하고 없다고 판단을 내리고 종료시킬 수 있다.
-        for문 밖으로 꺼내면 &amp;#39;!&amp;#39; 이 없이도 에러가 해결 될 수 있다.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;// 장바구니 담기 함수. todo앱의 수정로직과 같음!
-        void addToCart(
-        List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products,
-        List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList,
-        ) {
-        // 상품 번호를 입력받아 cartList를 업데이트하세요.
-        int productId = readIntInput(&amp;#39;장바구니에 담을 상품번호를 입력하세요.&amp;#39;);
-        // 1. 선택한 번호가 실제 상품목록 안에 있는지 확인
-        // 맵의 변수를 만들어주고
-        Map&amp;lt;String, dynamic&amp;gt;? selectProduct;
-        for (var prd in products) {
-        // 만약 입력한 상품번호가 목록의 제품 아이디와 같다면, 상품목록에 있는게 맞다.
-        if (prd[&amp;#39;id&amp;#39;] == productId) {
-        selectProduct = prd;
-        break;
-        }
-        // 만약 입력한 상품번호가 목록의 제품 아이디에 없다면 존재하지 않음을 알려주고 종료한다.
-        if (selectProduct == null) {
-        print(&amp;#39;존재하지 않는 상품정보 입니다. 다시 입력해주세요.&amp;#39;);
-        return;
-        }
-        }
-        // 2. 장바구니에 이미 이 상품이 있는지 확인하기. 있으면 기존 항목의 count만 1증가시키기
-        bool isExist = false;
-        for (var item in cartList) {
-        // 위에서 selectProduct의 값이 null이 아닐 경우 넘어오는 것이기 때문에 절대 null이 아니라고 !를 붙여준다.
-        if (item[&amp;#39;name&amp;#39;] == selectProduct![&amp;#39;name&amp;#39;]) {
-        // 이미 있다면
-        item[&amp;#39;count&amp;#39;]++;
-        isExist = true;
-        print(&amp;#39;${item[&amp;#39;name&amp;#39;]}의 수량이 추가되었습니다.&amp;#39;);
-        break;
-        }
-        }
-        // 3. 장바구니에 없다면 추가하기
-        if (!isExist) {
-        cartList.add({
-        &amp;#39;name&amp;#39;: selectProduct![&amp;#39;name&amp;#39;],
-        &amp;#39;price&amp;#39;: selectProduct[&amp;#39;price&amp;#39;],
-        &amp;#39;count&amp;#39;: 1,
-        });
-        print(&amp;#39;${selectProduct[&amp;#39;name&amp;#39;]}을 장바구니에 담았습니다.&amp;#39;);
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;코드 수정&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void addToCart(
-        List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; products,
-        List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList,
-        ) {
-        int productId = readIntInput(&amp;#39;장바구니에 담을 상품번호를 입력하세요.&amp;#39;);
-        
-        Map&amp;lt;String, dynamic&amp;gt;? selectProduct;
-        for (var prd in products) {
-        if (prd[&amp;#39;id&amp;#39;] == productId) {
-        selectProduct = prd;
-        break;
-        }
-        }
-        // 루프가 끝나고 한번만 검사한다!
-        if (selectProduct == null) {
-        print(&amp;#39;존재하지 않는 상품정보 입니다. 다시 입력해주세요.&amp;#39;);
-        return;
-        }
-        
-        bool isExist = false;
-        for (var item in cartList) {
-        if (item[&amp;#39;name&amp;#39;] == selectProduct[&amp;#39;name&amp;#39;]) {
-        item[&amp;#39;count&amp;#39;]++;
-        isExist = true;
-        print(&amp;#39;${item[&amp;#39;name&amp;#39;]}의 수량이 추가되었습니다.&amp;#39;);
-        break;
-        }
-        }
-        
-        if (!isExist) {
-        cartList.add({
-        &amp;#39;name&amp;#39;: selectProduct[&amp;#39;name&amp;#39;],
-        &amp;#39;price&amp;#39;: selectProduct[&amp;#39;price&amp;#39;],
-        &amp;#39;count&amp;#39;: 1,
-        });
-        print(&amp;#39;${selectProduct[&amp;#39;name&amp;#39;]}을 장바구니에 담았습니다.&amp;#39;);
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;hr&gt;
-        &lt;h4 id=&quot;장바구니-로직-함수&quot;&gt;장바구니 로직 함수&lt;/h4&gt;
-        &lt;h4 id=&quot;-문제점--1&quot;&gt;[ 문제점 ]&lt;/h4&gt;
-        &lt;p&gt;기본 구조 로직의 흐름 &lt;strong&gt;&amp;#39;번호로 항목을 고르는 법&amp;#39;&lt;/strong&gt;과 &lt;strong&gt;&amp;#39;수량 수정 로직&amp;#39;&lt;/strong&gt;구조를 짜는데 아직 이해도가 부족해서 도움을 받기로 했다.&lt;/p&gt;
-        &lt;h4 id=&quot;-원인--1&quot;&gt;[ 원인 ]&lt;/h4&gt;
-        &lt;p&gt;&lt;strong&gt;계산식 에러:&lt;/strong&gt; 
-        ${item[&amp;#39;price&amp;#39;] * [&amp;#39;count&amp;#39;]}에서 [&amp;#39;count&amp;#39;]는 리스트 형태라 숫자가 아닙니다. item[&amp;#39;count&amp;#39;]라고 써야 합니다.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;비교 대상 오류:&lt;/strong&gt; 
-        if (itemNumber == cartList)는 &amp;quot;숫자 하나&amp;quot;와 &amp;quot;장바구니 리스트 전체&amp;quot;를 비교하는 것이라 항상 거짓이 됩니다. &lt;strong&gt;&amp;quot;리스트의 몇 번째(인덱스)인가&amp;quot;&lt;/strong&gt;를 확인해야 합니다.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;수정 로직:&lt;/strong&gt; 
-        사용자가 &amp;#39;1&amp;#39;번 상품을 고르면, 컴퓨터 기준으로는 0번 인덱스(1 - 1)를 수정하는 방식이 가장 편합니다.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;// 장바구니 보기 및 수량 변경 함수
-        void showCart(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // 장바구니 목록을 번호로 고르고 수량 수정 여부를 물어보기
-        if (cartList.isEmpty) {
-        print(&amp;#39;장바구니에 담긴 상품이 없습니다.&amp;#39;);
-        return;
-        }
-        // 현재 장바구니에 담긴 정보를 출력
-        for (var item in cartList) {
-        print(
-        &amp;#39;${item[&amp;#39;name&amp;#39;]} ${item[&amp;#39;price&amp;#39;]} ${item[&amp;#39;count&amp;#39;]} = ${item[&amp;#39;price&amp;#39;] * [&amp;#39;count&amp;#39;]}원&amp;#39;,
-        );
-        }
-        // 수량변경 y/n 선택
-        // y일 경우 상품 번호와 새 수량을 받아서 업데이트한다. 수량을 0으로 입력 시 해당 항목을 삭제
-        stdout.write(&amp;#39;수량을 변경하시겠습니까? (y/n)&amp;#39;);
-        String input = stdin.readLineSync() ?? &amp;#39;&amp;#39;;
-        
-        if (input == &amp;#39;y&amp;#39; &amp;amp;&amp;amp; input == &amp;#39;yes&amp;#39;) {
-        // 상품 번호를 입력해서 선택한 뒤, 변경수량을 또 입력??
-        int itemNumber = readIntInput(&amp;#39;수량을 변경할 상품 번호와 새 수량을 입력해주세요.&amp;#39;);
-        
-        if (itemNumber == cartList) {
-        print(&amp;#39;${itemNumber[&amp;#39;count&amp;#39;]}+${cartList[&amp;#39;count&amp;#39;]}&amp;#39;);
-        }
-        } else if (input == &amp;#39;n&amp;#39; &amp;amp;&amp;amp; input == &amp;#39;no&amp;#39;) {
-        print(&amp;#39;결제 항목으로 넘어갑니다.&amp;#39;);
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;h4 id=&quot;-흐름-이해-&quot;&gt;&lt;strong&gt;[ 흐름 이해 ]&lt;/strong&gt;&lt;/h4&gt;
-        &lt;p&gt;장바구니에 담긴 정보를 보여주려면 리스트의 길이만큼 출력하는게 편하다.
-        수량 변경에 대해 의사를 먼저 물어본 뒤 y일 경우 n일 경우 분기처리
-        인덱스 값을 가져와서 변경할 정보를 선택하고, 삭제할지(0) 수정할지
-        장바구니 안에 있을 경우 - 리스트 안에서 새로운 값을 더해줘서 수정해주기 &lt;/p&gt;
-        &lt;p&gt;! 리스트에서 제거할 때는 removeAt()을 사용, 추가할 때는 add(), 수정할 때는 입력한 값을 리스트에 새로 담아주면 됨.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;void showCart(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // 장바구니 목록을 번호로 고르고 수량 수정 여부를 물어보기
-        if (cartList.isEmpty) {
-        print(&amp;#39;장바구니에 담긴 상품이 없습니다.&amp;#39;);
-        return;
-        }
-        // 현재 장바구니에 담긴 정보를 출력
-        for (var i = 0; i &amp;lt; cartList.length; i++) {
-        var item = cartList[i];
-        // i + 1 사용자에게 1번부터 보여주기. 총 합이 얼마인지
-        int subTotal = item[&amp;#39;price&amp;#39;] * item[&amp;#39;count&amp;#39;];
-        print(
-        &amp;#39;${i + 1}번 ${item[&amp;#39;name&amp;#39;]} | ${item[&amp;#39;price&amp;#39;]}원 | ${item[&amp;#39;count&amp;#39;]}개 | 소계: ${subTotal}원&amp;#39;,
-        );
-        }
-        // 수량변경 y/n 선택
-        // y일 경우 상품 번호와 새 수량을 받아서 업데이트한다. 수량을 0으로 입력 시 해당 항목을 삭제
-        stdout.write(&amp;#39;수량을 변경하시겠습니까? (y/n)&amp;#39;);
-        String input = stdin.readLineSync()?.toLowerCase() ?? &amp;#39;&amp;#39;;
-        
-        if (input == &amp;#39;y&amp;#39;) {
-        // 상품 번호를 입력해서 선택.
-        int itemNum = readIntInput(&amp;#39;수량을 변경할 상품 번호를 입력해주세요.&amp;#39;);
-        // 컴퓨터가 이해하는 인덱스 번호로 변환한 것
-        int index = itemNum - 1;
-        
-        // 입력한 번호가 장바구니 범위 안에 있는지 확인하기
-        if (index &amp;gt;= 0 &amp;amp;&amp;amp; index &amp;lt; cartList.length) {
-        int newCount = readIntInput(&amp;#39;새로운 수량을 입력하세요.(0 입력시 삭제)&amp;#39;);
-        
-        if (newCount &amp;lt;= 0) {
-        // Todo 삭제 로직과 동일함
-        print(&amp;#39;${cartList[index][&amp;#39;name&amp;#39;]} 항목이 삭제되었습니다.&amp;#39;);
-        cartList.removeAt(index);
-        } else {
-        // 수정 로직 동일함.
-        // newCount의 값을 리스트 안에 있는 목록 안 카운트의 값에 담아준다.
-        cartList[index][&amp;#39;count&amp;#39;] = newCount;
-        print(&amp;#39;수량이 변경되었습니다.&amp;#39;);
-        }
-        } else {
-        print(&amp;#39;잘못된 번호입니다.&amp;#39;);
-        }
-        } else if (input == &amp;#39;n&amp;#39;) {
-        print(&amp;#39;수량변경이 취소되었습니다.&amp;#39;);
-        return;
-        } else {
-        print(&amp;#39;잘못 입력하셨습니다. (y/n)중 선택해주세요.&amp;#39;);
-        return;
-        }
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;hr&gt;
-        &lt;h4 id=&quot;주문-및-결제-함수&quot;&gt;주문 및 결제 함수&lt;/h4&gt;
-        &lt;p&gt;데이터를 어떻게 처리하고 최종적으로 마무리하는지의 흐름
-        통계 로직의 기초&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-dart&quot;&gt;// 주문 및 결제 함수
-        void processOrder(List&amp;lt;Map&amp;lt;String, dynamic&amp;gt;&amp;gt; cartList) {
-        // 결제 로직을 구현하세요. 할인조건 총 액이 30,000원 이상이면 10% 할인 적용
-        // 최종 결제 금액 출력하고 장바구니를 비우기
-        // 장바구니가 비어있을 경우
-        if (cartList.isEmpty) {
-        print(&amp;#39;결제할 상품이 없습니다.&amp;#39;);
-        return;
-        }
-        
-        int total = 0;
-        // 반복문으로 모든 상품 가격*수량 total에 더하기
-        for (var i = 0; i &amp;lt; cartList.length; i++) {
-        // 반복되는 카트리스트의 값을 아이템에 담아주고, 토탈값을 계산해준다.
-        var item = cartList[i];
-        total += (item[&amp;#39;price&amp;#39;] as int) * (item[&amp;#39;count&amp;#39;] as int);
-        }
-        print(&amp;#39;최종합계: $total원 입니다.&amp;#39;);
-        // 할인적용
-        if (total &amp;gt;= 30000) {
-        total = (total * 0.9).toInt();
-        }
-        
-        print(&amp;#39;3만원 이상 구매시 10% 할인되어서 최종금액: $total원 입니다.&amp;#39;);
-        print(&amp;#39;결제가 완료되었습니다. 이용해주셔서 감사합니다.&amp;#39;);
-        
-        // 장바구니 비우기
-        cartList.clear();
-        return;
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;strong&gt;ToDo 앱에 대입해본다면?&lt;/strong&gt;
-        누적 합산: 
-        &amp;quot;전체 할 일 중 완료된 할 일은 몇 개인가?&amp;quot; 계산할 때 사용.
-        조건 처리: 
-        &amp;quot;할 일을 다 완료했으면 &amp;#39;축하합니다&amp;#39; 메시지 띄우기&amp;quot; 할 때 사용.
-        초기화: 
-        &amp;quot;완료된 항목만 전체 삭제하기&amp;quot; 기능을 만들 때 사용.&lt;/p&gt;
-        &lt;/blockquote&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>[TIL] 2026.02.18 - SQL : JOIN 심화</title>
-      <link>https://velog.io/@garden31201/TIL-2026.02.18-JOIN-%EC%8B%AC%ED%99%94</link>
-      <guid>https://velog.io/@garden31201/TIL-2026.02.18-JOIN-%EC%8B%AC%ED%99%94</guid>
-      <pubDate>Wed, 18 Feb 2026 15:54:52 GMT</pubDate>
-      <content:encoded>
-        &lt;h3 id=&quot;1-테이블-3개-이상-join-하기&quot;&gt;1. 테이블 3개 이상 JOIN 하기&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;원리&lt;/strong&gt;: 1번과 2번을 합친 결과물에 3번을 이어 붙이는 &lt;strong&gt;&amp;#39;계단식 조립&amp;#39;&lt;/strong&gt;.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;핵심&lt;/strong&gt;: 각 테이블을 잇는 &lt;strong&gt;&amp;#39;다리(공통 컬럼)&amp;#39;&lt;/strong&gt;를 정확히 찾아야 하며, 별칭(Alias)을 써서 컬럼의 출처를 명확히 해야 한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3 id=&quot;2-집계-함수sum-vs-단순-연산&quot;&gt;2. 집계 함수(&lt;code&gt;SUM&lt;/code&gt;) vs 단순 연산&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;단순 연산 (&lt;code&gt;A * B&lt;/code&gt;)&lt;/strong&gt;: 각 행(Row) 안에서 가로로 계산한다. 자동차 한 대의 30일치 대여료를 구할 때 쓴다.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;집계 함수 (&lt;code&gt;SUM(A * B)&lt;/code&gt;)&lt;/strong&gt;: 여러 행의 결과값을 세로로 모두 더해 하나의 합계를 낸다. 모든 자동차의 대여료 총합을 구할 때 쓴다.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;주의&lt;/strong&gt;: 문제에서 &amp;quot;자동차별 금액&amp;quot;을 원한다면 &lt;code&gt;SUM&lt;/code&gt;을 쓰지 말고 일반 연산식을 써야 한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3 id=&quot;3-소수점-처리-함수-floor&quot;&gt;3. 소수점 처리 함수 (&lt;code&gt;FLOOR&lt;/code&gt;)&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;&lt;code&gt;FLOOR(값)&lt;/code&gt;&lt;/strong&gt;: 소수점 아래를 무조건 버리고 정수로 만든다. (내림)&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;비교&lt;/strong&gt;: 반올림은 &lt;code&gt;ROUND&lt;/code&gt;, 올림은 &lt;code&gt;CEIL&lt;/code&gt;을 상황에 맞춰 사용한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3 id=&quot;4-고난도-필터링-기간-내-대여-가능-여부&quot;&gt;4. 고난도 필터링: 기간 내 대여 가능 여부&lt;/h3&gt;
-        &lt;p&gt;Lv.4 문제의 핵심 로직인 &lt;strong&gt;&amp;quot;특정 기간에 대여 기록이 없는 차 찾기&amp;quot;&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;방향성&lt;/strong&gt;: &lt;code&gt;BETWEEN&lt;/code&gt;으로 단순 비교하는 것이 아니라, &lt;strong&gt;&amp;quot;그 기간에 대여 중인 차들&amp;quot;&lt;/strong&gt;을 먼저 뽑은 뒤, &lt;code&gt;NOT IN&lt;/code&gt;을 사용하여 그 리스트에 포함되지 않는 차를 고르는 역발상이 필요하다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;hr&gt;
-        &lt;h2 id=&quot;⚠️-오답노트&quot;&gt;⚠️ 오답노트&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;&lt;code&gt;IS NOT&lt;/code&gt; vs `!=&lt;/strong&gt;&lt;code&gt;: 문자열이 같지 않음을 비교할 때는&lt;/code&gt;IS NOT&lt;code&gt;이 아니라 **&lt;/code&gt;!=&lt;code&gt;** 또는 **&lt;/code&gt;&amp;lt;&amp;gt;`**를 써야 문법 에러가 나지 않는다.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;날짜 비교&lt;/strong&gt;: 날짜 데이터에서 &lt;code&gt;&amp;lt;&lt;/code&gt;는 &amp;quot;더 과거(빠른 날짜)&amp;quot;를 의미하고, &lt;code&gt;&amp;gt;&lt;/code&gt;는 &amp;quot;더 미래(늦은 날짜)&amp;quot;를 의미한다.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;LIKE 연산자의 한계&lt;/strong&gt;: 날짜(DATE) 타입을 &lt;code&gt;LIKE &amp;#39;2022-05%&amp;#39;&lt;/code&gt;로 비교할 수도 있지만, 더 정확하고 안전한 방법은 &lt;code&gt;DATE_FORMAT&lt;/code&gt; 함수를 활용하는 것이다.&lt;/li&gt;
-        &lt;/ul&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Buy Old Gmail Accounts: The Ultimate Guide to Aged Google ...</title>
-      <link>https://velog.io/@hsgshegr/Buy-Old-Gmail-Accounts-The-Ultimate-Guide-to-Aged-Google--fz36ihi9</link>
-      <guid>https://velog.io/@hsgshegr/Buy-Old-Gmail-Accounts-The-Ultimate-Guide-to-Aged-Google--fz36ihi9</guid>
-      <pubDate>Wed, 18 Feb 2026 15:52:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Buy  Gmail accounts&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 We are available online 24/7&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Telegram: @getpvazone&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 WhatsApp: +1 (219) 396-6971&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Email: &lt;a href=&quot;mailto:getpvazon@gmail.com&quot;&gt;getpvazon@gmail.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Visit Our Website: &lt;a href=&quot;https://getpvazone.com&quot;&gt;https://getpvazone.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 come now our company: &lt;a href=&quot;https://getpvazone.com/product/buy-old-gmail-accounts/&quot;&gt;https://getpvazone.com/product/buy-old-gmail-accounts/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;Their principles The bottom line is that an email account is the key of so many things in today’s connected world, and Gmail is one of the most popular out there. But sometimes a fresh account means missing out on the perks of having an old one. That’s where GetpvaZone comes in. By the time you’re done with this guide, we would have covered everything there is to know about buying aged Gmail accounts from GetPVAZone including whether or not it’s such a good idea and how to generally go ahead with purchasing them in a safe manner.&lt;/p&gt;
-        &lt;p&gt;What Are Old Gmail Accounts?&lt;/p&gt;
-        &lt;p&gt;Old Gmail accounts get our focus Email addresses that are a couple of years old. In many cases these accounts have a backstory and they’re not new -– verified relationships, mailed correspondence, older data. They aren’t as “good” as fresh accounts, but they do have that credibility added, so you can use it in some uses cases that need certain type of behavior: Marketing campaigns Company stuff Or if you don’t want to start with an account from scratch and deal with what restricions I might place on them.&lt;/p&gt;
-        &lt;p&gt;Why You Need to Buy Gmail Accounts from GetpvaZone&lt;/p&gt;
-        &lt;p&gt;it sell outdated Gmail accounts Despite getting just because of this thePlanetpanel is not exactly like Individuals service providers. The website comes with a secured payment system, verified account profiles and members are its priority. GetpvaZone is one of very few sources for every account we sell is 100% real and authentic as you’ve been receiving from us since the beginning Others are selling accounts with some strange looking foreign characters in their description.&lt;/p&gt;
-        &lt;p&gt;Benefit for Buy Gmail Accounts from GetpvaZone&lt;/p&gt;
-        &lt;p&gt;Trustworthiness and Reputation&lt;/p&gt;
-        &lt;p&gt;Trust is a huge factor in why buyers love GetpvaZone. When you buy old Gmail accounts from GetpvaZone, What You’re receiving is a service that stands on honesty. All accounts sold on the site are legitimate and have clean history (no results from google ordering block or filter).&lt;/p&gt;
-        &lt;p&gt;Enhanced Security with Older Accounts&lt;/p&gt;
-        &lt;p&gt;Older Gmail accounts are also equipped with extra layers of security. For example, they may already have two-factor authentication (2FA) enabled on them and are consequently more secure than new accounts. This additional layer of security further secures your inbox and protects unauthorized access to your email even after someone gained access to your password.&lt;/p&gt;
-        &lt;p&gt;Versatile Use Cases&lt;/p&gt;
-        &lt;p&gt;Businesses are not alone in looking for marketing aids and old Gmail accounts are being used to run business with a push from Getpvazone. They’re perfect to use for account verification, social media posting or simply as an alias. You can also use old Gmail accounts to save yourself from getting blacklisted, so they are very useful for sending out transactional emails in bulk.&lt;/p&gt;
-        &lt;p&gt;How to buy old gmail accounts from GetpvaZone&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 We are available online 24/7&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Telegram: @getpvazone&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 WhatsApp: +1 (219) 396-6971&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Email: &lt;a href=&quot;mailto:getpvazon@gmail.com&quot;&gt;getpvazon@gmail.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Visit Our Website: &lt;a href=&quot;https://getpvazone.com&quot;&gt;https://getpvazone.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 come now our company: &lt;a href=&quot;https://getpvazone.com/product/buy-old-gmail-accounts/&quot;&gt;https://getpvazone.com/product/buy-old-gmail-accounts/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;How to Make a Secure Purchase&lt;/p&gt;
-        &lt;p&gt;Visit GetpvaZone: Visit the website of GetpvaZone. Review their inventory of old GMAIL accounts and pick one for yourself.&lt;/p&gt;
-        &lt;p&gt;Choose an Account Based on Activity: Check out the activity and account history of what you’re purchasing. The longer you keep an Account) The established by having it (Accounts which are left for some years to seasoned can be trusted.&lt;/p&gt;
-        &lt;p&gt;Payment &amp;amp; Terms Read or check the payment terms of service, and means of payment before purchasing. Safe Payment We do safe payment for example PAYpal to safeguard growing risk of your financial information.&lt;/p&gt;
-        &lt;p&gt;Account Verification Process&lt;/p&gt;
-        &lt;p&gt;This is to Check out before you finally stop shopping” getpvaZone Before you call it a day, make this check GetthepvaZone Verify the account. That means you’ll have all of that recovery info — think connected phone numbers or alternate emails — to help you get back in if worst does come to worst.&lt;/p&gt;
-        &lt;p&gt;Secure Your Investment After Purchase&lt;/p&gt;
-        &lt;p&gt;When you buy an aged Gmail account you need to know how to secure it. The password must be changed and two-factor authentication (2FA) turned on together. This extra step of protection can help ensure your new Gmail account never falls into the wrong hands or gets accessed by hackers.&lt;/p&gt;
-        &lt;p&gt;Pitfalls And Problems in buying Gmail Accounts&lt;/p&gt;
-        &lt;p&gt;The Possibility of Scams&lt;/p&gt;
-        &lt;p&gt;Like any online purchase, there is a potential for fraud. Some sellers may hawk inaccurately verified or stolen accounts. This can be avoided only by purchasing from credible vendors such as GetpvaZone, where every account we sell is guaranteed to be valid.&lt;/p&gt;
-        &lt;p&gt;Account Recovery Issues&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 We are available online 24/7&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Telegram: @getpvazone&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 WhatsApp: +1 (219) 396-6971&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Email: &lt;a href=&quot;mailto:getpvazon@gmail.com&quot;&gt;getpvazon@gmail.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Visit Our Website: &lt;a href=&quot;https://getpvazone.com&quot;&gt;https://getpvazone.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 come now our company: &lt;a href=&quot;https://getpvazone.com/product/buy-old-gmail-accounts/&quot;&gt;https://getpvazone.com/product/buy-old-gmail-accounts/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;One of the risks when you buy old Gmail Accounts is that if something happens you are in danger to recover your account. You might find yourself not able to get in, if the seller does not hand over you the rightful recovery information.- Always ensure that the seller gives you enough recovery options such as linked phone numbers or email ID’s used for recovery.&lt;/p&gt;
-        &lt;p&gt;Legal Things to Know About the Purchase of Gmail Accounts&lt;/p&gt;
-        &lt;p&gt;And while it may seem harmless enough to purchase old Gmail accounts, there’s also the legality of it all. As long as your swap is nice and vanilla, you won’t be violating any of Gmail services’ T&amp;amp;Cs. GetpvaZone is strict ad they guaranty that all accounts are in accordance with Google policies, but you should use it at your own risk, because having your account blocked would not be good.&lt;/p&gt;
-        &lt;p&gt;Some other Ways of Buying Old Gmail Accounts&lt;/p&gt;
-        &lt;p&gt;Creating a Fresh Gmail Account&lt;/p&gt;
-        &lt;p&gt;If you don’t want to buy an old Gmail account, your best be may to simply create a new one. 1) Google allows people to have more than one Gmail account, and for those who don’t mind trying or working a bit you can actually gain ‘accurate’ repute on a new one.&lt;/p&gt;
-        &lt;p&gt;Using Alternative Email List Services&lt;/p&gt;
-        &lt;p&gt;If you want a Gmail account with old age instead of buying, purchase an email list service. These platforms offer you material email lists full of active subscribers that you can employ for outreach, marketingowever and for anything else without wasting money on buying a stale account.&lt;/p&gt;
-        &lt;p&gt;FAQs&lt;/p&gt;
-        &lt;p&gt;Is it possible to buy (legal) vintage Gmail accounts?&lt;/p&gt;
-        &lt;p&gt;Is buying old Gmail accounts safe? Yes, Buying of an Old Gmail account can be safe with GetpvaZone and others.. Ensure your account is verified and has good recovery options.&lt;/p&gt;
-        &lt;p&gt;What makes your platform GetpvaZone different from similar products?&lt;/p&gt;
-        &lt;p&gt;GetpvaZone give u the proper peace of mind that the Gmail accounts are safe and were verified &amp;amp; guaranteed with recovery options.&lt;/p&gt;
-        &lt;p&gt;How do I secure my new provide Gmail email account?&lt;/p&gt;
-        &lt;p&gt;Once you receive it Login and Change password And enable 2 factor Authentication(2FA) For protect all Your New Gmail After purchase.&lt;/p&gt;
-        &lt;p&gt;Can I use old Gmail accounts to do marketing?&lt;/p&gt;
-        &lt;p&gt;Yeah, old Gmail accounts are perfect for marketing as they have a history and easily won’t be marked spammed.&lt;/p&gt;
-        &lt;p&gt;I can’t recover my purchased Gmail account? What should I do?&lt;/p&gt;
-        &lt;p&gt;If you cannot access your Gmail account, don’t worry we will help you @GetpvaZone. They provide support and will replace it if something goes wrong.&lt;/p&gt;
-        &lt;p&gt;Conclusion&lt;/p&gt;
-        &lt;p&gt;There are several advantages you have in buying the old Gmail accounts from GetpvaZone, such as more security, reliability and user friendly. For now, though, there are a few things you can do to protect yourself, including verifying the account is real and protecting your new acquisition after it becomes part of your inventory. Whether you decide to use an old account for a purchase — or a different route altogether — at least you know that your decision is purposeful and as mission-aware as it can be, while still adhering within the bounds.&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 We are available online 24/7&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Telegram: @getpvazone&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 WhatsApp: +1 (219) 396-6971&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Email: &lt;a href=&quot;mailto:getpvazon@gmail.com&quot;&gt;getpvazon@gmail.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 Visit Our Website: &lt;a href=&quot;https://getpvazone.com&quot;&gt;https://getpvazone.com&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🧠🤖📑💼🔐 come now our company: &lt;a href=&quot;https://getpvazone.com/product/buy-old-gmail-accounts/&quot;&gt;https://getpvazone.com/product/buy-old-gmail-accounts/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁🎁&lt;/p&gt;
-      </content:encoded>
-    </item>
+    <lastBuildDate>Wed, 18 Feb 2026 16:36:12 GMT</lastBuildDate>
     <item>
       <title>프로그래머스 고득점 kit - 도둑질(파이썬)</title>
       <link>https://velog.io/@gunwoo7179/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%A8%B8%EC%8A%A4-%EA%B3%A0%EB%93%9D%EC%A0%90-kit-%EB%8F%84%EB%91%91%EC%A7%88%ED%8C%8C%EC%9D%B4%EC%8D%AC</link>
@@ -2678,6 +1988,653 @@
         RAG의 파이프라인은 다음과 같이 구성됩니다. 가장 먼저 사용자가 프롬프트를 입력하고 프롬프트를 기반으로 벡터 DB에서 관련 정보를 읽어옵니다. 그리고 읽어온 정보와 함께 사용자에게 답변을 제공합니다.&lt;/p&gt;
         &lt;h2 id=&quot;이후-계획&quot;&gt;이후 계획&lt;/h2&gt;
         &lt;p&gt;이제 RAG를 연결하는 과정은 끝났으니 벡터 DB에 사용할 pdf를 찾아서 더 세밀한 DB를 구성하고 최종적으로 모델을 배포하며 마무리 할 계획입니다 &lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title># TIL – Unreal Engine UI 구조와 Subsystem 이해</title>
+      <link>https://velog.io/@gussen/TIL-Unreal-Engine-UI-%EA%B5%AC%EC%A1%B0%EC%99%80-Subsystem-%EC%9D%B4%ED%95%B4</link>
+      <guid>https://velog.io/@gussen/TIL-Unreal-Engine-UI-%EA%B5%AC%EC%A1%B0%EC%99%80-Subsystem-%EC%9D%B4%ED%95%B4</guid>
+      <pubDate>Wed, 18 Feb 2026 15:09:16 GMT</pubDate>
+      <content:encoded>
+        &lt;h1 id=&quot;til--unreal-engine-ui-구조와-subsystem-이해&quot;&gt;TIL – Unreal Engine UI 구조와 Subsystem 이해&lt;/h1&gt;
+        &lt;h2 id=&quot;1-commonuserwidget-vs-commonactivatablewidget&quot;&gt;1. CommonUserWidget vs CommonActivatableWidget&lt;/h2&gt;
+        &lt;p&gt;오늘은 CommonUI 구조의 기본 개념부터 정리했다.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;CommonUserWidget&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;일반적인 베이스 위젯&lt;/li&gt;
+        &lt;li&gt;활성화/비활성화 개념 없음&lt;/li&gt;
+        &lt;li&gt;단순 UI 구성용&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;CommonActivatableWidget&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;활성화/비활성화 개념 존재&lt;/li&gt;
+        &lt;li&gt;스택 기반 UI 관리 가능&lt;/li&gt;
+        &lt;li&gt;뒤로가기, 입력 차단 등 화면 전환 구조에 적합&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;즉, 화면 전환이 필요한 메뉴, 팝업 등은 ActivatableWidget을 사용하는 것이 맞다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;2-primarylayout--stackcontainer-구조-이해&quot;&gt;2. PrimaryLayout + StackContainer 구조 이해&lt;/h2&gt;
+        &lt;p&gt;구조는 다음과 같다.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;PrimaryLayout
+        └ StackContainer
+        └ ActivatableWidget&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+        &lt;li&gt;PrimaryLayout은 최상위 UI 루트&lt;/li&gt;
+        &lt;li&gt;StackContainer는 위젯을 쌓는 공간&lt;/li&gt;
+        &lt;li&gt;Widget은 실제 화면 요소&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;오늘 작성한 코드의 핵심은
+        &lt;strong&gt;StackContainer를 태그로 등록하고, 필요할 때 찾아서 사용하는 구조&lt;/strong&gt;였다.&lt;/p&gt;
+        &lt;h3 id=&quot;registerwidgetstack&quot;&gt;RegisterWidgetStack()&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;런타임일 때만 실행&lt;/li&gt;
+        &lt;li&gt;태그와 StackContainer를 TMap에 등록&lt;/li&gt;
+        &lt;li&gt;디자인 타임에서는 실행되지 않음&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;→ 즉, “Stack을 미리 저장해두는 역할”&lt;/p&gt;
+        &lt;h3 id=&quot;findwidgetstackbytag&quot;&gt;FindWidgetStackByTag()&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;태그로 StackContainer를 찾는 함수&lt;/li&gt;
+        &lt;li&gt;없으면 checkf로 즉시 에러 발생&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;→ 즉, “저장된 Stack을 꺼내는 역할”&lt;/p&gt;
+        &lt;p&gt;결론적으로
+        &lt;strong&gt;Stack은 런타임 시작 시 등록되고, 위젯이 필요할 때 꺼내서 사용된다.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;예시)&lt;/p&gt;
+        &lt;p&gt;스택컨테이너를 런타임에 생성 하고&lt;/p&gt;
+        &lt;p&gt;내가 메뉴 위젯이 필요하면&lt;/p&gt;
+        &lt;p&gt;태그로 메뉴 위젯을 찾은뒤&lt;/p&gt;
+        &lt;p&gt;그걸 스택 컨테이너에 넣어서 화면에 보여주는 방식&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;3-transient의-의미&quot;&gt;3. Transient의 의미&lt;/h2&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;UPROPERTY(Transient)&lt;/code&gt;&lt;/pre&gt;
+        &lt;ul&gt;
+        &lt;li&gt;저장되지 않음&lt;/li&gt;
+        &lt;li&gt;다음 게임 실행 시 유지되지 않음&lt;/li&gt;
+        &lt;li&gt;오직 런타임 전용 데이터&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;UI 스택은 세이브 데이터가 아니기 때문에 Transient가 맞다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;4-gengine의-역할&quot;&gt;4. GEngine의 역할&lt;/h2&gt;
+        &lt;p&gt;GEngine은
+        “현재 실행 중인 게임 전체를 관리하는 엔진의 중심 관리자 객체”&lt;/p&gt;
+        &lt;p&gt;디버그 출력 예시:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;GEngine-&amp;gt;AddOnScreenDebugMessage(...)&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;전역적으로 접근 가능하지만,
+        항상 null 체크를 해야 안전하다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;5-subsystem의-역할&quot;&gt;5. Subsystem의 역할&lt;/h2&gt;
+        &lt;p&gt;오늘 가장 중요한 개념.&lt;/p&gt;
+        &lt;h3 id=&quot;subsystem이란&quot;&gt;Subsystem이란?&lt;/h3&gt;
+        &lt;p&gt;게임 전체에서 공통으로 사용하는 기능을 관리하는 전역 관리자 객체.&lt;/p&gt;
+        &lt;p&gt;기존 방식:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;PlayerController에서 UI 생성&lt;/li&gt;
+        &lt;li&gt;GameMode에서 UI 생성&lt;/li&gt;
+        &lt;li&gt;각각 관리 → 복잡함&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Subsystem 방식:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Subsystem에 PrimaryLayout 저장&lt;/li&gt;
+        &lt;li&gt;어디서든 Get()으로 접근&lt;/li&gt;
+        &lt;li&gt;중앙 집중 관리 가능&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;→ 유지보수성 향상
+        → 구조 정리
+        → 확장성 증가&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;6-shouldcreatesubsystem&quot;&gt;6. ShouldCreateSubsystem()&lt;/h2&gt;
+        &lt;p&gt;이 함수의 목적은:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Dedicated Server에서는 생성하지 않음 (UI는 클라이언트 전용)&lt;/li&gt;
+        &lt;li&gt;자식 Subsystem이 존재하면 부모는 생성하지 않음&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;GetDerivedClasses(GetClass(), FoundClasses);
+        return FoundClasses.IsEmpty();&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;의미:
+        “이 Subsystem을 상속한 클래스가 없을 때만 생성”&lt;/p&gt;
+        &lt;p&gt;→ 중복 생성 방지 구조&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;7-오늘-이해한-핵심-구조&quot;&gt;7. 오늘 이해한 핵심 구조&lt;/h2&gt;
+        &lt;p&gt;정리하면 오늘 배운 UI 구조는 다음과 같다.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;PrimaryLayout이 StackContainer를 등록&lt;/li&gt;
+        &lt;li&gt;Subsystem이 PrimaryLayout을 저장&lt;/li&gt;
+        &lt;li&gt;어디서든 Subsystem을 통해 접근&lt;/li&gt;
+        &lt;li&gt;태그로 Stack을 찾아 위젯 Push&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;즉,&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;UI를 분산 관리하지 않고 중앙에서 통제하는 구조&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;오늘의-핵심-깨달음&quot;&gt;오늘의 핵심 깨달음&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;UI는 단순히 화면을 그리는 것이 아니라 “구조 설계”가 중요하다.&lt;/li&gt;
+        &lt;li&gt;Subsystem은 전역 접근을 위한 안전한 구조다.&lt;/li&gt;
+        &lt;li&gt;CommonUI는 스택 기반으로 설계해야 유지보수가 쉬워진다.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;p&gt;오늘 공부는 단순 문법이 아니라
+        &lt;strong&gt;UI 아키텍처 설계 이해 단계까지 올라간 하루였다.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;좋은 진도다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>네이버 부스트캠프 웹・모바일 10기 멤버십을 마치며</title>
+      <link>https://velog.io/@dongho18/%EB%84%A4%EC%9D%B4%EB%B2%84-%EB%B6%80%EC%8A%A4%ED%8A%B8%EC%BA%A0%ED%94%84-%EC%9B%B9%E3%83%BB%EB%AA%A8%EB%B0%94%EC%9D%BC-10%EA%B8%B0-%EB%A9%A4%EB%B2%84%EC%8B%AD%EC%9D%84-%EB%A7%88%EC%B9%98%EB%A9%B0</link>
+      <guid>https://velog.io/@dongho18/%EB%84%A4%EC%9D%B4%EB%B2%84-%EB%B6%80%EC%8A%A4%ED%8A%B8%EC%BA%A0%ED%94%84-%EC%9B%B9%E3%83%BB%EB%AA%A8%EB%B0%94%EC%9D%BC-10%EA%B8%B0-%EB%A9%A4%EB%B2%84%EC%8B%AD%EC%9D%84-%EB%A7%88%EC%B9%98%EB%A9%B0</guid>
+      <pubDate>Wed, 18 Feb 2026 15:09:08 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;안녕하세요..!&lt;/p&gt;
+        &lt;p&gt;길고 길었던 부스트캠프에서의 여정을 마무리 하게 되었습니다 🌱&lt;/p&gt;
+        &lt;p&gt;오늘은 잘 쓰려 하기보다, &lt;strong&gt;날 것 그대로&lt;/strong&gt; 제 이야기를 담아보려고 해요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;나는-왜-자신-있게-설명하지-못했을까&quot;&gt;&lt;strong&gt;나는 왜 자신 있게 설명하지 못했을까&lt;/strong&gt;&lt;/h2&gt;
+        &lt;p&gt;작년 2월에 지거국 컴퓨터공학과를 졸업하고 상반기 동안 취업 준비를 했어요.&lt;/p&gt;
+        &lt;p&gt;프로젝트 경험도 많고 기능 구현에도 익숙하다고 생각했기에, 스스로 준비가 잘 됐다고 믿었습니다.&lt;/p&gt;
+        &lt;p&gt;그런데 면접에 가면 늘 같은 질문에서 막혔어요. 🥲&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;“왜 그렇게 설계했나요?”&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;“다른 선택지는 없었나요?”&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/f83ef67f-f0cc-4337-9cbc-ed77011f115e/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;머릿속으로는 알고 있다고 생각했지만, 막상 설명하려 하면 말이 막혔어요.&lt;/p&gt;
+        &lt;p&gt;그때 처음 깨달았어요.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;‘아는 것’과 ‘설명할 수 있는 것’은 전혀 다른 문제라는 걸요.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;확신이 없으니 점점 면접용 스크립트를 만들어 외우기 시작했어요.&lt;/p&gt;
+        &lt;p&gt;논리로 설득하기보다 준비된 답을 말하려 했고, 스스로도 그게 어색하다는 걸 알고 있었어요.&lt;/p&gt;
+        &lt;p&gt;그렇게 몇 번의 면접을 지나고 나니 이런 생각이 들었어요.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;“이건 내가 되고 싶은 모습이 아닌데.”&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;준비된 답을 말하는 사람이 아니라, 제 선택을 스스로 납득하고 설명할 수 있는 사람이 되고 싶었어요.&lt;/p&gt;
+        &lt;p&gt;그래서 어떻게 하면 그런 사람이 될 수 있을지 그 당시에 고민이 정말 많았어요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;네이버-부스트캠프에-입과하다&quot;&gt;네이버 부스트캠프에 입과하다&lt;/h2&gt;
+        &lt;p&gt;그때 우연히 &lt;a href=&quot;https://blog.naver.com/boostcamp_official/223845032364&quot;&gt;네이버 부스트캠프의 학습 철학&lt;/a&gt;을 보게 됐어요.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;부스트캠프에서는 실전과 유사한 조건에서 복잡하고 비구조화된 문제를 &lt;strong&gt;해결하며 스스로 학습&lt;/strong&gt;하고 &lt;strong&gt;동료와의 소통&lt;/strong&gt;을 반복하며 문제 해결 경험을 쌓습니다.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;이 문장을 읽는 순간, 제가 부족하다고 느꼈던 부분을 정확히 짚어준 느낌이었어요.&lt;/p&gt;
+        &lt;p&gt;기능 구현은 익숙했지만, 정답이 없는 문제를 정의하고 선택의 이유를 설명하는 훈련은 충분히 해보지 못했거든요.&lt;/p&gt;
+        &lt;p&gt;면접에서 저를 당황하게 만들었던 질문들도 결국 정답이 없는 문제에 대해 &lt;strong&gt;제 사고 과정을 묻는 질문&lt;/strong&gt;이었고요.&lt;/p&gt;
+        &lt;p&gt;‘내가 찾던 곳이 바로 여기다’ 싶어서 망설임 없이 지원했고, &lt;/p&gt;
+        &lt;p&gt;베이직과 챌린지를 거쳐 멤버십까지 함께하게 되었습니다. 😀&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;매일-왜-앞에서-말문이-막혔다&quot;&gt;&lt;strong&gt;매일 “왜?” 앞에서 말문이 막혔다&lt;/strong&gt;&lt;/h2&gt;
+        &lt;p&gt;8개월간의 훈련 끝에 이제는, 말하는 감자에서 &lt;strong&gt;조금은 생각을 말로 꺼낼 수 있는 사람&lt;/strong&gt;이 된 것 같아요.&lt;/p&gt;
+        &lt;p&gt;다만 처음부터 쉬웠던 건 아니었어요. 부스트캠프에서는 모든 활동에 “왜?”가 따라붙었거든요.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;아침에는 10시에 동료들과 함께 문제를 해결한 과정을 말로 설명해야 했고&lt;/li&gt;
+        &lt;li&gt;오후에는 개발하면서 어떤 선택을 했는지 이유를 생각해둬야 했고&lt;/li&gt;
+        &lt;li&gt;하루를 마무리할 때는 GitHub PR에 오늘의 판단을 동료들이 이해하기 쉽게 정리해야 했어요&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;코드만 짜도 벅찼는데 생각까지 정리해 말해야 한다는 게 어려웠어요.&lt;/p&gt;
+        &lt;p&gt;“왜 그렇게 했냐”는 질문을 들으면 괜히 틀린 것 같고, 설명이 부족하면 실력이 없어 보일까 봐 말을 줄인 적도 있었고요. 🥲&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;말이-어렵다면-먼저-그려보자&quot;&gt;&lt;strong&gt;말이 어렵다면, 먼저 그려보자&lt;/strong&gt;&lt;/h2&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/038c1f2f-5cf4-4330-9610-a8f627a6ddc2/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;그러다 이런 생각이 들었어요.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;말이 어려우면, 글과 그림으로 먼저 정리해보자.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;그래서 챌린지 기간 동안은 말을 잘하기 전에, 먼저 제 생각부터 머릿 속에서 끄집어내려고 했어요.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;복잡한 요구사항을 그림으로 구조화하고&lt;/li&gt;
+        &lt;li&gt;코드 흐름을 다이어그램으로 그리고&lt;/li&gt;
+        &lt;li&gt;클래스 다이어그램을 그리기도 했어요.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;신기했던 건, &lt;strong&gt;그림은 거짓말을 못 한다&lt;/strong&gt;는 거였어요.&lt;/p&gt;
+        &lt;p&gt;흐름도를 그리다 보면 제가 모호하게 생각했던 부분이 그대로 드러났고, 설계의 빈틈도 보이기 시작했어요.&lt;/p&gt;
+        &lt;p&gt;그 부분을 다시 코드로 돌아가 고치거나, 설계를 다시 고민해보는 일이 반복됐어요.&lt;/p&gt;
+        &lt;p&gt;몇 번 반복하다 보니 동료들에게 설명하는 일이 점점 덜 두려워졌어요. &lt;/p&gt;
+        &lt;p&gt;특히 &amp;quot;이해가 잘 된다&amp;quot;는 피드백을 받기 시작하면서부터는 자신감도 생겼고요.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/3c6b4439-e9ab-4c46-bb30-bef89ebd0c10/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;누가 써주신 피드백인지는 모르겠지만 넘 감동이였습니다 !! 🥹&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;설명하려고-하니-생각이-깊어졌다&quot;&gt;설명하려고 하니, 생각이 깊어졌다&lt;/h2&gt;
+        &lt;p&gt;예전의 저는 일단 구현부터 하고, 돌아가면 다음으로 넘어갔어요.&lt;/p&gt;
+        &lt;p&gt;하지만 지금은 조금 달라졌어요.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;이 선택을 설명할 수 있을까?&lt;/li&gt;
+        &lt;li&gt;PR에 이 결정을 어떻게 적을까?&lt;/li&gt;
+        &lt;li&gt;누군가 반박한다면 나는 뭐라고 말할 수 있을까?&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;설명을 전제로 생각하기 시작하면서 제 사고가 한 단계 더 깊어지는 느낌을 받았어요.&lt;/p&gt;
+        &lt;p&gt;돌이켜보면 저는 말을 잘하게 된 게 아니라, &lt;strong&gt;생각을 정리하는 방법을 배운 것 같아요.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;글로 쓰고, 그림으로 그리고, 입으로 말해보고.&lt;/p&gt;
+        &lt;p&gt;그 과정을 반복하다 보니 말은 자연스럽게 따라왔어요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;그룹-프로젝트에서-배운-건-함께-일하는-방식이었다&quot;&gt;&lt;strong&gt;그룹 프로젝트에서 배운 건 ‘함께 일하는 방식’이었다&lt;/strong&gt;&lt;/h2&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/34e79aed-4a49-421c-9879-ba7e236ab138/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;멤버십 그룹 프로젝트에서 Web01 팀은 &lt;a href=&quot;https://boostus.site/&quot;&gt;boostus&lt;/a&gt; 라는 서비스를 만들었어요.&lt;/p&gt;
+        &lt;p&gt;네이버 부스트캠프에는 좋은 학습 활동이 정말 많지만, 입과 전에는 그 경험들을 한 곳에서 접하기가 쉽지 않았어요. 캠퍼들의 프로젝트나 회고를 보려면 직접 찾아다녀야 했고, 기수가 끝나면 기록들이 체계적으로 보존되지 못하는 문제도 있었어요.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;boostus는 소중한 경험들이 사라지지 않고 계속 축적될 수 있도록, 부스트캠퍼들의 프로젝트, 회고들을 한 곳에 모아 연결하는 아카이빙 플랫폼이에요.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;프로젝트의 기술적인 내용은 &lt;a href=&quot;https://github.com/boostcampwm2025/web01-BoostUs/wiki&quot;&gt;GitHub Wiki&lt;/a&gt;에 정리해두었으니, 궁금하시면 참고해 주세요!&lt;/p&gt;
+        &lt;p&gt;이번 그룹 프로젝트를 통해 가장 크게 배운 건, 기술보다는 &lt;strong&gt;함께 일하는 방식&lt;/strong&gt;이었어요.&lt;/p&gt;
+        &lt;h3 id=&quot;1-심리적-안전감이-팀을-바꾼다&quot;&gt;1. 심리적 안전감이 팀을 바꾼다&lt;/h3&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/6b832061-89a9-4735-a8c7-2e98dad3fe1f/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;1주차에는 각자의 목표와 강점, 약점을 솔직하게 공유하고 어떤 방식으로 협업할지 이야기하는 팀 캔버스 작성 시간을 가졌어요.&lt;/p&gt;
+        &lt;p&gt;가장 기억에 남는 건 약점을 나누던 순간이었어요. 저는 논쟁이 생기면 분위기가 어색해질까 봐 피하는 편이고, 다른 생각이 있어도 굳이 표현하지 않고 넘기는 경우가 많다고 털어놓았는데요. 막상 꺼내고 보니 비슷한 고민을 가진 팀원이 생각보다 많았어요.&lt;/p&gt;
+        &lt;p&gt;그래서 팀 그라운드 룰 중 하나로 &lt;strong&gt;&amp;quot;반대 의견이 있으면 숨기지 말고 건설적으로 표현하기&amp;quot;&lt;/strong&gt; 를 정했어요. 팀원 모두가 각자의 약점을 인정하며 함께 만들어낸 룰이었기에 실제로도 잘 작동했어요. 의견이 엇갈리는 순간에도 조금 더 용기를 낼 수 있었던 건, 이런 팀 빌딩 과정이 있었기 때문이라고 생각해요.&lt;/p&gt;
+        &lt;h3 id=&quot;2-기록은-남기기-위한-게-아니라-이해하기-위한-것이다&quot;&gt;&lt;strong&gt;2. 기록은 남기기 위한 게 아니라, 이해하기 위한 것이다&lt;/strong&gt;&lt;/h3&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/da436836-9040-49fa-9ecc-677c9eabf9d9/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;팀 프로젝트를 하면서 문서화의 중요성도 크게 느꼈어요.&lt;/p&gt;
+        &lt;p&gt;저희 팀은 매일 개발 일지를 작성했고, PR에도 변경 이유와 고민 과정을 최대한 자세하게 남기려고 했어요.&lt;/p&gt;
+        &lt;p&gt;데모 시간에 질문을 받았을 때 “그 부분은 제가 안 했어요”가 아니라, &lt;strong&gt;누구든지 답변할 수 있기를 바랐거든요.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;덕분에 팀원들이 어떤 작업을 하는지, 왜 그런 선택을 했는지 팀 전체가 이해할 수 있었고, 개선 사항이 생겼을 때도 기록을 보며 자연스럽게 흐름을 따라갈 수 있었어요.&lt;/p&gt;
+        &lt;p&gt;무엇보다 좋았던 건, 기록을 하면서 제 생각이 한 번 더 정리된다는 점이었어요.&lt;/p&gt;
+        &lt;p&gt;그냥 구현하고 끝내는 게 아니라 “왜 이렇게 했지?”를 스스로에게 다시 묻게 되면서, 조금 더 책임감 있는 코드를 작성할 수 있었어요.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/4271c192-0045-4b58-9397-e79881871973/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;여기서 한 걸음 더 나아가 회의록 관리 방식도 바꿔보고 싶었어요.&lt;/p&gt;
+        &lt;p&gt;기존에는 회의가 끝나면 노션에 정리된 회의록만 남는 구조였는데, 시간이 지나면 “이거 왜 이렇게 하기로 했지?”라는 질문이 나왔고 결국 노션을 다시 뒤지거나 기억에 의존해야 하는 경우가 많았어요.&lt;/p&gt;
+        &lt;p&gt;기록은 남아 있었지만 &lt;strong&gt;맥락은 남아 있지 않았던&lt;/strong&gt; 셈이었어요.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/a1aaaabd-fcf8-4faf-af7c-e414ea3136e0/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;그래서 Slack 허들 스크립트를 NotebookLM에 소스로 추가해 자연어 기반으로 검색할 수 있는 시스템을 만들었어요.&lt;/p&gt;
+        &lt;p&gt;덕분에 “이 기능을 왜 하기로 했지?”, “이때 반대 의견은 뭐였지?”처럼 잊기 쉬운 질문에도 빠르게 답을 얻을 수 있었어요.&lt;/p&gt;
+        &lt;h3 id=&quot;3-기술적인-도전보다-완성도를-택하다&quot;&gt;3. &lt;strong&gt;기술적인 도전보다 완성도를 택하다&lt;/strong&gt;&lt;/h3&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/dongho18/post/1e831f19-7d88-4901-818d-a447bda8057f/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;프로젝트를 하면서 팀 내에서 이런 고민이 있었어요. 실제 사용자의 문제를 해결하는 서비스를 만드는 것과, 취업을 위한 포트폴리오를 만드는 것 사이에서요.&lt;/p&gt;
+        &lt;p&gt;처음에는 기술적인 도전보다 팀원 모두가 공감하는 문제를 해결하는 방향으로 잡았어요. 그런데 시니어 리뷰어님께서 &amp;quot;문제 의식은 명확하지만, 커뮤니티 서비스 특성상 단순 CRUD 수준에서 끝날 가능성이 있어 보인다&amp;quot;는 피드백을 주시면서 고민이 깊어졌어요.&lt;/p&gt;
+        &lt;p&gt;피드백 이후 프로젝트 주제를 엎을지 말지 의견이 오갔는데, 주제를 바꾸기에는 리스크가 너무 크다고 판단해, 방향은 유지하되 기술적인 도전 요소를 찾아보기로 했어요. 마침 2주간의 인터미션 기간이 있었고, 그 시간에 프론트엔드/백엔드/DevOps 관점에서 가능한 도전들을 최대한 발산해봤어요.&lt;/p&gt;
+        &lt;p&gt;하지만 막상 구현 단계에 들어가니 핵심 사용자 시나리오 기능을 완성하는 것만으로도 시간이 빠듯했어요.&lt;/p&gt;
+        &lt;p&gt;결국 어설프게 도전 요소를 넣는 것보다 &lt;strong&gt;우리가 만들고자 한 기능을 제대로 완성하는 게 더 중요하다&lt;/strong&gt;고 판단했어요.&lt;/p&gt;
+        &lt;p&gt;포트폴리오보다 사용자를 먼저 생각한 선택이었고, 돌이켜보면 기술적인 도전은 의도적으로 만드는 게 아니라 사용자 경험을 고민하다 보면 자연스럽게 따라온다는 것을 배운 시간이었어요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;부스트캠프-덕분에-생긴-습관들&quot;&gt;&lt;strong&gt;부스트캠프 덕분에 생긴 습관들&lt;/strong&gt;&lt;/h2&gt;
+        &lt;h3 id=&quot;1-추상적인-생각-대신-구체적으로-생각하기&quot;&gt;1. 추상적인 생각 대신, 구체적으로 생각하기&lt;/h3&gt;
+        &lt;p&gt;부스트캠프 과정을 거치면서 가장 달라진 점은 추상적으로 생각하지 않게 되었다는 것이에요. &lt;/p&gt;
+        &lt;p&gt;예전에는 &amp;quot;기능을 구현하자&amp;quot; 정도로만 생각했다면, 이제는 문제를 작은 단위로 나누어 구체적으로 정의하려고 해요. &lt;/p&gt;
+        &lt;p&gt;AI에게 작업을 요청할 때도 단순히 &amp;quot;깃허브 소셜 로그인을 구현해줘&amp;quot;라고 말하기보다, 구현 의도와 흐름을 함께 담아 요청하게 됐어요.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;NestJS 기반의 백엔드 서버에서 OAuth2를 사용해서 깃허브 소셜 로그인을 구현하고 싶어.
+        로그인 성공 시에는 우리 서비스의 JWT를 발급하고, 기존 회원이면 바로 로그인 처리, 신규 회원이면 추가 정보를 입력 받는 플로우로 구성해줘… (중략)&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;h3 id=&quot;2-항상-why를-먼저-묻기&quot;&gt;2. 항상 Why를 먼저 묻기&lt;/h3&gt;
+        &lt;p&gt;부스트캠프를 하면서 자연스럽게 생긴 또 하나의 습관은 결정을 내리기 전에 항상 &amp;quot;왜?&amp;quot;를 먼저 묻는 것이에요. &lt;/p&gt;
+        &lt;p&gt;기술 선택을 할 때에도 근거를 설명할 수 있는지를 스스로에게 묻게 되었고, 덕분에 선택의 이유가 더 분명해졌어요.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;&amp;quot;JWT를 쓰자&amp;quot; → 왜 세션이 아니라 JWT인가? → Stateless 구조가 우리 서비스에 정말 필요한가? → 토큰 탈취 리스크는 어떻게 감당할 것인가? → 현재 규모에서는 세션으로도 충분하지만, 향후 확장성을 고려했을 때 JWT가 더 적합하다고 판단했다.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;/blockquote&gt;
+        &lt;h3 id=&quot;3-필요할-땐-도움을-요청하기&quot;&gt;3. 필요할 땐 도움을 요청하기&lt;/h3&gt;
+        &lt;p&gt;저는 부스트캠프에 입과하기 전까지 혼자 공부하는 것에 익숙했어요. 문제가 생기면 혼자 해결하려 했고, 며칠을 붙잡고 있어도 동료에게 먼저 물어보는 일이 거의 없었어요.&lt;/p&gt;
+        &lt;p&gt;그런데 한 번은 Next.js에서 이미지가 엑스박스로 뜨는 문제를 혼자 끙끙대다가, 처음으로 슬랙에 먼저 물어봤어요. 그랬더니 한 팀원분께서 바로 해결책을 알려주셔서 몇 분 만에 해결됐어요.&lt;/p&gt;
+        &lt;p&gt;혼자였다면 몇 시간은 걸렸을 문제였는데, 그때부터 “혼자 오래 고민하는 것”이 능력이 아닐 수도 있다는 걸 느꼈어요.&lt;/p&gt;
+        &lt;p&gt;이제는 혼자 오래 붙잡기보다, 일정 시간 고민해도 해결이 안 되면 먼저 물어보는 것을 선택하게 되었어요.&lt;/p&gt;
+        &lt;h3 id=&quot;4-생각의-외주화를-막기&quot;&gt;4. 생각의 외주화를 막기&lt;/h3&gt;
+        &lt;p&gt;저는 매일 자기 전에 PR을 작성하는 루틴이 있었는데, &lt;/p&gt;
+        &lt;p&gt;개발을 마치고 나면 너무 지쳐서 가끔 AI에게 PR 작성을 맡긴 적이 있었어요.&lt;/p&gt;
+        &lt;p&gt;나중에 그 PR을 다시 보면 내용은 그럴듯했지만, 정작 제가 그날 어떤 고민을 했는지는 남아있지 않았어요.&lt;/p&gt;
+        &lt;p&gt;그때 &lt;strong&gt;생각하는 과정까지 AI에게 맡기고 있었다&lt;/strong&gt;는 걸 스스로 자각하게 됐어요.&lt;/p&gt;
+        &lt;p&gt;그래서 점점 방식을 바꾸게 되었는데요.&lt;/p&gt;
+        &lt;p&gt;먼저 스스로 충분히 고민하고, 가설을 세우고, 문서로 정리한 뒤에 질문하는 방식으로요.&lt;/p&gt;
+        &lt;p&gt;그 과정에서 AI는 ‘대신 생각해주는 존재’가 아니라, &lt;strong&gt;제 사고를 확장해주는 도구&lt;/strong&gt;라는 것을 배우게 되었어요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;앞으로의-계획은&quot;&gt;앞으로의 계획은?&lt;/h2&gt;
+        &lt;p&gt;올해 상반기에는 본격적으로 이력서를 돌리고 면접을 준비할 계획이에요.&lt;/p&gt;
+        &lt;p&gt;부스트캠프를 하며 CS 기초(네트워크/운영체제/자료구조)가 개발 중 발목을 잡는 순간들이 있었기에, &lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;CS 스터디를 통해 단골 질문들에 근거 있게 답할 수 있는 수준까지 끌어올리는 것&lt;/strong&gt;이 단기 목표예요.&lt;/p&gt;
+        &lt;p&gt;단순히 암기해서 답하는 게 아니라, &lt;strong&gt;“왜 그렇게 동작하는지”를 제 언어로 설명할 수 있을 만큼&lt;/strong&gt; 이해하고 싶어요.&lt;/p&gt;
+        &lt;p&gt;장기적으로는 주어진 기능을 구현하는 것을 넘어, 사용자 입장에서 왜 이 기능이 필요한지를 먼저 고민하는 &lt;strong&gt;프로덕트 엔지니어&lt;/strong&gt;로 성장하고 싶어요.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;마무리하며&quot;&gt;마무리하며…&lt;/h2&gt;
+        &lt;p&gt;부스트캠프는 개발자로서 문제를 바라보는 태도와 동료와 협업하는 방식까지 배울 수 있었던 소중한 시간이었어요. 무엇보다 좋은 동료들을 많이 만난 게 가장 큰 행운이었고, 그 덕분에 혼자였다면 불가능했을 성장을 할 수 있었어요.&lt;/p&gt;
+        &lt;p&gt;부스트캠프를 시작하기 전에는 제 자신을 너무 몰랐는데, 부족한 부분들을 하나씩 채울 수 있는 환경을 만들어주신 운영진분들과 마스터님께 진심으로 감사드려요. 함께 달려온 동료들에게도 고마운 마음을 전하고 싶어요.&lt;/p&gt;
+        &lt;p&gt;비록 부스트캠프는 끝났지만, 앞으로도 쭉 근황 나누면서 함께 성장해나갔으면 좋겠어요! 😀&lt;/p&gt;
+        &lt;p&gt;긴 글 읽어주셔서 감사합니다!&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;글 쓰기 소요시간: 10시간 + @&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>[DX-Engine] Heirarchical-Z Buffer Occlusion Culling</title>
+      <link>https://velog.io/@geb0598/DX-Engine-Heirarchical-Z-Buffer-Occlusion-Culling</link>
+      <guid>https://velog.io/@geb0598/DX-Engine-Heirarchical-Z-Buffer-Occlusion-Culling</guid>
+      <pubDate>Wed, 18 Feb 2026 15:05:22 GMT</pubDate>
+      <content:encoded>
+        &lt;h1 id=&quot;1-개요&quot;&gt;1. 개요&lt;/h1&gt;
+        &lt;p&gt;렌더링 파이프라인 최적화에서는 &lt;strong&gt;오버드로우(Overdraw)&lt;/strong&gt;로 불리는 불필요한 연산 낭비를 줄이는 것이 핵심이다. 이번 포스트에서는 &lt;strong&gt;DirectX 11&lt;/strong&gt; 기반의 게임 엔진에서 &lt;strong&gt;Hi-Z Occlusion Culling&lt;/strong&gt;을 직접 구현하는 과정을 다룬다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;1-1-깊이-테스트-depth-test&quot;&gt;1-1. 깊이 테스트 (Depth Test)&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;GPU&lt;/strong&gt;는 가려진 픽셀을 그리지 않기 위한 메커니즘인 &lt;strong&gt;깊이 테스트(Depth Test)&lt;/strong&gt;를 가지고 있다.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/geb0598/post/0f6fcfce-4e4e-433f-adef-fd8bd97b4020/image.png&quot; alt=&quot;출처: To Early-Z, or Not To Early-Z&quot;&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Late Z-Test&lt;/strong&gt;: 전통적인 방식으로, 픽셀 쉐이더가 실행된 이후 &lt;strong&gt;Output Merger(OM) 단계&lt;/strong&gt;에서 깊이 값을 비교한다. 하지만, &lt;strong&gt;Late Z-Test&lt;/strong&gt;는 가려진 프래그먼트가 최종 픽셀에 반영되지 않게 할 뿐, &lt;strong&gt;오버드로우 자체&lt;/strong&gt;를 방지하지는 않는다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Early Z-Test&lt;/strong&gt;: 오버드로우를 방지하기 위해 &lt;strong&gt;GPU&lt;/strong&gt;에서 지원하는 기능은 &lt;strong&gt;Early Z-Test&lt;/strong&gt;이다. &lt;strong&gt;래스터라이저&lt;/strong&gt; 단계 직후에 깊이를 미리 테스트해서 픽셀 쉐이더 단계로 넘어가기 전에 가려진 &lt;strong&gt;프래그먼트&lt;/strong&gt;를 건너뛰는 방식으로 오버드로우를 방지한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;하지만, &lt;strong&gt;Early Z-Test&lt;/strong&gt; 자체에도 다음과 같은 명확한 한계점들이 존재한다.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;픽셀 쉐이더에서 &lt;strong&gt;SV_Depth&lt;/strong&gt;로 깊이 버퍼값을 변경하거나 &lt;code&gt;discard&lt;/code&gt;를 사용한다면, &lt;strong&gt;GPU&lt;/strong&gt;는 정확성을 위해 내부적으로 &lt;strong&gt;Early-Z&lt;/strong&gt;를 끄고, &lt;strong&gt;Late-Z&lt;/strong&gt;로 전환할 수 있다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;래스터라이저 단계에서 수행되므로 &lt;strong&gt;픽셀 쉐이더&lt;/strong&gt;에서의 비용을 줄일 수는 있다. 그러나, 이전 단계인 &lt;strong&gt;버텍스 쉐이더(VS, Vertex Shader)&lt;/strong&gt;, &lt;strong&gt;Input Assembler(IA)&lt;/strong&gt;에서의 정점 처리 비용은 여전히 발생한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;또한, &lt;strong&gt;Draw Call&lt;/strong&gt; 수 자체를 줄이지는 못한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h1 id=&quot;2-hi-z-occlusion-culling-hierachical-z-buffer-occlusion-culling&quot;&gt;2. Hi-Z Occlusion Culling (Hierachical-Z Buffer Occlusion Culling)&lt;/h1&gt;
+        &lt;p&gt;본 프로젝트에서는 오클루전 컬링의 원리를 명확히 이해하고, &lt;strong&gt;Draw Call&lt;/strong&gt; 수를 줄이기 위해서 &lt;strong&gt;Hi-Z Occlusion Culling&lt;/strong&gt;을 사용했다. &lt;/p&gt;
+        &lt;p&gt;일반적인 깊이 텍스쳐를 사용하여 오클루전 컬링을 수행하려면, 오브젝트가 차지하는 스크린 영역의 &lt;strong&gt;모든 픽셀&lt;/strong&gt;에 대해 깊이 검사를 수행해야한다.&lt;/p&gt;
+        &lt;p&gt;반면, &lt;strong&gt;Hi-Z Occlusion Culling&lt;/strong&gt;은 이 문제를 해결하기 위해 깊이 버퍼의 &lt;strong&gt;밉맵(Mipmap)&lt;/strong&gt;을 생성하여 검사 비용을 획기적으로 줄인다. 오브젝트가 스크린에서 차지하는 크기에 따라서 &lt;strong&gt;적절한 해상도&lt;/strong&gt;의 &lt;strong&gt;밉맵&lt;/strong&gt;을 샘플링하는 방식으로 오클루전 컬링을 수행한다.&lt;/p&gt;
+        &lt;h2 id=&quot;2-1-알고리즘-및-구현&quot;&gt;2-1. 알고리즘 및 구현&lt;/h2&gt;
+        &lt;h3 id=&quot;2-1-1-가시성-판별&quot;&gt;2-1-1. 가시성 판별&lt;/h3&gt;
+        &lt;p&gt;오클루전 컬링에서 보이지 않는 물체가 컬링되지 않는 &lt;strong&gt;false-negative&lt;/strong&gt;는 성능 손해만 볼 뿐 렌더링 결과에는 영향이 없어 안전하지만, 보이는 물체가 컬링되는 &lt;strong&gt;false-positive&lt;/strong&gt;는 위험하다. 따라서, 가시성 판별은 항상 &lt;strong&gt;보수적&lt;/strong&gt;으로 수행되어야 한다.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;가시성 판별&lt;/strong&gt;은 다음과 같은 단계로 수행된다.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;NDC 변환&lt;/strong&gt;
+        먼저 오브젝트의 &lt;strong&gt;바운딩 볼륨&lt;/strong&gt;(본 프로젝트에서는 &lt;strong&gt;AABB&lt;/strong&gt;를 사용)을 &lt;strong&gt;MVP(Model-View-Projection 행렬&lt;/strong&gt;을 통해서 &lt;strong&gt;NDC(Normalized Device Coordinates)&lt;/strong&gt;공간으로 변환한다. NDC로 변환된 &lt;strong&gt;AABB&lt;/strong&gt;의 각 꼭짓점 중 &lt;strong&gt;가장 가까운 깊이&lt;/strong&gt;를 $$Z_{object_{min}}$$이라 한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Mip Level 계산&lt;/strong&gt;
+        NDC로 변환된 &lt;strong&gt;AABB&lt;/strong&gt;가 스크린에서 차지하는 직사각형 영역을 구한다. 이 직사각형의 크기를 바탕으로 다음과 같이 텍셀 하나가 직사각형을 완전히 포함하는 &lt;strong&gt;Mip Level&lt;/strong&gt;을 계산할 수 있다. &lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;$$
+        Mip \space Level = \lceil {log_2(max(width, height))} \rceil
+        $$&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/geb0598/post/38bfbf55-dd79-4039-9858-bf1d979ea5f7/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;ol start=&quot;3&quot;&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;텍스쳐 샘플링&lt;/strong&gt;
+        하지만, 위 그림과 같이 직사각형 영역이 여러 텍셀에 걸쳐있는 경우도 존재한다. 따라서, 직사각형 영역의 네 꼭짓점을 샘플링 한 뒤, &lt;strong&gt;가장 먼 깊이&lt;/strong&gt;를 $$Z_{occluder_{max}}$$라 한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;깊이 비교&lt;/strong&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;&lt;strong&gt;오브젝트의 가장 앞부분&lt;/strong&gt;이 &lt;strong&gt;차폐물의 가장 뒷부분&lt;/strong&gt;보다 뒤에 있으면, 해당 오브젝트는 완전히 가려진 것으로 판단하여 렌더링에서 제외한다.&lt;/p&gt;
+        &lt;p&gt;$$
+        Z_{object_{min}} &amp;gt; Z_{occluder_{max}} \Rightarrow Culled(Invisible)
+        $$&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h3 id=&quot;hizocclusioncullingcs&quot;&gt;HiZOcclusionCulling.cs&lt;/h3&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;struct FAABB
+        {
+        float3 Min;
+        float Pad0;
+        float3 Max;
+        float Pad1;
+        };
+        
+        Texture2D&amp;lt;float&amp;gt; HiZTexture : register(t0);
+        
+        StructuredBuffer&amp;lt;FAABB&amp;gt; NDCAABBs : register(t1);
+        
+        RWStructuredBuffer&amp;lt;uint&amp;gt; Visibilities : register(u0);
+        
+        cbuffer OcclusionCullingConstants : register(b0)
+        {
+        uint NumAABBs;
+        uint MipLevels;
+        float2 ScreenSize;
+        }
+        
+        SamplerState OcclusionCullingSampler : register(s0);
+        
+        uint CalculateMipLevel(uint InWidth, uint InHeight)
+        {
+        return (int)ceil(log2(max(InWidth, InHeight)));
+        }
+        
+        [numthreads(64, 1, 1)]
+        void mainCS(uint3 DispatchThreadID : SV_DispatchThreadID)
+        {
+        uint Index = DispatchThreadID.x;
+        
+        if (Index &amp;gt;= NumAABBs)
+        {
+        return;
+        }
+        
+        float3 MinNDC = NDCAABBs[Index].Min;
+        float3 MaxNDC = NDCAABBs[Index].Max;
+        
+        float MinDepth = MinNDC.z;
+        
+        float2 MinUV;
+        MinUV.x = MinNDC.x * 0.5f + 0.5f;
+        MinUV.y = MinNDC.y * -0.5f + 0.5f;
+        MinUV = saturate(MinUV);
+        
+        float2 MaxUV;
+        MaxUV.x = MaxNDC.x * 0.5f + 0.5f;
+        MaxUV.y = MaxNDC.y * -0.5f + 0.5f;
+        MaxUV = saturate(MaxUV);
+        
+        float2 Rect = (MaxUV - MinUV) * ScreenSize;
+        
+        uint MipLevel = CalculateMipLevel(Rect.x, Rect.y);
+        
+        float HiZDepth0 = HiZTexture.SampleLevel(OcclusionCullingSampler, float2(MinUV.x, MinUV.y), MipLevel);
+        float HiZDepth1 = HiZTexture.SampleLevel(OcclusionCullingSampler, float2(MaxUV.x, MinUV.y), MipLevel);
+        float HiZDepth2 = HiZTexture.SampleLevel(OcclusionCullingSampler, float2(MinUV.x, MaxUV.y), MipLevel);
+        float HiZDepth3 = HiZTexture.SampleLevel(OcclusionCullingSampler, float2(MaxUV.x, MaxUV.y), MipLevel);
+        
+        float MaxHiZDepth = max(max(HiZDepth0, HiZDepth1), max(HiZDepth2, HiZDepth3));
+        
+        float Bias = 0.0001f;
+        
+        bool bIsVisible = MinDepth &amp;lt;= MaxHiZDepth + Bias;
+        
+        Visibilities[Index] = bIsVisible;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;hr&gt;
+        &lt;h3 id=&quot;2-1-2-aabb-ndc-변환&quot;&gt;2-1-2. AABB NDC 변환&lt;/h3&gt;
+        &lt;p&gt;가시성 판별을 수행하기 위해서는 모든 오브젝트의 AABB를 NDC 좌표로 변환해야 한다. 초기 구현에서는 이를 메인 스레드에서 순차적으로 처리했으나, 오브젝트 개수가 50,000개 이상으로 늘어나자 &lt;strong&gt;MVP 행렬 곱셈 연산&lt;/strong&gt;에서 심각한 CPU 병목이 발생했다.&lt;/p&gt;
+        &lt;p&gt;각 오브젝트의 AABB 변환 연산은 서로의 데이터에 의존하지 않는다. 즉, A라는 물체의 좌표 변환이 B라는 물체의 변환 결과에 영향을 주지 않는 독립적인 작업이다.&lt;/p&gt;
+        &lt;p&gt;이 점에 착안하여 C++의 &lt;code&gt;std::future&lt;/code&gt;와 &lt;strong&gt;스레드 풀(Thread Pool)&lt;/strong&gt;을 활용해 연산을 병렬화했다. 전체 오브젝트 배열을 코어 수에 맞춰 청크(Chunk)로 나누고, 각 청크를 별도의 스레드에서 처리한 뒤 결과를 취합하는 방식이다.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;성능 비교 (50,000 Objects)&lt;/strong&gt;&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;방식&lt;/th&gt;
+        &lt;th&gt;소요 시간&lt;/th&gt;
+        &lt;th&gt;비고&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;&lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;Single Thread&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;6.0 ~ 6.5ms&lt;/td&gt;
+        &lt;td&gt;메인 스레드 병목 발생&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;Multi Thread&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;strong&gt;0.7 ~ 0.9ms&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;28 Threads (i7-14700 기준)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+        &lt;p&gt;약 &lt;strong&gt;6배 이상의 성능 향상&lt;/strong&gt;을 얻을 수 있었다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h3 id=&quot;occlusioncullingmanagercpp&quot;&gt;OcclusionCullingManager.cpp&lt;/h3&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-cpp&quot;&gt;void FOcclusionCullingManager::BuildNDCAABBs_MultiThreaded(const TArray&amp;lt;UPrimitiveComponent*&amp;gt;&amp;amp; InPrimitiveComponents, const FMatrix&amp;amp; InViewMatrix, const FMatrix&amp;amp; InProjectionMatrix)
+        {
+        NDCAABBs.clear();
+        NDCAABBs.reserve(InPrimitiveComponents.size());
+        
+        PrimitiveComponents.clear();
+        PrimitiveComponents.reserve(InPrimitiveComponents.size());
+        
+        if (InPrimitiveComponents.size() == 0)
+        {
+        return;
+        }
+        
+        if (!OcclusionCullingThreadPool)
+        {
+        BuildNDCAABBs(InPrimitiveComponents, InViewMatrix, InProjectionMatrix);
+        return;
+        }
+        
+        const int32 TotalNum = InPrimitiveComponents.size();
+        const int32 Concurrency = std::thread::hardware_concurrency();
+        const int32 NumChunks = (Concurrency &amp;gt; 0) ? Concurrency : 4;
+        const int32 ChunkSize = (TotalNum + NumChunks - 1) / NumChunks;
+        
+        std::vector&amp;lt;std::future&amp;lt;FBuildNDCAABBsResult&amp;gt;&amp;gt; Futures;
+        Futures.reserve(NumChunks);
+        
+        FMatrix ViewProjMatrix = InViewMatrix * InProjectionMatrix;
+        
+        for (int32 ChunkIndex = 0; ChunkIndex &amp;lt; NumChunks; ++ChunkIndex)
+        {
+        const int32 StartIndex = ChunkIndex * ChunkSize;
+        const int32 EndIndex = std::min(StartIndex + ChunkSize, TotalNum);
+        
+        if (StartIndex &amp;gt;= EndIndex)
+        {
+        break;
+        }
+        
+        Futures.emplace_back(OcclusionCullingThreadPool-&amp;gt;Enqueue([this, &amp;amp;InPrimitiveComponents, ViewProjMatrix, StartIndex, EndIndex]() -&amp;gt; FBuildNDCAABBsResult
+        {
+        FBuildNDCAABBsResult LocalResult;
+        LocalResult.AABBs.reserve(EndIndex - StartIndex);
+        LocalResult.Components.reserve(EndIndex - StartIndex);
+        
+        for (int32 i = StartIndex; i &amp;lt; EndIndex; ++i)
+        {
+        const UPrimitiveComponent* PrimitiveComponent = InPrimitiveComponents[i];
+        FAABBProxy NDCAABB;
+        
+        if (CalculateNDCAABB(PrimitiveComponent, ViewProjMatrix, NDCAABB))
+        {
+        LocalResult.AABBs.push_back(NDCAABB);
+        LocalResult.Components.push_back(PrimitiveComponent);
+        }
+        else if (PrimitiveComponent)
+        {
+        LocalResult.InvisibleComponents.push_back(PrimitiveComponent);
+        }
+        }
+        
+        return LocalResult;
+        }));
+        }
+        
+        for (auto&amp;amp; Future : Futures)
+        {
+        FBuildNDCAABBsResult Result = Future.get();
+        
+        NDCAABBs.insert(NDCAABBs.end(), Result.AABBs.begin(), Result.AABBs.end());
+        PrimitiveComponents.insert(PrimitiveComponents.end(), Result.Components.begin(), Result.Components.end());
+        
+        for (const auto PrimitiveComponent : Result.InvisibleComponents)
+        {
+        PrimitiveVisibilities[PrimitiveComponent] = false;
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;hr&gt;
+        &lt;h3 id=&quot;2-1-3-밉맵-생성&quot;&gt;2-1-3. 밉맵 생성&lt;/h3&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/geb0598/post/57a7d6bb-312d-4b7f-8667-424dabd2d0de/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;깊이 버퍼를 기반으로 &lt;strong&gt;Hi-Z 텍스쳐&lt;/strong&gt;를 생성한다. &lt;strong&gt;Hi-Z 텍스쳐&lt;/strong&gt; 생성은 컴퓨트 쉐이더를 통해서 해상도를 절반 씩 줄여나가는 &lt;strong&gt;다운샘플링&lt;/strong&gt; 방식으로 수행된다.&lt;/p&gt;
+        &lt;p&gt;일반적인 텍스쳐 밉맵 생성이 텍셀들의 평균값을 취하는 것과 달리, &lt;strong&gt;Hi-Z 텍스쳐&lt;/strong&gt; 생성 시에는 가장 먼 깊이 값을 선택해야 한다. 그 이유는 보수적인 컬링을 보장하기 위함이다.&lt;/p&gt;
+        &lt;p&gt;$$
+        Z_{mip} = max(Z_{00}, Z_{10}, Z_{01}, Z_{11})
+        $$&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h1 id=&quot;3-결과&quot;&gt;3. 결과&lt;/h1&gt;
+        &lt;p&gt;&lt;img src=&quot;https://velog.velcdn.com/images/geb0598/post/02a8e402-bf8e-45c3-a812-274ea0d6a036/image.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;3-1-테스트-환경&quot;&gt;3-1. 테스트 환경&lt;/h2&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;H/W&lt;/th&gt;
+        &lt;th&gt;Specs&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;&lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;CPU&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;Intel Core i7-14700&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;RAM&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;32GB&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;GPU&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;NVIDIA GeForce RTX 4060 (8GB)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;테스트 씬&lt;/strong&gt;은 인스턴싱없이 50,000개의 개별 오브젝트를 렌더링하는 상황을 가정했다. 각 오브젝트는 라이팅 연산 없이 텍스쳐 샘플링만 수행하는 가벼운 픽셀 쉐이더를 사용한다.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 id=&quot;3-2-성능-프로파일링-결과&quot;&gt;3-2. 성능 프로파일링 결과&lt;/h2&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;바라보는 각도에 따라서 약 &lt;strong&gt;33,000 ~ 37,000개&lt;/strong&gt; 가량의 오브젝트가 컬링되었다. 아래 결과는 해당 상황에서 측정한 &lt;strong&gt;성능 프로파일링&lt;/strong&gt; 결과이다.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;&lt;strong&gt;프레임 레이트 비교&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Hi-Z Occlusion Culling OFF&lt;/strong&gt;: 28 ~ 30ms&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Hi-Z Occlusion Culling ON&lt;/strong&gt;: 33 ~ 34ms (약 4ms 성능 하락)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;strong&gt;소요 시간&lt;/strong&gt;&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;단계 (Stage)&lt;/th&gt;
+        &lt;th&gt;소요 시간 (Time)&lt;/th&gt;
+        &lt;th&gt;비고&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;&lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;RenderDepthPrepass&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;6.0 ~ 6.5ms&lt;/td&gt;
+        &lt;td&gt;컬링을 위한 선행 단계&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;BuildNDCAABBs&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;0.7 ~ 0.9ms&lt;/td&gt;
+        &lt;td&gt;Multi-Threaded (28 Threads) 최적화 적용&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;GenerateHiZMipMap&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;~0.007ms&lt;/td&gt;
+        &lt;td&gt;Compute Shader&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;ExecuteOcclusionCulling&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;~0.1ms&lt;/td&gt;
+        &lt;td&gt;Compute Shader&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;strong&gt;FetchOcclusionCulling&lt;/strong&gt;&lt;/td&gt;
+        &lt;td&gt;2.5 ~ 2.6ms&lt;/td&gt;
+        &lt;td&gt;GPU Readback (Stall 발생)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+        &lt;h2 id=&quot;3-3-결과-분석&quot;&gt;3-3. 결과 분석&lt;/h2&gt;
+        &lt;p&gt;약 70% 가량의 오브젝트를 컬링했음에도 불구하고, 전체 프레임 시간은 증가하였다. 그 원인은 다음과 같다.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;현재 렌더링 방식은 &lt;strong&gt;포워드 렌더링&lt;/strong&gt;으로, 깊이 정보를 얻기 위해 별도의 &lt;strong&gt;깊이 패스&lt;/strong&gt;를 추가한 상황이다. 또한, 쉐이더 코드 자체가 단순하기 때문에 새로 추가한 렌더 패스의 부하가 컬링으로 얻는 이득을 능가하는 상황이다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;FetchOcclusionCulling&lt;/code&gt; 단계에서 컴퓨트 쉐이더의 결과를 &lt;strong&gt;Readback&lt;/strong&gt;하는 과정에서 &lt;strong&gt;CPU&lt;/strong&gt;가 대기하는 &lt;strong&gt;Stall&lt;/strong&gt;이 발생한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;위 병목들을 해결할 수 있다면 &lt;strong&gt;Hi-Z Occlusion Culling&lt;/strong&gt;을 통해서 확실한 성능 향상을 얻을 수 있을 것으로 예상된다.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h1 id=&quot;4-결론-및-향후-과제&quot;&gt;4. 결론 및 향후 과제&lt;/h1&gt;
+        &lt;p&gt;이번 구현을 통해서 &lt;strong&gt;Hi-Z Occlusion Culling&lt;/strong&gt;을 직접 게임 엔진에 구현하였고, 70% 이상의 오브젝트들이 컬링되는 상황에서도 &lt;strong&gt;시각적 아티팩트&lt;/strong&gt;가 보이지 않는 결과물을 얻었다. 다만, 이번 테스트 환경의 특수성 탓에 성능 면에서는 큰 이득을 보지는 못했다.&lt;/p&gt;
+        &lt;p&gt;향후 기회가 된다면 다음과 같은 최적화를 도입해서 실질적인 성능 향상을 이끌어낼 계획이다.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;렌더링 방식을 &lt;strong&gt;디퍼드 렌더링&lt;/strong&gt;으로 바꾸어서 현재 프레임의 깊이 정보를 얻어오도록 변경한다. 또는, 이전 프레임의 깊이 정보를 토대로 컬링을 수행한다. 이 방법은 이전에 사용해 보았으나 카메라가 빠르게 움직이는 상황에서 시각적 아티팩트가 눈에 띈다. 이를 보완할 방법을 고민해 보아야 한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;DrawInstancedIndirect&lt;/code&gt; 등의 함수를 통해서 가시성 판별 여부를 &lt;strong&gt;CPU&lt;/strong&gt;로 Readback하지 않고, &lt;strong&gt;GPU&lt;/strong&gt;에서 관리하고 렌더링에 활용하도록 변경한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;AABB 변환을 &lt;strong&gt;CPU&lt;/strong&gt;가 아닌 컴퓨트 쉐이더에서 처리하도록 변경한다.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;h1 id=&quot;참고자료&quot;&gt;참고자료&lt;/h1&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://therealmjp.github.io/posts/to-earlyz-or-not-to-earlyz/&quot;&gt;To Early-Z, or Not To Early-Z&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
       </content:encoded>
     </item>
   </channel>

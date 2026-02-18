@@ -4,357 +4,7 @@
     <title>dev RSS - Dev.to</title>
     <link>https://dev.to</link>
     <description>Dev.to RSS 피드</description>
-    <lastBuildDate>Wed, 18 Feb 2026 16:30:23 GMT</lastBuildDate>
-    <item>
-      <title>Making a Fetch Request &amp; POST Request with json-server in React (Beginner-to-Real App Guide)</title>
-      <link>https://dev.to/usama_dev/making-a-fetch-request-post-request-with-json-server-in-react-beginner-to-real-app-guide-35p5</link>
-      <guid>https://dev.to/usama_dev/making-a-fetch-request-post-request-with-json-server-in-react-beginner-to-real-app-guide-35p5</guid>
-      <pubDate>Wed, 18 Feb 2026 15:48:26 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;When you start building real React applications, sooner or later you need &amp;lt;strong&amp;gt;data&amp;lt;/strong&amp;gt; — and that means working with APIs.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;But what if your backend is not ready yet?&amp;lt;br&amp;gt;
-        This is where &amp;lt;strong&amp;gt;&amp;lt;code&amp;gt;json-server&amp;lt;/code&amp;gt;&amp;lt;/strong&amp;gt; becomes a lifesaver.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;In this guide, you’ll learn:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;How to &amp;lt;strong&amp;gt;simulate a REST API locally&amp;lt;/strong&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;How to &amp;lt;strong&amp;gt;GET data&amp;lt;/strong&amp;gt; using &amp;lt;code&amp;gt;fetch&amp;lt;/code&amp;gt; in React&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;How to &amp;lt;strong&amp;gt;POST data&amp;lt;/strong&amp;gt; (create new records)&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Common mistakes beginners make&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;SEO-friendly best practices&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;This is the exact workflow I used while building real projects, not just demos.&amp;lt;/p&amp;gt;
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        What is json-server?
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;json-server&amp;lt;/code&amp;gt; is a tiny tool that turns a simple &amp;lt;code&amp;gt;db.json&amp;lt;/code&amp;gt; file into a &amp;lt;strong&amp;gt;full fake REST API&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;You don’t need Node backend knowledge.&amp;lt;br&amp;gt;
-        You don’t need databases.&amp;lt;br&amp;gt;
-        You just need JSON.&amp;lt;/p&amp;gt;
-        &amp;lt;h3&amp;gt;
-        
-        
-        Installation
-        &amp;lt;/h3&amp;gt;
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;npm &amp;lt;span class=&quot;nb&quot;&amp;gt;install&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nt&quot;&amp;gt;-g&amp;lt;/span&amp;gt; json-server
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        &amp;lt;p&amp;gt;Or as a dev dependency:&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;npm &amp;lt;span class=&quot;nb&quot;&amp;gt;install &amp;lt;/span&amp;gt;json-server &amp;lt;span class=&quot;nt&quot;&amp;gt;--save-dev&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Step 1 — Create a &amp;lt;code&amp;gt;db.json&amp;lt;/code&amp;gt; File
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Example:&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight json&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;cities&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;id&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;name&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;London&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;},&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;id&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;2&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nl&quot;&amp;gt;&quot;name&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;Paris&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt; &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;w&quot;&amp;gt;
-        &amp;lt;/span&amp;gt;&amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Step 2 — Start the Fake Server
-        &amp;lt;/h2&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight shell&quot;&amp;gt;&amp;lt;code&amp;gt;json-server &amp;lt;span class=&quot;nt&quot;&amp;gt;--watch&amp;lt;/span&amp;gt; db.json &amp;lt;span class=&quot;nt&quot;&amp;gt;--port&amp;lt;/span&amp;gt; 8000
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;Now you automatically have:&amp;lt;/p&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;GET /cities&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;POST /cities&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;DELETE /cities/:id&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;PUT /cities/:id&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;p&amp;gt;Just like a real backend.&amp;lt;/p&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Making a GET Request in React
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Fetching data usually happens inside &amp;lt;code&amp;gt;useEffect&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Basic Pattern
-        &amp;lt;/h3&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight jsx&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;useEffect&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;k&quot;&amp;gt;async&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;fetchData&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;await&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;fetch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;URL_HERE&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;await&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;json&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nx&quot;&amp;gt;console&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;log&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
-        
-        &amp;lt;span class=&quot;nf&quot;&amp;gt;fetchData&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;},&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;[]);&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Why &amp;lt;code&amp;gt;useEffect&amp;lt;/code&amp;gt;?
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Because React components re-render often.&amp;lt;br&amp;gt;
-        You don’t want to fetch data every render — only once when the component mounts.&amp;lt;/p&amp;gt;
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Handling Loading State (Important)
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;Real apps always show loading states.&amp;lt;br&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight jsx&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;setIsLoading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kc&quot;&amp;gt;true&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c1&quot;&amp;gt;// fetch logic&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nf&quot;&amp;gt;setIsLoading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kc&quot;&amp;gt;false&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;p&amp;gt;This improves UX and prevents UI flickering.&amp;lt;/p&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Making a POST Request in React
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;POST means &amp;lt;strong&amp;gt;creating new data&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Clean POST Example
-        &amp;lt;/h3&amp;gt;
-        
-        
-        
-        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
-        &amp;lt;pre class=&quot;highlight jsx&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;fetch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;URL_HERE&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;method&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;POST&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;headers&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;Content-Type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;application/json&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;},&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;body&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;JSON&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;stringify&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;({&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;id&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;2&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;name&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;John&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;na&quot;&amp;gt;lastName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;Doe&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;}),&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;})&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;then&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;((&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;json&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;())&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;then&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;((&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;console&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nf&quot;&amp;gt;log&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;));&amp;lt;/span&amp;gt;
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        What’s Happening Here?
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;div class=&quot;table-wrapper-paragraph&quot;&amp;gt;&amp;lt;table&amp;gt;
-        &amp;lt;thead&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;th&amp;gt;Part&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;Purpose&amp;lt;/th&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;/thead&amp;gt;
-        &amp;lt;tbody&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;method: &quot;POST&quot;&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;Tells server we’re creating data&amp;lt;/td&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;headers&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;Specifies JSON format&amp;lt;/td&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;body&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;Converts JS object into JSON string&amp;lt;/td&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;response.json()&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;Converts server reply back into JS&amp;lt;/td&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;/tbody&amp;gt;
-        &amp;lt;/table&amp;gt;&amp;lt;/div&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Common Beginner Mistakes
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        1. Forgetting &amp;lt;code&amp;gt;Content-Type&amp;lt;/code&amp;gt;
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Server won’t understand your data.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        2. Not Using &amp;lt;code&amp;gt;JSON.stringify&amp;lt;/code&amp;gt;
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Objects must be converted to strings.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        3. No Loading State
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;UI becomes confusing.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        4. No Error Handling
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Always wrap fetch in &amp;lt;code&amp;gt;try/catch&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Real-World Best Practices
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Always show &amp;lt;strong&amp;gt;loading UI&amp;lt;/strong&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Use &amp;lt;strong&amp;gt;async/await&amp;lt;/strong&amp;gt; for readability&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Handle &amp;lt;strong&amp;gt;errors gracefully&amp;lt;/strong&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Keep API URLs in a &amp;lt;strong&amp;gt;config file&amp;lt;/strong&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Never hard-code everything everywhere&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h2&amp;gt;
-        
-        
-        Why json-server is Perfect for React Learners
-        &amp;lt;/h2&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;Instant backend&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Zero database setup&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Helps understand CRUD&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Builds real-world confidence&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;Perfect for portfolio projects&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        
-        
-        
-        
-        &amp;lt;h3&amp;gt;
-        
-        
-        Final Thoughts
-        &amp;lt;/h3&amp;gt;
-        
-        &amp;lt;p&amp;gt;Using &amp;lt;code&amp;gt;json-server&amp;lt;/code&amp;gt; bridges the gap between &amp;lt;strong&amp;gt;learning React&amp;lt;/strong&amp;gt; and &amp;lt;strong&amp;gt;building real applications&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;You start thinking less like a tutorial watcher and more like a &amp;lt;strong&amp;gt;frontend engineer interacting with APIs&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;Once you master GET and POST with a fake server, switching to a real backend becomes &amp;lt;strong&amp;gt;10x easier&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;Small steps like these are what turn simple React projects into &amp;lt;strong&amp;gt;production-ready skills&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
+    <lastBuildDate>Wed, 18 Feb 2026 16:36:17 GMT</lastBuildDate>
     <item>
       <title>Azure AI Agent Service Part 4: Production Patterns—State Management, Sessions, and Observability</title>
       <link>https://dev.to/bspann/azure-ai-agent-service-part-4-production-patterns-state-management-sessions-and-observability-291n</link>
@@ -10559,6 +10209,264 @@
         &amp;lt;p&amp;gt;In short:&amp;lt;/p&amp;gt;
         
         &amp;lt;p&amp;gt;Vite is the engine that makes your frontend project come alive.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>useReducer or Redux Reducer? How to Tell Which You Need</title>
+      <link>https://dev.to/aneeqakhan/usereducer-or-redux-reducer-how-to-tell-which-you-need-19b4</link>
+      <guid>https://dev.to/aneeqakhan/usereducer-or-redux-reducer-how-to-tell-which-you-need-19b4</guid>
+      <pubDate>Wed, 18 Feb 2026 09:10:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;If you’ve worked with React long enough, you’ve probably seen two things with “reducer” in the name:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;The &amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; hook in React&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Reducers in Redux&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;They sound similar… and they kind of are — but they live in different neighbourhoods.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Let’s break it down.&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🎯 The Core Idea: What’s a Reducer?
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Both &amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; and Redux reducers are built on the same concept:&amp;lt;br&amp;gt;
+        A reducer is just a function that:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;Takes the current state and an action&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Returns the next state&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;In plain JavaScript, it looks like this:&amp;lt;br&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight javascript&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;reducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;switch &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;increment&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;decrement&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;-&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;nl&quot;&amp;gt;default&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        &amp;lt;p&amp;gt;No side effects. No mutations. Just a pure function.&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🪝 &amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; in React
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; is a React hook for managing state in a single component (or a small group of components via props or context).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Example:&amp;lt;br&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight javascript&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;k&quot;&amp;gt;import&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;React&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;useReducer&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;from&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;react&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;Counter&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;initialState&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;0&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;reducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;switch &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;increment&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;decrement&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;-&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;nl&quot;&amp;gt;default&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;useReducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;reducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;initialState&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;amp;gt;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;p&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;Count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/p&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;      &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;button&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;onClick&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;({&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;increment&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;})}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;+&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/button&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;      &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;button&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;onClick&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;({&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;decrement&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;})}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;-&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/button&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;    &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;  &amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        &amp;lt;p&amp;gt;Key points about &amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt;:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;State is local to the component (unless you manually share it via context)&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;No middleware, no dev tools, no global store&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Great for complex local state updates&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🏪 Redux Reducers
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;In Redux, a reducer works the same way — but instead of local state, it updates a global store that can be accessed anywhere in your app.&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Example:&amp;lt;br&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight javascript&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// reducer.js&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;counterReducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;0&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;},&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;switch &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;action&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;increment&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;case&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;decrement&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;-&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;};&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;nl&quot;&amp;gt;default&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;export&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;default&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;counterReducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight javascript&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// store.js&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;import&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;createStore&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;from&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;redux&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;import&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;counterReducer&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;from&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;./reducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;store&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;createStore&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;counterReducer&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        
+        
+        &amp;lt;div class=&quot;highlight js-code-highlight&quot;&amp;gt;
+        &amp;lt;pre class=&quot;highlight javascript&quot;&amp;gt;&amp;lt;code&amp;gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// Component.jsx&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;k&quot;&amp;gt;import&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;useSelector&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;useDispatch&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;from&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;react-redux&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;Counter&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;useSelector&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;state&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;kd&quot;&amp;gt;const&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;useDispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&quot;k&quot;&amp;gt;return &amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;amp;gt;&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;p&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;Count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;count&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/p&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;      &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;button&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;onClick&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;({&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;increment&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;})}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;+&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/button&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;      &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;button&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;onClick&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;{()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nf&quot;&amp;gt;dispatch&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;({&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;na&quot;&amp;gt;type&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;decrement&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;dl&quot;&amp;gt;&apos;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;})}&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;-&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/button&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;    &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;lt;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;err&quot;&amp;gt;&amp;amp;gt;
+        &amp;lt;/span&amp;gt;  &amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        
+        
+        
+        &amp;lt;p&amp;gt;Key points about Redux reducers:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;State is global&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Supports powerful middleware (like Redux Thunk, Redux Saga)&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Integrated with dev tools for debugging&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Usually used in large, complex apps&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🔍 How They’re the Same
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fgc1p63g3pnhsyowr0z70.png&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fgc1p63g3pnhsyowr0z70.png&quot; alt=&quot;usereducer and reducer similarities&quot; width=&quot;800&quot; height=&quot;233&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;Both are built on the same reducer concept from functional programming.&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🔀 How They’re Different
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;a href=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fdpy0vuyxhm8ijmahn80j.png&quot; class=&quot;article-body-image-wrapper&quot;&amp;gt;&amp;lt;img src=&quot;https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fdpy0vuyxhm8ijmahn80j.png&quot; alt=&quot;usereducer and reducer differences&quot; width=&quot;800&quot; height=&quot;275&quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        💡 Which Should You Use?
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;Use &amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; when:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;The state is complex, but only relevant to one component or a small subtree.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;You don’t need global state sharing.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;You want to avoid pulling in Redux for something small.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;p&amp;gt;Use Redux reducers when:&amp;lt;/p&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;You need global state management.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;You want advanced debugging, time travel, and middleware.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Your app is big enough to justify the extra setup.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        
+        
+        
+        
+        &amp;lt;h2&amp;gt;
+        
+        
+        🏁 Final Takeaway
+        &amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;useReducer&amp;lt;/code&amp;gt; and Redux reducers are like bicycles and buses — they both get you from state A to state B, but one is for short, personal trips (local component state), and the other is for carrying the whole city (global app state).&amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;They share the same functional programming DNA, but live in different ecosystems.&amp;lt;/p&amp;gt;
+        
+        
+        
+        
+        &amp;lt;p&amp;gt;Thank you for reading! Feel free to connect with me on &amp;lt;a href=&quot;https://www.linkedin.com/in/aneeqa-khan-990459135/&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;LinkedIn&amp;lt;/a&amp;gt; or &amp;lt;a href=&quot;https://github.com/AneeqaKhan&quot; rel=&quot;noopener noreferrer&quot;&amp;gt;GitHub&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
   </channel>
