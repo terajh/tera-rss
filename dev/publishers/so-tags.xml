@@ -4,7 +4,128 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Fri, 20 Feb 2026 16:15:02 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 21 Feb 2026 16:08:54 GMT</lastBuildDate>
+    <item>
+      <title>Fluid colums with fixed header element ui</title>
+      <link>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element-ui</link>
+      <guid>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element-ui</guid>
+      <pubDate>Fri, 20 Feb 2026 17:11:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve got a table with &lt;code&gt;table-layout=&amp;quot;auto&amp;quot;&lt;/code&gt; for &lt;code&gt;autowidth&lt;/code&gt; of the columns, and setting &lt;code&gt;height=400&lt;/code&gt; for get the fixed header, but, in this case, the scroll overflows the header, that should not happen.&lt;/p&gt;
+        &lt;p&gt;If I put the table with &lt;code&gt;tablelayout fixed&lt;/code&gt;, the scroll will fix, but the columns will not get all the width&lt;/p&gt;
+        &lt;p&gt;it is working with vue3 and the library component element plus&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;el-table
+        height=&amp;quot;400&amp;quot;
+        :data=&amp;quot;internalData&amp;quot;
+        :default-sort=&amp;quot;defaultSort&amp;quot;
+        @sort-change=&amp;quot;$emit(&apos;sort-change&apos;, $event)&amp;quot;
+        style=&amp;quot;width: 100%&amp;quot;
+        border
+        class=&amp;quot;custom-table&amp;quot;
+        table-layout=&amp;quot;fixed&amp;quot;
+        overflow-x=&amp;quot;auto&amp;quot;
+        @row-click=&amp;quot;handleRowClick&amp;quot;
+        &amp;gt;
+        &amp;lt;el-table-column
+        v-for=&amp;quot;col in columns&amp;quot;
+        :key=&amp;quot;col.prop&amp;quot;
+        :prop=&amp;quot;col.prop&amp;quot;
+        :label=&amp;quot;col.label&amp;quot;
+        :width=&amp;quot;col.width&amp;quot;
+        :min-width=&amp;quot;col.minWidth&amp;quot;
+        :sortable=&amp;quot;col.sortable ? &apos;custom&apos; : false&amp;quot;
+        &amp;gt;
+        &amp;lt;/el-table-column&amp;gt;
+        &amp;lt;/el-table&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { ref, onBeforeMount, watch } from &apos;vue&apos;
+        
+        // Define props and emits (añadí `desync` para debugging)
+        const props = defineProps&amp;lt;{
+        data: Record&amp;lt;string, any&amp;gt;[],
+        columns: any[],
+        desync?: boolean
+        }&amp;gt;()
+        
+        defineEmits([&apos;sort-change&apos;])
+        
+        const handleRowClick = (row: any) =&amp;gt; {
+        console.log(row)
+        }
+        
+        // defaultSort definido antes del render
+        const defaultSort = ref({
+        prop: &apos;id&apos;,
+        order: &apos;ascending&apos; as &apos;ascending&apos; | &apos;descending&apos; | null, // Element Plus usa &apos;ascending&apos;/&apos;descending&apos;
+        })
+        
+        // datos internos que usa la tabla (permite simular desincronía)
+        const internalData = ref&amp;lt;Record&amp;lt;string, any&amp;gt;[]&amp;gt;([])
+        
+        function applySort(arr: Record&amp;lt;string, any&amp;gt;[], sort: { prop?: string; order?: string | null }) {
+        if (!sort?.prop || !sort.order) return
+        const prop = sort.prop
+        const order = sort.order === &apos;ascending&apos; ? 1 : -1
+        arr.sort((a, b) =&amp;gt; {
+        if (a[prop] == null) return 1 * order
+        if (b[prop] == null) return -1 * order
+        if (a[prop] &amp;gt; b[prop]) return 1 * order
+        if (a[prop] &amp;lt; b[prop]) return -1 * order
+        return 0
+        })
+        }
+        
+        function shuffle(arr: Record&amp;lt;string, any&amp;gt;[]) {
+        // Fisher–Yates
+        for (let i = arr.length - 1; i &amp;gt; 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+        }
+        }
+        
+        // inicializar antes del primer render
+        onBeforeMount(() =&amp;gt; {
+        internalData.value = props.data ? [...props.data] : []
+        if (props.desync) {
+        // para reproducir el bug: la UI se muestra en orden distinto al sort por defecto
+        shuffle(internalData.value)
+        // mantiene defaultSort para la cabecera pero la lista mostrada está desordenada
+        } else {
+        // aplicar sort por defecto antes del render para evitar flicker
+        applySort(internalData.value, defaultSort.value)
+        }
+        })
+        
+        // si los datos externos cambian, sincronizar respetando el modo desync
+        watch(
+        () =&amp;gt; props.data,
+        (newData) =&amp;gt; {
+        internalData.value = newData ? [...newData] : []
+        if (props.desync) {
+        shuffle(internalData.value)
+        } else {
+        applySort(internalData.value, defaultSort.value)
+        }
+        },
+        { immediate: false }
+        )
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        :deep(.cell) {
+        white-space: nowrap !important;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That&apos;s my code, just changing this the cols will expand  and then the scroll will put over the header&lt;/p&gt;
+        &lt;p&gt;How can I fix it? I need a mix between table fixed and table auto for full fit the cols&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;table-layout=&amp;quot;fixed&amp;quot; to table-layout=&amp;quot;auto&amp;quot;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to fix indent not working in TipTap taskItem nodes?</title>
       <link>https://stackoverflow.com/questions/79888000/how-to-fix-indent-not-working-in-tiptap-taskitem-nodes</link>
@@ -450,80 +571,6 @@
         
         &amp;lt;/script&amp;gt;
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Laravel reverb cant /isnt establishing connection to https</title>
-      <link>https://stackoverflow.com/questions/79869391/laravel-reverb-cant-isnt-establishing-connection-to-https</link>
-      <guid>https://stackoverflow.com/questions/79869391/laravel-reverb-cant-isnt-establishing-connection-to-https</guid>
-      <pubDate>Fri, 16 Jan 2026 12:21:39 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am working on a laravel + vuejs project where in dashboard all data from database is displayed and newly inserted rows/data will come through laravel broadcasting reverb and show them separately. but no matter what I do this message is popping up on Console. I have spent 6 hours with chatGPT, laravel boost, gemini GHcopilot nothing helps everything they have said I have customized everywhere (I think) where http or https matters or ws or wss matters.problem persist even if I turn off https.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;app-CTK8W6NU.js:76 WebSocket connection to &apos;wss://docuvault.test:8080/app/ymstb1nglumzbxm9yjoq?protocol=7&amp;amp;client=js&amp;amp;version=8.4.0&amp;amp;flash=false&apos; failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;broadcasting.php:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&apos;connections&apos; =&amp;gt; [
-        
-        &apos;reverb&apos; =&amp;gt; [
-        &apos;driver&apos; =&amp;gt; &apos;reverb&apos;,
-        &apos;key&apos; =&amp;gt; env(&apos;REVERB_APP_KEY&apos;),
-        &apos;secret&apos; =&amp;gt; env(&apos;REVERB_APP_SECRET&apos;),
-        &apos;app_id&apos; =&amp;gt; env(&apos;REVERB_APP_ID&apos;),
-        &apos;options&apos; =&amp;gt; [
-        &apos;host&apos; =&amp;gt; env(&apos;REVERB_HOST&apos;),
-        &apos;port&apos; =&amp;gt; env(&apos;REVERB_PORT&apos;, 443),
-        &apos;scheme&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;),
-        &apos;useTLS&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;) === &apos;https&apos;,
-        ],
-        &apos;client_options&apos; =&amp;gt; [
-        // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
-        ],
-        
-        ],
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;reverb.php:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&apos;apps&apos; =&amp;gt; [
-        
-        &apos;provider&apos; =&amp;gt; &apos;config&apos;,
-        
-        &apos;apps&apos; =&amp;gt; [
-        [
-        &apos;key&apos; =&amp;gt; env(&apos;REVERB_APP_KEY&apos;),
-        &apos;secret&apos; =&amp;gt; env(&apos;REVERB_APP_SECRET&apos;),
-        &apos;app_id&apos; =&amp;gt; env(&apos;REVERB_APP_ID&apos;),
-        &apos;options&apos; =&amp;gt; [
-        &apos;host&apos; =&amp;gt; env(&apos;REVERB_HOST&apos;),
-        &apos;port&apos; =&amp;gt; env(&apos;REVERB_PORT&apos;, 8080),
-        &apos;scheme&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;),
-        &apos;ssl&apos; =&amp;gt; [
-        &apos;local_cert&apos; =&amp;gt; base_path(&apos;docuvault.test.pem&apos;),       // certificate
-        &apos;local_pk&apos; =&amp;gt; base_path(&apos;docuvault.test-key.pem&apos;),   // private key
-        ],
-        // &apos;useTLS&apos; =&amp;gt; env(&apos;REVERB_SCHEME&apos;, &apos;https&apos;) === &apos;https&apos;,
-        &apos;useTLS&apos; =&amp;gt; true,
-        ],
-        &apos;allowed_origins&apos; =&amp;gt; [&apos;*&apos;],
-        &apos;ping_interval&apos; =&amp;gt; env(&apos;REVERB_APP_PING_INTERVAL&apos;, 60),
-        &apos;activity_timeout&apos; =&amp;gt; env(&apos;REVERB_APP_ACTIVITY_TIMEOUT&apos;, 30),
-        &apos;max_connections&apos; =&amp;gt; env(&apos;REVERB_APP_MAX_CONNECTIONS&apos;),
-        &apos;max_message_size&apos; =&amp;gt; env(&apos;REVERB_APP_MAX_MESSAGE_SIZE&apos;, 10_000), 
-        ],
-        ],
-        
-        ],
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;env:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;APP_URL=https://docuvault.test
-        REVERB_APP_ID=214918
-        REVERB_APP_KEY=ymstb1nglumzbxm9yjoq
-        REVERB_APP_SECRET=qx9smxoms8smr5repkcf
-        REVERB_HOST=docuvault.test
-        REVERB_PORT=8080
-        REVERB_SCHEME=https
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Herd when linking project: https✅&lt;/p&gt;
-        &lt;p&gt;Generated certificates with mkcert✅&lt;/p&gt;
       </content:encoded>
     </item>
     <item>
