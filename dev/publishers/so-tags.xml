@@ -4,7 +4,43 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sat, 21 Feb 2026 16:08:54 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 22 Feb 2026 15:56:42 GMT</lastBuildDate>
+    <item>
+      <title>How to correctly react to a promise in Vue/axios</title>
+      <link>https://stackoverflow.com/questions/79893889/how-to-correctly-react-to-a-promise-in-vue-axios</link>
+      <guid>https://stackoverflow.com/questions/79893889/how-to-correctly-react-to-a-promise-in-vue-axios</guid>
+      <pubDate>Sun, 22 Feb 2026 09:22:19 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m writing a signup form with Vue 3 and use axios to check if a username is already taken. My component looks like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import axios from &apos;axios&apos;;
+        const nickname = ref(&apos;&apos;);
+        function checkNickname() {
+        if (nickname.value.length === 0) {
+        return true;
+        }
+        return axios.post(&apos;localhost:8080/api/v1/public/account/nickname&apos;, nickname.value.toString().trim(), {
+        headers: {
+        &apos;content-type&apos;: &apos;text/plain&apos;,
+        }
+        })
+        .then(response =&amp;gt; !Boolean(response.data), () =&amp;gt; true);
+        }
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;form&amp;gt;
+        &amp;lt;input v-model=&amp;quot;nickname&amp;quot; /&amp;gt;
+        &amp;lt;span v-show=&amp;quot;!checkNickname()&amp;quot;&amp;gt;Nickname taken!&amp;lt;/span&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now my server returns a plain &lt;code&gt;true&lt;/code&gt; when the submitted String is &lt;code&gt;Admin&lt;/code&gt; and &lt;code&gt;false&lt;/code&gt; otherwise. I checked that the post request actually receives these answers via the browser debugger. However, the error span is never shown. What am I doing wrong?&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Fluid colums with fixed header element ui</title>
       <link>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element-ui</link>
@@ -1831,28 +1867,6 @@
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;This didn&apos;t help. I have the same problem in other components as well.&lt;/p&gt;
         &lt;p&gt;How is it possible that static content causes this issue, and how can I avoid it?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>HTML img element (or v-img) will not load SVG, request has status 200 but empty response in Dev Tools &gt; Network, No CORS issue and no error in console [duplicate]</title>
-      <link>https://stackoverflow.com/questions/79848624/html-img-element-or-v-img-will-not-load-svg-request-has-status-200-but-empty</link>
-      <guid>https://stackoverflow.com/questions/79848624/html-img-element-or-v-img-will-not-load-svg-request-has-status-200-but-empty</guid>
-      <pubDate>Tue, 16 Dec 2025 14:47:28 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am trying to load an SVG image in a Veutify/Vue web app without embedding the SVG in the project build bundle. I want to loaded the image dynamically at runtime. When referencing the image via the src element on a a v-img component, it will not load the file although there is a status 200 response from the server. I have tried simplifying the v-img to a simple html img element, and the problem persists.&lt;/p&gt;
-        &lt;p&gt;In Chrome development tools it shows the request/response with 200 a status code, but the response is shown as empty. There is no error in the console. Adding an error handler will fire the attached function, but it does not give an error reason. Opening the same image URL in the browser shows the SVG image source code with the message &amp;quot;This XML file does not appear to have any style information associated with it. The document tree is shown below.&amp;quot; I tried adding &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP&quot; rel=&quot;nofollow noreferrer&quot;&gt;Content Security Policy (CSP) headers&lt;/a&gt; to fix any CORS issues, but this didn&apos;t help.&lt;/p&gt;
-        &lt;p&gt;Reproduction steps:&lt;/p&gt;
-        &lt;p&gt;Simple HTML img element embedded in a valid HTML document:&lt;/p&gt;
-        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;img src=&amp;quot;example.svg&amp;quot; /&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;SVG file contents:&lt;/p&gt;
-        &lt;pre class=&quot;lang-svg prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;svg width=&amp;quot;300&amp;quot; height=&amp;quot;200&amp;quot; viewBox=&amp;quot;0 0 300 200&amp;quot;&amp;gt;
-        &amp;lt;path fill=&amp;quot;#fff&amp;quot; stroke=&amp;quot;#000&amp;quot; stroke-width=&amp;quot;2&amp;quot; d=&amp;quot;M0 0h300v200H0z&amp;quot;/&amp;gt;
-        &amp;lt;path stroke=&amp;quot;#000&amp;quot; stroke-width=&amp;quot;2&amp;quot; d=&amp;quot;m0 0 300 200m0-200L0 200&amp;quot; opacity=&amp;quot;0.25&amp;quot;/&amp;gt;
-        &amp;lt;text x=&amp;quot;150&amp;quot; y=&amp;quot;100&amp;quot; font-size=&amp;quot;24&amp;quot; text-anchor=&amp;quot;middle&amp;quot; dominant-baseline=&amp;quot;middle&amp;quot;&amp;gt;Development&amp;lt;/text&amp;gt;
-        &amp;lt;/svg&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In Visual Studio Code, I see the message &amp;quot;An error occurred while loading the image. Open file using VS Code&apos;s standard text/binary editor?&amp;quot; The image was generated using an online tool, so it is assumed to be valid SVG code. It is viewable in other editors.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
