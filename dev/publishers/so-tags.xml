@@ -4,7 +4,80 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Mon, 23 Feb 2026 16:18:46 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 24 Feb 2026 16:29:36 GMT</lastBuildDate>
+    <item>
+      <title>Can&apos;t get svg markup to render as a data uri in an image source [duplicate]</title>
+      <link>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</link>
+      <guid>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</guid>
+      <pubDate>Tue, 24 Feb 2026 00:33:15 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am attempting to get the google material symbols loaded into a canvas to download them. This is generally straight forward, except the fill property in the font-variation-settings. This I cannot get to work in the canvas. I only saw how to kind of do this through &lt;a href=&quot;https://stackoverflow.com/questions/65670959/variable-fonts-in-html5-canvas&quot;&gt;this&lt;/a&gt; SO post, but this is not working for me.&lt;/p&gt;
+        &lt;p&gt;My attempt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const canvas = document.createElement( &amp;quot;canvas&amp;quot; );
+        
+        const svgNS = &apos;https://www.w3.org/2000/svg&apos;;
+        const svg = document.createElementNS( svgNS, &amp;quot;svg&amp;quot; );
+        
+        const style = document.createElementNS( svgNS, &amp;quot;style&amp;quot; );
+        style.textContent = `@font-face {
+        font-family: &apos;Material Symbols Outlined&apos;;
+        font-style: normal;
+        font-weight: 100 700;
+        src: url(&apos;https://fonts.gstatic.com/s/materialsymbolsoutlined/v315/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2&apos;) format(&apos;woff2&apos;); 
+        }
+        .material-symbols-outlined {
+        font-family: &apos;Material Symbols Outlined&apos;;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;  /* Preferred icon size */
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+        }`;
+        svg.append( style );
+        
+        const foreignObject = document.createElementNS( svgNS, &amp;quot;foreignObject&amp;quot; );
+        foreignObject.setAttribute( &amp;quot;x&amp;quot;, &apos;0&apos; );
+        foreignObject.setAttribute( &amp;quot;y&amp;quot;, &apos;0&apos; );
+        
+        
+        const clone = icon.cloneNode(true);
+        foreignObject.append( clone );
+        
+        const { width, height } = icon.getBoundingClientRect();
+        foreignObject.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
+        foreignObject.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
+        svg.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
+        svg.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
+        
+        svg.append( foreignObject );
+        
+        const svg_markup = new XMLSerializer().serializeToString( svg );
+        const svg_file = new Blob( [ svg_markup ], { type: &amp;quot;image/svg+xml&amp;quot; } );
+        
+        Object.assign( canvas, { width, height } );
+        const ctx = canvas.getContext( &amp;quot;2d&amp;quot; );
+        
+        const img = new Image();
+        img.onload = () =&amp;gt; {
+        console.log(&apos;img loaded&apos;);
+        };
+        img.onerror = () =&amp;gt; {
+        console.log(&apos;image failed to load&apos;);
+        }
+        const svgURL = &apos;data:image/svg+xml,&apos; + encodeURIComponent(svg_markup);
+        img.src = svgURL;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;No matter what, the img onerror always fires. I can go to the data uri I get and it is valid. the I have even tried turning the turning svg_file blob into a data uri and using that. Same issue, I can go to that data uri, but img always throws an error. I don&apos;t get it!&lt;/p&gt;
+        &lt;p&gt;And of course the onerror for img doesn&apos;t give any info on why it failed. There are no errors in the console. It just hits the onerror.&lt;/p&gt;
+        &lt;p&gt;I tried to simplify it too by just putting the svg markup as the canvas innerHTML, of course that didn&apos;t work...&lt;/p&gt;
+        &lt;p&gt;Wondering if anyone has any clue how I may get the google material symbols to be able to apply the FILL font-variation-setting to render in canvas to download. Just toggling it on the span or parent container doesn&apos;t work. Canvas doesn&apos;t naturally pick that css attribute up it seems.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>vue lag s and slow after the installation on ubbunto server using nginx and the backend is laravel also using the reverb websocket [closed]</title>
       <link>https://stackoverflow.com/questions/79894159/vue-lag-s-and-slow-after-the-installation-on-ubbunto-server-using-nginx-and-the</link>
@@ -363,7 +436,7 @@
       </content:encoded>
     </item>
     <item>
-      <title>Why can&apos;t I import Dagre into my Vite app?</title>
+      <title>Why can&apos;t I import Dagre into my Vite app? [closed]</title>
       <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
       <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
       <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
@@ -1508,279 +1581,6 @@
         * @link ../../
         */
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vite build only transforming 53 modules instead of all Vue pages in Laravel Inertia.js SSR project</title>
-      <link>https://stackoverflow.com/questions/79852021/vite-build-only-transforming-53-modules-instead-of-all-vue-pages-in-laravel-iner</link>
-      <guid>https://stackoverflow.com/questions/79852021/vite-build-only-transforming-53-modules-instead-of-all-vue-pages-in-laravel-iner</guid>
-      <pubDate>Sat, 20 Dec 2025 22:48:57 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Problem&lt;/p&gt;
-        &lt;p&gt;I&apos;m working on a Laravel 12 project with Inertia.js, Vue 3, TypeScript, and SSR. When I run &lt;code&gt;npm run build:ssr&lt;/code&gt;, Vite only transforms &lt;strong&gt;53 modules&lt;/strong&gt; and produces a &lt;strong&gt;36KB JavaScript file&lt;/strong&gt;, even though I have &lt;strong&gt;43 Vue component files&lt;/strong&gt; in my &lt;code&gt;resources/js/Pages&lt;/code&gt; directory.&lt;/p&gt;
-        &lt;p&gt;The build completes without errors, but clearly isn&apos;t including all my Vue pages.&lt;/p&gt;
-        &lt;h2&gt;Expected Behavior&lt;/h2&gt;
-        &lt;p&gt;The build should:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Transform 300-500+ modules (including all Vue pages and dependencies)&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Produce larger bundle files (500KB+)&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Include all pages from &lt;code&gt;resources/js/Pages/**/*.vue&lt;/code&gt;&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2&gt;Actual Behavior&lt;/h2&gt;
-        &lt;p&gt;Build output:&lt;/p&gt;
-        &lt;p&gt;bash&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;vite v7.1.9 building for production...
-        ✓ 53 modules transformed.
-        public/build/manifest.json             0.31 kB │ gzip:  0.17 kB
-        public/build/assets/app-BZmm_rKM.css  38.32 kB │ gzip:  8.38 kB
-        public/build/assets/app-BZmm_rKM.js   36.08 kB │ gzip: 14.58 kB
-        ✓ built in 587ms
-        
-        vite v7.1.9 building SSR bundle for production...
-        ✓ 3 modules transformed.
-        bootstrap/ssr/ssr-manifest.json  0.07 kB
-        bootstrap/ssr/app2.js            0.13 kB
-        ✓ built in 175ms
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Only 2 asset files are generated (CSS and JS), with no code-split chunks for individual pages.&lt;/p&gt;
-        &lt;h2&gt;My Setup&lt;/h2&gt;
-        &lt;p&gt;&lt;strong&gt;Directory structure:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;bash&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;resources/js/
-        ├── Pages/           # Capital P
-        │   ├── Dashboard.vue
-        │   ├── Welcome.vue
-        │   ├── admin/
-        │   ├── auth/
-        │   ├── kitchen/
-        │   ├── pos/
-        │   └── settings/
-        ├── app.ts
-        ├── ssr.ts
-        └── components/
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I have 43 &lt;code&gt;.vue&lt;/code&gt; files total in the Pages directory (verified with &lt;code&gt;find resources/js/Pages -name &amp;quot;*.vue&amp;quot; | wc -l&lt;/code&gt;).&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;vite.config.ts:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;typescript&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { wayfinder } from &apos;@laravel/vite-plugin-wayfinder&apos;;
-        import tailwindcss from &apos;@tailwindcss/vite&apos;;
-        import vue from &apos;@vitejs/plugin-vue&apos;;
-        import laravel from &apos;laravel-vite-plugin&apos;;
-        import { defineConfig } from &apos;vite&apos;;
-        
-        export default defineConfig({
-        plugins: [
-        laravel({
-        input: [&apos;resources/js/app.ts&apos;],
-        ssr: &apos;resources/js/ssr.ts&apos;,
-        refresh: true,
-        }),
-        tailwindcss(),
-        wayfinder({
-        formVariants: true,
-        }),
-        vue({
-        template: {
-        transformAssetUrls: {
-        base: null,
-        includeAbsolute: false,
-        },
-        },
-        }),
-        ],
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;resources/js/app.ts:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;typescript&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import &apos;../css/app.css&apos;;
-        import { createInertiaApp } from &apos;@inertiajs/vue3&apos;;
-        import { resolvePageComponent } from &apos;laravel-vite-plugin/inertia-helpers&apos;;
-        import { createPinia } from &apos;pinia&apos;;
-        import type { DefineComponent } from &apos;vue&apos;;
-        import { createApp, h } from &apos;vue&apos;;
-        
-        const appName = import.meta.env.VITE_APP_NAME || &apos;Laravel&apos;;
-        
-        createInertiaApp({
-        title: (title) =&amp;gt; (title ? `${title} - ${appName}` : appName),
-        resolve: (name) =&amp;gt;
-        resolvePageComponent(
-        `./Pages/${name}.vue`,
-        import.meta.glob&amp;lt;DefineComponent&amp;gt;(&apos;./Pages/**/*.vue&apos;),
-        ),
-        setup({ el, App, props, plugin }) {
-        createApp({ render: () =&amp;gt; h(App, props) })
-        .use(plugin)
-        .use(createPinia())
-        .mount(el);
-        },
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;resources/js/ssr.ts:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;typescript&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { createInertiaApp } from &apos;@inertiajs/vue3&apos;;
-        import createServer from &apos;@inertiajs/vue3/server&apos;;
-        import { resolvePageComponent } from &apos;laravel-vite-plugin/inertia-helpers&apos;;
-        import { createSSRApp, DefineComponent, h } from &apos;vue&apos;;
-        import { renderToString } from &apos;vue/server-renderer&apos;;
-        
-        const appName = import.meta.env.VITE_APP_NAME || &apos;JollofMan&apos;;
-        
-        createServer(
-        (page) =&amp;gt;
-        createInertiaApp({
-        page,
-        render: renderToString,
-        title: (title) =&amp;gt; (title ? `${title} - ${appName}` : appName),
-        resolve: (name) =&amp;gt;
-        resolvePageComponent(
-        `./Pages/${name}.vue`,
-        import.meta.glob&amp;lt;DefineComponent&amp;gt;(&apos;./Pages/**/*.vue&apos;),
-        ),
-        setup: ({ App, props, plugin }) =&amp;gt;
-        createSSRApp({ render: () =&amp;gt; h(App, props) }).use(plugin),
-        }),
-        { cluster: true },
-        );
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;package.json (relevant dependencies):&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;json&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{
-        &amp;quot;$schema&amp;quot;: &amp;quot;https://www.schemastore.org/package.json&amp;quot;,
-        &amp;quot;private&amp;quot;: true,
-        &amp;quot;type&amp;quot;: &amp;quot;module&amp;quot;,
-        &amp;quot;scripts&amp;quot;: {
-        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
-        &amp;quot;build:ssr&amp;quot;: &amp;quot;vite build &amp;amp;&amp;amp; vite build --ssr&amp;quot;,
-        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
-        &amp;quot;format&amp;quot;: &amp;quot;prettier --write resources/&amp;quot;,
-        &amp;quot;format:check&amp;quot;: &amp;quot;prettier --check resources/&amp;quot;,
-        &amp;quot;lint&amp;quot;: &amp;quot;eslint . --fix&amp;quot;
-        },
-        &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;@eslint/js&amp;quot;: &amp;quot;^9.19.0&amp;quot;,
-        &amp;quot;@laravel/echo-vue&amp;quot;: &amp;quot;^2.2.6&amp;quot;,
-        &amp;quot;@laravel/vite-plugin-wayfinder&amp;quot;: &amp;quot;^0.1.3&amp;quot;,
-        &amp;quot;@tailwindcss/vite&amp;quot;: &amp;quot;^4.1.11&amp;quot;,
-        &amp;quot;@types/node&amp;quot;: &amp;quot;^22.13.5&amp;quot;,
-        &amp;quot;@vitejs/plugin-vue&amp;quot;: &amp;quot;^6.0.0&amp;quot;,
-        &amp;quot;@vue/eslint-config-typescript&amp;quot;: &amp;quot;^14.3.0&amp;quot;,
-        &amp;quot;concurrently&amp;quot;: &amp;quot;^9.0.1&amp;quot;,
-        &amp;quot;eslint&amp;quot;: &amp;quot;^9.17.0&amp;quot;,
-        &amp;quot;eslint-config-prettier&amp;quot;: &amp;quot;^10.0.1&amp;quot;,
-        &amp;quot;eslint-plugin-vue&amp;quot;: &amp;quot;^9.32.0&amp;quot;,
-        &amp;quot;laravel-echo&amp;quot;: &amp;quot;^2.2.6&amp;quot;,
-        &amp;quot;prettier&amp;quot;: &amp;quot;^3.4.2&amp;quot;,
-        &amp;quot;prettier-plugin-organize-imports&amp;quot;: &amp;quot;^4.1.0&amp;quot;,
-        &amp;quot;prettier-plugin-tailwindcss&amp;quot;: &amp;quot;^0.6.11&amp;quot;,
-        &amp;quot;pusher-js&amp;quot;: &amp;quot;^8.4.0&amp;quot;,
-        &amp;quot;typescript&amp;quot;: &amp;quot;^5.2.2&amp;quot;,
-        &amp;quot;typescript-eslint&amp;quot;: &amp;quot;^8.23.0&amp;quot;,
-        &amp;quot;vite&amp;quot;: &amp;quot;^7.0.4&amp;quot;,
-        &amp;quot;vue-tsc&amp;quot;: &amp;quot;^2.2.4&amp;quot;
-        },
-        &amp;quot;dependencies&amp;quot;: {
-        &amp;quot;@headlessui/vue&amp;quot;: &amp;quot;^1.7.23&amp;quot;,
-        &amp;quot;@heroicons/vue&amp;quot;: &amp;quot;^2.2.0&amp;quot;,
-        &amp;quot;@inertiajs/vue3&amp;quot;: &amp;quot;^2.1.0&amp;quot;,
-        &amp;quot;@types/lodash&amp;quot;: &amp;quot;^4.17.21&amp;quot;,
-        &amp;quot;@vee-validate/zod&amp;quot;: &amp;quot;^4.15.1&amp;quot;,
-        &amp;quot;@vueuse/core&amp;quot;: &amp;quot;^12.8.2&amp;quot;,
-        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.5.1&amp;quot;,
-        &amp;quot;class-variance-authority&amp;quot;: &amp;quot;^0.7.1&amp;quot;,
-        &amp;quot;clsx&amp;quot;: &amp;quot;^2.1.1&amp;quot;,
-        &amp;quot;date-fns&amp;quot;: &amp;quot;^4.1.0&amp;quot;,
-        &amp;quot;embla-carousel-vue&amp;quot;: &amp;quot;^8.6.0&amp;quot;,
-        &amp;quot;escpos&amp;quot;: &amp;quot;^3.0.0-alpha.6&amp;quot;,
-        &amp;quot;escpos-network&amp;quot;: &amp;quot;^3.0.0-alpha.5&amp;quot;,
-        &amp;quot;escpos-serialport&amp;quot;: &amp;quot;^3.0.0-alpha.4&amp;quot;,
-        &amp;quot;escpos-usb&amp;quot;: &amp;quot;^3.0.0-alpha.4&amp;quot;,
-        &amp;quot;laravel-vite-plugin&amp;quot;: &amp;quot;^2.0.0&amp;quot;,
-        &amp;quot;lucide-vue-next&amp;quot;: &amp;quot;^0.468.0&amp;quot;,
-        &amp;quot;pinia&amp;quot;: &amp;quot;^3.0.4&amp;quot;,
-        &amp;quot;radix-vue&amp;quot;: &amp;quot;^1.9.17&amp;quot;,
-        &amp;quot;reka-ui&amp;quot;: &amp;quot;^2.4.1&amp;quot;,
-        &amp;quot;tailwind-merge&amp;quot;: &amp;quot;^3.4.0&amp;quot;,
-        &amp;quot;tailwindcss&amp;quot;: &amp;quot;^4.1.1&amp;quot;,
-        &amp;quot;tailwindcss-animate&amp;quot;: &amp;quot;^1.0.7&amp;quot;,
-        &amp;quot;tw-animate-css&amp;quot;: &amp;quot;^1.2.5&amp;quot;,
-        &amp;quot;uninstall&amp;quot;: &amp;quot;^0.0.0&amp;quot;,
-        &amp;quot;vee-validate&amp;quot;: &amp;quot;^4.15.1&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.5.13&amp;quot;,
-        &amp;quot;vue-chartjs&amp;quot;: &amp;quot;^5.3.3&amp;quot;,
-        &amp;quot;vue-sonner&amp;quot;: &amp;quot;^2.0.9&amp;quot;,
-        &amp;quot;vue-toastification&amp;quot;: &amp;quot;^2.0.0-rc.5&amp;quot;,
-        &amp;quot;zod&amp;quot;: &amp;quot;^4.1.13&amp;quot;
-        },
-        &amp;quot;optionalDependencies&amp;quot;: {
-        &amp;quot;@rollup/rollup-linux-x64-gnu&amp;quot;: &amp;quot;4.9.5&amp;quot;,
-        &amp;quot;@rollup/rollup-win32-x64-msvc&amp;quot;: &amp;quot;4.9.5&amp;quot;,
-        &amp;quot;@tailwindcss/oxide-linux-x64-gnu&amp;quot;: &amp;quot;^4.0.1&amp;quot;,
-        &amp;quot;@tailwindcss/oxide-win32-x64-msvc&amp;quot;: &amp;quot;^4.0.1&amp;quot;,
-        &amp;quot;lightningcss-linux-x64-gnu&amp;quot;: &amp;quot;^1.29.1&amp;quot;,
-        &amp;quot;lightningcss-win32-x64-msvc&amp;quot;: &amp;quot;^1.29.1&amp;quot;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2&gt;What I&apos;ve Tried&lt;/h2&gt;
-        &lt;ol&gt;
-        &lt;li&gt;&lt;strong&gt;Added &lt;code&gt;{ eager: true }&lt;/code&gt;&lt;/strong&gt; to &lt;code&gt;import.meta.glob()&lt;/code&gt; - This caused TypeScript errors:&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;pre&gt;&lt;code&gt;   error TS2345: Argument of type &apos;Record&amp;lt;string, DefineComponent&amp;gt;&apos; is not assignable 
-        to parameter of type &apos;Record&amp;lt;string, Promise&amp;lt;DefineComponent&amp;gt; | (() =&amp;gt; Promise&amp;lt;DefineComponent&amp;gt;)&amp;gt;&apos;.
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;ol start=&quot;2&quot;&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Verified file paths&lt;/strong&gt; - The glob pattern &lt;code&gt;./Pages/**/*.vue&lt;/code&gt; is correct and matches my directory structure&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Cleared caches:&lt;/strong&gt;&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;bash&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;   rm -rf node_modules/.vite
-        rm -rf public/build
-        rm -rf bootstrap/ssr
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;ol start=&quot;4&quot;&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Checked TypeScript errors&lt;/strong&gt; - Running &lt;code&gt;npx tsc --noEmit&lt;/code&gt; shows many component import errors but no errors in the Pages directory itself&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Tried different glob patterns&lt;/strong&gt; - No change in behavior&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Checked Vite dev mode&lt;/strong&gt; - &lt;code&gt;npm run dev&lt;/code&gt; works fine and pages load correctly in development&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;h2&gt;Questions&lt;/h2&gt;
-        &lt;ol&gt;
-        &lt;li&gt;&lt;p&gt;Why is Vite only transforming 53 modules when I have 43+ Vue files?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Why aren&apos;t individual page components being included in the build?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Is there an issue with how &lt;code&gt;import.meta.glob()&lt;/code&gt; works with &lt;code&gt;resolvePageComponent&lt;/code&gt;?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Should the build create separate chunk files for each page, or bundle everything into one file?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;h2&gt;Environment&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;OS:&lt;/strong&gt; Linux (shared hosting)&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Node:&lt;/strong&gt; v20.19.6&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;npm:&lt;/strong&gt; 10.9.2&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Laravel:&lt;/strong&gt; 12.x&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Vite:&lt;/strong&gt; 7.1.9&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Vue:&lt;/strong&gt; 3.5.x&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Inertia.js:&lt;/strong&gt; 2.x with SSR enabled&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Cloudways&lt;/p&gt;
-        &lt;p&gt;Any help would be greatly appreciated!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
