@@ -7,10 +7,10 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/\"> <img src=\"https://external-preview.redd.it/1-hqaS8DfBe9HsRF714gJOHrkUL1EY6vGs1_aDSUqh0.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=917f6b3f4348456072267f0adc7b2eaa31716e58\" alt=\"I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required\" title=\"I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I recently started documenting my flows and system design using Mermaid for my Vue and Nuxt projects.</p> <p>While using it more, I felt the diagrams looked a bit plain when sharing screenshots, and most online editors required login. I just wanted something quick.</p> <p>So I built a small tool called Graphlet.</p> <p>It focuses on three things:</p> <ul> <li>Clean, good-looking themes</li> <li>Iframe embeds with the same styling</li> <li>No login</li> </ul> <p>Just write Mermaid and get a shareable diagram.</p> <p>Would genuinely love feedback from other Vue devs, especially on UX or performance.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/lostRiddler\"> /u/lostRiddler </a> <br/> <span><a href=\"https://graphlet.xyz\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-02-28T15:24:51.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/"
+    "title": "I made a devtools plugin to help debug \"private\" stuff",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I always get annoyed when having to debug a composable. First you add a bunch of log statements, and then you need to find right log statements related to the one specific instance you need to debug.</p> <p>With this tool you can inspect the individual composable instances in the devtools, and it also highlights the component on screen, so it&#39;s easier to find the right one.</p> <p>I now also use this to inspect &quot;private&quot; state in pinia stores, instead of returning them just for the sake of devtools.</p> <p><a href=\"https://www.npmjs.com/package/@vingy/vuebugger\">https://www.npmjs.com/package/@vingy/vuebugger</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/vinpog\"> /u/vinpog </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1riqxvv/i_made_a_devtools_plugin_to_help_debug_private/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1riqxvv/i_made_a_devtools_plugin_to_help_debug_private/\">[comments]</a></span>",
+    "date": "2026-03-02T11:59:47.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1riqxvv/i_made_a_devtools_plugin_to_help_debug_private/"
   },
   {
     "publisherId": "reddit-dev",
@@ -20,10 +20,36 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Built my first Vue.js project – looking for feedback on implementation",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone,</p> <p>I recently finished building a project using Vue.js and wanted to share it with the community to get some feedback on my approach. The site itself is a sports odds platform, but my main goal here is to learn and improve my Vue skills.</p> <p>Some of the areas I’d love feedback on:</p> <ul> <li><strong>State management:</strong> I used Vuex for handling odds data and user interactions.</li> <li><strong>Routing:</strong> Implemented Vue Router for navigation between pages.</li> <li><strong>API integration:</strong> Pulled in live data and displayed it dynamically.</li> <li><strong>Performance:</strong> Curious if there are optimizations I might have missed.</li> </ul> <p>Here’s the link: <a href=\"https://tambuatips.com/\">https://tambuatips.com/</a></p> <p>I’d really appreciate any thoughts on my code structure, component design, or general best practices for Vue projects. Thanks in advance!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/cj_oluoch\"> /u/cj_oluoch </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rhqd0u/built_my_first_vuejs_project_looking_for_feedback/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rhqd0u/built_my_first_vuejs_project_looking_for_feedback/\">[comments]</a></span>",
-    "date": "2026-03-01T06:47:44.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1rhqd0u/built_my_first_vuejs_project_looking_for_feedback/"
+    "title": "NUXT websocket issue",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I have two servers. A front-end nuxt one and a separate back-end server. I have recently upgraded nuxt and added a domain name other than localhost(still have the port number on it), and made new self-signed certs that are used by both.</p> <p>In the nuxt config the relevant part looks like this:</p> <pre><code> server: { proxy: { &#39;/test1&#39;: { target: process.env.SERVER_SITE_URL, secure: false, }, &#39;/test2&#39;: { target: process.env.SERVER_SITE_URL, secure: false, }, &#39;/websocket&#39;: { target: process.env.SERVER_SITE_URL, secure: true, // ws: true, // rewriteWsOrigin: true, // changeOrigin: true, }, }, cors: false, origin: &quot;*&quot;, headers: { &#39;Access-Control-Allow-Origin&#39;: &#39;*&#39; } } }, devServer: { cors: { origin: &quot;*&quot; }, host: &#39;testsite.com&#39;, port: 3000, https: { key: &quot;./certs/self-signed.key&quot;, cert: &quot;./certs/self-signed.crt&quot;, }, }, </code></pre> <p>I can fetch with test1 and test2, no prob, but when I use useWebSocket(&#39;/websocket&#39;) or WebSocket(&#39;/websocket&#39;), not only does it not reach my server(no console logs show it ever tried), but also crashes the server!? It instantly restarts though.</p> <pre><code> ERROR [unhandledRejection] read ECONNRESET 4:39:55 PM at TLSWrap.onStreamRead (node:internal/stream_base_commons:218:20) at TLSWrap.callbackTrampoline (node:internal/async_hooks:130:17) </code></pre> <p>You can see the commented out lines, that was me trying to see it add or removing that fixed the issue. Curiously if I add the the nitro experimental feature websocket, no crash and connection opens, but to no where!?</p> <p>Latest certs were generated by: openssl req -x509 -newkey rsa:4096 -keyout self-signed.key -out self-signed.crt -sha256 -days 36500 -nodes -subj &quot;/C=US/ST=NY/O=OrgName/OU=SiteName/CN=testsite.com&quot; -addext &quot;subjectAltName = DNS:testsite.com&quot;</p> <p>nuxt for both devDependancy and dependancy is 4.3.0 (not sure how I got two of them). Vite 7.3.1 and Vue 3.5.27.</p> <p>I am confused as to how to add the websocket and make it work. This is the most infuriating and time wasting errors and I hate them. Any advice?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TheMadnessofMadara\"> /u/TheMadnessofMadara </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rian3z/nuxt_websocket_issue/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rian3z/nuxt_websocket_issue/\">[comments]</a></span>",
+    "date": "2026-03-01T22:06:11.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1rian3z/nuxt_websocket_issue/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Vue tickets for free this month March",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Vue cinema </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Objective_Neat9862\"> /u/Objective_Neat9862 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1riq84x/vue_tickets_for_free_this_month_march/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1riq84x/vue_tickets_for_free_this_month_march/\">[comments]</a></span>",
+    "date": "2026-03-02T11:20:52.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1riq84x/vue_tickets_for_free_this_month_march/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/\"> <img src=\"https://external-preview.redd.it/1-hqaS8DfBe9HsRF714gJOHrkUL1EY6vGs1_aDSUqh0.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=917f6b3f4348456072267f0adc7b2eaa31716e58\" alt=\"I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required\" title=\"I built a Mermaid diagram editor with Vue/Nuxt — clean themes, iframe embeds, no login required\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I recently started documenting my flows and system design using Mermaid for my Vue and Nuxt projects.</p> <p>While using it more, I felt the diagrams looked a bit plain when sharing screenshots, and most online editors required login. I just wanted something quick.</p> <p>So I built a small tool called Graphlet.</p> <p>It focuses on three things:</p> <ul> <li>Clean, good-looking themes</li> <li>Iframe embeds with the same styling</li> <li>No login</li> </ul> <p>Just write Mermaid and get a shareable diagram.</p> <p>Would genuinely love feedback from other Vue devs, especially on UX or performance.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/lostRiddler\"> /u/lostRiddler </a> <br/> <span><a href=\"https://graphlet.xyz\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-02-28T15:24:51.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1rh5cxb/i_built_a_mermaid_diagram_editor_with_vuenuxt/"
   },
   {
     "publisherId": "reddit-dev",
@@ -297,31 +323,5 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey Vue folks 👋</p> <p>I just released @framework-doctor/vue, because “it compiles” is not a full health report.</p> <p>It’s part of Framework Doctor, a CLI that gives your project a check-up before it slowly mutates into something nobody wants to upgrade.</p> <p>What it pokes at:</p> <p>🩺 Project structure</p> <p>⚠️ Deprecated / upgrade-sensitive patterns</p> <p>📦 Dependency setup</p> <p>🔐 Potential security vulnerabilities</p> <p>It’s not trying to replace ESLint.</p> <p>It’s more like: “Hey… are you sure this is fine?”</p> <p>NPM:</p> <p><a href=\"https://www.npmjs.com/package/@framework-doctor/vue\"> https://www.npmjs.com/package/@framework-doctor/vue </a></p> <p>React and Svelte doctors are already working overtime.</p> <p>Angular is on the way.</p> <p>If there are Vue-specific checks you think are essential, I’d love suggestions (or PRs). Let’s keep our apps healthy before production teaches us a lesson.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/voltomper\"> /u/voltomper </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1redsmd/vue_apps_get_sick_too_so_i_released/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1redsmd/vue_apps_get_sick_too_so_i_released/\">[comments]</a></span>",
     "date": "2026-02-25T13:52:56.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1redsmd/vue_apps_get_sick_too_so_i_released/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "vs code extensione",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>what the vscode extensions you use in vue projects ?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/lorens_osman\"> /u/lorens_osman </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rdq0xu/vs_code_extensione/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rdq0xu/vs_code_extensione/\">[comments]</a></span>",
-    "date": "2026-02-24T19:29:16.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1rdq0xu/vs_code_extensione/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Been a year in since the launch of our React table, thinking of bringing it to Vue next.",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1rcw3h0/been_a_year_in_since_the_launch_of_our_react/\"> <img src=\"https://preview.redd.it/3wnbbxddlblg1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=7f3bfc35e71ad27e05bb0a7d26c4674668881667\" alt=\"Been a year in since the launch of our React table, thinking of bringing it to Vue next.\" title=\"Been a year in since the launch of our React table, thinking of bringing it to Vue next.\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Hey guys,</p> <p>We&#39;ve recently released version 2 of LyteNyte Grid, a high performance React Data Grid. We built the grid for first React, but our design is declarative and would fit the Vue Js state model just as well.</p> <p>LyteNyte Grid has every feature you expect from advanced data grids, but packs a tiny bundle size (~30kb gzipped). It&#39;s blazingly fast as a React Data Grid, and I&#39;d expect it to be even faster when implemented for Vue.</p> <p>The goal would be to build a full Vue implementation. <strong>No wrappers or translation layers.</strong></p> <p>If you guys are interested, let us know by giving this issue a thumb ups <a href=\"https://github.com/1771-Technologies/lytenyte/issues/373\">https://github.com/1771-Technologies/lytenyte/issues/373</a>.</p> <p>If you would like to learn more check out our <a href=\"https://1771technologies.com\">website</a>, or ask in the comments here, happy to answer more.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/After_Medicine8859\"> /u/After_Medicine8859 </a> <br/> <span><a href=\"https://i.redd.it/3wnbbxddlblg1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1rcw3h0/been_a_year_in_since_the_launch_of_our_react/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-02-23T22:26:26.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1rcw3h0/been_a_year_in_since_the_launch_of_our_react/"
   }
 ]
