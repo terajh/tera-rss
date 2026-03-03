@@ -4,7 +4,95 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Mon, 02 Mar 2026 16:11:32 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 03 Mar 2026 16:24:19 GMT</lastBuildDate>
+    <item>
+      <title>Nuxt useFetch does not refetch on URL parameter change</title>
+      <link>https://stackoverflow.com/questions/79900219/nuxt-usefetch-does-not-refetch-on-url-parameter-change</link>
+      <guid>https://stackoverflow.com/questions/79900219/nuxt-usefetch-does-not-refetch-on-url-parameter-change</guid>
+      <pubDate>Tue, 03 Mar 2026 15:04:43 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Given this Nuxt example code of the app root component using the Nuxt UI calendar component to handle the current selected day&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { today, getLocalTimeZone } from &apos;@internationalized/date&apos;;
+        
+        const foo = &apos;some-id&apos;; // this is a page parameter but for the sake of simplicity...
+        
+        const currentSelectedDate = shallowRef(today(getLocalTimeZone()));
+        
+        const currentSelectedISODate = computed(() =&amp;gt; {
+        return currentSelectedDate.value.toString();
+        });
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;UApp&amp;gt;
+        &amp;lt;UCalendar v-model:model-value=&amp;quot;currentSelectedDate&amp;quot; /&amp;gt;
+        &amp;lt;Child :foo=&amp;quot;foo&amp;quot; :bar=&amp;quot;currentSelectedISODate&amp;quot; /&amp;gt;
+        &amp;lt;/UApp&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now I got a child component expecting the values as props&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        const { foo, bar } = defineProps&amp;lt;{
+        foo: string;
+        bar: string;
+        }&amp;gt;();
+        
+        // does not refetch on bar ( isoDate ) change
+        const { data, pending, error } = await useFetch(`/api/${foo}/${bar}`);
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;UCard&amp;gt;
+        &amp;lt;template #header&amp;gt; Foo: {{ foo }} &amp;lt;/template&amp;gt;
+        &amp;lt;template #footer&amp;gt; Bar: {{ bar }} &amp;lt;/template&amp;gt;
+        &amp;lt;/UCard&amp;gt;
+        &amp;lt;UCard&amp;gt;
+        &amp;lt;template #header&amp;gt; data: {{ data }} &amp;lt;/template&amp;gt;
+        &amp;lt;div&amp;gt;pending: {{ pending }}&amp;lt;/div&amp;gt;
+        &amp;lt;template #footer&amp;gt; error: {{ error }} &amp;lt;/template&amp;gt;
+        &amp;lt;/UCard&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For the sake of simplicity I created an API endpoint at&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;/api/[foo]/[bar].get.ts&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;pre class=&quot;lang-ts prettyprint-override&quot;&gt;&lt;code&gt;export default defineEventHandler(async (event) =&amp;gt; {
+        return new Date().toISOString();
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I can see that the props change but &lt;code&gt;useFetch&lt;/code&gt; won&apos;t refetch if &lt;code&gt;bar&lt;/code&gt; changes. Whenever I select another day I can see that &lt;code&gt;bar&lt;/code&gt; changes but &lt;code&gt;data&lt;/code&gt; never changes. Further there is no API call so &lt;code&gt;useFetch&lt;/code&gt; is not reactive anymore.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;&lt;em&gt;I&apos;m currently working on a sandbox&lt;/em&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&lt;/a&gt;&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;How can I take care of the reactivity?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Fullcalendar Vue slot templates</title>
+      <link>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</link>
+      <guid>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</guid>
+      <pubDate>Tue, 03 Mar 2026 10:14:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Fullcalendar docs mention only one slot template, &amp;quot;event-content&amp;quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren&apos;t mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/resourceAreaColumns&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/resourceAreaColumns&lt;/a&gt;) from resource timeline feature, but it doesn&apos;t work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/vue#slot-templates&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/vue#slot-templates&lt;/a&gt;)&lt;/p&gt;
+        &lt;p&gt;So while this works:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #eventContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This doesn&apos;t:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #cellContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Architectural differences between Laravel + Inertia (Vue) and Laravel API + React SPA</title>
       <link>https://stackoverflow.com/questions/79897129/architectural-differences-between-laravel-inertia-vue-and-laravel-api-reac</link>
@@ -1442,151 +1530,6 @@
         });
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;&lt;strong&gt;None of the above worked.&lt;/strong&gt; I don&apos;t know how to make main.scss load after Vant&apos;s base.css. This way, my styles will have higher priority. Does anyone have any suggestions? Helpppppppppp&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to properly access a ref value passed as a prop in a child component? data var only sees initial value</title>
-      <link>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</link>
-      <guid>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</guid>
-      <pubDate>Wed, 24 Dec 2025 13:43:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I have a parent component that has a ref variable that is set after a fetch request, and I&apos;m trying to pass it to a child card component that has a little animation that counts up to that number, but I think I&apos;m not passing it correctly.&lt;/p&gt;
-        &lt;p&gt;The variable shows up correctly and is reactive when referenced directly on the page in the parent and in the child, but when referenced in a data variable it only receives the first value.&lt;/p&gt;
-        &lt;p&gt;in parent component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
-        // etc...
-        
-        var myNumber = ref(0)
-        
-        const fetchMyNumber = async () =&amp;gt; {
-        // fetch function etc
-        // on success:
-        myNumber.value = Number(fetchedNumber)
-        }
-        
-        // etc...
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        {{ myNumber }} // displays the correct fetchedNumber
-        
-        &amp;lt;count-up :to=&amp;quot;myNumber&amp;quot; /&amp;gt; // only ever shows 0
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;in my count-up card component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;script&amp;gt;
-        import { nth } from &apos;@/utils/charts&apos;
-        export default {
-        name: &apos;CountUp&apos;,
-        props: {
-        currency: {
-        type: Boolean,
-        default: false
-        },
-        suffix: {
-        type: Boolean,
-        default: false
-        },
-        percent: {
-        type: Boolean,
-        default: false
-        },
-        to: {
-        type: Number,
-        default: null
-        }
-        },
-        data() {
-        return {
-        count: 0,
-        interval: null,
-        end: this.to // returns 0
-        }
-        },
-        computed: {
-        // end() {
-        // return this.to // also returns 0
-        // },
-        increment() {
-        console.log(&apos;end: &apos; + this.end) // sees 0
-        return Math.ceil(this.end / 30)
-        }
-        },
-        mounted() {
-        this.interval = setInterval(this.tick, 20)
-        },
-        methods: {
-        tick() {
-        if (this.count + this.increment &amp;gt;= this.end) {
-        this.count = this.to.toLocaleString()
-        return clearInterval(this.interval)
-        }
-        this.count += this.increment
-        }
-        }
-        }
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        {{ to }} // returns correct number!!!
-        &amp;lt;span v-text=&amp;quot;count&amp;quot; /&amp;gt; // Returns 0!
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I checked &lt;code&gt;typeof()&lt;/code&gt; in both parent and child and both are Number, which is what the child asks for&lt;/p&gt;
-        &lt;p&gt;I tried using a computed function instead of a data variable inside of the child, but it also returns 0&lt;/p&gt;
-        &lt;p&gt;When I pass a number that isn&apos;t pulled from fetch, it works correctly, for example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;count-up :to=&amp;quot;1234&amp;quot; /&amp;gt; //works correctly
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I tried switching to &lt;code&gt;parseInt&lt;/code&gt; or &lt;code&gt;parseFloat&lt;/code&gt; instead of &lt;code&gt;Number&lt;/code&gt; and that didn&apos;t work&lt;/p&gt;
-        &lt;p&gt;I get no errors in console&lt;/p&gt;
-        &lt;p&gt;And then occasionally, when I save something in my IDE and my project hot-updates, it works! Which makes me think I&apos;m just not passing the ref correctly. What am I doing wrong?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Nuxt js 3 cookies not set in the hosted environment</title>
-      <link>https://stackoverflow.com/questions/79854298/nuxt-js-3-cookies-not-set-in-the-hosted-environment</link>
-      <guid>https://stackoverflow.com/questions/79854298/nuxt-js-3-cookies-not-set-in-the-hosted-environment</guid>
-      <pubDate>Wed, 24 Dec 2025 10:34:13 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I have this Nuxt 3 end point&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;// server/api/login.post.ts
-        export default defineEventHandler((event) =&amp;gt; {
-        const token = &amp;quot;set by login api&amp;quot;;
-        // Delete all cookies
-        const cookies = parseCookies(event);
-        for (const cookieName in cookies) {
-        deleteCookie(event, cookieName);
-        }
-        
-        setCookie(event, &amp;quot;pathumToken&amp;quot;, token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: &amp;quot;none&amp;quot;,
-        path: &amp;quot;/&amp;quot;,
-        });
-        const tokenResults = getCookie(event, &amp;quot;pathumToken&amp;quot;);
-        
-        // biome-ignore lint/suspicious/noConsole: &amp;lt;explanation&amp;gt;
-        console.log(&amp;quot;Set Cookie =&amp;quot;, tokenResults);
-        
-        return {
-        token: tokenResults,
-        };
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Which works fine in the local and returns the outpput correctly which is&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{
-        &amp;quot;token&amp;quot;: &amp;quot;set by login api&amp;quot;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;But the same endpoint not working in the hosted environment. It won&apos;t return an error either it will return this&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{}
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What are the possible reasons that this could happen?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

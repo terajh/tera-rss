@@ -4,12 +4,220 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 02 Mar 2026 16:11:40 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 03 Mar 2026 16:24:28 GMT</lastBuildDate>
+    <item>
+      <title>Using Astro for a Combined RSS View and Generator</title>
+      <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
+      <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
+        &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
+        &lt;p&gt;Each of our changelogs has an RSS feed as well so if you&apos;re using a feed reader, it&apos;s an easy to keep up to date. However, there isn&apos;t &lt;em&gt;one&lt;/em&gt; unified RSS feed for all of our developer products. Given that I just worked on &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;RSS parsing in Astro&lt;/a&gt;, I thought this would be a fun little utility to build.&lt;/p&gt;
+        &lt;h2 id=&quot;the-application&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-application&quot;&gt;The Application&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;My application is built in &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; (of course) and runs on the Webflow platform via &lt;a href=&quot;https://developers.webflow.com/webflow-cloud/intro&quot;&gt;Webflow Cloud&lt;/a&gt;. It does two things - present a UI of a combined view of RSS feeds from our docs and serves up it&apos;s own RSS feed.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a look at the UI:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/app1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App view showing all our developer updates&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Nothing too earth shattering but it does exactly what I need - let me see all our developer updates at once.&lt;/p&gt;
+        &lt;p&gt;If you don&apos;t care about the code and just want to see it running, hop on over to where I deployed it: &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Yes, I was thinking Bowie when crafting that URL.&lt;/p&gt;
+        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so the app is a grand total of one HTML page and two additional routes. The HTML page makes use of &lt;a href=&quot;https://simplecss.org/&quot;&gt;SimpleCSS&lt;/a&gt; for UI, but don&apos;t forget Webflow Cloud apps can adopt the UI of their core site. In this case I didn&apos;t have a site (well, I did, but I&apos;m not using it for anything) so SimpleCSS made it... err... simple.&lt;/p&gt;
+        &lt;p&gt;The home page isn&apos;t too complex, especially with the layout abstracted out, but all it&apos;s doing is hitting my endpoint for the data and then rendering:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
+        import Layout from &apos;../layouts/Layout.astro&apos;;
+        ---
+        
+        &amp;lt;Layout&amp;gt;
+        
+        &amp;lt;style is:global&amp;gt;
+        .card {
+        border: 1px solid var(--border, #d8d8d8);
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        }
+        .card-header {
+        background-color: var(--accent-bg, #f2f2f2);
+        padding: 1rem;
+        border-bottom: 1px solid var(--border, #d8d8d8);
+        }
+        .card-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        }
+        .card-body {
+        padding: 1rem;
+        }
+        .card-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border, #d8d8d8);
+        }
+        
+        #content {
+        padding-top: 25px;
+        }
+        &amp;lt;/style&amp;gt;
+        
+        &amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;i&amp;gt;Loading greatness...&amp;lt;/i&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;script&amp;gt;
+        
+        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
+        
+        let $content = document.querySelector(&apos;#content&apos;);
+        // I had issues with the relative pathing - this SHOULD work. In WFC, I&apos;m always at (root)/(path) with no / at the dn
+        let itemReq = await fetch (document.URL + &apos;/changes.json&apos;);
+        let items = await itemReq.json();
+        
+        let html = &apos;&apos;;
+        items.forEach(i =&amp;gt; {
+        html += `
+        &amp;lt;div class=&amp;quot;card&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;card-header&amp;quot;&amp;gt;
+        &amp;lt;h2&amp;gt;${i.title}&amp;lt;/h2&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;card-body&amp;quot;&amp;gt;
+        ${i.content}
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Published:&amp;lt;/strong&amp;gt; ${formatDate(i.pubDate)}&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;card-footer&amp;quot;&amp;gt;
+        &amp;lt;a href=&amp;quot;${i.link}&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;Read More&amp;lt;/a&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        `;
+        })
+        console.log(items);
+        
+        $content.innerHTML = html;
+        });
+        
+        function formatDate(d) {
+        d = new Date(d);
+        return Intl.DateTimeFormat(&apos;en-US&apos;, {
+        dateStyle: &apos;long&apos;
+        }).format(d);
+        }
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;/Layout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;When the document loads, I hit my endpoint, which I defined in &lt;code&gt;changes.json.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import getFeeds from &apos;./getfeed.js&apos;;
+        
+        export async function GET({ request }) {
+        
+        let items = await getFeeds();
+        
+        return new Response(JSON.stringify(items), {
+        status: 200,
+        headers: {
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;,
+        },
+        });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Yeah, not much there, that&apos;s because the core logic of &amp;quot;hit X RSS feeds and combine them&amp;quot; in defined in a helper function. The reason why will make sense in a sec. Here&apos;s that code, which makes use of the &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;rss-parser&lt;/a&gt; package:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import Parser from &apos;rss-parser&apos;;
+        import { feeds } from &apos;./feeds.config.js&apos;;
+        let parser;
+        
+        export default async () =&amp;gt; {
+        
+        parser = new Parser();
+        let items = [];
+        
+        let reqs = [];
+        for (const feedUrl of feeds) {
+        reqs.push(parseURL(feedUrl.url));
+        }
+        
+        const results = await Promise.allSettled(reqs);
+        for (const result of results) {
+        if (result.status === &apos;fulfilled&apos;) {
+        const feed = result.value;
+        console.log(`Fetched feed: ${feed.title} with ${feed.items.length} items.`);
+        let newItems = [];
+        feed.items.forEach(item =&amp;gt; {
+        let content = item.contentSnippet || item.summary || item.content || &apos;&apos;;
+        newItems.push({
+        title: item.title,
+        link: item.link,
+        content: content,
+        pubDate: item.pubDate,
+        feedTitle: feed.title
+        });
+        });
+        
+        items.push(...newItems);
+        
+        } else {
+        console.error(&apos;Error fetching/parsing feed:&apos;, result.reason);
+        }
+        }
+        
+        // now sort items by pubDate descending
+        items.sort((a, b) =&amp;gt; new Date(b.pubDate) - new Date(a.pubDate));
+        
+        return items;
+        };
+        
+        async function parseURL(u) {
+        let xmlReq = await fetch(u);
+        let xml = await xmlReq.text();
+        return parser.parseString(xml);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I set the RSS feeds as a config file so I could easily tweak it in the future - it&apos;s just an array of feed names and URLs. I expect there&apos;s nothing too interesting here, but note &lt;code&gt;parseURL&lt;/code&gt;. Why am I doing this?&lt;/p&gt;
+        &lt;p&gt;Webflow Cloud apps run on Cloudflare, and Cloudflare doesn&apos;t run the &amp;quot;full&amp;quot; Node environment, which means some packages/code won&apos;t work out of the box. I&apos;ve run into this before, and simply forgot when I was building this app. You can read more about this in our docs, &lt;a href=&quot;https://developers.webflow.com/webflow-cloud/environment/nodejs-compatibility&quot;&gt;Node.js compatibility&lt;/a&gt;, but honestly, the only time this impacted me at Cloudflare was, literally, the &lt;code&gt;rss-parser&lt;/code&gt; package. It makes use of &lt;code&gt;http&lt;/code&gt; and Cloudflare wants you to use &lt;code&gt;fetch&lt;/code&gt; instead. Most modern Node packages do, but you will, from time to time, run into cases like I did here.&lt;/p&gt;
+        &lt;p&gt;Luckily, &lt;code&gt;rss-parser&lt;/code&gt; supports a &amp;quot;give me the XML string&amp;quot; method so I used &lt;code&gt;fetch&lt;/code&gt; and and passed the XML string to it. Easy fix once I realized what was going on.&lt;/p&gt;
+        &lt;p&gt;The last part of the app was taking that combined set of items and creating an RSS feed for it. To handle that, I used a npm package named &lt;a href=&quot;https://www.npmjs.com/package/feed&quot;&gt;feed&lt;/a&gt; which lets you create an RSS feed (of different flavors even) on the fly. I served this from a file named &lt;code&gt;feed.xml.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import getFeeds from &apos;./getfeed.js&apos;;
+        import { Feed } from &apos;feed&apos;;
+        
+        export async function GET({ request }) {
+        
+        let items = await getFeeds();
+        
+        const feed = new Feed({
+        title:&amp;quot;Combined Webflow Changelog Feed&amp;quot;,
+        });
+        
+        items.forEach(i =&amp;gt; {
+        feed.addItem({
+        title: i.title, 
+        id: i.link, 
+        link: i.link, 
+        content: i.content, 
+        date: new Date(i.pubDate)
+        })
+        });
+        
+        return new Response(feed.rss2(), {
+        status: 200,
+        headers: {
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/rss+xml&amp;quot;,
+        },
+        });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I should note that the feed package supports a heck of a lot more options for creating RSS feeds than I needed, so keep in mind I did the bare minimum here. You can see this here: &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges/feed.xml&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges/feed.xml&lt;/a&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show Me the Code!&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, if you want to play with it, don&apos;t forget it lives up here, &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&lt;/a&gt;, and you can see all of the code here: &lt;a href=&quot;https://github.com/Webflow-Examples/wfc-chachachachanges&quot;&gt;https://github.com/Webflow-Examples/wfc-chachachachanges&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@chris_designer?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Christina Radevich&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-red-light-in-a-window-VNmQWlKeskQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Using Val Town to Get Me to the Movies</title>
       <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
       <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
@@ -130,7 +338,7 @@
       <title>ColdFusion Wrappers for Bluesky and Mastodon</title>
       <link>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</link>
       <guid>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s been a hot minute since I opened a repo for ColdFusion code, but I thought I&apos;d package up my previous wrapper for Mastodon support, port over my BoxLang Bluesky module, and properly release the code on GitHub for folks who want it: &lt;a href=&quot;https://github.com/cfjedimaster/coldfusion-social-wrappers&quot;&gt;https://github.com/cfjedimaster/coldfusion-social-wrappers&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Right now I&apos;m using one repo for both Bluesky and Mastodon. Usually I&apos;d separate them, but with the &amp;quot;support&amp;quot; being a grand total of one file each, I figured no one would mind getting the &amp;quot;extra&amp;quot; code if they only care about one. I&apos;ll also note the code is very much focused on &lt;em&gt;posting&lt;/em&gt;, not reading data, but part of the reason I wanted to package this up was for people to run with it and add additional support. Fire off those PRs folks!&lt;/p&gt;
@@ -141,7 +349,7 @@
       <title>Links For You (2/22/26)</title>
       <link>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</link>
       <guid>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is where I&apos;d usually comment about how the past two weeks seemed to fly by in a blink, but I&apos;m tired of saying that so... oh crap, too late. To be fair, part of the reason the time flew by this week was me being out of town for my first offsite with Webflow. I got to meet my boss, coworkers, and learn more about our company and what our plans are for the year. I&apos;m really happy I joined Webflow and I&apos;m looking forward to the future. It feels like it&apos;s been a while since I could say that and damn do I appreciate having a good job.&lt;/p&gt;
         &lt;h2 id=&quot;an-ai-drama-in-four-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-ai-drama-in-four-parts&quot;&gt;An AI Drama in Four Parts&lt;/a&gt;&lt;/h2&gt;
@@ -167,7 +375,7 @@
       <title>Three Plug-N-Play CSS Libraries</title>
       <link>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</link>
       <guid>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For probably over a decade, when I wanted to make a demo/site look nice and didn&apos;t really care about making it unique, I&apos;d go to &lt;a href=&quot;https://getbootstrap.com/&quot;&gt;Bootstrap&lt;/a&gt;. Bootstrap had a nice, clean look and as I was usually employing it for demos, or admin screens, I didn&apos;t care if it looked like every other Bootstrap site. While Bootstrap was &lt;em&gt;mostly&lt;/em&gt; simple, it&apos;s also wordy as heck. Bootstrap has an insane love affair with div tags and even a simple Bootstrap page feels like the line number goes up 4X. Again, that&apos;s &lt;em&gt;fine&lt;/em&gt;, but I found myself wishing for something a bit simpler. That&apos;s where the frameworks I&apos;m sharing today come in. For the most part, these libraries require little to no work on your part. You add a CSS library (or two), and everything just gets better. You &lt;em&gt;can&lt;/em&gt; optionally update your markup a bit, but in general, these libraries are great for the &amp;quot;I don&apos;t care, just make it nice and clean&amp;quot; approach that works great for demos and POCs.&lt;/p&gt;
         &lt;p&gt;As an example of what I would &lt;em&gt;not&lt;/em&gt; consider to be &amp;quot;plug-n-play&amp;quot;, is the excellent &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; library, which requires you to use web components to make use of the library. I really like Shoelace, but the options I&apos;m sharing below are even simpler to use.&lt;/p&gt;
@@ -337,7 +545,7 @@
       <title>I threw thousands of files at Astro and you won&apos;t believe what happened next...</title>
       <link>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</link>
       <guid>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, forgive me for the &lt;em&gt;incredibly&lt;/em&gt; over the top title there. Yes, it&apos;s clickbait, but I&apos;m also tired after a &lt;em&gt;very&lt;/em&gt; long week and feeling a little crazy, so just go with me here a bit, I promise it will be worth it. I was curious how well &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; could handle a large amount of data and I thought - what happens if I threw this blog (well, the Markdown files) at it and tried to render out a site? Here&apos;s what I did wrong and what eventually worked (better than I expected).&lt;/p&gt;
         &lt;h2 id=&quot;round-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-one&quot;&gt;Round One&lt;/a&gt;&lt;/h2&gt;
@@ -454,7 +662,7 @@
       <title>Creating Reddit Summaries with URL Context and Gemini</title>
       <link>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</link>
       <guid>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A while ago, the &lt;a href=&quot;https://ai.google.dev/gemini-api/docs&quot;&gt;Gemini API&lt;/a&gt; added a feature to help work with URL content, &lt;a href=&quot;https://ai.google.dev/gemini-api/docs/url-context&quot;&gt;URL Context&lt;/a&gt;. Previously you had to fetch and download the HTML of the page and pass it to the API. This feature allows Gemini to request content (with limits) from public web pages. I thought it would be interesting to test this against Reddit. In the past I&apos;ve made use of Reddit&apos;s APIs, but as they&apos;ve pretty much destroyed access to those APIs, I thought this could be a good work around. Here&apos;s a simple demo I built.&lt;/p&gt;
         &lt;p&gt;My demo parses the &lt;a href=&quot;https://www.reddit.com/r/astrojs&quot;&gt;Astro&lt;/a&gt; subreddit, specifically the &lt;code&gt;new&lt;/code&gt; feed, and asks for a summary of items that seem to require a developer&apos;s help, as well as items that may be critical of Astro.&lt;/p&gt;
@@ -633,7 +841,7 @@
       <title>Links For You (2/8/26)</title>
       <link>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</link>
       <guid>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Superb Owl Day! As my team didn&apos;t even get close to the playoffs, I&apos;ll be rooting for the Seahawks, but even more so, hoping for a fun game. Tomorrow I head out to Vegas for my first offsite with Webflow, and the first in-person company event I&apos;ve been too since Auth0 nearly a decade ago. I&apos;m looking forward to meeting my teammates in person and meeting new people. Now - to the links!&lt;/p&gt;
         &lt;h2 id=&quot;adding-touch-to-powershell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-touch-to-powershell&quot;&gt;Adding Touch to PowerShell&lt;/a&gt;&lt;/h2&gt;
@@ -652,7 +860,7 @@
       <title>Building a Bluesky Sentiment Dashboard with Alpine and Chrome AI</title>
       <link>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</link>
       <guid>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs! Today I&apos;m sharing yet another example of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; features, this time to demonstrate a &amp;quot;Bluesky Sentiment Dashboard&amp;quot;. In other words, a tool that lets you enter terms and then get a report on the average sentiment for posts using that word. I actually did this before (and yes, I forgot until about a minute ago) last year using Transformers.js: &lt;a href=&quot;https://www.raymondcamden.com/2025/01/03/building-a-bluesky-ai-sentiment-analysis-dashboard&quot;&gt;Building a Bluesky AI Sentiment Analysis Dashboard&lt;/a&gt;. I also built this for Twitter, before it went down the toilet, killed off API access, etc. etc., but I can&apos;t seem to find it in my archives so maybe I&apos;m hallucinating. That being said, earlier this week I thought I&apos;d try building this because honestly I had forgotten about my previous demo, but it gave me a chance to play more with Chrome&apos;s AI tooling. Interesting enough, in that post from last year I mentioned possibly adding &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; for UI which I actually did for &lt;em&gt;this&lt;/em&gt; demo... so not a total waste of time, right? Let&apos;s get into it!&lt;/p&gt;
         &lt;h2 id=&quot;bluesky&apos;s-search-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#bluesky&apos;s-search-api&quot;&gt;Bluesky&apos;s Search API&lt;/a&gt;&lt;/h2&gt;
@@ -816,7 +1024,7 @@
       <title>Building an RSS Aggregator with Astro</title>
       <link>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</link>
       <guid>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
+      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This weekend I had some fun building a little Astro site for RSS aggregation. It works by the individual user defining a set of feeds they care about and works with a server-side Astro route to handle getting and parsing the feeds. Here&apos;s a quick example. On hitting the site, it notices you haven&apos;t defined any feeds and prompts you to do so:&lt;/p&gt;
         &lt;p&gt;
@@ -1133,135 +1341,6 @@
         &lt;p&gt;That was it, literally. I&apos;m pretty sure I could have specified &lt;code&gt;server&lt;/code&gt; output just for my one route, but this was the quick and dirty solution. I was sure I&apos;d have to rewrite my code into a Netlify Function, but nope, it just worked.&lt;/p&gt;
         &lt;p&gt;Speaking of just working, blob support also just worked. Honestly I&apos;m not even 100% sure I know how. In production, I know it automatically picks up on the right environment settings to associate the blobs with the site. Locally, I&apos;ve got no clue. It&apos;s definitely a &lt;em&gt;different&lt;/em&gt; store, not the production one, but again, it just plain worked.&lt;/p&gt;
         &lt;p&gt;I just want to give a huge shout out to the Astro team, and Netlify, for making this so freaking pleasant!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Interrogate Your PDFs with Chrome AI</title>
-      <link>https://www.raymondcamden.com/2026/01/29/interrogate-your-pdfs-with-chrome-ai</link>
-      <guid>https://www.raymondcamden.com/2026/01/29/interrogate-your-pdfs-with-chrome-ai</guid>
-      <pubDate>Mon, 02 Mar 2026 15:51:50 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Yesterday I &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;blogged&lt;/a&gt; about using &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; and Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; to create summaries of PDF documents, all within the browser, for free. In that post I mentioned it would be possible to build a Q and A system so users could ask questions about the document, and like a dog with a bone, I couldn&apos;t let it go. Last I built not one, but two demos of this. Check it out.&lt;/p&gt;
-        &lt;h2 id=&quot;version-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#version-one&quot;&gt;Version One&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Before I begin, note that this version makes use of the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;, which is still behind a flag in Chrome. For this demo to work for you, you would need the latest Chrome and the right flags enabled. The Prompt API is available in extensions without the flag and it wouldn&apos;t surprise me if this requirement is removed in the next few months. Than again, I don&apos;t speak for Google so take that with a Greenland-sized grain of salt.&lt;/p&gt;
-        &lt;p&gt;If you remember, I shared the code &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;yesterday&lt;/a&gt; that parsed a PDF and grabbed the text, so today I&apos;ll focus on the changes to allow for questions.&lt;/p&gt;
-        &lt;p&gt;First, the HTML now includes a text box. I hide this in CSS until a PDF is selected and parsed.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;h2&amp;gt;PDF Q &amp;amp; A&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;
-        Select a PDF and then ask questions. 
-        &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;pdf-upload&amp;quot; accept=&amp;quot;.pdf&amp;quot; /&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;div id=&amp;quot;chatArea&amp;quot;&amp;gt;
-        &amp;lt;input id=&amp;quot;question&amp;quot;&amp;gt; &amp;lt;button id=&amp;quot;ask&amp;quot;&amp;gt;Ask about the PDF&amp;lt;/button&amp;gt;
-        &amp;lt;div id=&amp;quot;response&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In the JavaScript, I once again use feature detection:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function canDoIt() {
-        if(!window.LanguageModel) return false;
-        return (await LanguageModel.availability()) !== &apos;unavailable&apos;;
-        }
-        
-        // in my DOMContentLoaded event handler:
-        
-        // do an early check
-        let weCanDoIt = await canDoIt();
-        if(!weCanDoIt) {
-        alert(&amp;quot;Sorry, this browser can&apos;t use the Prompt API.&amp;quot;);
-        return;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;After the user has selected a PDF and the text is parsed, I then run &lt;code&gt;enableChat&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function enableChat(text,title) {
-        $chatArea.style.display = &apos;block&apos;;
-        let session = await LanguageModel.create({
-        initialPrompts: [
-        {role:&apos;system&apos;, content:`You answer questions about a PDF document. You only answer questions about the document. If the user tries to ask about something else, tell them you cannot answer it. Here is the text of the document:\n\n${text}`}
-        ]
-        });
-        
-        $ask.addEventListener(&apos;click&apos;, async () =&amp;gt; {
-        $response.innerHTML = &apos;&apos;;
-        let q = $question.value.trim();
-        if(q === &apos;&apos;) return;
-        console.log(`ask about ${q}`);
-        $response.innerHTML = &apos;&amp;lt;i&amp;gt;working...&amp;lt;/i&amp;gt;&apos;;
-        let response = await session.prompt(q);
-        console.log(`response: ${response}`);
-        $response.innerHTML = marked.parse(response);
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note in the system instruction I tell the model to stick to the PDF, so if the user does something cute like, &amp;quot;why are cats better than dogs&amp;quot;, the system will direct them back to the document. I had to put two statements about this in the system information as one didn&apos;t seem to be good enough.&lt;/p&gt;
-        &lt;p&gt;I&apos;ll include the demo below, but assuming most of you won&apos;t be able to run it, here&apos;s a few examples using an incredibly boring Adobe security document.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/01/pdf2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;result of asking what the document is about&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;That&apos;s pretty much the same as the summary, so let&apos;s try something specific:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/01/pdf3.jpg&quot; loading=&quot;lazy&quot; alt=&quot;result of asking about security levels&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;And finally, here&apos;s what happens if I try to go off topic:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/01/pdf4.jpg&quot; loading=&quot;lazy&quot; alt=&quot;result of asking about black holes&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;As a reminder, you can&apos;t use beefy PDFs in this demo, and unlike yesterday&apos;s post, I didn&apos;t add a good error handler for that. Sorry!&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;vEKpzRZ&quot; data-pen-title=&quot;Chrome AI, PDF.js - QA&quot; data-preview=&quot;true&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/vEKpzRZ&quot;&gt;
-        Chrome AI, PDF.js - QA&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;h2 id=&quot;version-two&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#version-two&quot;&gt;Version Two&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I was pretty happy with the initial version, but I was curious if the on-device model could handle creating references to the document?&lt;/p&gt;
-        &lt;p&gt;I began by keeping the page text in an array instead of one big string:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let fullText = [];
-        
-        for (let i = 1; i &amp;lt;= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        
-        const textContent = await page.getTextContent();
-        
-        // Note: &apos;item.str&apos; is the raw string. &apos;item.hasEOL&apos; can be used for formatting.
-        const pageText = textContent.items.map(item =&amp;gt; item.str).join(&apos; &apos;);
-        
-        fullText.push(pageText);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Then I modified by &lt;code&gt;enableChat&lt;/code&gt; a few ways. First, I created a new block of text that marked the pages:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let pagedText = &apos;&apos;;
-        textArr.forEach((t,x) =&amp;gt; {
-        pagedText += `
-        
-        Page ${x+1}:
-        ${t}
-        
-        `;
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I think this could be better, perhaps with a &lt;code&gt;---&lt;/code&gt; around the page content. Next I modified the system prompt:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let session = await LanguageModel.create({
-        initialPrompts: [
-        {role:&apos;system&apos;, content:`You answer questions about a PDF document. You only answer questions about the document. If the user tries to ask about something else, tell them you cannot answer it. The text is split into pages marked by: &amp;quot;Page X:&amp;quot;, where X represents the page number. When you answer questions, always give a reference to the page where you found your answer. Here is the text of the document:\n\n${pagedText}`}
-        ]
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Oddly, this wasn&apos;t enough. I&apos;d ask a question, but wouldn&apos;t get references. However, if I &lt;em&gt;asked&lt;/em&gt; for references, I did. So the final change was to prefix each user prompt as well:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let response = await session.prompt(`When answering this question, try to include the page number: ${q}`);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This seemed to do it:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/01/pdf5.jpg&quot; loading=&quot;lazy&quot; alt=&quot;result of adding page references&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;This is not always accurate. For example, when I asked: &amp;quot;what can you tell me about adobe confidential data?&amp;quot;, which is covered in detail on page 3, the result focused on page 2. The confidential data classification is &lt;em&gt;introduced&lt;/em&gt; on page 2, but is covered more in depth on page 3. Maybe improving the page formatting in the prompt would help here, but I&apos;m happy with this demo so far. (If you want a copy of the PDF I tested with, you can find it &lt;a href=&quot;https://github.com/cfjedimaster/ai-testingzone/blob/main/pdf_test/adobe_security_properly_ocr.pdf&quot;&gt;here&lt;/a&gt;.)&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-theme-id=&quot;dark&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;PwzEdxe&quot; data-pen-title=&quot;Chrome AI, PDF.js - QA&quot; data-preview=&quot;true&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;padding-bottom: 10px;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/PwzEdxe&quot;&gt;
-        Chrome AI, PDF.js - QA&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;br&gt;
-        As I said yesterday, give these demos a spin and let me know what you think!
       </content:encoded>
     </item>
   </channel>
