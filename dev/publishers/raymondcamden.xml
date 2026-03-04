@@ -4,12 +4,112 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 03 Mar 2026 16:24:28 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 04 Mar 2026 16:10:48 GMT</lastBuildDate>
+    <item>
+      <title>Dyanimically Adjusting Image Text for Contrast</title>
+      <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
+      <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2012/01/13/Demo-of-Color-Palettes-and-PhoneGap&quot;&gt;Demo of Color Palettes and PhoneGap&lt;/a&gt; - from way back in 2012&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2013/05/20/capturing-camerapicture-data-without-phonegap&quot;&gt;Capturing camera/picture data without PhoneGap&lt;/a&gt; - in 2013&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2013/10/18/Drag-and-drop-image-matching-search-at-Behance&quot;&gt;Drag and drop image matching search at Behance&lt;/a&gt; - do people still use Behance?&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2017/01/24/new-camera-hotness-from-chrome&quot;&gt;New Camera Hotness from Chrome&lt;/a&gt; - &amp;quot;new&amp;quot; as of 2017&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2018/01/25/building-a-progressive-color-thief&quot;&gt;Building a Progressive Color Thief&lt;/a&gt; - this was me exploring PWAs&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.raymondcamden.com/2024/07/16/web-component-to-generate-image-color-palettes&quot;&gt;Web Component to Generate Image Color Palettes&lt;/a&gt; - the most recent post (2024) where I use it in a web component&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;So yeah, it&apos;s a cool library, and as I said, I was stoked to see it get a major upgrade. The last version improves the library quite a bit, adding n TypeScript definitions but also a set of features that can directly help with creating text that contrasts well with the image. After examining an image, it has a basic &lt;code&gt;isDark&lt;/code&gt; variable that can be checked, two &lt;code&gt;contrast&lt;/code&gt; variables for white and black, and best of all, a simple &lt;code&gt;textColor&lt;/code&gt; value that provides the best &lt;strong&gt;suggestion&lt;/strong&gt; (and yes, this won&apos;t be perfect, I&apos;ll touch on why at the end) for what text color should be used to provide contrast.&lt;/p&gt;
+        &lt;p&gt;As an example, consider this simple demo. First, I&apos;ve got some HTML and CSS to render text over an image. Here&apos;s the HTML:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div class=&amp;quot;image-container&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;https://unsplash.it/640/425?image=40&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;overlay-text&amp;quot;&amp;gt;Your Text Here&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And here&apos;s the CSS (I used Gemini to help write this):&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.image-container {
+        position: relative;
+        display: inline-block; /* Keeps the container the same size as the image */
+        }
+        
+        .image-container img {
+        display: block; /* Removes unwanted whitespace at the bottom of the image */
+        max-width: 100%;
+        height: auto;
+        }
+        
+        .overlay-text {
+        position: absolute;
+        bottom: 15px; /* Padding from the bottom */
+        right: 15px;  /* Padding from the right */
+        
+        /* Styling */
+        color: white; 
+        font-family: sans-serif;
+        font-weight: bold;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.7); /* Helps readability on busy images */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can see how it looks below. The text-shadow absolutely helps (and I wish I had known about this before), but it&apos;s still a bit washed out:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Text on image test&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;vEXLxmE&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/vEXLxmE&quot;&gt;
+        Text on image test&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;To correct this, I added Color Thief. Given a pointer to an image object, all you need to do is run &lt;code&gt;geColorSync&lt;/code&gt;. One of the values returned will be &lt;code&gt;textColor&lt;/code&gt; and I can then update the CSS on the fly.&lt;/p&gt;
+        &lt;p&gt;So, first I modified my HTML to have two images, nicely showing different levels of darkness (&amp;quot;Levels of Darkness&amp;quot; is the name of my new darkwave band - coming soon):&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div class=&amp;quot;image-container&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;https://unsplash.it/640/425?image=80&amp;quot; crossorigin&amp;gt;
+        &amp;lt;div class=&amp;quot;overlay-text&amp;quot;&amp;gt;Your Text Here&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;image-container&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;https://unsplash.it/640/425?image=40&amp;quot; crossorigin&amp;gt;
+        &amp;lt;div class=&amp;quot;overlay-text&amp;quot;&amp;gt;Your Text Here&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My CSS stayed the same, and as you remember, defaults to white text. Now here&apos;s the JavaScript I use to examine and update that color:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { getColorSync } from &apos;https://unpkg.com/colorthief@3/dist/index.js&apos;;
+        
+        /*
+        const img = document.querySelector(&apos;img&apos;);
+        const caption = document.querySelector(&apos;#caption-text&apos;);
+        
+        const color = getColorSync(img);
+        console.log(color.hex());
+        console.log(color.isDark, color.textColor);
+        caption.style.color = color.textColor;
+        */
+        
+        // get the containers
+        let containers = document.querySelectorAll(&apos;.image-container&apos;);
+        containers.forEach(c =&amp;gt; {
+        let myImage = c.querySelector(&apos;img&apos;);
+        let myText = c.querySelector(&apos;div.overlay-text&apos;);
+        // assume loaded - may be bad
+        const color = getColorSync(myImage);
+        myText.style.color = color.textColor;
+        
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You&apos;ll note the comment where I mention I should check and see if the image is loaded, but I was feeling pretty lazy. Anyway, the result is perfect!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Text on image test (with CT)&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;NPRxpag&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/NPRxpag&quot;&gt;
+        Text on image test (with CT)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Neat! So - a few caveats, things to think about, etc. I could probably also have used a simple black background on the div element wrapping my text. What I have now though feels a bit less obtrusive. Also note that it&apos;s possible for a dark image to have a &amp;quot;light corner&amp;quot; where your text is. In that case, Color Thief would be thrown off and return a value that&apos;s not helpful. (I plan on filing an issue on their repo suggesting a way to perhaps examine &lt;em&gt;part&lt;/em&gt; of an image.) Finally, this could also be useful if you are using Cloudinary to host your image. Cloudinary can dynamically add text to an image (see my &lt;a href=&quot;https://cloudinary.com/blog/building-infographic-with-cloudinary-and-the-national-park-service-api&quot;&gt;blog post&lt;/a&gt; where I demonstrate this with the National Parks System API) and in theory, you could use this to help determine the best color.&lt;/p&gt;
+        &lt;p&gt;Let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Using Astro for a Combined RSS View and Generator</title>
       <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
       <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
         &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
@@ -217,7 +317,7 @@
       <title>Using Val Town to Get Me to the Movies</title>
       <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
       <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
@@ -338,7 +438,7 @@
       <title>ColdFusion Wrappers for Bluesky and Mastodon</title>
       <link>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</link>
       <guid>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s been a hot minute since I opened a repo for ColdFusion code, but I thought I&apos;d package up my previous wrapper for Mastodon support, port over my BoxLang Bluesky module, and properly release the code on GitHub for folks who want it: &lt;a href=&quot;https://github.com/cfjedimaster/coldfusion-social-wrappers&quot;&gt;https://github.com/cfjedimaster/coldfusion-social-wrappers&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Right now I&apos;m using one repo for both Bluesky and Mastodon. Usually I&apos;d separate them, but with the &amp;quot;support&amp;quot; being a grand total of one file each, I figured no one would mind getting the &amp;quot;extra&amp;quot; code if they only care about one. I&apos;ll also note the code is very much focused on &lt;em&gt;posting&lt;/em&gt;, not reading data, but part of the reason I wanted to package this up was for people to run with it and add additional support. Fire off those PRs folks!&lt;/p&gt;
@@ -349,7 +449,7 @@
       <title>Links For You (2/22/26)</title>
       <link>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</link>
       <guid>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is where I&apos;d usually comment about how the past two weeks seemed to fly by in a blink, but I&apos;m tired of saying that so... oh crap, too late. To be fair, part of the reason the time flew by this week was me being out of town for my first offsite with Webflow. I got to meet my boss, coworkers, and learn more about our company and what our plans are for the year. I&apos;m really happy I joined Webflow and I&apos;m looking forward to the future. It feels like it&apos;s been a while since I could say that and damn do I appreciate having a good job.&lt;/p&gt;
         &lt;h2 id=&quot;an-ai-drama-in-four-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-ai-drama-in-four-parts&quot;&gt;An AI Drama in Four Parts&lt;/a&gt;&lt;/h2&gt;
@@ -375,7 +475,7 @@
       <title>Three Plug-N-Play CSS Libraries</title>
       <link>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</link>
       <guid>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For probably over a decade, when I wanted to make a demo/site look nice and didn&apos;t really care about making it unique, I&apos;d go to &lt;a href=&quot;https://getbootstrap.com/&quot;&gt;Bootstrap&lt;/a&gt;. Bootstrap had a nice, clean look and as I was usually employing it for demos, or admin screens, I didn&apos;t care if it looked like every other Bootstrap site. While Bootstrap was &lt;em&gt;mostly&lt;/em&gt; simple, it&apos;s also wordy as heck. Bootstrap has an insane love affair with div tags and even a simple Bootstrap page feels like the line number goes up 4X. Again, that&apos;s &lt;em&gt;fine&lt;/em&gt;, but I found myself wishing for something a bit simpler. That&apos;s where the frameworks I&apos;m sharing today come in. For the most part, these libraries require little to no work on your part. You add a CSS library (or two), and everything just gets better. You &lt;em&gt;can&lt;/em&gt; optionally update your markup a bit, but in general, these libraries are great for the &amp;quot;I don&apos;t care, just make it nice and clean&amp;quot; approach that works great for demos and POCs.&lt;/p&gt;
         &lt;p&gt;As an example of what I would &lt;em&gt;not&lt;/em&gt; consider to be &amp;quot;plug-n-play&amp;quot;, is the excellent &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; library, which requires you to use web components to make use of the library. I really like Shoelace, but the options I&apos;m sharing below are even simpler to use.&lt;/p&gt;
@@ -545,7 +645,7 @@
       <title>I threw thousands of files at Astro and you won&apos;t believe what happened next...</title>
       <link>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</link>
       <guid>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, forgive me for the &lt;em&gt;incredibly&lt;/em&gt; over the top title there. Yes, it&apos;s clickbait, but I&apos;m also tired after a &lt;em&gt;very&lt;/em&gt; long week and feeling a little crazy, so just go with me here a bit, I promise it will be worth it. I was curious how well &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; could handle a large amount of data and I thought - what happens if I threw this blog (well, the Markdown files) at it and tried to render out a site? Here&apos;s what I did wrong and what eventually worked (better than I expected).&lt;/p&gt;
         &lt;h2 id=&quot;round-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-one&quot;&gt;Round One&lt;/a&gt;&lt;/h2&gt;
@@ -662,7 +762,7 @@
       <title>Creating Reddit Summaries with URL Context and Gemini</title>
       <link>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</link>
       <guid>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A while ago, the &lt;a href=&quot;https://ai.google.dev/gemini-api/docs&quot;&gt;Gemini API&lt;/a&gt; added a feature to help work with URL content, &lt;a href=&quot;https://ai.google.dev/gemini-api/docs/url-context&quot;&gt;URL Context&lt;/a&gt;. Previously you had to fetch and download the HTML of the page and pass it to the API. This feature allows Gemini to request content (with limits) from public web pages. I thought it would be interesting to test this against Reddit. In the past I&apos;ve made use of Reddit&apos;s APIs, but as they&apos;ve pretty much destroyed access to those APIs, I thought this could be a good work around. Here&apos;s a simple demo I built.&lt;/p&gt;
         &lt;p&gt;My demo parses the &lt;a href=&quot;https://www.reddit.com/r/astrojs&quot;&gt;Astro&lt;/a&gt; subreddit, specifically the &lt;code&gt;new&lt;/code&gt; feed, and asks for a summary of items that seem to require a developer&apos;s help, as well as items that may be critical of Astro.&lt;/p&gt;
@@ -841,7 +941,7 @@
       <title>Links For You (2/8/26)</title>
       <link>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</link>
       <guid>https://www.raymondcamden.com/2026/02/08/links-for-you-2826</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Superb Owl Day! As my team didn&apos;t even get close to the playoffs, I&apos;ll be rooting for the Seahawks, but even more so, hoping for a fun game. Tomorrow I head out to Vegas for my first offsite with Webflow, and the first in-person company event I&apos;ve been too since Auth0 nearly a decade ago. I&apos;m looking forward to meeting my teammates in person and meeting new people. Now - to the links!&lt;/p&gt;
         &lt;h2 id=&quot;adding-touch-to-powershell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-touch-to-powershell&quot;&gt;Adding Touch to PowerShell&lt;/a&gt;&lt;/h2&gt;
@@ -860,7 +960,7 @@
       <title>Building a Bluesky Sentiment Dashboard with Alpine and Chrome AI</title>
       <link>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</link>
       <guid>https://www.raymondcamden.com/2026/02/05/building-a-bluesky-sentiment-dashboard-with-alpine-and-chrome-ai</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:48:53 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs! Today I&apos;m sharing yet another example of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; features, this time to demonstrate a &amp;quot;Bluesky Sentiment Dashboard&amp;quot;. In other words, a tool that lets you enter terms and then get a report on the average sentiment for posts using that word. I actually did this before (and yes, I forgot until about a minute ago) last year using Transformers.js: &lt;a href=&quot;https://www.raymondcamden.com/2025/01/03/building-a-bluesky-ai-sentiment-analysis-dashboard&quot;&gt;Building a Bluesky AI Sentiment Analysis Dashboard&lt;/a&gt;. I also built this for Twitter, before it went down the toilet, killed off API access, etc. etc., but I can&apos;t seem to find it in my archives so maybe I&apos;m hallucinating. That being said, earlier this week I thought I&apos;d try building this because honestly I had forgotten about my previous demo, but it gave me a chance to play more with Chrome&apos;s AI tooling. Interesting enough, in that post from last year I mentioned possibly adding &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; for UI which I actually did for &lt;em&gt;this&lt;/em&gt; demo... so not a total waste of time, right? Let&apos;s get into it!&lt;/p&gt;
         &lt;h2 id=&quot;bluesky&apos;s-search-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#bluesky&apos;s-search-api&quot;&gt;Bluesky&apos;s Search API&lt;/a&gt;&lt;/h2&gt;
@@ -1018,329 +1118,6 @@
         &lt;p&gt;Lastly, I update &lt;code&gt;this.cards&lt;/code&gt; which is an Alpine variable and is what was used in the HTML above to render out a bunch of Shoelace Card elements. Whew.&lt;/p&gt;
         &lt;h2 id=&quot;try-it!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#try-it!&quot;&gt;Try It!&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;If you&apos;ve got the Prompt API enabled, you can try this yourself here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/bs_sentiment/&quot;&gt;https://cfjedimaster.github.io/webdemos/bs_sentiment/&lt;/a&gt;. (And I&apos;m just noticing - along with providing download feedback - I need to show an alert for unsupported browsers... version 2!). You can check out the complete code for the app here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/bs_sentiment&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/bs_sentiment&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building an RSS Aggregator with Astro</title>
-      <link>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</link>
-      <guid>https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro</guid>
-      <pubDate>Tue, 03 Mar 2026 15:59:58 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This weekend I had some fun building a little Astro site for RSS aggregation. It works by the individual user defining a set of feeds they care about and works with a server-side Astro route to handle getting and parsing the feeds. Here&apos;s a quick example. On hitting the site, it notices you haven&apos;t defined any feeds and prompts you to do so:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/02/rss1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;initial display of app, prompting for you to add a feed&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Clicking &amp;quot;Manage Feeds&amp;quot; opens up a dialog (my first time using one with native web platform tech!) where you can add and delete RSS feeds:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/02/rss2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;dialog to add and delete feeds&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;After you have some specified, the app then calls server-side to fetch and parse the feeds. Items are mixed together and returned sorted by date:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/02/rss3.jpg&quot; loading=&quot;lazy&quot; alt=&quot;display of items&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Not too shabby looking, either. That&apos;s thanks to the simple addition of &lt;a href=&quot;https://simplecss.org/&quot;&gt;Simple.css&lt;/a&gt;. Let&apos;s take a look at the code.&lt;/p&gt;
-        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The entire application really comes down to two routes. The first being just the home page, which is pretty slim:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        ---
-        
-        &amp;lt;BaseLayout pageTitle=&amp;quot;Your Feeds&amp;quot;&amp;gt;
-        
-        &amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;dialog id=&amp;quot;manageFeedsDialog&amp;quot;&amp;gt;
-        &amp;lt;button autofocus style=&amp;quot;float: right;margin-bottom: 15px&amp;quot;&amp;gt;Close&amp;lt;/button&amp;gt;
-        &amp;lt;table id=&amp;quot;feedsTableDialog&amp;quot;&amp;gt;
-        &amp;lt;thead&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;th&amp;gt;Feed URL&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;Actions&amp;lt;/th&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;/thead&amp;gt;
-        &amp;lt;tbody&amp;gt;
-        &amp;lt;/tbody&amp;gt;
-        &amp;lt;/table&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;input type=&amp;quot;url&amp;quot; id=&amp;quot;feedUrl&amp;quot; placeholder=&amp;quot;Enter Feed URL&amp;quot; /&amp;gt;
-        &amp;lt;button id=&amp;quot;addFeedButton&amp;quot;&amp;gt;Add Feed&amp;lt;/button&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/dialog&amp;gt;
-        
-        &amp;lt;script src=&amp;quot;/app.js&amp;quot; is:inline&amp;gt;&amp;lt;/script&amp;gt;
-        
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The &lt;code&gt;&amp;lt;BaseLayout&amp;gt;&lt;/code&gt; wrapper just sets up HTML wrapper that would be useful if I had more than one page to be displayed, but even with one such page, I like having the abstraction. Note that the &lt;code&gt;dialog&lt;/code&gt; element is hidden when initially viewing the page, it only shows up when the &lt;code&gt;Manage Feeds&lt;/code&gt; button is clicked. For completeness, here it is in &lt;code&gt;BaseLayout.astro&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import &apos;../css/app.css&apos;;
-        
-        const { pageTitle } = Astro.props;
-        ---
-        
-        &amp;lt;!DOCTYPE html&amp;gt;
-        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
-        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
-        &amp;lt;title&amp;gt;{pageTitle}&amp;lt;/title&amp;gt; 
-        
-        &amp;lt;meta name=&amp;quot;generator&amp;quot; content={Astro.generator} /&amp;gt;
-        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
-        &amp;lt;/head&amp;gt;
-        
-        &amp;lt;body class=&amp;quot;line-numbers&amp;quot;&amp;gt;
-        
-        &amp;lt;header&amp;gt;
-        &amp;lt;h1&amp;gt;RSS Aggregator&amp;lt;/h1&amp;gt;
-        &amp;lt;/header&amp;gt;
-        
-        &amp;lt;main&amp;gt;
-        &amp;lt;h2&amp;gt;{pageTitle}&amp;lt;/h2&amp;gt;
-        &amp;lt;slot/&amp;gt;
-        &amp;lt;/main&amp;gt;
-        
-        &amp;lt;footer&amp;gt;
-        &amp;lt;button id=&amp;quot;showDialogButton&amp;quot;&amp;gt;Manage Feeds&amp;lt;/button&amp;gt;
-        &amp;lt;/footer&amp;gt;
-        
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The fun part comes in the JavaScript. I begin by declaring a few global variables, and setting up the code I want to run when the page loads:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let feeds = [];
-        let $content, $dialog, $showDialogBtn, $closeDialogBtn, $addFeedBtn, $feedUrl, $feedTableDialog;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
-        
-        $content = document.querySelector(&apos;#content&apos;);
-        $feedTableDialog = document.querySelector(&apos;#feedsTableDialog tbody&apos;);
-        $showDialogBtn = document.querySelector(&apos;#showDialogButton&apos;);
-        $dialog = document.querySelector(&apos;#manageFeedsDialog&apos;);
-        $closeDialogBtn = document.querySelector(&apos;#manageFeedsDialog button&apos;);
-        $addFeedBtn = document.querySelector(&apos;#addFeedButton&apos;);
-        $feedUrl = document.querySelector(&apos;#feedUrl&apos;);
-        
-        $showDialogBtn.addEventListener(&amp;quot;click&amp;quot;, async () =&amp;gt; {
-        // before we show the dialog, get our feeds and render to table
-        await renderFeedsDialog();
-        $dialog.showModal();
-        });
-        
-        $closeDialogBtn.addEventListener(&amp;quot;click&amp;quot;, () =&amp;gt; {
-        loadFeedItems();
-        $dialog.close();
-        });
-        
-        $addFeedBtn.addEventListener(&amp;quot;click&amp;quot;, async () =&amp;gt; {
-        
-        if($feedUrl.checkValidity() === false) {
-        $feedUrl.reportValidity();
-        return;
-        }
-        
-        const feedUrl = $feedUrl.value;
-        if (feedUrl) {
-        console.log(`Adding feed: ${feedUrl}`);
-        let feeds = await getFeeds();
-        feeds.push(feedUrl);
-        window.localStorage.setItem(&apos;feeds&apos;, JSON.stringify(feeds));
-        await renderFeedsDialog();
-        $feedUrl.value = &apos;&apos;;
-        }
-        });
-        
-        loadFeedItems();
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;You can see there the event logic to handle showing the dialog as well as the handler for adding a RSS field. As you can see, I&apos;m using &lt;code&gt;window.localStorage&lt;/code&gt; for storage which means you can leave and come back, and the application will know what feeds you care about. I&apos;ve got a simple wrapper to get them as well:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function getFeeds() {
-        let f = window.localStorage.getItem(&apos;feeds&apos;);
-        if (f) {
-        return JSON.parse(f);
-        } else {
-        return [];
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Now one quick note. &lt;code&gt;LocalStorage&lt;/code&gt; is not asynchronous, it&apos;s blocking, but I built my function with the idea that in the future, I could switch to IndexDB or another solution entirely. That may be overkill now, but it doesn&apos;t hurt anything.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s how I handle rendering the feeds in the dialog, as well as deletions:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function renderFeedsDialog() {
-        let feeds = await getFeeds();
-        let content = &apos;&apos;;
-        feeds.forEach(f =&amp;gt; {
-        content += `&amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;${f}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;lt;button onclick=&amp;quot;deleteFeed(&apos;${f}&apos;)&amp;quot;&amp;gt;Delete&amp;lt;/button&amp;gt;&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;`;
-        })
-        $feedTableDialog.innerHTML = content;
-        }
-        
-        async function deleteFeed(feedUrl) {
-        let feeds = await getFeeds();
-        feeds = feeds.filter(f =&amp;gt; f !== feedUrl);
-        window.localStorage.setItem(&apos;feeds&apos;, JSON.stringify(feeds));
-        await renderFeedsDialog();
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Next up is the code that calls for feed items and handles rendering them:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function loadFeedItems() {
-        console.log(&apos;Loading feed items...&apos;);
-        let feeds = await getFeeds();
-        
-        if(feeds.length === 0) {
-        $content.innerHTML = &apos;&amp;lt;p&amp;gt;No feeds available. Please add some feeds using the button below!&amp;lt;/p&amp;gt;&apos;;
-        return;
-        }
-        
-        $content.innerHTML = &apos;&amp;lt;i&amp;gt;Loading feed items...&amp;lt;/i&amp;gt;&apos;;
-        let qs = new URLSearchParams({
-        feeds
-        }).toString();
-        
-        let items = await fetch(`/loaditems?${qs}`, {
-        method: &apos;GET&apos;,
-        headers: {
-        &apos;Content-Type&apos;: &apos;application/json&apos;
-        }        
-        });
-        let data = await items.json();
-        console.log(&apos;Fetched feed items&apos;, data.length);
-        let result = &apos;&apos;;
-        data.forEach(item =&amp;gt; {
-        result += `&amp;lt;div class=&amp;quot;feedItem&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;&amp;lt;a href=&amp;quot;${item.link}&amp;quot; target=&amp;quot;_blank&amp;quot; rel=&amp;quot;noopener&amp;quot;&amp;gt;${item.title}&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
-        &amp;lt;p&amp;gt;${snippet(item.content)}&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;From: ${item.feedTitle} | Published: ${new Date(item.pubDate).toLocaleString()}&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;`;
-        });
-        $content.innerHTML = result;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This is pretty vanilla network calling with &lt;code&gt;fetch&lt;/code&gt;, although I&apos;ll note that I had some qualms about using the query string. There &lt;em&gt;are&lt;/em&gt; limits to how long that could be, and in theory, I should switch to a &lt;code&gt;POST&lt;/code&gt; probably.&lt;/p&gt;
-        &lt;p&gt;The last bit of client-side code is &lt;code&gt;snippet&lt;/code&gt;, which handles the content of the feed item:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;/*
-        I clean the content from parsing to remove HTML and reduce size
-        */
-        function snippet(content) {
-        content = content.replace(/(&amp;lt;([^&amp;gt;]+)&amp;gt;)/gi, &amp;quot;&amp;quot;); // remove HTML tags
-        const maxLength = 200;
-        if (content.length &amp;lt;= maxLength) {
-        return content;
-        } else {
-        return content.substring(0, maxLength) + &apos;...&apos;;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I should probably move that &lt;code&gt;maxLength&lt;/code&gt; up top. I&apos;ll do so. Eventually.&lt;/p&gt;
-        &lt;h2 id=&quot;fetching-rss-items&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#fetching-rss-items&quot;&gt;Fetching RSS Items&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Now for the fun part, fetching RSS items. For this, I made use of the &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;rss-parser&lt;/a&gt; Node package. The logic is relatively simple - given a call to the route with a list of RSS urls, fetch them, parse them, sort them by date, and return, but as an added wrinkle, I made use of &lt;a href=&quot;https://docs.netlify.com/build/data-and-storage/netlify-blobs/&quot;&gt;Netlify Blobs&lt;/a&gt; for easy caching. Here&apos;s the server-side route I built named &lt;code&gt;loaditems.js&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import Parser from &apos;rss-parser&apos;;
-        import { getStore } from &amp;quot;@netlify/blobs&amp;quot;;
-        
-        const TTL = 1000 * 60 * 60; // 1 hour cache 
-        
-        export async function GET({ request }) {
-        
-        const store = getStore(&apos;rssagg-store&apos;);
-        const url = new URL(request.url);
-        const feeds = url.searchParams.get(&apos;feeds&apos;).split(&apos;,&apos;);
-        const parser = new Parser();
-        console.log(&apos;Feeds requested:&apos;, feeds);
-        let items = [];
-        
-        let reqs = [];
-        for (const feedUrl of feeds) {
-        // first, do we have this in cache?
-        const cacheKey = `feedcache-${encodeURIComponent(feedUrl)}`;
-        let cached = await store.get(cacheKey);
-        if(cached) {
-        cached = JSON.parse(cached);
-        // check age
-        const now = Date.now();
-        if(now - cached.timestamp &amp;lt; TTL) {
-        console.log(`Using cached feed for ${feedUrl}`);
-        items.push(...cached.items);
-        } else {
-        console.log(`Cache expired for ${feedUrl}, fetching new data.`);
-        reqs.push(parser.parseURL(feedUrl));
-        }
-        } else {
-        console.log(`No cache for ${feedUrl}, fetching data.`);
-        reqs.push(parser.parseURL(feedUrl));
-        }
-        
-        }
-        
-        const results = await Promise.allSettled(reqs);
-        for (const result of results) {
-        if (result.status === &apos;fulfilled&apos;) {
-        const feed = result.value;
-        console.log(`Fetched feed: ${feed.title} with ${feed.items.length} items.`);
-        let newItems = [];
-        feed.items.forEach(item =&amp;gt; {
-        /*
-        will use content as a grab all for different fields
-        for example, netlify had summary, not content
-        */
-        let content = item.contentSnippet || item.summary || item.content || &apos;&apos;;
-        newItems.push({
-        title: item.title,
-        link: item.link,
-        content: content,
-        pubDate: item.pubDate,
-        feedTitle: feed.title
-        });
-        });
-        
-        items.push(...newItems);
-        
-        // cache the feed
-        const cacheKey = `feedcache-${encodeURIComponent(feed.feedUrl)}`;
-        console.log(`Caching feed data for ${feed.feedUrl}`);
-        await store.setJSON(cacheKey, {
-        timestamp: Date.now(),
-        items: newItems
-        });
-        } else {
-        console.error(&apos;Error fetching/parsing feed:&apos;, result.reason);
-        }
-        }
-        
-        // now sort items by pubDate descending
-        items.sort((a, b) =&amp;gt; new Date(b.pubDate) - new Date(a.pubDate));
-        
-        return new Response(JSON.stringify(items), {
-        status: 200,
-        headers: {
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;,
-        },
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The cache is based on the RSS URL so in theory, if two users come in requesting the same feed, they all get the benefit of the cache. I cache for one hour, which frankly could be a lot more. I blog &lt;em&gt;a lot&lt;/em&gt; and even I don&apos;t usually have more than 2 or 3 a week, so feel free to tweak this as you see fit if you play with the code.&lt;/p&gt;
-        &lt;h2 id=&quot;check-it-out!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#check-it-out!&quot;&gt;Check It Out!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, if you want to try this out yourself, head over to &lt;a href=&quot;https://astrorssagg.netlify.app/&quot;&gt;https://astrorssagg.netlify.app/&lt;/a&gt; and try adding a few feeds. Let me know how it works for you. The complete code of the application may be found here: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/rssagg&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/rssagg&lt;/a&gt;&lt;/p&gt;
-        &lt;h2 id=&quot;but-wait...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#but-wait...&quot;&gt;But Wait...&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, that&apos;s all I have to say about the application, and in theory, you can stop reading now, but I &lt;strong&gt;really&lt;/strong&gt; want to comment on something. The DX (developer experience) of using Astro on Netlify is incredible. Like, I was in shock at how things &amp;quot;just worked&amp;quot;. Multiple times I was &lt;em&gt;certain&lt;/em&gt; I was going to hit a roadblock, need to configure and tweak something, and honestly, that never happened. Here&apos;s what I found.&lt;/p&gt;
-        &lt;p&gt;The first thing I did was add the &lt;a href=&quot;https://docs.netlify.com/build/frameworks/framework-setup-guides/astro/&quot;&gt;Netlify adapter&lt;/a&gt;, which comes down to:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;npx astro add netlify
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;By itself, that was enough, but I wanted my server-side RSS parser to run on the server, which means I had to changeone line in &lt;code&gt;astro.config.js&lt;/code&gt;. By default, the &lt;code&gt;defineConfig&lt;/code&gt; looks like this after adding the adapter:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default defineConfig({
-        adapter: netlify()
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I added the &lt;code&gt;output&lt;/code&gt; parameter:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default defineConfig({
-        output: &apos;server&apos;,
-        adapter: netlify()
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That was it, literally. I&apos;m pretty sure I could have specified &lt;code&gt;server&lt;/code&gt; output just for my one route, but this was the quick and dirty solution. I was sure I&apos;d have to rewrite my code into a Netlify Function, but nope, it just worked.&lt;/p&gt;
-        &lt;p&gt;Speaking of just working, blob support also just worked. Honestly I&apos;m not even 100% sure I know how. In production, I know it automatically picks up on the right environment settings to associate the blobs with the site. Locally, I&apos;ve got no clue. It&apos;s definitely a &lt;em&gt;different&lt;/em&gt; store, not the production one, but again, it just plain worked.&lt;/p&gt;
-        &lt;p&gt;I just want to give a huge shout out to the Astro team, and Netlify, for making this so freaking pleasant!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

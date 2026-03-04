@@ -4,12 +4,314 @@
     <title>dev RSS - Sarah L. Fossheim</title>
     <link>https://fossheim.io/</link>
     <description>Sarah L. Fossheim RSS 피드</description>
-    <lastBuildDate>Tue, 03 Mar 2026 16:24:33 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 04 Mar 2026 16:10:54 GMT</lastBuildDate>
+    <item>
+      <title>Dataviz accessibility principles, demonstrated by the 2024 presidential election dashboards.</title>
+      <link>https://fossheim.io/writing/posts/2024-dataviz-a11y-elections</link>
+      <guid>https://fossheim.io/writing/posts/2024-dataviz-a11y-elections</guid>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
+      <content:encoded>
+        
+        &lt;p&gt;In 2020 I &lt;a href=&quot;/writing/posts/accessible-dataviz-us-elections/&quot;&gt;reviewed the dataviz accessibility of the US presidential election results&lt;/a&gt; (spoiler: it was bad), and in 2023 I did the same with the &lt;a href=&quot;/writing/posts/dataviz-accessibility-review-norwegian-elections-2023/&quot;&gt;dashboards used for the Norwegian government elections&lt;/a&gt;. So naturally, I had to inspect the accessibility of this year&apos;s US election graphs as well.&lt;/p&gt;
+        &lt;p&gt;Just like in 2020, I discovered quite a lot of accessibility issues for all of the dashboards. Most of these were the type of issues I frequently encounter when doing dataviz accessibility audits and reviews. For example: content that&apos;s not zoomable, interaction that&apos;s not available for keyboard users, insights that don&apos;t get communicated to screen reader users, lacking text alternatives, semantic errors, or missing explanations.&lt;/p&gt;
+        &lt;p&gt;This time I also ran &lt;a href=&quot;https://www.deque.com/axe/devtools/&quot;&gt;axe DevTools&lt;/a&gt; at the end of the review, which picked up between 3 (NRK) and 62 (Fox News) errors against WCAG 2.1. When including tests against best practices, a total of 870 issues were found on Fox News, 206 on the Washington Post, 24 on Reuters, and 70 on NRK.&lt;/p&gt;
+        &lt;p&gt;These findings aren&apos;t surprising, as according to a 2024 &lt;a href=&quot;https://webaim.org/projects/million/&quot;&gt;WebAIM study&lt;/a&gt; around 96% of tested home pages had accessibility issues, with an average of more than 56 errors per page.&lt;/p&gt;
+        &lt;h2&gt;Scope&lt;/h2&gt;
+        &lt;p&gt;For this article, I manually tested data visualizations on the following news websites:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.washingtonpost.com/elections/results/2024/11/05/president/&quot;&gt;Washington Post&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.bloomberg.com/graphics/2024-us-election-results/&quot;&gt;Bloomberg&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.foxnews.com/elections&quot;&gt;Fox News&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://edition.cnn.com/election/2024/results/president?election-data-id=2024-PG&amp;amp;election-painting-mode=projection-with-lead&amp;amp;filter-key-races=false&amp;amp;filter-flipped=false&amp;amp;filter-remaining=false&quot;&gt;CNN&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.nbcnews.com/politics/2024-elections/president-results&quot;&gt;NBC&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://abcnews.go.com/Elections/2024-us-presidential-election-results-live-map&quot;&gt;ABC News&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.reuters.com/graphics/USA-ELECTION/RESULTS/zjpqnemxwvx/&quot;&gt;Reuters&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.wsj.com/election/2024/general&quot;&gt;The Wall Street Journal&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.nrk.no/spesial/presidentvalget-i-usa-_-resultater-1.17110820&quot;&gt;NRK (Norwegian)&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;At the end of the review I also ran tests with axe DevTools, to get an idea of how many issues automated tests could detect on each of the dashboards.&lt;/p&gt;
+        &lt;p&gt;&lt;em&gt;Note: this is an article for my blog illustrating some dataviz accessibility principles and common mistakes against them; this is not a detailed review or audit of these platforms. For that reason, I didn&apos;t test every single chart on these dashboards, and only tested certain aspects of them. For the same reason I focused on MacOS and VoiceOver (since that&apos;s my main device), and if I encountered any particularly weird behavior, I re-tested it with NVDA on Windows as well.&lt;/em&gt;&lt;/p&gt;
+        &lt;h2&gt;Is the content still accessible when zoomed in to 400%?&lt;/h2&gt;
+        &lt;p&gt;It should be possible to zoom up to 400% into a page and visualization without losing any functionality, and without any content being obscured.&lt;/p&gt;
+        &lt;p&gt;My eyes have gotten to the age (aka: I&apos;m over 30 🫣) where I frequently end up having to browse the web at 200% zoom, so it&apos;s an accessibility requirement I unintentionally end up testing on a lot of websites I visit.&lt;/p&gt;
+        &lt;p&gt;And unfortunately, almost every single election dashboard I checked out had issues when zoomed in.&lt;/p&gt;
+        &lt;p&gt;All of the dashboards had &lt;strong&gt;sticky or fixed&lt;/strong&gt; headers. Some of them had double headers, and some combined their fixed headers with floating buttons or fixed footers.&lt;/p&gt;
+        &lt;p&gt;When zooming up to 200% and 400%, those sticky, fixed and floating elements start taking up a lot of the page&apos;s real estate, sometimes even hiding the actual content of the page completely.&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-zoomies.png&quot; alt=&quot;Fox news zoomed in: heading menu takes around half of the vertical height, part of a map is showing underneath (400% zoom)&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/wp-zoomies.png&quot; alt=&quot;Washington Post zoomed in: heading menu takes up the top half of the screen, subscription ad banner is taking up the bottom half of the screen, leaving literally no space at all for actual content (400% zoom)&quot;&gt;
+        &lt;/div&gt;
+        &lt;p&gt;The sticky navigation bar at Fox News took up almost half of the page, and The Washington Post hid &lt;em&gt;all&lt;/em&gt; of the page&apos;s content behind the header and footer.&lt;/p&gt;
+        &lt;p&gt;Another example of this is NBC News. They didn&apos;t just have one, but &lt;em&gt;three&lt;/em&gt; navigation bars overlayed on top of the screen, and in addition to that the table headers were also sticky.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-zoomies.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: At 200% there&apos;s a double sticky header obscuring around a third of the page. Once the user scrolls to the results table, the table&apos;s sticky header takes up almost all the rest of the view. At 400% zoom, the sticky page header takes up most of the height of the screen, only leaving a small band with content at the bottom, which gets completely blocked once the table with sticky header is reached.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;NRK did it differently: no sticky navigation bars that take up all of the space, but instead a small fixed progress bar with the results itself:&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-zoomies-1.png&quot; alt=&quot;NRK zoomed in to 200%, showing a small progress bar sticky on top of the page, divided in blue (Harris) and red (Trump) indicating the proportion of their votes. Underneath is the map with the results, showing blue and red states on the map.&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-zoomies-2.png&quot; alt=&quot;NRK zoomed in to 400%, showing a progress bar sticky on top of the page, with the same map underneath, taking up around a fifth of the vertical height of the screen.&quot;&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;em&gt;Personally&lt;/em&gt;, as a zoom-user, I wasn&apos;t bothered by NRK&apos;s sticky progress bar when at 200% zoom on my 13&amp;quot; MacBook, although it started limiting the content a bit already. But at 400%, the progress bar took up around a fifth of the height of the page, restricting the available space for the rest of the content quite a bit more.&lt;/p&gt;
+        &lt;h2&gt;Is data explained through more properties than just color?&lt;/h2&gt;
+        &lt;p&gt;All of the maps I inspected had a similar design: the states were color coded in blue (democrat), red (republican), or gray (no results yet), and swing states had an additional pattern.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-color.png&quot; alt=&quot;Map of the United Stated, with states colored in red (for republican wins) or blue (democrat wins), and with a pattern if they&apos;re swing states. The west-coast and northern part of the east coast are blue, the center and south is more red.&quot;&gt;
+        &lt;p&gt;Red and blue are generally considered a &amp;quot;color blind friendly&amp;quot; combination, but for example, people with achromatopsia perceive everything in black and white/different shades of gray.&lt;/p&gt;
+        &lt;p&gt;For example, on the map used on the Reuters dashboard democrat and republican states become the exact same shade of gray when using a color blindness simulator.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-bw.png&quot; class=&quot;large&quot; alt=&quot;Color blind simulation of the map of the United Stated with the election results. All the states are medium gray, with barely any difference in contrast (republican and democrat are the same gray), making it impossible to read the results.&quot;&gt;
+        &lt;p&gt;Additionally, people using monochrome displays or grayscale plugins will also not perceive the colors, and will benefit from additional cues.&lt;/p&gt;
+        &lt;h3&gt;Are the fallbacks accessible too?&lt;/h3&gt;
+        &lt;p&gt;Some might argue that there &lt;em&gt;is&lt;/em&gt; in fact a fallback: when hovering over a state, the maps show a tooltip stating who won that state, and how many votes they received.&lt;/p&gt;
+        &lt;p&gt;However, for the absolute majority of maps tested for this article, these tooltips were not keyboard or screen reader accessible.&lt;/p&gt;
+        &lt;h2&gt;Can all content be navigated to and interacted with through keyboard interaction?&lt;/h2&gt;
+        &lt;p&gt;As already brought up in the previous section, any interaction that can be performed through mouse/trackpad/touch, should also be accessible through keyboard interaction.&lt;/p&gt;
+        &lt;p&gt;Lots of the election charts had some level of interaction connected to them, either tooltips that appeared on hover or new pages that opened when clicking a state, but very few made this interaction accessible by keyboard.&lt;/p&gt;
+        &lt;p&gt;For example, CNN showed tooltips containing the winner and amount of votes when hovering over a state. But when using the &lt;code&gt;TAB&lt;/code&gt; key to navigate the page, the focus indicator jumped straight past the map, to a carousel underneath.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-cnn.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: First the user hovers over states on the map, and tooltips pop up. Then the user starts using the TAB key, and the browser&apos;s default focus indicators highlight which object is in focus, showing the map/interactive states are not part of the focus order.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Over at Reuters, the tooltips were successfully exposed when receiving keyboard focus (🎉), but the tab order was completely random.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-reuters.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: The user repeatedly and quickly presses the tab key, shifting the focus between the different states on the map. When a state is in focus, a styled tooltip/pop-up with more info (state name, electoral votes, number of votes for each candidate, % of votes counted) appears. The states get focused in random order, going from New Mexico to South Dakota to California to Kentucky to Alabama, and so on.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;The states on Bloomberg&apos;s map were focusable, but besides receiving a focus outline, nothing else happened. Pressing &lt;code&gt;ENTER&lt;/code&gt; (one of the typical keys to activate a link or button) opened a new page where. There it was possible to find the same info as in the tooltip, but that&apos;s a lot of extra back-and-forth to get to the same data as a mouse user.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-bberg.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: The user first hovers over the progress chart, where a tooltip shows how many votes each candidate received in each state. Afterwards the keyboard is used to tab through the interactive elements on the page, and every single small square on the progress bars (each square representing an electoral college vote) is part of the tab order. No tooltips appear. Afterwards the user keeps tabbing through the map, where the states receive focus, but also don&apos;t show a tooltip.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Another issue with keyboard navigation on Bloomberg&apos;s charts was found in the progress bars showing the electoral votes per candidate. Each bar was made out of small squares, one square representing one electoral vote. Each of the squares was wrapped in its own link (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), meaning all of the squares were part of the default focus order on the page and became individually focusable when pressing the &lt;code&gt;TAB&lt;/code&gt; key. With 538 votes available, that means 538 links to tab past.&lt;/p&gt;
+        &lt;h2&gt;Are data, insights, trends, and patterns accessible to screen reader users?&lt;/h2&gt;
+        &lt;p&gt;People who use assistive technologies (like braille or screen readers) should have access to the same information, including trends, patterns, and other visually apparent features.&lt;/p&gt;
+        &lt;p&gt;This can be done in a variety of ways, for example:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Turning the chart into an &lt;strong&gt;image with alt text&lt;/strong&gt;.&lt;/li&gt;
+        &lt;li&gt;Providing an &lt;strong&gt;accessible table alternative&lt;/strong&gt;, close to or linked to from the visualization.&lt;/li&gt;
+        &lt;li&gt;Making the &lt;strong&gt;elements within the viz&lt;/strong&gt; accessible to screen readers (eg. turning the chart into a list or table by adding roles and other ARIA).&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Which method is most appropriate depends on the type of visualization, interaction attached to it, as well as the purpose, the way it will be used/conditions it will be used in, and the target audience.&lt;/p&gt;
+        &lt;h3&gt;Are the text alternatives useful, with relevant and accurate information, providing equal value to what&apos;s visualized?&lt;/h3&gt;
+        &lt;p&gt;When using the &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; element alt text can be added in the &lt;code&gt;alt&lt;/code&gt; attribute. Elements that are turned into images by adding &lt;code&gt;role=&amp;quot;img&amp;quot;&lt;/code&gt; can have their alt text set through &lt;code&gt;aria-label&lt;/code&gt; or &lt;code&gt;aria-labelledby&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Whether or not these attributes are set is something that can be detected by automated accessibility checkers (like &lt;a href=&quot;https://www.deque.com/axe/&quot;&gt;axe&lt;/a&gt; or &lt;a href=&quot;https://developer.chrome.com/docs/lighthouse/overview&quot;&gt;Lighthouse&lt;/a&gt;), linters, or unit tests. But the quality and usefulness of the text is something that requires a human touch.&lt;/p&gt;
+        &lt;p&gt;As a result, when performing accessibility reviews, I often come across images that actually have alt text, but where the alt text doesn&apos;t accurately describe the image at all or leaves out vital information. This was the case with a lot of the tested election graphs as well.&lt;/p&gt;
+        &lt;p&gt;Several of the election maps I encountered were programmatically turned into an image with alt text, but left out the actual results.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-map-img.png&quot; alt=&quot;Map of the united states, with the different states color coded in blue/red to indicate who won (the map is overwhelmingly red, with blue areas around the west coast and east coast). VoiceOver is active and reads the map as &apos;Kart over USA som viser antall valgmenn per stat&apos;, translates to &apos;Map of the USA that shows the amount of electoral college votes per state&apos;.&quot; class=&quot;large&quot; /&gt;
+        &lt;p&gt;Like this example from NRK, the Norwegian state media, where the alt text of the map translates to &amp;quot;Map of the United States that shows the amount of electoral college votes per state&amp;quot;.&lt;/p&gt;
+        &lt;p&gt;When looking at the map, sighted users get to see which states voted for which candidate, and how red or blue the map overall looked like.&lt;/p&gt;
+        &lt;p&gt;For example, I can tell at a glance that the westc oast and north east mainly voted Democrat, the center and south voted Republican, Harris won 54 electoral votes in California, while Trump got 30 of them in Flordia.&lt;/p&gt;
+        &lt;p&gt;Blind people using screen readers, however, are only told there&apos;s a map with results, without any further information.&lt;/p&gt;
+        &lt;p&gt;CNN used a canvas, labelled &amp;quot;Map&amp;quot;, which was the only information available.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/cnn-map-img.png&quot; alt=&quot;Line chart on the Bloomberg website (timeseries with red and blue lines, they all start around the 50% mark, but the blue ones go down and the red ones go up over time). The code inspector is open. The chart is an svg, with an img role attached to it, and aria-describedby that refers to a visually hidden text element with the following text: Multi-series line chart showing the odds Vice President Kamala Harris and former President Donald Trump will each win the presidency. These three prediction markets will be charted: Kalshi, Polymarket and PredictIt.&quot;&gt;
+        &lt;p&gt;Bloomberg did something similar with their &lt;em&gt;Live Prediction Market Odds&lt;/em&gt; line chart, where the text alternative was &lt;em&gt;&amp;quot;Multi-series line chart showing the odds Vice President Kamala Harris and former President Donald Trump will each win the presidency. These three prediction markets will be charted: Kalshi, Polymarket and PredictIt.&amp;quot;&lt;/em&gt;,. The type of data and chart was explained, but the actual results were not.&lt;/p&gt;
+        &lt;p&gt;Similarly, ABC News&apos;s map announced the geographical position of the state that was focused &lt;em&gt;(eg. &amp;quot;New Mexico. Colorado is north. Oklahoma is east. Texas is south. Arizona is west.&amp;quot;)&lt;/em&gt;, but did not announce the actual electoral votes &lt;em&gt;(visually available as text)&lt;/em&gt; or winner of the state &lt;em&gt;(visually available through color)&lt;/em&gt;.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/abc-reader.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: The user moves the focus around between the different states on the map using the arrow keys. Each time a state is focused, VoiceOver announces the name of the focused state along with the bordering states. Using the right arrow moves the focus to the state bordering on the east, down arrow to the state bordering south, and so on.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;h3&gt;How are SVG elements handled in the code?&lt;/h3&gt;
+        &lt;p&gt;SVG elements are not accessible by default. So when creating data visualizations using SVG, additional work will always be needed to make the expeience more accessible for assistive tech users.&lt;/p&gt;
+        &lt;p&gt;The Wall Street Journal showed all the states, in comparison to the amount of electoral votes they had to offer, each state represented by small squares. The squares were color coded in blue and red to represent the candidate that won the state, and on hover the distribution of votes was shown in a tooltip.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-squares.png&quot; alt=&quot;Legend of the WSJ election result map: each state is built out of blue or red colored squares. The amount of squares represents the amount of electoral votes, the color refers to who won the state and received the votes. One of the squares has a black outline with an annotation saying &apos;1 square = 1 electoral vote&apos;. At the bottom of the map there&apos;s a legend explaining the color.&quot; class=&quot;large&quot;&gt;
+        &lt;p&gt;When using VoiceOver with Safari, each of the individual squares (&lt;code&gt;&amp;lt;rect&amp;gt;&lt;/code&gt; elements) were announced as images without alt text, after which all of the text elements were announced. There was no information about who won the state or how many votes they received, and the tooltips could not be accessed with a screen reader either.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-imgimgimg.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: VoiceOver is used to go through the contents of the map. First VoiceOver announces a title for the map (&quot;Cartogram of US Presidential Electoral Map. Each small block represents 1 electoral vote, with 538 total, each grouped by state. States colored by candidate leading or won. Blue indicates Democrat and red indicates Republican.&quot;), afterwards each individual little square on the map gets read as &quot;image&quot; without context (1 square = 1 electoral vote, so 538 squares, at elast 538 &quot;image&quot;s).&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Because all screen readers treat SVGs slightly different, NVDA didn&apos;t announce the squares as images without alt text, it just skipped the squares, but the rest of the experience was pretty much the same: the text elements were read in the order they appeared in the DOM, and no additional info was included.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-grouping.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: NVDA is used to go through the contents of the map. No title is announced for the map like on VoiceOver, and the graphical elements are not treated as images either. Instead, NVDA reads all the state abbreviations without any further context (&quot;Clickable, Ala., Tenn., Miss., Fla., etc.), and some of them are there twice.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Bloomberg&apos;s map offered a similar experience. Theirs was made out of two different SVG elements, each of them containing:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;text elements (&lt;code&gt;&amp;lt;text&amp;gt;&lt;/code&gt;) with the state name abbreviations, as well as&lt;/li&gt;
+        &lt;li&gt;color-coded squares (&lt;code&gt;&amp;lt;rect&amp;gt;&lt;/code&gt;) wrapped inside links (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), representing the amount of electoral votes.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As a result, VoiceOver on Safari announced the abbreviations for all the States, followed by a bunch of empty links.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-weird.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: Moving through Bloomberg&apos;s map with electoral votes with VoiceOver. First the abbreviated states on the east of the Mississippi River are announced, afterwards empty links for the clickable areas on the east, then the annotation of the Mississippi River, then the abbreviated state names on the west, and finally a group of empty links for the clickable areas on the west. The legend is made out of 3 tables.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;You may notice that all of these Bloomberg examples contain two sets of text elements followed by links.&lt;/p&gt;
+        &lt;p&gt;That&apos;s because the graph was made out of two SVGs: one for the states East of the Mississippi River, and one for those West of the Mississippi River. I only realized this when inspecting the code, as the grouping was not explained anywhere.&lt;/p&gt;
+        &lt;p&gt;The sorting of the text elements did not match the sorting of the links, both sort orders seemed completely random, and no information about the sorting or grouping was included.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-unordered.png&quot; alt=&quot;Code screenshot of the inspector, showing an SVG element with a group with labels, where the first elements are: Wis., W.Va., Vt., Va., Tenn., S.C., R.I., (and so on). Underneath there&apos;s a group called &apos;races&apos; with links, there the first states are: Maine, Rhode Island, New Hampshire, Delaware, Connecticut, Massachusetts, (and so on). The order does not match. There is no additional ARIA.&quot;&gt;
+        &lt;p&gt;On the state-level dashboard at Bloomberg, the text labels on the &amp;quot;Race &amp;amp; Ethnicity&amp;quot; and &amp;quot;Educational Attainment&amp;quot; charts were read, but in an order that didn&apos;t match the visuals, and without the actual associated values.&lt;/p&gt;
+        &lt;div class=&quot;video-wrapper large&quot;&gt;
+        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
+        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-details.mp4&quot; type=&quot;video/mp4&quot;&gt;
+        &lt;/video&gt;
+        &lt;p class=&quot;transcript&quot;&gt;Video description: VoiceOver reads all the elements on the chart, but without extra context and not always in a wat that makes sense. For Race &amp; Ethnicity: &quot;Image&quot;, &quot;White&quot;, &quot;Image&quot;, &quot;Black&quot;, &quot;Image&quot;, &quot;Or Latino&quot;, &quot;Hispanic&quot;, &quot;Image&quot;, &quot;Asian&quot;, &quot;Image&quot;, &quot;American&quot;, &quot;Native&quot;, &quot;Image&quot;, &quot;Other&quot;, &quot;0&quot;, &quot;25&quot;, &quot;25&quot;, &quot;50%&quot;, &quot;50%&quot;. Something similar happens with the educational background chart.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;In order to make visualizations like this more accessible, the developers would &lt;em&gt;&lt;strong&gt;at least&lt;/strong&gt;&lt;/em&gt; have to:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;be mindful of the &lt;strong&gt;order of the elements&lt;/strong&gt; in the DOM,&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;hide duplicate&lt;/strong&gt; and decorative elements from assistive tech, and&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;provide more information&lt;/strong&gt; (through roles, &lt;code&gt;aria&lt;/code&gt;, visually hidden text, etc.) for assistive tech users where needed.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;Is there an accessible table alternative?&lt;/h3&gt;
+        &lt;p&gt;Tables are a robust, precise, and universally recognizable way of communicating data. As a result, having a table alternative is almost always a good idea, and often a necessity, especially when visualizing more than a handful of datapoints.&lt;/p&gt;
+        &lt;p&gt;For something like the map overview, a table with the candidates as the column headers and the states as the row headers would be a good alternative view.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-table.png&quot; alt=&quot;Table with 6 columns (state, number of electoral votes, percentage of people who voted Harris, percentage of people who voted Trump, percentage of people who voted for others, percentage of votes counted) and a row for each of the states.&quot; /&gt;
+        &lt;p&gt;NBC did show the results in a table, although since some of the column headers contain a lot of information (candidate name, party, total amount of votes, total percentage of votes), navigating between the cells in a row can become quite verbose. Another item for improvement there could be to add row headings, so that the corresponding state gets announced when navigating the table vertically.&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-vo-harris.png&quot; alt=&quot;VoiceOver screenshot, with focus on a table cell, announcing the following: D, Harris, 48.3, and 75,700,293 48.5%, column 3 of 6&quot; /&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-vo-trump.png&quot; alt=&quot;VoiceOver screenshot, with focus on a table cell, announcing the following: R, Trump, 49.9, and 77,133,674 50.7%, column 3 of 6&quot; /&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Fox News provided a list of race calls as a list of cards, each of which contained a table with the results for that sate. None of these tables had captions, and each table had three more tables nested inside, resulting in a very long list of unnamed tables in the tables VoiceOver menu.&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-tables.png&quot; alt=&quot;Grid of cards on the Fox News website. There&apos;s a card for each state, and each card contains a table with the results for that state&quot; /&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-tables-vo.png&quot; alt=&quot;VoiceOver screenshot, showing the tables menu with a long list of unnamed tables, all along the lines of: &apos;3 columns, 1 row&apos; and &apos;1 column, 4 rows&apos;&quot; /&gt;
+        &lt;/div&gt;
+        &lt;h2&gt;Do the semantics match the element&apos;s functionality and visuals?&lt;/h2&gt;
+        &lt;p&gt;The type of HTML element used determines what kind of styling, keyboard interaction, and screen reader experience it will have by default.&lt;/p&gt;
+        &lt;p&gt;For example, headings (&lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;h2&amp;gt;&lt;/code&gt;, etc.) give structure to the page, &lt;code&gt;&amp;lt;button&amp;gt;&lt;/code&gt;s are focusable by keyboard and can be activated through the space or enter key, and &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; elements let screen reader users browse data two-dimensionally.&lt;/p&gt;
+        &lt;p&gt;When using the &amp;quot;wrong&amp;quot; elements, or using elements differently than intended, we create a mismatch between what the element looks like and how it works, and often strip away important default styling or interaction.&lt;/p&gt;
+        &lt;p&gt;Bloomberg used the &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; markup to style their legend, even though the legend contains no data.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-table-legend.png&quot; alt=&quot;Legend of the Bloomberg election result map, along with the Safari code inspector. There are three blocks with color (blue = democrat, red = republican, yellow = independent), each in two shades (light for leading, dark for won). The code inspector shows that each of these blocks is its own table, with two rows and four columns. The first row contains the labels lead (column 2) and win (column 3), the second row the candidate name (column 1) and two colors (column 2 &amp; 3). The fourth column on both rows is empty.&quot; class=&quot;large&quot;&gt;
+        &lt;p&gt;Reuters nested buttons (&lt;code&gt;&amp;lt;button&amp;gt;&lt;/code&gt;) inside link elements (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), which is both invalid HTML and something that can make the interaction unpredictable. When using the keyboard, buttons can be activated through the space and enter key, links can only be opened by pressing enter.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-links-result.png&quot; alt=&quot;Page navigation with items that look like links: President (underlined), senate, house, governor, state results&quot; class=&quot;medium&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-links-code.png&quot; alt=&quot;List of links (&lt;a&gt;) with a button (&lt;button&gt;) inside each of the link elements.&quot; class=&quot;medium&quot;&gt;
+        &lt;p&gt;Another example is Fox News using a checkbox for something that visually looks like a toggle button group. Buttons, checkboxes, and radio buttons all have different keyboard interaction and screen reader controls.&lt;/p&gt;
+        &lt;p&gt;Sighted keyboard users may expect this component to function like a button, which can be confusing when it ends up behaving like a checkbox. Additionally, while the checkbox &lt;code&gt;input&lt;/code&gt; was programmatically linked to a &lt;code&gt;label&lt;/code&gt;, the label didn&apos;t have any accessible name and was just given a &lt;code&gt;title&lt;/code&gt; element.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-toggle.png&quot; alt=&quot;States/Counties toggle button. &apos;States&apos; is white text against a black background, next to it is &apos;Counties&apos; in a white rounded cell with black text.&quot; class=&quot;xsmall&quot;&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div class=&amp;quot;map-toggle&amp;quot;&amp;gt;
+        &amp;lt;input id=&amp;quot;countyToggle&amp;quot; type=&amp;quot;checkbox&amp;quot;&amp;gt;
+        &amp;lt;label for=&amp;quot;countyToggle&amp;quot; title=&amp;quot;Toggle states and counties&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;map-toggle__switch&amp;quot; data-checked=&amp;quot;Counties&amp;quot; data-unchecked=&amp;quot;States&amp;quot;&amp;gt;
+        ::before
+        ::after
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/label&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And ABC News added a &lt;code&gt;role=&amp;quot;menu&amp;quot;&lt;/code&gt; to their page navigation. The menu role is intended for action menu types of components, not site navigation (for that the &lt;code&gt;&amp;lt;nav&amp;gt;&lt;/code&gt; element exists).&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/abc-menu.png&quot; alt=&quot;Page navigation containing links like &apos;Video&apos;, &apos;Live&apos;, &apos;Shows&apos;. The code inspector is open, and shows that the div containing these elements has been given a role=&apos;menu&apos;&quot; class=&quot;medium&quot;&gt;
+        &lt;h2&gt;Is the chart&apos;s interaction explained?&lt;/h2&gt;
+        &lt;p&gt;The interaction on each of the maps &lt;em&gt;may seem logical&lt;/em&gt;, so explaining something along the lines of &amp;quot;click on a state to open a dashboard with a breakdown of the state-level results&amp;quot; could be thought of as excessive while designing. However, almost all of the maps repsonded differently to a state being &lt;strong&gt;clicked&lt;/strong&gt; on:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;NBC&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: opened state breakdown in a new page&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;NBC&lt;/strong&gt; &lt;em&gt;(state-level)&lt;/em&gt;: nothing on click, tooltip on hover&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;CNN&lt;/strong&gt;: zoomed in on the state and showed a breakdow next to the map&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;NRK&lt;/strong&gt;: highlighted the state and showed a beakdown below the map&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Reuters&lt;/strong&gt;: nothing on click, tooltip on hover&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;ABC&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: highlighted the state and showed a breakdown next to the map&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;ABC&lt;/strong&gt; &lt;em&gt;(state-level)&lt;/em&gt;: highlighted the county, breakdown updated for the county&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Fox News&lt;/strong&gt;: zoomed in on the map, no text breakdown&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Bloomberg&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: opened breakdown in a new page&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Washington Post&lt;/strong&gt;: nothing on click, tooltip on hover&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;So even though the maps all look similar, they behave slightly differently. This makes the interaction less predictable, and suddenly explaining the interaction makes a lot more sense.&lt;/p&gt;
+        &lt;p&gt;Can I click on a state? If so, will clicking on the map trigger a tooltip? Will a new page open? Or will the map zoom in on the state? Will other visualizations on the page be updated? And can I undo this action?&lt;/p&gt;
+        &lt;p&gt;Setting the right expectations avoids confusion and makes the navigation a lot smoother for everyone. And in the case of elections, it becomes one less piece of frustration and stress to what for many is already a period of heightened anxiety.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-explanations.png&quot; alt=&quot;Map of the US election results, with counties being colored in dark red or dark blue according to who won. Underneath the map is a text description explaining that more info can be shown by hovering or tabbing on the states.&quot;&gt;
+        &lt;p&gt;None of the maps had any information about the interaction added, aside from the one by Fox News. They wrote &lt;em&gt;&amp;quot;Hover over states on desktop or tap on mobile to see the latest data as results come in throughout the evening.&amp;quot;&lt;/em&gt; in the description underneath the map.&lt;/p&gt;
+        &lt;h2&gt;Are additional explanations or more context about the data and visualization needed?&lt;/h2&gt;
+        &lt;p&gt;An important part of making data visualizations more understandable is providing legends or other ways of explaining visual elements.&lt;/p&gt;
+        &lt;p&gt;Most of the election graphs had their colors and patterns explained, and some added annotations with more info.&lt;/p&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/legends-ex.png&quot; alt=&quot;A collection of legends and annotations from the different dashboards, explaining that blue = democrat, red = republican, and pattern = swing state&quot; /&gt;
+        &lt;p&gt;But there&apos;s more that goes into explaining data visualiations than explaining the &lt;em&gt;visualization&lt;/em&gt;. Understanding what the &lt;em&gt;data&lt;/em&gt; means and understanding the context behind it is just as important.&lt;/p&gt;
+        &lt;p&gt;For non-Americans, the way the voting system works might not be very clear, and not everyone abroad (or even within the US) is up-to-date about what the candidates stood for this election, what swing states are, or which states are typically democrat/republican-leaning.&lt;/p&gt;
+        &lt;p&gt;But all of this is usefull background information to have when reading the election result map. A historically democrat state voting republican for the first time means something else than a historically republican state still voting republican.&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-swingers.png&quot; alt=&quot;Collapsible/expandable questions and answers to questions like &apos;What is a swing state&apos;, &apos;Why are swing states so important?&apos; and &apos;Map of the swing states&apos; (all in Norwegian). The last two questions are expanded, showing an explanation and a map.&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-cali.png&quot; alt=&quot;List of results per state. The state of California is expanded, showing a breakdown of how the state voted this year (58.5% or 9 249 261 votes to Harris; 38.3% or 6 050 902 to Trump; visualized in text and with a progress bar), two paragraphs with information about the state (there&apos;s a lot of tech, liberal abortion and drug laws, Harris was born there and went to college there), and a breakdown of how Californians voted the previous years.&quot;&gt;
+        &lt;/div&gt;
+        &lt;p&gt;NRK, the Norwegian news, went for a solution that focused on explaining the elections and putting the results in context.&lt;/p&gt;
+        &lt;p&gt;They had a carousel with cards explaining the different &amp;quot;technical&amp;quot; aspects of the election, dropdowns with background information about the different states, &amp;quot;frequently asked questions&amp;quot;, video explanations, and a link to a follow-up article explaining how the outcome could affect Norway and the world.&lt;/p&gt;
+        &lt;div class=&quot;img-gallery&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-carousel-1.png&quot; alt=&quot;Card in a carousel explaining the american election system in Norwegian. This is card 1, where text and an image show there are 538 electoral votes to get, and a candidate needs 270 to win.&quot;&gt;
+        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-carousel-2.png&quot; alt=&quot;Card 3 of the carousel, explaining in text and image that it&apos;s an all or nothing system. For example in 2020 in Georgia, Biden received 49.5% of the votes and Trump 49.3%, so Biden received all 16 electoral votes.&quot;&gt;
+        &lt;/div&gt;
+        &lt;h2&gt;A few final thoughts on these issues.&lt;/h2&gt;
+        &lt;p&gt;Comparing the outcomes of my tests from 2024 with those from 2020, it feels like not much has changed. The charts are still not accessible to people using assistive tech, interaction is not accessible to keyboard-only users, the layouts are not zoomable, there are issues with the colors, explanations are lacking, and some of the dashboards had up to 800+ automatically detectable errors.&lt;/p&gt;
+        &lt;p&gt;What I don&apos;t want to do with this article, however, is putting (all) the blame on the individual contributors (aka the developers and designers) of the dashboards.&lt;/p&gt;
+        &lt;p&gt;When asking my audience during workshops and talks what their biggest accessibility blockers are, I commonly get answers along the lines of &amp;quot;someone higher up is not letting us prioritize accessibility&amp;quot;, &amp;quot;we&apos;re overworked&amp;quot; or &amp;quot;I don&apos;t know enough and am not given the time at work to learn more&amp;quot;.&lt;/p&gt;
+        &lt;p&gt;While we as developers and designers do carry a responsibility to make the products we work on as accessible as possible, accessibility is a &lt;em&gt;group effort&lt;/em&gt; and when accessibility issues make it into production, it&apos;s typically an indicator of issues with the processes, planning, and culture within a company. For example, when automated tests pick up on 807 issues on a single page, it shows me there&apos;s no consistent accessibility testing going on.&lt;/p&gt;
+        &lt;p&gt;Fox News gets &lt;a href=&quot;https://www.similarweb.com/website/foxnews.com/#overview&quot;&gt;over 200 million website visitors&lt;/a&gt; each month, CNN nearly &lt;a href=&quot;https://www.similarweb.com/website/cnn.com/#overview&quot;&gt;600 million&lt;/a&gt;, Reuters &lt;a href=&quot;https://www.thomsonreuters.com/content/dam/ewp-m/documents/careers/en/pdf/fact-sheets/reutersfactsheet_spring2018.pdf&quot;&gt;35 million&lt;/a&gt;, and &lt;a href=&quot;https://fido.nrk.no/7b22a3da7a41df4569937fa3aab286a0a53c1c7db4cfee04cc53a51566600123/nrks_allmennkringkasterregnskap_2020_del_%202_statistikk_2.pdf&quot;&gt;around half of the Norwegian population&lt;/a&gt; reads NRK daily.&lt;/p&gt;
+        &lt;p&gt;Combine that with the fact that according to the CDC &lt;a href=&quot;https://www.cdc.gov/media/releases/2024/s0716-Adult-disability.html#:~:text=The%20latest%20data%2C%20from%20the,having%20a%20disability%20in%202022.&quot;&gt;1 in 4 Americans have a disability&lt;/a&gt; (according to WHO it&apos;s &lt;a href=&quot;https://www.who.int/health-topics/disability#:~:text=Disability%20is%20part%20of%20being,the%20prevalence%20of%20noncommunicable%20diseases.&quot;&gt;16% worldwide&lt;/a&gt;), laws like the &lt;a href=&quot;https://www.ada.gov&quot;&gt;ADA&lt;/a&gt; and &lt;a href=&quot;https://ec.europa.eu/social/main.jsp?catId=1202&quot;&gt;European Accessibility Act&lt;/a&gt; exist, and disabled people have a &lt;a href=&quot;https://www.weforum.org/stories/2023/12/driving-disability-inclusion-is-more-than-a-moral-imperative-it-s-a-business-one/#:~:text=The%20World%20Health%20Organization%20estimates,spending%20power%20of%20%2413%20trillion.&quot;&gt;spending power of 13 trillion USD&lt;/a&gt;, there definitely should be enough financial and legal incentive for these companies to prioritize accessibility, in addition to it being a human rights issue.&lt;/p&gt;
+        &lt;p&gt;And given the fact that for example &lt;a href=&quot;https://www.statista.com/statistics/1270363/fox-corporation-revenue/#:~:text=The%20revenue%20of%20Fox%20Corporation,almost%2014%20billion%20U.S.%20dollars.&quot;&gt;Fox News made over $10 billion&lt;/a&gt; in revenue in 2024 and &lt;a href=&quot;https://nypost.com/2024/11/15/media/how-cnn-might-find-its-way-to-the-auction-block/#:~:text=Analysts%20believe%20CNN%20makes%20what,news%2C%20meaning%20declining%20cable%20fees.&quot;&gt;CNN made over $750 million&lt;/a&gt;, they have little to no excuse to not put resources towards accessibility testing, training, and remediation.&lt;/p&gt;
+        &lt;h2&gt;Want to learn more about dataviz accessibility, wondering how accessible your dashboards are, or looking for help with making them more accessible?&lt;/h2&gt;
+        &lt;p&gt;I&apos;m a freelance accessibility specialist, and can be hired for (dataviz) accessibility reviews/audits, training, and guidance, and have occasional availability for front-end engineering projects (with a focus on accessibility) as well.&lt;/p&gt;
+        &lt;p&gt;I&apos;m also open to talk about accessibility and inclusive design at conferences, schools and meetups.&lt;/p&gt;
+        &lt;p&gt;Interested in collaborating?
+        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; Check out &lt;a href=&quot;/work&quot;&gt;my services&lt;/a&gt;, drop me a message on &lt;a href=&quot;https://www.linkedin.com/in/sarah-fossheim/&quot;&gt;LinkedIn&lt;/a&gt;, or send me an &lt;a href=&quot;mailto:collab@fossheim.io&quot;&gt;e-mail&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Want to keep in touch?
+        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; Follow me on &lt;a href=&quot;http://front-end.social/@fossheim&quot;&gt;Mastodon&lt;/a&gt; or &lt;a href=&quot;https://bsky.app/profile/fossheim.bsky.social&quot;&gt;Bluesky&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Want to see birds instead?
+        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; See &lt;a href=&quot;https://fossheim.photography&quot;&gt;fossheim.photography&lt;/a&gt; or &lt;a href=&quot;https://mastodon.art/@fosstography&quot;&gt;@fosstography&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2&gt;Resources&lt;/h2&gt;
+        &lt;h3&gt;Guidelines&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://chartability.github.io/POUR-CAF/&quot;&gt;Chartability workbook&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/TR/WCAG22/&quot;&gt;Web Content Accessibility Guidelines (WCAG) 2.2&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/WAI/WCAG22/quickref/&quot;&gt;WCAG 2.2 techniques &amp;amp; failures&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;Tools&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://webaim.org/resources/contrastchecker/&quot;&gt;WebAIM Color Contrast Checker&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;http://datavizcontrast.com&quot;&gt;Dataviz Contrast&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://projects.susielu.com/viz-palette&quot;&gt;VizPalette&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.deque.com/axe/&quot;&gt;axe DevTools&lt;/a&gt; (by &lt;a href=&quot;https://www.deque.com/&quot;&gt;deque&lt;/a&gt;)&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.figma.com/community/plugin/1085612091163821851/axe-for-designers-a-free-accessibility-plugin&quot;&gt;axe for designers&lt;/a&gt; (by &lt;a href=&quot;https://www.deque.com/&quot;&gt;deque&lt;/a&gt; for Figma)&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://accesslint.com&quot;&gt;AccessLint&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=deque-systems.vscode-axe-linter&quot;&gt;axe Accessibility Linter&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h4&gt;Libraries&lt;/h4&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.highcharts.com/blog/accessibility/&quot;&gt;Highcharts&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/visa/visa-chart-components&quot;&gt;VISA Charts&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/cmudig/data-navigator&quot;&gt;Data Navigator&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;Dataviz accessibility tips&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/dataviza11y/resources&quot;&gt;Dataviz accessibility resources&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;/writing/posts/accessible-dataviz-us-elections/&quot;&gt;How (not) to make accessible data visualizations, illustrated by the US presidential election.&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.elsevier.com/connect/making-charts-accessible-for-people-with-visual-impairments&quot;&gt;Making charts accessible for people with visual impairments&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;/writing/posts/dataviz-accessibility-review-norwegian-elections-2023/&quot;&gt;Dataviz accessibility review: what we can learn from the Norwegian 2023 election graphs&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://observablehq.com/@frankelavsky/chartability-contrast-series&quot;&gt;Introduction to Accessible Contrast and Color for Data Visualization&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://nightingaledvs.com/designing-for-neurodivergent-audiences/&quot;&gt;Designing for Neurodivergent Audiences&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://observablehq.com/@frankelavsky/no-use-of-color-alone-in-data-visualization&quot;&gt;What is &amp;quot;No Use of Color Alone&amp;quot; in Data Visualization? (with examples)&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.urban.org/research/publication/do-no-harm-guide-centering-accessibility-data-visualization&quot;&gt;Do No Harm Guide: Centering Accessibility in Data Visualization&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.highcharts.com/blog/tutorials/10-guidelines-for-dataviz-accessibility/&quot;&gt;10 Guidelines for DataViz Accessibility&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81&quot;&gt;Writing Alt Text for Data Visualization&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://adrianroselli.com/2021/04/sortable-table-columns.html&quot;&gt;Sortable table columns&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://thevizcollective.starschema.com/posts/accessibility-and-data-visualization&quot;&gt;Accessibility and data visualization&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;More about accessibility&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://practical-accessibility.today&quot;&gt;Practical Accessibility Course&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://tink.uk/perceived-affordances-and-the-functionality-mismatch/&quot;&gt;Perceived affordances and the functionality mismatch&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://ashleemboyer.com/blog/an-accessibility-bookmarklet-for-testing-200-percent-text-size&quot;&gt;An Accessibility Bookmarklet for Testing 200% Text Size&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://webaim.org/standards/wcag/checklist&quot;&gt;WCAG 2 Checklist by WebAIM&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.a11yproject.com&quot;&gt;A11YProject&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        
+      </content:encoded>
+    </item>
     <item>
       <title>Dataviz accessibility review: what we can learn from the Norwegian 2023 election graphs</title>
       <link>https://fossheim.io/writing/posts/dataviz-accessibility-review-norwegian-elections-2023</link>
       <guid>https://fossheim.io/writing/posts/dataviz-accessibility-review-norwegian-elections-2023</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;During the 2020 presidential election night in the United States, I &lt;a href=&quot;https://fossheim.io/writing/posts/accessible-dataviz-us-elections/&quot;&gt;reviewed the data visualizations used by the major US news networks&lt;/a&gt;, and used it to illustrate some dataviz accessibility dos and don’ts.&lt;/p&gt;
@@ -195,7 +497,7 @@
       <title>Looking back at the past year (and a half) of accessibility work.</title>
       <link>https://fossheim.io/writing/posts/looking-back-at-the-past-year-and-a-half-of-accessibility-work</link>
       <guid>https://fossheim.io/writing/posts/looking-back-at-the-past-year-and-a-half-of-accessibility-work</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;It&apos;s the end of the year, which means time to look back at what has been and write a year in review blog post about it. Because it&apos;s been silent on my blog for a while, I decided to combine it with another post that&apos;s long overdue: a recap of my first year (and a half) of freelancing.&lt;/p&gt;
@@ -263,7 +565,7 @@
       <title>Building an accessible theme picker with HTML, CSS and JavaScript.</title>
       <link>https://fossheim.io/writing/posts/accessible-theme-picker-html-css-js</link>
       <guid>https://fossheim.io/writing/posts/accessible-theme-picker-html-css-js</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;In the recent refresh of my website’s design I implemented different theming options. It’s now possible to choose between six different color schemes when reading my blog.&lt;/p&gt;
@@ -620,7 +922,7 @@
       <title>How to create a screen reader accessible graph like Apple&apos;s with D3.js</title>
       <link>https://fossheim.io/writing/posts/apple-dataviz-a11y-tutorial</link>
       <guid>https://fossheim.io/writing/posts/apple-dataviz-a11y-tutorial</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;After previously writing about the accessibility of &lt;a href=&quot;https://fossheim.io/writing/posts/apple-health-dataviz-a11y/&quot;&gt;Apple Health’s data visualizations&lt;/a&gt;, I felt inspired to recreate one of them with D3.js. I already covered some of the basics &lt;a href=&quot;https://fossheim.io/writing/posts/accessible-dataviz-d3-intro/&quot;&gt;in the form of a bar chart&lt;/a&gt;, so this time I decided to go for a different type of graph: the activity rings.&lt;/p&gt;
@@ -893,7 +1195,7 @@
       <title>Getting started with trans inclusive design: tools and resources</title>
       <link>https://fossheim.io/writing/posts/trans-inclusive-design-tools</link>
       <guid>https://fossheim.io/writing/posts/trans-inclusive-design-tools</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;As I pointed out in my previous article about &lt;a href=&quot;https://fossheim.io/writing/posts/excluding-non-binary-people-by-design/&quot;&gt;Google’s discrimination against non-binary people&lt;/a&gt;, tech doesn’t exist in a vacuum. What we create has an impact on people’s lives and affects even entire communities.&lt;/p&gt;
@@ -1014,7 +1316,7 @@
       <title>Excluding non-binary people by design: How sign-up forms can lead to discrimination</title>
       <link>https://fossheim.io/writing/posts/excluding-non-binary-people-by-design</link>
       <guid>https://fossheim.io/writing/posts/excluding-non-binary-people-by-design</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;What happens when we don’t include trans and non-binary people in our products? How do our products cause harm? Why is education so important and change so hard?&lt;/p&gt;
@@ -1070,7 +1372,7 @@
       <title>What we can learn from Apple&apos;s dataviz accessibility</title>
       <link>https://fossheim.io/writing/posts/apple-health-dataviz-a11y</link>
       <guid>https://fossheim.io/writing/posts/apple-health-dataviz-a11y</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Ever since getting the Apple Watch in November, I’ve been looking at my Apple Health &amp;amp; Activity data on a daily basis. After being disappointed by all the inaccessible graphs around the US Presidential Elections, I wanted to find out how Apple’s visualizations are handled by VoiceOver.&lt;/p&gt;
@@ -1137,7 +1439,7 @@
       <title>I launched a directory with ethical design resources</title>
       <link>https://fossheim.io/writing/posts/ethical-design-guide</link>
       <guid>https://fossheim.io/writing/posts/ethical-design-guide</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Tech is all around us, developing fast, and not going away. Which is why ethics should be a part of the design and engineering curriculum, and a focus for everyone working in the industry.&lt;/p&gt;
@@ -1156,7 +1458,7 @@
       <title>How (not) to make accessible data visualizations, illustrated by the US presidential election.</title>
       <link>https://fossheim.io/writing/posts/accessible-dataviz-us-elections</link>
       <guid>https://fossheim.io/writing/posts/accessible-dataviz-us-elections</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;In the days around the 2020 US presidential elections a lot of people have been following predictions, results and exit polls quite closely. The majority of news sources published plenty of visualizations, but very few of them in an accessible format.&lt;/p&gt;
@@ -1284,7 +1586,7 @@
       <title>Thoughts on Genderify, gender discrimination, transphobia, and (un)ethical AI.</title>
       <link>https://fossheim.io/writing/posts/ai-bias-genderify</link>
       <guid>https://fossheim.io/writing/posts/ai-bias-genderify</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Earlier this week Genderify, an AI-driven platform that “identifies” users’ gender based on their name, launched and listed themselves on ProductHunt. They received &lt;strong&gt;a lot&lt;/strong&gt; of very valid criticism both on ProductHunt and other social media, but I think they’re worthy of some more criticism from me on here as well.&lt;/p&gt;
@@ -1341,7 +1643,7 @@
       <title>Navigating the internet as a non-binary designer</title>
       <link>https://fossheim.io/writing/posts/non-binary-design</link>
       <guid>https://fossheim.io/writing/posts/non-binary-design</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Earlier I wrote a &lt;a href=&quot;https://twitter.com/liatrisbian/status/1281978736318001152?s=21&quot;&gt;twitter thread&lt;/a&gt; about small things designers can do to make their products more inclusive for trans and non-binary people. It’s a topic quite close to my heart, since I am non-binary myself, so I want to address some of the points in a proper post as well.&lt;/p&gt;
@@ -1440,7 +1742,7 @@
       <title>An introduction to accessible data visualizations with D3.js</title>
       <link>https://fossheim.io/writing/posts/accessible-dataviz-d3-intro</link>
       <guid>https://fossheim.io/writing/posts/accessible-dataviz-d3-intro</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Data visualizations can be great to communicate complex data in an easy way. Unfortunately, there&apos;s a lot that can go wrong when it comes to accessibility. A few weeks ago I decided to navigate one of the highest listed &lt;a href=&quot;https://www.worldometers.info/coronavirus/country/norway/&quot;&gt;COVID-19 dashboards&lt;/a&gt; with VoiceOver, and I barely could make it past the first graph before closing my browser in frustration.&lt;/p&gt;
@@ -1734,7 +2036,7 @@
       <title>Re-creating a Macintosh with gradients and box-shadows</title>
       <link>https://fossheim.io/writing/posts/css-macintosh</link>
       <guid>https://fossheim.io/writing/posts/css-macintosh</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;You might have seen my CSS &lt;a href=&quot;https://fossheim.io/writing/posts/css-polaroid-camera/&quot;&gt;Polaroid camera&lt;/a&gt; and a &lt;a href=&quot;https://fossheim.io/writing/posts/showcase-css-abatron803/&quot;&gt;calculator&lt;/a&gt; already, and now I re-created another iconic product: Apple&apos;s Macintosh, released in 1984.&lt;/p&gt;
@@ -1784,7 +2086,7 @@
       <title>Recommended reads on ethics, big data and equality in tech</title>
       <link>https://fossheim.io/writing/posts/resources-ethics-tech-books</link>
       <guid>https://fossheim.io/writing/posts/resources-ethics-tech-books</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;h2&gt;&lt;a href=&quot;https://www.goodreads.com/book/show/28186015-weapons-of-math-destruction?ac=1&amp;amp;from_search=true&amp;amp;qid=dN1hL0r66S&amp;amp;rank=1&quot;&gt;Weapons of Math Destruction&lt;/a&gt; by Cathy O&apos;Neil&lt;/h2&gt;
@@ -1827,7 +2129,7 @@
       <title>Creating a similar post component with Eleventy</title>
       <link>https://fossheim.io/writing/posts/eleventy-similar-posts</link>
       <guid>https://fossheim.io/writing/posts/eleventy-similar-posts</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;When updating my portfolio design, I wanted to create a component that automatically displays similar posts at the bottom of each blog post. Because I couldn&apos;t find any tutorials on how to achieve that, I thought it would be a good idea to share my solution.&lt;/p&gt;
@@ -1909,7 +2211,7 @@
       <title>How to create an accordion hover effect with box-shadows</title>
       <link>https://fossheim.io/writing/posts/css-box-shadow-animation</link>
       <guid>https://fossheim.io/writing/posts/css-box-shadow-animation</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;In this tutorial we&apos;ll use the &lt;code&gt;box-shadow&lt;/code&gt; property to create a layered card component, and animate it on hover.&lt;/p&gt;
@@ -2055,7 +2357,7 @@
       <title>What I&apos;ve learned from designing for experts</title>
       <link>https://fossheim.io/writing/posts/ux-domain-experts</link>
       <guid>https://fossheim.io/writing/posts/ux-domain-experts</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;h2&gt;Domain experts aren&apos;t always expert users&lt;/h2&gt;
@@ -2099,7 +2401,7 @@
       <title>How I recreated a Polaroid camera with CSS gradients only</title>
       <link>https://fossheim.io/writing/posts/css-polaroid-camera</link>
       <guid>https://fossheim.io/writing/posts/css-polaroid-camera</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Earlier I remade the design of an &lt;a href=&quot;https://fossheim.io/writing/posts/showcase-css-abatron803/&quot;&gt;old calculator&lt;/a&gt; entirely in CSS. I had a lot of fun making it, so I decided to do the same with &lt;a href=&quot;https://eu.polaroidoriginals.com/products/onestep2-polaroid-camera&quot;&gt;a Polaroid camera&lt;/a&gt; this time.&lt;/p&gt;
@@ -2368,7 +2670,7 @@
       <title>Design of the Abatron 803 calculator replicated in CSS</title>
       <link>https://fossheim.io/writing/posts/showcase-css-abatron803</link>
       <guid>https://fossheim.io/writing/posts/showcase-css-abatron803</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Recently I came across the design of the &lt;a href=&quot;https://www.calculator.org/calculators/Abatron_803.html&quot;&gt;Abatron 803&lt;/a&gt;, a calculator from 1975. I thought it looked really good, so I decided to recreate the design in HTML/CSS.&lt;/p&gt;
@@ -2418,7 +2720,7 @@
       <title>How to add a gradient overlay to text with CSS</title>
       <link>https://fossheim.io/writing/posts/css-text-gradient</link>
       <guid>https://fossheim.io/writing/posts/css-text-gradient</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;To add a gradient overlay to a text element, we need to set three different CSS properties to the text we want to style:&lt;/p&gt;
@@ -2504,7 +2806,7 @@
       <title>An intro to designing accessible data visualizations</title>
       <link>https://fossheim.io/writing/posts/accessible-dataviz-design</link>
       <guid>https://fossheim.io/writing/posts/accessible-dataviz-design</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Accessibility should always be a focus when designing products, and the same goes when working with data visualizations and graphs.&lt;/p&gt;
@@ -2601,7 +2903,7 @@
       <title>Tools for designing good-looking accessible interfaces</title>
       <link>https://fossheim.io/writing/posts/accessible-design-tools</link>
       <guid>https://fossheim.io/writing/posts/accessible-design-tools</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;It&apos;s important for me that everything I design is both accessible, ethical and user friendly. And to be fair, the three really go hand-in-hand. A product cannot be &lt;em&gt;friendly&lt;/em&gt; if it&apos;s harmful or inaccessible.&lt;/p&gt;
@@ -2667,7 +2969,7 @@
       <title>How to style and animate the letters in a string using CSS</title>
       <link>https://fossheim.io/writing/posts/react-text-splitting-animations</link>
       <guid>https://fossheim.io/writing/posts/react-text-splitting-animations</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Earlier I wrote a &lt;a href=&quot;https://fossheim.io/writing/posts/react-text-splitting&quot;&gt;tutorial&lt;/a&gt; on how to split text and render the letters or words as separate spans in React.&lt;/p&gt;
@@ -2741,7 +3043,7 @@
       <title>Splitting text into individual characters with React</title>
       <link>https://fossheim.io/writing/posts/react-text-splitting</link>
       <guid>https://fossheim.io/writing/posts/react-text-splitting</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Recently I needed to animate the individual characters in a heading element. I was hoping there would be a convenient css-only solution, similar to &lt;code&gt;:nth-child(i)&lt;/code&gt; , but unfortunately that doesn&apos;t exist. So I decided to research how to achieve something similar, and accessible, nonetheless.&lt;/p&gt;
@@ -2793,7 +3095,7 @@
       <title>Advent of Code 2019: Day 2 solutions in Python</title>
       <link>https://fossheim.io/writing/posts/adventofcode19-day2</link>
       <guid>https://fossheim.io/writing/posts/adventofcode19-day2</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;Earlier we solved the &lt;a href=&quot;https://fossheim.io/writing/posts/adventofcode19-day1&quot;&gt;first day&lt;/a&gt; of the Advent of Code 2019 challenge. Now, let&apos;s take a look at how to solve the second puzzle.&lt;/p&gt;
@@ -2878,7 +3180,7 @@
       <title>Advent Of Code 2019: Day 1 solutions in Python</title>
       <link>https://fossheim.io/writing/posts/adventofcode19-day1</link>
       <guid>https://fossheim.io/writing/posts/adventofcode19-day1</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
+      <pubDate>Wed, 04 Mar 2026 15:49:17 GMT</pubDate>
       <content:encoded>
         
         &lt;p&gt;I&apos;ve been really excited to work on the &lt;a href=&quot;https://adventofcode.com/&quot;&gt;advent of code&lt;/a&gt; challenges this year again. If you don&apos;t know the concept, it&apos;s basically an advent calendar with programming puzzles that gradually get more difficult. Each day has two challenges that are related to each other, and they can be solved using any coding language or software.&lt;/p&gt;
@@ -2922,308 +3224,6 @@
         &lt;p&gt;Outside of the for-loop we can now print the &lt;code&gt;total_fuel&lt;/code&gt;, which is the output for part 2 of the exercise.&lt;/p&gt;
         &lt;p&gt;👉 &lt;a href=&quot;https://github.com/sarahfossheim/adventofcode19/blob/master/python/day-01/part2.py&quot;&gt;View my solution on GitHub&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;I will try to publish and explain as many of my solutions as possible over the next couple of weeks, if time allows it. You can also keep an eye on my GitHub account for updates.&lt;/p&gt;
-        
-        
-      </content:encoded>
-    </item>
-    <item>
-      <title>Dataviz accessibility principles, demonstrated by the 2024 presidential election dashboards.</title>
-      <link>https://fossheim.io/writing/posts/2024-dataviz-a11y-elections</link>
-      <guid>https://fossheim.io/writing/posts/2024-dataviz-a11y-elections</guid>
-      <pubDate>Tue, 03 Mar 2026 16:00:22 GMT</pubDate>
-      <content:encoded>
-        
-        &lt;p&gt;In 2020 I &lt;a href=&quot;/writing/posts/accessible-dataviz-us-elections/&quot;&gt;reviewed the dataviz accessibility of the US presidential election results&lt;/a&gt; (spoiler: it was bad), and in 2023 I did the same with the &lt;a href=&quot;/writing/posts/dataviz-accessibility-review-norwegian-elections-2023/&quot;&gt;dashboards used for the Norwegian government elections&lt;/a&gt;. So naturally, I had to inspect the accessibility of this year&apos;s US election graphs as well.&lt;/p&gt;
-        &lt;p&gt;Just like in 2020, I discovered quite a lot of accessibility issues for all of the dashboards. Most of these were the type of issues I frequently encounter when doing dataviz accessibility audits and reviews. For example: content that&apos;s not zoomable, interaction that&apos;s not available for keyboard users, insights that don&apos;t get communicated to screen reader users, lacking text alternatives, semantic errors, or missing explanations.&lt;/p&gt;
-        &lt;p&gt;This time I also ran &lt;a href=&quot;https://www.deque.com/axe/devtools/&quot;&gt;axe DevTools&lt;/a&gt; at the end of the review, which picked up between 3 (NRK) and 62 (Fox News) errors against WCAG 2.1. When including tests against best practices, a total of 870 issues were found on Fox News, 206 on the Washington Post, 24 on Reuters, and 70 on NRK.&lt;/p&gt;
-        &lt;p&gt;These findings aren&apos;t surprising, as according to a 2024 &lt;a href=&quot;https://webaim.org/projects/million/&quot;&gt;WebAIM study&lt;/a&gt; around 96% of tested home pages had accessibility issues, with an average of more than 56 errors per page.&lt;/p&gt;
-        &lt;h2&gt;Scope&lt;/h2&gt;
-        &lt;p&gt;For this article, I manually tested data visualizations on the following news websites:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.washingtonpost.com/elections/results/2024/11/05/president/&quot;&gt;Washington Post&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.bloomberg.com/graphics/2024-us-election-results/&quot;&gt;Bloomberg&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.foxnews.com/elections&quot;&gt;Fox News&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://edition.cnn.com/election/2024/results/president?election-data-id=2024-PG&amp;amp;election-painting-mode=projection-with-lead&amp;amp;filter-key-races=false&amp;amp;filter-flipped=false&amp;amp;filter-remaining=false&quot;&gt;CNN&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.nbcnews.com/politics/2024-elections/president-results&quot;&gt;NBC&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://abcnews.go.com/Elections/2024-us-presidential-election-results-live-map&quot;&gt;ABC News&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.reuters.com/graphics/USA-ELECTION/RESULTS/zjpqnemxwvx/&quot;&gt;Reuters&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.wsj.com/election/2024/general&quot;&gt;The Wall Street Journal&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.nrk.no/spesial/presidentvalget-i-usa-_-resultater-1.17110820&quot;&gt;NRK (Norwegian)&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;At the end of the review I also ran tests with axe DevTools, to get an idea of how many issues automated tests could detect on each of the dashboards.&lt;/p&gt;
-        &lt;p&gt;&lt;em&gt;Note: this is an article for my blog illustrating some dataviz accessibility principles and common mistakes against them; this is not a detailed review or audit of these platforms. For that reason, I didn&apos;t test every single chart on these dashboards, and only tested certain aspects of them. For the same reason I focused on MacOS and VoiceOver (since that&apos;s my main device), and if I encountered any particularly weird behavior, I re-tested it with NVDA on Windows as well.&lt;/em&gt;&lt;/p&gt;
-        &lt;h2&gt;Is the content still accessible when zoomed in to 400%?&lt;/h2&gt;
-        &lt;p&gt;It should be possible to zoom up to 400% into a page and visualization without losing any functionality, and without any content being obscured.&lt;/p&gt;
-        &lt;p&gt;My eyes have gotten to the age (aka: I&apos;m over 30 🫣) where I frequently end up having to browse the web at 200% zoom, so it&apos;s an accessibility requirement I unintentionally end up testing on a lot of websites I visit.&lt;/p&gt;
-        &lt;p&gt;And unfortunately, almost every single election dashboard I checked out had issues when zoomed in.&lt;/p&gt;
-        &lt;p&gt;All of the dashboards had &lt;strong&gt;sticky or fixed&lt;/strong&gt; headers. Some of them had double headers, and some combined their fixed headers with floating buttons or fixed footers.&lt;/p&gt;
-        &lt;p&gt;When zooming up to 200% and 400%, those sticky, fixed and floating elements start taking up a lot of the page&apos;s real estate, sometimes even hiding the actual content of the page completely.&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-zoomies.png&quot; alt=&quot;Fox news zoomed in: heading menu takes around half of the vertical height, part of a map is showing underneath (400% zoom)&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/wp-zoomies.png&quot; alt=&quot;Washington Post zoomed in: heading menu takes up the top half of the screen, subscription ad banner is taking up the bottom half of the screen, leaving literally no space at all for actual content (400% zoom)&quot;&gt;
-        &lt;/div&gt;
-        &lt;p&gt;The sticky navigation bar at Fox News took up almost half of the page, and The Washington Post hid &lt;em&gt;all&lt;/em&gt; of the page&apos;s content behind the header and footer.&lt;/p&gt;
-        &lt;p&gt;Another example of this is NBC News. They didn&apos;t just have one, but &lt;em&gt;three&lt;/em&gt; navigation bars overlayed on top of the screen, and in addition to that the table headers were also sticky.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-zoomies.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: At 200% there&apos;s a double sticky header obscuring around a third of the page. Once the user scrolls to the results table, the table&apos;s sticky header takes up almost all the rest of the view. At 400% zoom, the sticky page header takes up most of the height of the screen, only leaving a small band with content at the bottom, which gets completely blocked once the table with sticky header is reached.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;NRK did it differently: no sticky navigation bars that take up all of the space, but instead a small fixed progress bar with the results itself:&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-zoomies-1.png&quot; alt=&quot;NRK zoomed in to 200%, showing a small progress bar sticky on top of the page, divided in blue (Harris) and red (Trump) indicating the proportion of their votes. Underneath is the map with the results, showing blue and red states on the map.&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-zoomies-2.png&quot; alt=&quot;NRK zoomed in to 400%, showing a progress bar sticky on top of the page, with the same map underneath, taking up around a fifth of the vertical height of the screen.&quot;&gt;
-        &lt;/div&gt;
-        &lt;p&gt;&lt;em&gt;Personally&lt;/em&gt;, as a zoom-user, I wasn&apos;t bothered by NRK&apos;s sticky progress bar when at 200% zoom on my 13&amp;quot; MacBook, although it started limiting the content a bit already. But at 400%, the progress bar took up around a fifth of the height of the page, restricting the available space for the rest of the content quite a bit more.&lt;/p&gt;
-        &lt;h2&gt;Is data explained through more properties than just color?&lt;/h2&gt;
-        &lt;p&gt;All of the maps I inspected had a similar design: the states were color coded in blue (democrat), red (republican), or gray (no results yet), and swing states had an additional pattern.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-color.png&quot; alt=&quot;Map of the United Stated, with states colored in red (for republican wins) or blue (democrat wins), and with a pattern if they&apos;re swing states. The west-coast and northern part of the east coast are blue, the center and south is more red.&quot;&gt;
-        &lt;p&gt;Red and blue are generally considered a &amp;quot;color blind friendly&amp;quot; combination, but for example, people with achromatopsia perceive everything in black and white/different shades of gray.&lt;/p&gt;
-        &lt;p&gt;For example, on the map used on the Reuters dashboard democrat and republican states become the exact same shade of gray when using a color blindness simulator.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-bw.png&quot; class=&quot;large&quot; alt=&quot;Color blind simulation of the map of the United Stated with the election results. All the states are medium gray, with barely any difference in contrast (republican and democrat are the same gray), making it impossible to read the results.&quot;&gt;
-        &lt;p&gt;Additionally, people using monochrome displays or grayscale plugins will also not perceive the colors, and will benefit from additional cues.&lt;/p&gt;
-        &lt;h3&gt;Are the fallbacks accessible too?&lt;/h3&gt;
-        &lt;p&gt;Some might argue that there &lt;em&gt;is&lt;/em&gt; in fact a fallback: when hovering over a state, the maps show a tooltip stating who won that state, and how many votes they received.&lt;/p&gt;
-        &lt;p&gt;However, for the absolute majority of maps tested for this article, these tooltips were not keyboard or screen reader accessible.&lt;/p&gt;
-        &lt;h2&gt;Can all content be navigated to and interacted with through keyboard interaction?&lt;/h2&gt;
-        &lt;p&gt;As already brought up in the previous section, any interaction that can be performed through mouse/trackpad/touch, should also be accessible through keyboard interaction.&lt;/p&gt;
-        &lt;p&gt;Lots of the election charts had some level of interaction connected to them, either tooltips that appeared on hover or new pages that opened when clicking a state, but very few made this interaction accessible by keyboard.&lt;/p&gt;
-        &lt;p&gt;For example, CNN showed tooltips containing the winner and amount of votes when hovering over a state. But when using the &lt;code&gt;TAB&lt;/code&gt; key to navigate the page, the focus indicator jumped straight past the map, to a carousel underneath.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-cnn.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: First the user hovers over states on the map, and tooltips pop up. Then the user starts using the TAB key, and the browser&apos;s default focus indicators highlight which object is in focus, showing the map/interactive states are not part of the focus order.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Over at Reuters, the tooltips were successfully exposed when receiving keyboard focus (🎉), but the tab order was completely random.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-reuters.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: The user repeatedly and quickly presses the tab key, shifting the focus between the different states on the map. When a state is in focus, a styled tooltip/pop-up with more info (state name, electoral votes, number of votes for each candidate, % of votes counted) appears. The states get focused in random order, going from New Mexico to South Dakota to California to Kentucky to Alabama, and so on.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;The states on Bloomberg&apos;s map were focusable, but besides receiving a focus outline, nothing else happened. Pressing &lt;code&gt;ENTER&lt;/code&gt; (one of the typical keys to activate a link or button) opened a new page where. There it was possible to find the same info as in the tooltip, but that&apos;s a lot of extra back-and-forth to get to the same data as a mouse user.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/tab-bberg.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: The user first hovers over the progress chart, where a tooltip shows how many votes each candidate received in each state. Afterwards the keyboard is used to tab through the interactive elements on the page, and every single small square on the progress bars (each square representing an electoral college vote) is part of the tab order. No tooltips appear. Afterwards the user keeps tabbing through the map, where the states receive focus, but also don&apos;t show a tooltip.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Another issue with keyboard navigation on Bloomberg&apos;s charts was found in the progress bars showing the electoral votes per candidate. Each bar was made out of small squares, one square representing one electoral vote. Each of the squares was wrapped in its own link (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), meaning all of the squares were part of the default focus order on the page and became individually focusable when pressing the &lt;code&gt;TAB&lt;/code&gt; key. With 538 votes available, that means 538 links to tab past.&lt;/p&gt;
-        &lt;h2&gt;Are data, insights, trends, and patterns accessible to screen reader users?&lt;/h2&gt;
-        &lt;p&gt;People who use assistive technologies (like braille or screen readers) should have access to the same information, including trends, patterns, and other visually apparent features.&lt;/p&gt;
-        &lt;p&gt;This can be done in a variety of ways, for example:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Turning the chart into an &lt;strong&gt;image with alt text&lt;/strong&gt;.&lt;/li&gt;
-        &lt;li&gt;Providing an &lt;strong&gt;accessible table alternative&lt;/strong&gt;, close to or linked to from the visualization.&lt;/li&gt;
-        &lt;li&gt;Making the &lt;strong&gt;elements within the viz&lt;/strong&gt; accessible to screen readers (eg. turning the chart into a list or table by adding roles and other ARIA).&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Which method is most appropriate depends on the type of visualization, interaction attached to it, as well as the purpose, the way it will be used/conditions it will be used in, and the target audience.&lt;/p&gt;
-        &lt;h3&gt;Are the text alternatives useful, with relevant and accurate information, providing equal value to what&apos;s visualized?&lt;/h3&gt;
-        &lt;p&gt;When using the &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; element alt text can be added in the &lt;code&gt;alt&lt;/code&gt; attribute. Elements that are turned into images by adding &lt;code&gt;role=&amp;quot;img&amp;quot;&lt;/code&gt; can have their alt text set through &lt;code&gt;aria-label&lt;/code&gt; or &lt;code&gt;aria-labelledby&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;Whether or not these attributes are set is something that can be detected by automated accessibility checkers (like &lt;a href=&quot;https://www.deque.com/axe/&quot;&gt;axe&lt;/a&gt; or &lt;a href=&quot;https://developer.chrome.com/docs/lighthouse/overview&quot;&gt;Lighthouse&lt;/a&gt;), linters, or unit tests. But the quality and usefulness of the text is something that requires a human touch.&lt;/p&gt;
-        &lt;p&gt;As a result, when performing accessibility reviews, I often come across images that actually have alt text, but where the alt text doesn&apos;t accurately describe the image at all or leaves out vital information. This was the case with a lot of the tested election graphs as well.&lt;/p&gt;
-        &lt;p&gt;Several of the election maps I encountered were programmatically turned into an image with alt text, but left out the actual results.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-map-img.png&quot; alt=&quot;Map of the united states, with the different states color coded in blue/red to indicate who won (the map is overwhelmingly red, with blue areas around the west coast and east coast). VoiceOver is active and reads the map as &apos;Kart over USA som viser antall valgmenn per stat&apos;, translates to &apos;Map of the USA that shows the amount of electoral college votes per state&apos;.&quot; class=&quot;large&quot; /&gt;
-        &lt;p&gt;Like this example from NRK, the Norwegian state media, where the alt text of the map translates to &amp;quot;Map of the United States that shows the amount of electoral college votes per state&amp;quot;.&lt;/p&gt;
-        &lt;p&gt;When looking at the map, sighted users get to see which states voted for which candidate, and how red or blue the map overall looked like.&lt;/p&gt;
-        &lt;p&gt;For example, I can tell at a glance that the westc oast and north east mainly voted Democrat, the center and south voted Republican, Harris won 54 electoral votes in California, while Trump got 30 of them in Flordia.&lt;/p&gt;
-        &lt;p&gt;Blind people using screen readers, however, are only told there&apos;s a map with results, without any further information.&lt;/p&gt;
-        &lt;p&gt;CNN used a canvas, labelled &amp;quot;Map&amp;quot;, which was the only information available.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/cnn-map-img.png&quot; alt=&quot;Line chart on the Bloomberg website (timeseries with red and blue lines, they all start around the 50% mark, but the blue ones go down and the red ones go up over time). The code inspector is open. The chart is an svg, with an img role attached to it, and aria-describedby that refers to a visually hidden text element with the following text: Multi-series line chart showing the odds Vice President Kamala Harris and former President Donald Trump will each win the presidency. These three prediction markets will be charted: Kalshi, Polymarket and PredictIt.&quot;&gt;
-        &lt;p&gt;Bloomberg did something similar with their &lt;em&gt;Live Prediction Market Odds&lt;/em&gt; line chart, where the text alternative was &lt;em&gt;&amp;quot;Multi-series line chart showing the odds Vice President Kamala Harris and former President Donald Trump will each win the presidency. These three prediction markets will be charted: Kalshi, Polymarket and PredictIt.&amp;quot;&lt;/em&gt;,. The type of data and chart was explained, but the actual results were not.&lt;/p&gt;
-        &lt;p&gt;Similarly, ABC News&apos;s map announced the geographical position of the state that was focused &lt;em&gt;(eg. &amp;quot;New Mexico. Colorado is north. Oklahoma is east. Texas is south. Arizona is west.&amp;quot;)&lt;/em&gt;, but did not announce the actual electoral votes &lt;em&gt;(visually available as text)&lt;/em&gt; or winner of the state &lt;em&gt;(visually available through color)&lt;/em&gt;.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/abc-reader.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: The user moves the focus around between the different states on the map using the arrow keys. Each time a state is focused, VoiceOver announces the name of the focused state along with the bordering states. Using the right arrow moves the focus to the state bordering on the east, down arrow to the state bordering south, and so on.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;h3&gt;How are SVG elements handled in the code?&lt;/h3&gt;
-        &lt;p&gt;SVG elements are not accessible by default. So when creating data visualizations using SVG, additional work will always be needed to make the expeience more accessible for assistive tech users.&lt;/p&gt;
-        &lt;p&gt;The Wall Street Journal showed all the states, in comparison to the amount of electoral votes they had to offer, each state represented by small squares. The squares were color coded in blue and red to represent the candidate that won the state, and on hover the distribution of votes was shown in a tooltip.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-squares.png&quot; alt=&quot;Legend of the WSJ election result map: each state is built out of blue or red colored squares. The amount of squares represents the amount of electoral votes, the color refers to who won the state and received the votes. One of the squares has a black outline with an annotation saying &apos;1 square = 1 electoral vote&apos;. At the bottom of the map there&apos;s a legend explaining the color.&quot; class=&quot;large&quot;&gt;
-        &lt;p&gt;When using VoiceOver with Safari, each of the individual squares (&lt;code&gt;&amp;lt;rect&amp;gt;&lt;/code&gt; elements) were announced as images without alt text, after which all of the text elements were announced. There was no information about who won the state or how many votes they received, and the tooltips could not be accessed with a screen reader either.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-imgimgimg.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: VoiceOver is used to go through the contents of the map. First VoiceOver announces a title for the map (&quot;Cartogram of US Presidential Electoral Map. Each small block represents 1 electoral vote, with 538 total, each grouped by state. States colored by candidate leading or won. Blue indicates Democrat and red indicates Republican.&quot;), afterwards each individual little square on the map gets read as &quot;image&quot; without context (1 square = 1 electoral vote, so 538 squares, at elast 538 &quot;image&quot;s).&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Because all screen readers treat SVGs slightly different, NVDA didn&apos;t announce the squares as images without alt text, it just skipped the squares, but the rest of the experience was pretty much the same: the text elements were read in the order they appeared in the DOM, and no additional info was included.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/wsj-grouping.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: NVDA is used to go through the contents of the map. No title is announced for the map like on VoiceOver, and the graphical elements are not treated as images either. Instead, NVDA reads all the state abbreviations without any further context (&quot;Clickable, Ala., Tenn., Miss., Fla., etc.), and some of them are there twice.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Bloomberg&apos;s map offered a similar experience. Theirs was made out of two different SVG elements, each of them containing:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;text elements (&lt;code&gt;&amp;lt;text&amp;gt;&lt;/code&gt;) with the state name abbreviations, as well as&lt;/li&gt;
-        &lt;li&gt;color-coded squares (&lt;code&gt;&amp;lt;rect&amp;gt;&lt;/code&gt;) wrapped inside links (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), representing the amount of electoral votes.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;As a result, VoiceOver on Safari announced the abbreviations for all the States, followed by a bunch of empty links.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-weird.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: Moving through Bloomberg&apos;s map with electoral votes with VoiceOver. First the abbreviated states on the east of the Mississippi River are announced, afterwards empty links for the clickable areas on the east, then the annotation of the Mississippi River, then the abbreviated state names on the west, and finally a group of empty links for the clickable areas on the west. The legend is made out of 3 tables.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;You may notice that all of these Bloomberg examples contain two sets of text elements followed by links.&lt;/p&gt;
-        &lt;p&gt;That&apos;s because the graph was made out of two SVGs: one for the states East of the Mississippi River, and one for those West of the Mississippi River. I only realized this when inspecting the code, as the grouping was not explained anywhere.&lt;/p&gt;
-        &lt;p&gt;The sorting of the text elements did not match the sorting of the links, both sort orders seemed completely random, and no information about the sorting or grouping was included.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-unordered.png&quot; alt=&quot;Code screenshot of the inspector, showing an SVG element with a group with labels, where the first elements are: Wis., W.Va., Vt., Va., Tenn., S.C., R.I., (and so on). Underneath there&apos;s a group called &apos;races&apos; with links, there the first states are: Maine, Rhode Island, New Hampshire, Delaware, Connecticut, Massachusetts, (and so on). The order does not match. There is no additional ARIA.&quot;&gt;
-        &lt;p&gt;On the state-level dashboard at Bloomberg, the text labels on the &amp;quot;Race &amp;amp; Ethnicity&amp;quot; and &amp;quot;Educational Attainment&amp;quot; charts were read, but in an order that didn&apos;t match the visuals, and without the actual associated values.&lt;/p&gt;
-        &lt;div class=&quot;video-wrapper large&quot;&gt;
-        &lt;video width=&quot;100%&quot; height=&quot;auto&quot; controls&gt;
-        &lt;source src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-details.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        &lt;/video&gt;
-        &lt;p class=&quot;transcript&quot;&gt;Video description: VoiceOver reads all the elements on the chart, but without extra context and not always in a wat that makes sense. For Race &amp; Ethnicity: &quot;Image&quot;, &quot;White&quot;, &quot;Image&quot;, &quot;Black&quot;, &quot;Image&quot;, &quot;Or Latino&quot;, &quot;Hispanic&quot;, &quot;Image&quot;, &quot;Asian&quot;, &quot;Image&quot;, &quot;American&quot;, &quot;Native&quot;, &quot;Image&quot;, &quot;Other&quot;, &quot;0&quot;, &quot;25&quot;, &quot;25&quot;, &quot;50%&quot;, &quot;50%&quot;. Something similar happens with the educational background chart.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;In order to make visualizations like this more accessible, the developers would &lt;em&gt;&lt;strong&gt;at least&lt;/strong&gt;&lt;/em&gt; have to:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;be mindful of the &lt;strong&gt;order of the elements&lt;/strong&gt; in the DOM,&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;hide duplicate&lt;/strong&gt; and decorative elements from assistive tech, and&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;provide more information&lt;/strong&gt; (through roles, &lt;code&gt;aria&lt;/code&gt;, visually hidden text, etc.) for assistive tech users where needed.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3&gt;Is there an accessible table alternative?&lt;/h3&gt;
-        &lt;p&gt;Tables are a robust, precise, and universally recognizable way of communicating data. As a result, having a table alternative is almost always a good idea, and often a necessity, especially when visualizing more than a handful of datapoints.&lt;/p&gt;
-        &lt;p&gt;For something like the map overview, a table with the candidates as the column headers and the states as the row headers would be a good alternative view.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-table.png&quot; alt=&quot;Table with 6 columns (state, number of electoral votes, percentage of people who voted Harris, percentage of people who voted Trump, percentage of people who voted for others, percentage of votes counted) and a row for each of the states.&quot; /&gt;
-        &lt;p&gt;NBC did show the results in a table, although since some of the column headers contain a lot of information (candidate name, party, total amount of votes, total percentage of votes), navigating between the cells in a row can become quite verbose. Another item for improvement there could be to add row headings, so that the corresponding state gets announced when navigating the table vertically.&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-vo-harris.png&quot; alt=&quot;VoiceOver screenshot, with focus on a table cell, announcing the following: D, Harris, 48.3, and 75,700,293 48.5%, column 3 of 6&quot; /&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nbc-vo-trump.png&quot; alt=&quot;VoiceOver screenshot, with focus on a table cell, announcing the following: R, Trump, 49.9, and 77,133,674 50.7%, column 3 of 6&quot; /&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Fox News provided a list of race calls as a list of cards, each of which contained a table with the results for that sate. None of these tables had captions, and each table had three more tables nested inside, resulting in a very long list of unnamed tables in the tables VoiceOver menu.&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-tables.png&quot; alt=&quot;Grid of cards on the Fox News website. There&apos;s a card for each state, and each card contains a table with the results for that state&quot; /&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-tables-vo.png&quot; alt=&quot;VoiceOver screenshot, showing the tables menu with a long list of unnamed tables, all along the lines of: &apos;3 columns, 1 row&apos; and &apos;1 column, 4 rows&apos;&quot; /&gt;
-        &lt;/div&gt;
-        &lt;h2&gt;Do the semantics match the element&apos;s functionality and visuals?&lt;/h2&gt;
-        &lt;p&gt;The type of HTML element used determines what kind of styling, keyboard interaction, and screen reader experience it will have by default.&lt;/p&gt;
-        &lt;p&gt;For example, headings (&lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;h2&amp;gt;&lt;/code&gt;, etc.) give structure to the page, &lt;code&gt;&amp;lt;button&amp;gt;&lt;/code&gt;s are focusable by keyboard and can be activated through the space or enter key, and &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; elements let screen reader users browse data two-dimensionally.&lt;/p&gt;
-        &lt;p&gt;When using the &amp;quot;wrong&amp;quot; elements, or using elements differently than intended, we create a mismatch between what the element looks like and how it works, and often strip away important default styling or interaction.&lt;/p&gt;
-        &lt;p&gt;Bloomberg used the &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; markup to style their legend, even though the legend contains no data.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/bb-table-legend.png&quot; alt=&quot;Legend of the Bloomberg election result map, along with the Safari code inspector. There are three blocks with color (blue = democrat, red = republican, yellow = independent), each in two shades (light for leading, dark for won). The code inspector shows that each of these blocks is its own table, with two rows and four columns. The first row contains the labels lead (column 2) and win (column 3), the second row the candidate name (column 1) and two colors (column 2 &amp; 3). The fourth column on both rows is empty.&quot; class=&quot;large&quot;&gt;
-        &lt;p&gt;Reuters nested buttons (&lt;code&gt;&amp;lt;button&amp;gt;&lt;/code&gt;) inside link elements (&lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;), which is both invalid HTML and something that can make the interaction unpredictable. When using the keyboard, buttons can be activated through the space and enter key, links can only be opened by pressing enter.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-links-result.png&quot; alt=&quot;Page navigation with items that look like links: President (underlined), senate, house, governor, state results&quot; class=&quot;medium&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/reuters-links-code.png&quot; alt=&quot;List of links (&lt;a&gt;) with a button (&lt;button&gt;) inside each of the link elements.&quot; class=&quot;medium&quot;&gt;
-        &lt;p&gt;Another example is Fox News using a checkbox for something that visually looks like a toggle button group. Buttons, checkboxes, and radio buttons all have different keyboard interaction and screen reader controls.&lt;/p&gt;
-        &lt;p&gt;Sighted keyboard users may expect this component to function like a button, which can be confusing when it ends up behaving like a checkbox. Additionally, while the checkbox &lt;code&gt;input&lt;/code&gt; was programmatically linked to a &lt;code&gt;label&lt;/code&gt;, the label didn&apos;t have any accessible name and was just given a &lt;code&gt;title&lt;/code&gt; element.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-toggle.png&quot; alt=&quot;States/Counties toggle button. &apos;States&apos; is white text against a black background, next to it is &apos;Counties&apos; in a white rounded cell with black text.&quot; class=&quot;xsmall&quot;&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;div class=&amp;quot;map-toggle&amp;quot;&amp;gt;
-        &amp;lt;input id=&amp;quot;countyToggle&amp;quot; type=&amp;quot;checkbox&amp;quot;&amp;gt;
-        &amp;lt;label for=&amp;quot;countyToggle&amp;quot; title=&amp;quot;Toggle states and counties&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;map-toggle__switch&amp;quot; data-checked=&amp;quot;Counties&amp;quot; data-unchecked=&amp;quot;States&amp;quot;&amp;gt;
-        ::before
-        ::after
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/label&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And ABC News added a &lt;code&gt;role=&amp;quot;menu&amp;quot;&lt;/code&gt; to their page navigation. The menu role is intended for action menu types of components, not site navigation (for that the &lt;code&gt;&amp;lt;nav&amp;gt;&lt;/code&gt; element exists).&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/abc-menu.png&quot; alt=&quot;Page navigation containing links like &apos;Video&apos;, &apos;Live&apos;, &apos;Shows&apos;. The code inspector is open, and shows that the div containing these elements has been given a role=&apos;menu&apos;&quot; class=&quot;medium&quot;&gt;
-        &lt;h2&gt;Is the chart&apos;s interaction explained?&lt;/h2&gt;
-        &lt;p&gt;The interaction on each of the maps &lt;em&gt;may seem logical&lt;/em&gt;, so explaining something along the lines of &amp;quot;click on a state to open a dashboard with a breakdown of the state-level results&amp;quot; could be thought of as excessive while designing. However, almost all of the maps repsonded differently to a state being &lt;strong&gt;clicked&lt;/strong&gt; on:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;NBC&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: opened state breakdown in a new page&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;NBC&lt;/strong&gt; &lt;em&gt;(state-level)&lt;/em&gt;: nothing on click, tooltip on hover&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;CNN&lt;/strong&gt;: zoomed in on the state and showed a breakdow next to the map&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;NRK&lt;/strong&gt;: highlighted the state and showed a beakdown below the map&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;Reuters&lt;/strong&gt;: nothing on click, tooltip on hover&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;ABC&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: highlighted the state and showed a breakdown next to the map&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;ABC&lt;/strong&gt; &lt;em&gt;(state-level)&lt;/em&gt;: highlighted the county, breakdown updated for the county&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;Fox News&lt;/strong&gt;: zoomed in on the map, no text breakdown&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;Bloomberg&lt;/strong&gt; &lt;em&gt;(US-level)&lt;/em&gt;: opened breakdown in a new page&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;Washington Post&lt;/strong&gt;: nothing on click, tooltip on hover&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;So even though the maps all look similar, they behave slightly differently. This makes the interaction less predictable, and suddenly explaining the interaction makes a lot more sense.&lt;/p&gt;
-        &lt;p&gt;Can I click on a state? If so, will clicking on the map trigger a tooltip? Will a new page open? Or will the map zoom in on the state? Will other visualizations on the page be updated? And can I undo this action?&lt;/p&gt;
-        &lt;p&gt;Setting the right expectations avoids confusion and makes the navigation a lot smoother for everyone. And in the case of elections, it becomes one less piece of frustration and stress to what for many is already a period of heightened anxiety.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/fox-explanations.png&quot; alt=&quot;Map of the US election results, with counties being colored in dark red or dark blue according to who won. Underneath the map is a text description explaining that more info can be shown by hovering or tabbing on the states.&quot;&gt;
-        &lt;p&gt;None of the maps had any information about the interaction added, aside from the one by Fox News. They wrote &lt;em&gt;&amp;quot;Hover over states on desktop or tap on mobile to see the latest data as results come in throughout the evening.&amp;quot;&lt;/em&gt; in the description underneath the map.&lt;/p&gt;
-        &lt;h2&gt;Are additional explanations or more context about the data and visualization needed?&lt;/h2&gt;
-        &lt;p&gt;An important part of making data visualizations more understandable is providing legends or other ways of explaining visual elements.&lt;/p&gt;
-        &lt;p&gt;Most of the election graphs had their colors and patterns explained, and some added annotations with more info.&lt;/p&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/legends-ex.png&quot; alt=&quot;A collection of legends and annotations from the different dashboards, explaining that blue = democrat, red = republican, and pattern = swing state&quot; /&gt;
-        &lt;p&gt;But there&apos;s more that goes into explaining data visualiations than explaining the &lt;em&gt;visualization&lt;/em&gt;. Understanding what the &lt;em&gt;data&lt;/em&gt; means and understanding the context behind it is just as important.&lt;/p&gt;
-        &lt;p&gt;For non-Americans, the way the voting system works might not be very clear, and not everyone abroad (or even within the US) is up-to-date about what the candidates stood for this election, what swing states are, or which states are typically democrat/republican-leaning.&lt;/p&gt;
-        &lt;p&gt;But all of this is usefull background information to have when reading the election result map. A historically democrat state voting republican for the first time means something else than a historically republican state still voting republican.&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-swingers.png&quot; alt=&quot;Collapsible/expandable questions and answers to questions like &apos;What is a swing state&apos;, &apos;Why are swing states so important?&apos; and &apos;Map of the swing states&apos; (all in Norwegian). The last two questions are expanded, showing an explanation and a map.&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-cali.png&quot; alt=&quot;List of results per state. The state of California is expanded, showing a breakdown of how the state voted this year (58.5% or 9 249 261 votes to Harris; 38.3% or 6 050 902 to Trump; visualized in text and with a progress bar), two paragraphs with information about the state (there&apos;s a lot of tech, liberal abortion and drug laws, Harris was born there and went to college there), and a breakdown of how Californians voted the previous years.&quot;&gt;
-        &lt;/div&gt;
-        &lt;p&gt;NRK, the Norwegian news, went for a solution that focused on explaining the elections and putting the results in context.&lt;/p&gt;
-        &lt;p&gt;They had a carousel with cards explaining the different &amp;quot;technical&amp;quot; aspects of the election, dropdowns with background information about the different states, &amp;quot;frequently asked questions&amp;quot;, video explanations, and a link to a follow-up article explaining how the outcome could affect Norway and the world.&lt;/p&gt;
-        &lt;div class=&quot;img-gallery&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-carousel-1.png&quot; alt=&quot;Card in a carousel explaining the american election system in Norwegian. This is card 1, where text and an image show there are 538 electoral votes to get, and a candidate needs 270 to win.&quot;&gt;
-        &lt;img src=&quot;/static/sources/2024-dataviz-a11y-elections/nrk-carousel-2.png&quot; alt=&quot;Card 3 of the carousel, explaining in text and image that it&apos;s an all or nothing system. For example in 2020 in Georgia, Biden received 49.5% of the votes and Trump 49.3%, so Biden received all 16 electoral votes.&quot;&gt;
-        &lt;/div&gt;
-        &lt;h2&gt;A few final thoughts on these issues.&lt;/h2&gt;
-        &lt;p&gt;Comparing the outcomes of my tests from 2024 with those from 2020, it feels like not much has changed. The charts are still not accessible to people using assistive tech, interaction is not accessible to keyboard-only users, the layouts are not zoomable, there are issues with the colors, explanations are lacking, and some of the dashboards had up to 800+ automatically detectable errors.&lt;/p&gt;
-        &lt;p&gt;What I don&apos;t want to do with this article, however, is putting (all) the blame on the individual contributors (aka the developers and designers) of the dashboards.&lt;/p&gt;
-        &lt;p&gt;When asking my audience during workshops and talks what their biggest accessibility blockers are, I commonly get answers along the lines of &amp;quot;someone higher up is not letting us prioritize accessibility&amp;quot;, &amp;quot;we&apos;re overworked&amp;quot; or &amp;quot;I don&apos;t know enough and am not given the time at work to learn more&amp;quot;.&lt;/p&gt;
-        &lt;p&gt;While we as developers and designers do carry a responsibility to make the products we work on as accessible as possible, accessibility is a &lt;em&gt;group effort&lt;/em&gt; and when accessibility issues make it into production, it&apos;s typically an indicator of issues with the processes, planning, and culture within a company. For example, when automated tests pick up on 807 issues on a single page, it shows me there&apos;s no consistent accessibility testing going on.&lt;/p&gt;
-        &lt;p&gt;Fox News gets &lt;a href=&quot;https://www.similarweb.com/website/foxnews.com/#overview&quot;&gt;over 200 million website visitors&lt;/a&gt; each month, CNN nearly &lt;a href=&quot;https://www.similarweb.com/website/cnn.com/#overview&quot;&gt;600 million&lt;/a&gt;, Reuters &lt;a href=&quot;https://www.thomsonreuters.com/content/dam/ewp-m/documents/careers/en/pdf/fact-sheets/reutersfactsheet_spring2018.pdf&quot;&gt;35 million&lt;/a&gt;, and &lt;a href=&quot;https://fido.nrk.no/7b22a3da7a41df4569937fa3aab286a0a53c1c7db4cfee04cc53a51566600123/nrks_allmennkringkasterregnskap_2020_del_%202_statistikk_2.pdf&quot;&gt;around half of the Norwegian population&lt;/a&gt; reads NRK daily.&lt;/p&gt;
-        &lt;p&gt;Combine that with the fact that according to the CDC &lt;a href=&quot;https://www.cdc.gov/media/releases/2024/s0716-Adult-disability.html#:~:text=The%20latest%20data%2C%20from%20the,having%20a%20disability%20in%202022.&quot;&gt;1 in 4 Americans have a disability&lt;/a&gt; (according to WHO it&apos;s &lt;a href=&quot;https://www.who.int/health-topics/disability#:~:text=Disability%20is%20part%20of%20being,the%20prevalence%20of%20noncommunicable%20diseases.&quot;&gt;16% worldwide&lt;/a&gt;), laws like the &lt;a href=&quot;https://www.ada.gov&quot;&gt;ADA&lt;/a&gt; and &lt;a href=&quot;https://ec.europa.eu/social/main.jsp?catId=1202&quot;&gt;European Accessibility Act&lt;/a&gt; exist, and disabled people have a &lt;a href=&quot;https://www.weforum.org/stories/2023/12/driving-disability-inclusion-is-more-than-a-moral-imperative-it-s-a-business-one/#:~:text=The%20World%20Health%20Organization%20estimates,spending%20power%20of%20%2413%20trillion.&quot;&gt;spending power of 13 trillion USD&lt;/a&gt;, there definitely should be enough financial and legal incentive for these companies to prioritize accessibility, in addition to it being a human rights issue.&lt;/p&gt;
-        &lt;p&gt;And given the fact that for example &lt;a href=&quot;https://www.statista.com/statistics/1270363/fox-corporation-revenue/#:~:text=The%20revenue%20of%20Fox%20Corporation,almost%2014%20billion%20U.S.%20dollars.&quot;&gt;Fox News made over $10 billion&lt;/a&gt; in revenue in 2024 and &lt;a href=&quot;https://nypost.com/2024/11/15/media/how-cnn-might-find-its-way-to-the-auction-block/#:~:text=Analysts%20believe%20CNN%20makes%20what,news%2C%20meaning%20declining%20cable%20fees.&quot;&gt;CNN made over $750 million&lt;/a&gt;, they have little to no excuse to not put resources towards accessibility testing, training, and remediation.&lt;/p&gt;
-        &lt;h2&gt;Want to learn more about dataviz accessibility, wondering how accessible your dashboards are, or looking for help with making them more accessible?&lt;/h2&gt;
-        &lt;p&gt;I&apos;m a freelance accessibility specialist, and can be hired for (dataviz) accessibility reviews/audits, training, and guidance, and have occasional availability for front-end engineering projects (with a focus on accessibility) as well.&lt;/p&gt;
-        &lt;p&gt;I&apos;m also open to talk about accessibility and inclusive design at conferences, schools and meetups.&lt;/p&gt;
-        &lt;p&gt;Interested in collaborating?
-        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; Check out &lt;a href=&quot;/work&quot;&gt;my services&lt;/a&gt;, drop me a message on &lt;a href=&quot;https://www.linkedin.com/in/sarah-fossheim/&quot;&gt;LinkedIn&lt;/a&gt;, or send me an &lt;a href=&quot;mailto:collab@fossheim.io&quot;&gt;e-mail&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;Want to keep in touch?
-        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; Follow me on &lt;a href=&quot;http://front-end.social/@fossheim&quot;&gt;Mastodon&lt;/a&gt; or &lt;a href=&quot;https://bsky.app/profile/fossheim.bsky.social&quot;&gt;Bluesky&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;Want to see birds instead?
-        &lt;br /&gt;&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt; See &lt;a href=&quot;https://fossheim.photography&quot;&gt;fossheim.photography&lt;/a&gt; or &lt;a href=&quot;https://mastodon.art/@fosstography&quot;&gt;@fosstography&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2&gt;Resources&lt;/h2&gt;
-        &lt;h3&gt;Guidelines&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://chartability.github.io/POUR-CAF/&quot;&gt;Chartability workbook&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/TR/WCAG22/&quot;&gt;Web Content Accessibility Guidelines (WCAG) 2.2&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/WAI/WCAG22/quickref/&quot;&gt;WCAG 2.2 techniques &amp;amp; failures&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3&gt;Tools&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://webaim.org/resources/contrastchecker/&quot;&gt;WebAIM Color Contrast Checker&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;http://datavizcontrast.com&quot;&gt;Dataviz Contrast&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://projects.susielu.com/viz-palette&quot;&gt;VizPalette&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.deque.com/axe/&quot;&gt;axe DevTools&lt;/a&gt; (by &lt;a href=&quot;https://www.deque.com/&quot;&gt;deque&lt;/a&gt;)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.figma.com/community/plugin/1085612091163821851/axe-for-designers-a-free-accessibility-plugin&quot;&gt;axe for designers&lt;/a&gt; (by &lt;a href=&quot;https://www.deque.com/&quot;&gt;deque&lt;/a&gt; for Figma)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://accesslint.com&quot;&gt;AccessLint&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=deque-systems.vscode-axe-linter&quot;&gt;axe Accessibility Linter&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h4&gt;Libraries&lt;/h4&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.highcharts.com/blog/accessibility/&quot;&gt;Highcharts&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://github.com/visa/visa-chart-components&quot;&gt;VISA Charts&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://github.com/cmudig/data-navigator&quot;&gt;Data Navigator&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3&gt;Dataviz accessibility tips&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://github.com/dataviza11y/resources&quot;&gt;Dataviz accessibility resources&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;/writing/posts/accessible-dataviz-us-elections/&quot;&gt;How (not) to make accessible data visualizations, illustrated by the US presidential election.&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.elsevier.com/connect/making-charts-accessible-for-people-with-visual-impairments&quot;&gt;Making charts accessible for people with visual impairments&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;/writing/posts/dataviz-accessibility-review-norwegian-elections-2023/&quot;&gt;Dataviz accessibility review: what we can learn from the Norwegian 2023 election graphs&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://observablehq.com/@frankelavsky/chartability-contrast-series&quot;&gt;Introduction to Accessible Contrast and Color for Data Visualization&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://nightingaledvs.com/designing-for-neurodivergent-audiences/&quot;&gt;Designing for Neurodivergent Audiences&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://observablehq.com/@frankelavsky/no-use-of-color-alone-in-data-visualization&quot;&gt;What is &amp;quot;No Use of Color Alone&amp;quot; in Data Visualization? (with examples)&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.urban.org/research/publication/do-no-harm-guide-centering-accessibility-data-visualization&quot;&gt;Do No Harm Guide: Centering Accessibility in Data Visualization&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.highcharts.com/blog/tutorials/10-guidelines-for-dataviz-accessibility/&quot;&gt;10 Guidelines for DataViz Accessibility&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81&quot;&gt;Writing Alt Text for Data Visualization&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://adrianroselli.com/2021/04/sortable-table-columns.html&quot;&gt;Sortable table columns&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://thevizcollective.starschema.com/posts/accessibility-and-data-visualization&quot;&gt;Accessibility and data visualization&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3&gt;More about accessibility&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://practical-accessibility.today&quot;&gt;Practical Accessibility Course&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://tink.uk/perceived-affordances-and-the-functionality-mismatch/&quot;&gt;Perceived affordances and the functionality mismatch&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://ashleemboyer.com/blog/an-accessibility-bookmarklet-for-testing-200-percent-text-size&quot;&gt;An Accessibility Bookmarklet for Testing 200% Text Size&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://webaim.org/standards/wcag/checklist&quot;&gt;WCAG 2 Checklist by WebAIM&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://www.a11yproject.com&quot;&gt;A11YProject&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
         
         
       </content:encoded>
