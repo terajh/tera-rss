@@ -4,7 +4,29 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Thu, 05 Mar 2026 16:26:01 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 06 Mar 2026 16:09:45 GMT</lastBuildDate>
+    <item>
+      <title>Buefy 3.0.4 and nuxt 4 gives me Cannot read properties of undefined (reading &apos;$buefy&apos;)</title>
+      <link>https://stackoverflow.com/questions/79902206/buefy-3-0-4-and-nuxt-4-gives-me-cannot-read-properties-of-undefined-reading-b</link>
+      <guid>https://stackoverflow.com/questions/79902206/buefy-3-0-4-and-nuxt-4-gives-me-cannot-read-properties-of-undefined-reading-b</guid>
+      <pubDate>Fri, 06 Mar 2026 10:30:49 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;After trying the nuxt-buefy plugin with no successful outcome I tried adding buefy to nuxt using the plugin option. This gives me an server 500 error declaring&lt;/p&gt;
+        &lt;p&gt;&apos;Cannot read properties of undefined (reading &apos;$buefy&apos;)&apos;&lt;/p&gt;
+        &lt;p&gt;It is a near fresh installation of nuxt.&lt;/p&gt;
+        &lt;p&gt;My plugins/buefy.ts file looks like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import Buefy from &apos;buefy&apos;
+        import &apos;buefy/dist/css/buefy.css&apos;
+        
+        export default defineNuxtPlugin((nuxtApp) =&amp;gt; {
+        nuxtApp.vueApp.use(Buefy, {})
+        nuxtApp.provide(&apos;buefy&apos;, Buefy)
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Has anyone had the same error?&lt;/p&gt;
+        &lt;p&gt;I have been at this trying different aproaches and nothing seems to work&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to make cookies work with axios and vue3-cookies?</title>
       <link>https://stackoverflow.com/questions/79901062/how-to-make-cookies-work-with-axios-and-vue3-cookies</link>
@@ -1541,108 +1563,6 @@
         });
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;&lt;strong&gt;None of the above worked.&lt;/strong&gt; I don&apos;t know how to make main.scss load after Vant&apos;s base.css. This way, my styles will have higher priority. Does anyone have any suggestions? Helpppppppppp&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to properly access a ref value passed as a prop in a child component? data var only sees initial value</title>
-      <link>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</link>
-      <guid>https://stackoverflow.com/questions/79854399/how-to-properly-access-a-ref-value-passed-as-a-prop-in-a-child-component-data-v</guid>
-      <pubDate>Wed, 24 Dec 2025 13:43:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I have a parent component that has a ref variable that is set after a fetch request, and I&apos;m trying to pass it to a child card component that has a little animation that counts up to that number, but I think I&apos;m not passing it correctly.&lt;/p&gt;
-        &lt;p&gt;The variable shows up correctly and is reactive when referenced directly on the page in the parent and in the child, but when referenced in a data variable it only receives the first value.&lt;/p&gt;
-        &lt;p&gt;in parent component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
-        // etc...
-        
-        var myNumber = ref(0)
-        
-        const fetchMyNumber = async () =&amp;gt; {
-        // fetch function etc
-        // on success:
-        myNumber.value = Number(fetchedNumber)
-        }
-        
-        // etc...
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        {{ myNumber }} // displays the correct fetchedNumber
-        
-        &amp;lt;count-up :to=&amp;quot;myNumber&amp;quot; /&amp;gt; // only ever shows 0
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;in my count-up card component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;script&amp;gt;
-        import { nth } from &apos;@/utils/charts&apos;
-        export default {
-        name: &apos;CountUp&apos;,
-        props: {
-        currency: {
-        type: Boolean,
-        default: false
-        },
-        suffix: {
-        type: Boolean,
-        default: false
-        },
-        percent: {
-        type: Boolean,
-        default: false
-        },
-        to: {
-        type: Number,
-        default: null
-        }
-        },
-        data() {
-        return {
-        count: 0,
-        interval: null,
-        end: this.to // returns 0
-        }
-        },
-        computed: {
-        // end() {
-        // return this.to // also returns 0
-        // },
-        increment() {
-        console.log(&apos;end: &apos; + this.end) // sees 0
-        return Math.ceil(this.end / 30)
-        }
-        },
-        mounted() {
-        this.interval = setInterval(this.tick, 20)
-        },
-        methods: {
-        tick() {
-        if (this.count + this.increment &amp;gt;= this.end) {
-        this.count = this.to.toLocaleString()
-        return clearInterval(this.interval)
-        }
-        this.count += this.increment
-        }
-        }
-        }
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        {{ to }} // returns correct number!!!
-        &amp;lt;span v-text=&amp;quot;count&amp;quot; /&amp;gt; // Returns 0!
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I checked &lt;code&gt;typeof()&lt;/code&gt; in both parent and child and both are Number, which is what the child asks for&lt;/p&gt;
-        &lt;p&gt;I tried using a computed function instead of a data variable inside of the child, but it also returns 0&lt;/p&gt;
-        &lt;p&gt;When I pass a number that isn&apos;t pulled from fetch, it works correctly, for example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;count-up :to=&amp;quot;1234&amp;quot; /&amp;gt; //works correctly
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I tried switching to &lt;code&gt;parseInt&lt;/code&gt; or &lt;code&gt;parseFloat&lt;/code&gt; instead of &lt;code&gt;Number&lt;/code&gt; and that didn&apos;t work&lt;/p&gt;
-        &lt;p&gt;I get no errors in console&lt;/p&gt;
-        &lt;p&gt;And then occasionally, when I save something in my IDE and my project hot-updates, it works! Which makes me think I&apos;m just not passing the ref correctly. What am I doing wrong?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
