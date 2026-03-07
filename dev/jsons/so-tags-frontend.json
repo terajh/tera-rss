@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "Vue 3 component's v-html doesn't update after hydration",
+    "partialText": "<p>I am experiencing a strange hydration behaviour in Vue 3 (Nuxt/SSR context). In my component, I have a reactive variable that initialises with a timestamp.</p>\n<p>On the initial client-side render, the standard mustache interpolation <code>{{ processedHtml }}</code> updates to the client-side time correctly, but the content inside <code>v-html</code> stays stuck on the server-side value. Both only &quot;sync up&quot; once a subsequent reactive change occurs (e.g., via a <code>setTimeout</code>).</p>\n<p><strong>The Problem:</strong></p>\n<ol>\n<li><p><strong>Server Renders:</strong> Both values show Server Time (e.g., <code>12:00:00</code>).</p>\n</li>\n<li><p><strong>Client Hydration:</strong> <code>{{ processedHtml }}</code> updates to Client Time (<code>12:00:01</code>), but <code>v-html</code> <strong>remains</strong> <code>12:00:00</code>.</p>\n</li>\n<li><p><strong>After 2000ms:</strong> Both update to the new timestamp and are finally in sync.</p>\n</li>\n</ol>\n<p><strong>Minimal reproducable component:</strong></p>\n<pre><code>&lt;template&gt;\n  {{ processedHtml }}\n  &lt;div v-html=&quot;processedHtml&quot; class=&quot;prose max-w-none prose-a:text-blue-600 hover:prose-a:underline&quot;&gt;&lt;/div&gt;\n&lt;/template&gt;\n\n&lt;script setup lang=&quot;ts&quot;&gt;\nimport { computed } from 'vue';\n\nconst props = defineProps&lt;{\n  node: any;\n}&gt;();\n\n\nconst nowDate = ref&lt;string&gt;(Date.now().toString());\n\nsetTimeout(() =&gt; {\n  nowDate.value = Date.now().toString();\n}, (2000));\n\nconst processedHtml = computed(() =&gt; {\n  return `&lt;p&gt;${nowDate.value}&lt;/p&gt;`;\n});\n&lt;/script&gt;\n</code></pre>\n<p>I suspect Vue's hydration algorithm is skipping the <code>v-html</code> update because the root element tag matches, but I'm not sure why it differs from the mustache interpolation behavior.</p>\n<p>How can I ensure <code>v-html</code> stays in sync with the client-side reactive state immediately upon hydration?</p>",
+    "date": "2026-03-06T16:50:50.000Z",
+    "url": "https://stackoverflow.com/questions/79902409/vue-3-components-v-html-doesnt-update-after-hydration"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "Buefy 3.0.4 and nuxt 4 gives me Cannot read properties of undefined (reading '$buefy')",
     "partialText": "<p>After trying the nuxt-buefy plugin with no successful outcome I tried adding buefy to nuxt using the plugin option. This gives me an server 500 error declaring</p>\n<p>'Cannot read properties of undefined (reading '$buefy')'</p>\n<p>It is a near fresh installation of nuxt.</p>\n<p>My plugins/buefy.ts file looks like so:</p>\n<pre><code>import Buefy from 'buefy'\nimport 'buefy/dist/css/buefy.css'\n\nexport default defineNuxtPlugin((nuxtApp) =&gt; {\n  nuxtApp.vueApp.use(Buefy, {})\n  nuxtApp.provide('buefy', Buefy)\n})\n</code></pre>\n<p>Has anyone had the same error?</p>\n<p>I have been at this trying different aproaches and nothing seems to work</p>",
     "date": "2026-03-06T10:30:49.000Z",
@@ -375,18 +388,5 @@
     "partialText": "<p>I've been using NuxtUI for my UI elements, and I'm using fullCalendar for calendaring things. I want to add a popover that would display some text when hovering over an event (with the popover preferably being aware of the event). How would I achieve that? The Popover seems to really want some element as a default, but I don't know how to pass the current event to it.</p>",
     "date": "2025-12-24T19:05:47.000Z",
     "url": "https://stackoverflow.com/questions/79854551/how-would-i-add-a-nuxtui-popover-to-a-fullcalendar-event"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Global styles are being overridden by Vant styles using Nuxt",
-    "partialText": "<p>I'm coding using Nuxt. I'm confused about the global styles import.</p>\n<p>I using <a href=\"https://vant-ui.github.io/vant/#/en-US/quickstart#use-vant-in-nuxt-3\" rel=\"nofollow noreferrer\">Vant</a>(UI Library) and Sass in my project.</p>\n<p>I've defined some simple styles in '/assets/styles/main.scss', like this:</p>\n<pre class=\"lang-scss prettyprint-override\"><code>/* /assets/styles/main.scss */\nbody {\n  font-size: 14px;\n  font-family: Arial, Helvetica, sans-serif;\n}\n</code></pre>\n<p>And I use Vant's components in my pages(/pages/index.vue), like this:</p>\n<pre class=\"lang-js prettyprint-override\"><code>&lt;!-- /pages/index.vue --&gt;\n&lt;template&gt;\n  &lt;div&gt;\n    &lt;van-button&gt;Test&lt;/van-button&gt;\n  &lt;/div&gt;\n&lt;/template&gt;\n</code></pre>\n<p>The button renders correctly, but the body's styles are being overridden by Vant's styles.</p>\n<p><a href=\"https://i.sstatic.net/BHJFdxxz.png\" rel=\"nofollow noreferrer\">Screenshot of the body style</a></p>\n<p>Because Vant‘s `base.css` that includes style settings for the `body` element, but my &quot;main.scss“ is before “base.css”.</p>\n<p><a href=\"https://i.sstatic.net/DMQGcg4E.png\" rel=\"nofollow noreferrer\">Screenshot of stylesheet</a></p>\n<p>This is my nuxt configuration:</p>\n<pre class=\"lang-js prettyprint-override\"><code>// nuxt.config.ts\nexport default defineNuxtConfig({\n  modules: [&quot;@vant/nuxt&quot;],\n  compatibilityDate: &quot;2025-07-15&quot;,\n  devtools: { enabled: true },\n  css: [&quot;@/assets/styles/main.scss&quot;],\n});\n</code></pre>\n<p><strong>What I've tried:</strong></p>\n<ul>\n<li>Delete nuxt configuration <code>css</code> option, import &quot;main.scss&quot; in <code>&lt;style&gt;</code> of &quot;app.vue&quot;.</li>\n</ul>\n<pre><code>// app.vue\n&lt;style lang=&quot;scss&quot;&gt;\n@use &quot;~/assets/styles/main.scss&quot;;\n&lt;/style&gt;\n</code></pre>\n<ul>\n<li>Delete nuxt configuration <code>css</code> option, import &quot;main.scss&quot; in <code>&lt;script&gt;</code> of &quot;app.vue&quot;</li>\n</ul>\n<pre><code>// app.vue\n&lt;script setup lang=&quot;ts&quot;&gt;\nimport &quot;~/assets/styles/main.scss&quot;;\n&lt;/script&gt;\n</code></pre>\n<ul>\n<li>Delete nuxt configuration <code>css</code> option, add ''vite.css.preprocessorOptions.scss.additionalData&quot; in nuxt configuration</li>\n</ul>\n<pre class=\"lang-js prettyprint-override\"><code>// nuxt.config.ts\nexport default defineNuxtConfig({\n  modules: [&quot;@vant/nuxt&quot;],\n  compatibilityDate: &quot;2025-07-15&quot;,\n  devtools: { enabled: true },\n  vite: {\n    css: {\n      preprocessorOptions: {\n        scss: {\n          additionalData: `@use &quot;~/assets/styles/main.scss&quot; as *;`,\n        },\n      },\n    },\n  },\n});\n</code></pre>\n<p><strong>None of the above worked.</strong> I don't know how to make main.scss load after Vant's base.css. This way, my styles will have higher priority. Does anyone have any suggestions? Helpppppppppp</p>",
-    "date": "2025-12-24T14:15:58.000Z",
-    "url": "https://stackoverflow.com/questions/79854413/global-styles-are-being-overridden-by-vant-styles-using-nuxt"
   }
 ]
