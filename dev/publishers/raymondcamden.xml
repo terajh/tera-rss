@@ -4,12 +4,213 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 10 Mar 2026 16:32:33 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 11 Mar 2026 16:16:07 GMT</lastBuildDate>
+    <item>
+      <title>Testing Live Content Collections in Astro V6</title>
+      <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
+      <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
+        &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
+        &lt;p&gt;To test this, I created an app that wrapped the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;TMDB API&lt;/a&gt; to provide the following features:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A home page that rendered a list of movie genres.&lt;/li&gt;
+        &lt;li&gt;A detail page for each genre showing recently released movies in that genre.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Here&apos;s how I built it.&lt;/p&gt;
+        &lt;h2 id=&quot;the-live-loader&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-live-loader&quot;&gt;The Live Loader&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;docs&lt;/a&gt; are a great guide to how this feature works and you should absolutely spend some time there, but at a high level, this feature requires:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A loader script that handles returning all items in your collection or one particular item.&lt;/li&gt;
+        &lt;li&gt;A definition file for your app that defines all the live loaders.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Let&apos;s start with the later. Unlike static content collections which are defined in &lt;code&gt;content.config.ts&lt;/code&gt;, Astro looks like live collections in &lt;code&gt;live.config.ts&lt;/code&gt;. Here&apos;s mine:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Define live collections for accessing real-time data
+        import { defineLiveCollection } from &apos;astro:content&apos;;
+        import { genreLoader } from &apos;./loaders/tmdbloader&apos;;
+        
+        const genres = defineLiveCollection({
+        loader: genreLoader({
+        apiKey: process.env.TMDB_API_KEY!
+        }),
+        });
+        
+        export const collections = { genres };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There isn&apos;t much here as I&apos;ve only got one loader. Let&apos;s now take a look at that loader:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import type { LiveLoader } from &apos;astro/loaders&apos;;
+        
+        interface Genre {
+        id: string;
+        name: string;
+        }
+        
+        interface EntryFilter {
+        id: string;
+        }
+        
+        export function genreLoader(config: { apiKey: string }): LiveLoader&amp;lt;Genre, EntryFilter, never&amp;gt; {
+        return {
+        name: &apos;genre-loader&apos;,
+        loadCollection: async () =&amp;gt; {
+        try {
+        
+        let genreReq = await fetch(&apos;https://api.themoviedb.org/3/genre/movie/list&apos;, {
+        headers: {
+        &apos;Authorization&apos;: `Bearer ${config.apiKey}`, 
+        &apos;accept&apos;:&apos;application/json&apos;
+        }
+        });
+        
+        let genreData = await genreReq.json();
+        console.log(`Got ${genreData.genres.length} genres`);
+        return {
+        entries: genreData.genres.map((g:Genre) =&amp;gt; ({
+        id: g.id,
+        data: g,
+        })),
+        };
+        } catch (error) {
+        console.log(&apos;------------- ERROR --------&apos;);
+        return {
+        error: new Error(&apos;Failed to load genres &apos;, { cause: error }),
+        };
+        }
+        },
+        loadEntry: async ({ filter }) =&amp;gt; {
+        console.log(&apos;loadEntry called with filter&apos;, filter);
+        
+        try {
+        let movieReq = await fetch(`https://api.themoviedb.org/3/discover/movie?region=US&amp;amp;language=en-US&amp;amp;with_genres=${filter.id}&amp;amp;sort_by=primary_release_date.desc`, {
+        headers: {
+        &apos;Authorization&apos;: `Bearer ${config.apiKey}`, 
+        &apos;accept&apos;:&apos;application/json&apos;
+        }
+        });
+        
+        let movieData = await movieReq.json();
+        console.log(`Loaded movies for ${filter.id}`);
+        return {
+        id: filter.id,
+        data: movieData.results
+        }
+        
+        } catch (error) {
+        return {
+        error: new Error(&apos;Failed to load movies&apos;, { cause: error }),
+        };
+        }
+        
+        },
+        };
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Per the docs, your loader needs to define a name, a &lt;code&gt;loadCollection&lt;/code&gt; method that returns an array, and a &lt;code&gt;loadEntry&lt;/code&gt; method that returns an object representing one part of your collection. For me, this came down to hitting the TMDB &lt;a href=&quot;https://developer.themoviedb.org/reference/genre-movie-list&quot;&gt;genre list for movies API&lt;/a&gt; and then following up with the &lt;a href=&quot;https://developer.themoviedb.org/reference/discover-movie&quot;&gt;discover movies API&lt;/a&gt; that filtered to the genre. (As well as English movies and sorted by release date.)&lt;/p&gt;
+        &lt;h2 id=&quot;using-the-live-collection&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#using-the-live-collection&quot;&gt;Using the Live Collection&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I first used the collection in my home page, &lt;code&gt;index.astro&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
+        export const prerender = false; 
+        
+        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
+        import { getLiveCollection } from &apos;astro:content&apos;;
+        
+        const { entries } = await getLiveCollection(&apos;genres&apos;);
+        ---
+        
+        &amp;lt;BaseLayout pageTitle=&amp;quot;List of Genres&amp;quot;&amp;gt;
+        
+        &amp;lt;ul&amp;gt;
+        { entries.map((genre:any) =&amp;gt; 
+        &amp;lt;li&amp;gt;&amp;lt;a href={&amp;quot;genre/&amp;quot; + genre.id + &amp;quot;?l=&amp;quot; + genre.data.name}&amp;gt;{genre.data.name}&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        )}
+        &amp;lt;/ul&amp;gt;
+        
+        &amp;lt;/BaseLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is pretty much the exact same way I&apos;d use a static collection. Get the entries - iterate - done. For details, you&apos;ll note I&apos;m linkking to &amp;quot;genre/X?l=NAME&amp;quot; for each genre. I created &lt;code&gt;pages\genre\[id].astro&lt;/code&gt; to support that. You&apos;ll notice I&apos;m passing the name of the genre in the query string. That&apos;s just so I can use it for display purposes. Here&apos;s the code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
+        export const prerender = false; 
+        
+        import BaseLayout from &apos;../../layouts/BaseLayout.astro&apos;;
+        import { getLiveEntry } from &apos;astro:content&apos;;
+        const { entry, error } = await getLiveEntry(&apos;genres&apos;, Astro.params.id);
+        
+        if (error) {
+        return Astro.rewrite(&apos;/404&apos;);
+        }
+        
+        const title = Astro.url.searchParams.get(&amp;quot;l&amp;quot;);
+        ---
+        
+        &amp;lt;BaseLayout pageTitle={title}&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;movieWrapper&amp;quot;&amp;gt;
+        { entry.data.map((movie:any) =&amp;gt; 
+        &amp;lt;article class=&amp;quot;movie&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;{movie.title}&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;
+        {movie.overview}
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        Releases {movie.release_date}
+        &amp;lt;/p&amp;gt;
+        { movie.poster_path ?
+        &amp;lt;p&amp;gt;&amp;lt;img src={&amp;quot;https://image.tmdb.org/t/p/w300/&amp;quot;+movie.poster_path}&amp;gt;&amp;lt;/p&amp;gt; : &apos;&apos;
+        }
+        &amp;lt;/article&amp;gt;
+        )}
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;/BaseLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And... that&apos;s it. I fired it up, ran it, and it worked perfectly. After adding the Netlify adapter, I pushed it up here: &lt;a href=&quot;https://tmdb-movie-browser-v6.netlify.app/&quot;&gt;https://tmdb-movie-browser-v6.netlify.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;but-wait...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#but-wait...&quot;&gt;But wait...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;This isn&apos;t the most complex example of course, and I was ready to write up the blog post when I noticed something interesting in the V6 post - &lt;a href=&quot;https://astro.build/blog/astro-6/#experimental-route-caching&quot;&gt;route caching&lt;/a&gt;. This is still marked as experimental so I&apos;m not sure I&apos;d use it in a production app, but it looked super easy so I thought I&apos;d give it a try.&lt;/p&gt;
+        &lt;p&gt;In both pages, I added this to my front matter:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;Astro.cache.set({
+        maxAge: 120, // Cache for 2 minutes
+        swr: 60, // Serve stale for 1 minute while revalidating
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And modified my &lt;code&gt;astro.config.mjs&lt;/code&gt; to load it:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// @ts-check
+        import { defineConfig } from &apos;astro/config&apos;;
+        import { memoryCache } from &apos;astro/config&apos;;
+        
+        import netlify from &apos;@astrojs/netlify&apos;;
+        
+        // https://astro.build/config
+        export default defineConfig({
+        adapter: netlify(),
+        experimental: {
+        cache: { provider: memoryCache() },
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And... it did nothing! Complete failure! Astro sucks!&lt;/p&gt;
+        &lt;p&gt;After taking a minute to chill out, I looked closer at the &lt;a href=&quot;https://docs.astro.build/en/reference/experimental-flags/route-caching/&quot;&gt;docs&lt;/a&gt; for this feature and noticed this important line (emphasis mine):&lt;/p&gt;
+        &lt;blockquote&gt;
+        Use `cache.enabled` to check whether a cache provider is configured and active.
+        This returns false when no provider is configured, or in &lt;u style=&quot;color:red&quot;&gt;development mode:&lt;/u&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I killed my locally running Astro app and did this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;npm run build
+        npm run preview
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That was the first time I&apos;d done that with an Astro app and it worked perfectly - and - the caching worked perfectly as well. Literally a line of code to each page and the work was done!&lt;/p&gt;
+        &lt;h2 id=&quot;show-me-the-code-(and-more-stuff)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code-(and-more-stuff)&quot;&gt;Show Me the Code (and More Stuff)&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;If you want to see everything, the repo is here: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/tmdb-movie-browser-v6&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/tmdb-movie-browser-v6&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;As a quick note - a &amp;quot;live&amp;quot; view of movie genres is &lt;strong&gt;not&lt;/strong&gt; the most sensible example of this feature. Most likely the movie genre data itself changes incredibly rarely. But this goes back to what I said above - I really dig that Astro would make it easy to have build time data (genres) and live data (moves in that genre) with minimal effort on my part.&lt;/p&gt;
+        &lt;p&gt;Let me know what you think, and if you are already an Astro user, have you moved to V6 yet?&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@wansan_99?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Wan San Yip&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/people-sitting-on-chair-inside-room-ID1yWa1Wpx0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -551,7 +752,7 @@
       <title>Links For You (3/8/26)</title>
       <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
       <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
         &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
@@ -605,7 +806,7 @@
       <title>Dynamically Adjusting Image Text for Contrast</title>
       <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
       <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
         &lt;ul&gt;
@@ -705,7 +906,7 @@
       <title>Using Astro for a Combined RSS View and Generator</title>
       <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
       <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
         &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
@@ -913,7 +1114,7 @@
       <title>Using Val Town to Get Me to the Movies</title>
       <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
       <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
@@ -1034,7 +1235,7 @@
       <title>ColdFusion Wrappers for Bluesky and Mastodon</title>
       <link>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</link>
       <guid>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s been a hot minute since I opened a repo for ColdFusion code, but I thought I&apos;d package up my previous wrapper for Mastodon support, port over my BoxLang Bluesky module, and properly release the code on GitHub for folks who want it: &lt;a href=&quot;https://github.com/cfjedimaster/coldfusion-social-wrappers&quot;&gt;https://github.com/cfjedimaster/coldfusion-social-wrappers&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Right now I&apos;m using one repo for both Bluesky and Mastodon. Usually I&apos;d separate them, but with the &amp;quot;support&amp;quot; being a grand total of one file each, I figured no one would mind getting the &amp;quot;extra&amp;quot; code if they only care about one. I&apos;ll also note the code is very much focused on &lt;em&gt;posting&lt;/em&gt;, not reading data, but part of the reason I wanted to package this up was for people to run with it and add additional support. Fire off those PRs folks!&lt;/p&gt;
@@ -1045,7 +1246,7 @@
       <title>Links For You (2/22/26)</title>
       <link>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</link>
       <guid>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is where I&apos;d usually comment about how the past two weeks seemed to fly by in a blink, but I&apos;m tired of saying that so... oh crap, too late. To be fair, part of the reason the time flew by this week was me being out of town for my first offsite with Webflow. I got to meet my boss, coworkers, and learn more about our company and what our plans are for the year. I&apos;m really happy I joined Webflow and I&apos;m looking forward to the future. It feels like it&apos;s been a while since I could say that and damn do I appreciate having a good job.&lt;/p&gt;
         &lt;h2 id=&quot;an-ai-drama-in-four-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-ai-drama-in-four-parts&quot;&gt;An AI Drama in Four Parts&lt;/a&gt;&lt;/h2&gt;
@@ -1071,7 +1272,7 @@
       <title>Three Plug-N-Play CSS Libraries</title>
       <link>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</link>
       <guid>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For probably over a decade, when I wanted to make a demo/site look nice and didn&apos;t really care about making it unique, I&apos;d go to &lt;a href=&quot;https://getbootstrap.com/&quot;&gt;Bootstrap&lt;/a&gt;. Bootstrap had a nice, clean look and as I was usually employing it for demos, or admin screens, I didn&apos;t care if it looked like every other Bootstrap site. While Bootstrap was &lt;em&gt;mostly&lt;/em&gt; simple, it&apos;s also wordy as heck. Bootstrap has an insane love affair with div tags and even a simple Bootstrap page feels like the line number goes up 4X. Again, that&apos;s &lt;em&gt;fine&lt;/em&gt;, but I found myself wishing for something a bit simpler. That&apos;s where the frameworks I&apos;m sharing today come in. For the most part, these libraries require little to no work on your part. You add a CSS library (or two), and everything just gets better. You &lt;em&gt;can&lt;/em&gt; optionally update your markup a bit, but in general, these libraries are great for the &amp;quot;I don&apos;t care, just make it nice and clean&amp;quot; approach that works great for demos and POCs.&lt;/p&gt;
         &lt;p&gt;As an example of what I would &lt;em&gt;not&lt;/em&gt; consider to be &amp;quot;plug-n-play&amp;quot;, is the excellent &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; library, which requires you to use web components to make use of the library. I really like Shoelace, but the options I&apos;m sharing below are even simpler to use.&lt;/p&gt;
@@ -1241,7 +1442,7 @@
       <title>I threw thousands of files at Astro and you won&apos;t believe what happened next...</title>
       <link>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</link>
       <guid>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
+      <pubDate>Wed, 11 Mar 2026 15:55:47 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, forgive me for the &lt;em&gt;incredibly&lt;/em&gt; over the top title there. Yes, it&apos;s clickbait, but I&apos;m also tired after a &lt;em&gt;very&lt;/em&gt; long week and feeling a little crazy, so just go with me here a bit, I promise it will be worth it. I was curious how well &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; could handle a large amount of data and I thought - what happens if I threw this blog (well, the Markdown files) at it and tried to render out a site? Here&apos;s what I did wrong and what eventually worked (better than I expected).&lt;/p&gt;
         &lt;h2 id=&quot;round-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-one&quot;&gt;Round One&lt;/a&gt;&lt;/h2&gt;
@@ -1352,185 +1553,6 @@
         &lt;p&gt;So, if you want to try this yourself, you can find the source here: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/rayblog&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/rayblog&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Note! I thought it was a bit of a waste to check in &lt;em&gt;all&lt;/em&gt; of my blog posts in this repo so I filtered it down to the last three years. If you want to recreate that I did (and heck, you can probably make it quicker, if you do, drop me a line!), you can clone my posts here: &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;https://github.com/cfjedimaster/raymondcamden2023&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@jeremythomasphoto?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Jeremy Thomas&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/the-stars-and-galaxy-as-seen-from-rocky-mountain-national-park-4dpAqfTbvKA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Creating Reddit Summaries with URL Context and Gemini</title>
-      <link>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</link>
-      <guid>https://www.raymondcamden.com/2026/02/09/creating-reddit-summaries-with-url-context-and-gemini</guid>
-      <pubDate>Tue, 10 Mar 2026 16:08:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;A while ago, the &lt;a href=&quot;https://ai.google.dev/gemini-api/docs&quot;&gt;Gemini API&lt;/a&gt; added a feature to help work with URL content, &lt;a href=&quot;https://ai.google.dev/gemini-api/docs/url-context&quot;&gt;URL Context&lt;/a&gt;. Previously you had to fetch and download the HTML of the page and pass it to the API. This feature allows Gemini to request content (with limits) from public web pages. I thought it would be interesting to test this against Reddit. In the past I&apos;ve made use of Reddit&apos;s APIs, but as they&apos;ve pretty much destroyed access to those APIs, I thought this could be a good work around. Here&apos;s a simple demo I built.&lt;/p&gt;
-        &lt;p&gt;My demo parses the &lt;a href=&quot;https://www.reddit.com/r/astrojs&quot;&gt;Astro&lt;/a&gt; subreddit, specifically the &lt;code&gt;new&lt;/code&gt; feed, and asks for a summary of items that seem to require a developer&apos;s help, as well as items that may be critical of Astro.&lt;/p&gt;
-        &lt;p&gt;I began with my imports and loading in my key from the environment:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
-        from google import genai
-        from google.genai import types
-        
-        client = genai.Client(
-        api_key=os.environ.get(&amp;quot;GEMINI_API_KEY&amp;quot;),
-        )
-        model = &amp;quot;gemini-flash-latest&amp;quot;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Next, I built a method for my prompt:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def summarize():
-        
-        contents = [
-        types.Content(
-        role=&amp;quot;user&amp;quot;,
-        parts=[
-        types.Part.from_text(text=&amp;quot;&amp;quot;&amp;quot;Look at this page in Reddit (https://www.reddit.com/r/astrojs/new/) and scan the titles of the most recent posts to see if anything needs a developer to respond or is overly critical of Astro. When reporting on threads, always include the URL to the thread.&amp;quot;&amp;quot;&amp;quot;),
-        ],
-        ),
-        ]
-        tools = [
-        types.Tool(url_context=types.UrlContext()),
-        ]
-        generate_content_config = types.GenerateContentConfig(
-        thinking_config=types.ThinkingConfig(
-        thinking_budget=0,
-        ),
-        tools=tools,
-        )
-        
-        response = client.models.generate_content(
-        model=model,
-        contents=contents,
-        config=generate_content_config,
-        )
-        
-        return response.text
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The prompt is basically what I stated above, and in theory, you could make this method much more generic, taking in a subreddit by name and changing the company name. But the real important bit is the &lt;code&gt;tools&lt;/code&gt; section which enables URL content. It&apos;s basically like an &amp;quot;internet pass&amp;quot; to allow Gemini to hit the URL (or URLs) specified and add it to the prompt. It may be obvious but just in case, yes, the size of the web page will impact the total number of tokens in the prompt.&lt;/p&gt;
-        &lt;p&gt;The result of this is pretty good. Here&apos;s an example from the current set of new posts.&lt;/p&gt;
-        &lt;iframe src=&quot;https://static.raymondcamden.com/images/2026/02/report.pdf&quot; loading=&quot;lazy&quot; width=&quot;100%&quot; height=&quot;400px&quot;&gt;&lt;/iframe&gt;
-        &lt;p&gt;Ok, that&apos;s fine, but I really prefer to have a set format to my output. Typically this is easy - switch to structured output and supply a JSON schema, but oddly that feature is disabled when using URL Context. Turns out there&apos;s a simple enough solution - just build another prompt!&lt;/p&gt;
-        &lt;p&gt;Here&apos;s the second method I added to my script:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def turn_to_json(input):
-        
-        contents = [
-        types.Content(
-        role=&amp;quot;user&amp;quot;,
-        parts=[
-        types.Part.from_text(text=f&amp;quot;&amp;quot;&amp;quot;
-        I used a previous prompt to parse a URL and provide a report on issues that need a developer, and issues that reflect on the technology.
-        
-        That prompt made use of URL tools and the SDK does not allow you to create structured output. So I want you to take the output and return it in my designed JSON format. Here is the previous output, in Markdown:
-        
-        {input}                                     
-        &amp;quot;&amp;quot;&amp;quot;),
-        ],
-        ),
-        ]
-        generate_content_config = types.GenerateContentConfig(
-        thinking_config=types.ThinkingConfig(
-        thinking_budget=0,
-        ),
-        response_mime_type=&amp;quot;application/json&amp;quot;,
-        response_schema=genai.types.Schema(
-        type = genai.types.Type.OBJECT,
-        required = [&amp;quot;posts&amp;quot;],
-        properties = {
-        &amp;quot;posts&amp;quot;: genai.types.Schema(
-        type = genai.types.Type.ARRAY,
-        items = genai.types.Schema(
-        type = genai.types.Type.OBJECT,
-        required = [&amp;quot;title&amp;quot;, &amp;quot;reason&amp;quot;, &amp;quot;url&amp;quot;],
-        properties = {
-        &amp;quot;title&amp;quot;: genai.types.Schema(
-        type = genai.types.Type.STRING,
-        ),
-        &amp;quot;reason&amp;quot;: genai.types.Schema(
-        type = genai.types.Type.STRING,
-        ),
-        &amp;quot;url&amp;quot;: genai.types.Schema(
-        type = genai.types.Type.STRING,
-        ),
-        },
-        ),
-        ),
-        },
-        ),
-        )
-        
-        response = client.models.generate_content(
-        model=model,
-        contents=contents,
-        config=generate_content_config,
-        )
-        
-        return response.text
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The prompt lets Gemini know that I had a previous prompt and couldn&apos;t get structured output. I then specify I &lt;em&gt;want&lt;/em&gt; structured output, pass in the result from the previous call, and use a specific JSON schema in the call to get my precise response back.&lt;/p&gt;
-        &lt;p&gt;The final part of the script simply calls the methods:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;if __name__ == &amp;quot;__main__&amp;quot;:
-        summary = summarize()
-        json = turn_to_json(summary)
-        print(json)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the result (and as a quick note, I ran my script a few times between creating a PDF export of the initial response and now so if you see any differences, that&apos;s why):&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &amp;quot;posts&amp;quot;: [
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Next.js or Astro for scroll-driven, motion-heavy websites? (leaving Gatsby)&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is asking for long-term production experience advice on which framework (Next.js or Astro) is better for complex, motion-heavy websites, especially when integrating with a headless CMS. This requires input from experienced Astro developers.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qp6a28/nextjs_or_astro_for_scrolldriven_motionheavy/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Astro Managed Hosting? (for my customer)&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is specifically looking for a \&amp;quot;managed hosting\&amp;quot; service for an Astro SSR site (similar to WordPress managed hosting) that will automatically handle Astro updates and service restarts. This is a question for developers who might know of a niche hosting provider or for a hosting provider&apos;s developer to potentially address a market gap.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qpar5l/astro_managed_hosting_for_my_customer/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;How do you all render rich text from Payload CMS&apos;s lexical?&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is looking for a common or best-practice solution for rendering rich text and blocks from Payload CMS&apos;s lexical editor, noting that the official Astro docs lack an example. This needs a practical code-based answer from developers who have solved this integration.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qof39g/how_do_you_all_render_rich_text_from_payload_cmss/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;4 vulnerabilities (2 moderate, 2 high) from upgrading wrangler in Astro&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is asking about the seriousness and the best fix for security vulnerabilities flagged by npm audit after upgrading wrangler in an Astro + Cloudflare project. This is a direct request for technical assistance/clarification on security.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qmx8p7/4_vulnerabilities_2_moderate_2_high_from_upgrading/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Help regarding Astro.js + FastAPI&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is struggling to deploy a combined Astro.js and FastAPI application to Vercel, running into routing issues. They need assistance with the specific configuration for Vercel, the Astro adapter, and the vercel.json file.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qk880f/help_regarding_astrojs_fastapi/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Experimental Content Security Policy (CSP)&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is running into issues with Astro&apos;s experimental CSP feature not covering all script/style hashes and is asking for tips from others who have successfully implemented it in production. This is a request for developer-level configuration guidance.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qip31d/experimental_content_security_policy_csp/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;How do UI libraries work with islands?&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is struggling with how to use a consistent UI library across both static .astro components and hydrated components (like a React island). This is a fundamental architectural question about best practices in an Astro Islands setup and requires a technical answer.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qhb4n3/how_do_ui_libraries_work_with_islands/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Are Astro Templates worth it?&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user reports a \&amp;quot;very sour taste\&amp;quot; after purchasing a paid template that hasn&apos;t been updated since 2022, causing them to abandon it. This is a criticism of the template ecosystem&apos;s quality control and longevity.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qp66w2/are_astro_templates_worth_it/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;Anyone else feel burned out with all these Astro integrated CMS solutions?&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user expresses burnout and frustration, stating that the market is \&amp;quot;missing a clear solution\&amp;quot; for a CMS that nails key fundamentals like good markdown integration, image/asset preview inside MDX, and intuitive component integration. This is a direct criticism of the current state of the Astro CMS ecosystem.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qj5k6z/anyone_else_feel_burned_out_with_all_these_astro/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;High TTFB and execution latency on Astro SSR routes despite fast app code ( vercel hosted )&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user is seeing intermittent and high Time to First Byte (TTFB) and execution latency spikes (3-7s) on their Astro SSR admin routes hosted on Vercel, despite the app code being fast. This is a serious performance criticism of the SSR implementation/Vercel adapter under real-world load.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qi98t5/high_ttfb_and_execution_latency_on_astro_ssr/&amp;quot;
-        },
-        {
-        &amp;quot;title&amp;quot;: &amp;quot;What&apos;s the point of Astro&apos;s i18n internationalization features?&amp;quot;,
-        &amp;quot;reason&amp;quot;: &amp;quot;The user criticizes Astro&apos;s i18n features, stating they expected something more dynamic but have to \&amp;quot;manually create the folders and route files for each locale,\&amp;quot; \&amp;quot;manually load the translation files,\&amp;quot; and that the built-in utilities are confusing and broken for things like translated URLs and language switching.&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;https://www.reddit.com/r/astrojs/comments/1qk3rwi/whats_the_point_of_astros_i18n_internationalization/&amp;quot;
-        }
-        ]
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That&apos;s pretty much it. The URL Context tool works as advertised, which is good, but it&apos;s kinda weird it Gemini can&apos;t map the results to a structured form. That being said, I dig the idea of using a second prompt to improve the results of an initial prompt, and it&apos;s something I&apos;ll consider in the future as well.&lt;/p&gt;
-        &lt;p&gt;You can find the complete script here: &lt;a href=&quot;https://github.com/cfjedimaster/ai-testingzone/tree/main/reddit_summary&quot;&gt;https://github.com/cfjedimaster/ai-testingzone/tree/main/reddit_summary&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
