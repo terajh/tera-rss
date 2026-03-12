@@ -4,7 +4,7 @@
     <title>dev RSS - Reginald Braithwaite</title>
     <link>https://raganwald.com/</link>
     <description>Reginald Braithwaite RSS 피드</description>
-    <lastBuildDate>Wed, 11 Mar 2026 16:16:09 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 12 Mar 2026 16:37:29 GMT</lastBuildDate>
     <item>
       <title>New Yorker Cartoon, c. 2025</title>
       <link>https://raganwald.com/2023/04/27/chatgpt-whisperer.html</link>
@@ -8143,7 +8143,7 @@
         
         &lt;p&gt;We now know that “balanced parentheses” cannot be recognized with one of the simplest possible computing machines, a finite state automaton. This leads us to ask, “What is the simplest form of machine that can recognize balanced parentheses?” Computer scientists have studied this and related problems, and there are a few ideal machines that are more powerful than a DFA, but less powerful than a Turing Machine.&lt;/p&gt;
         
-        &lt;p&gt;All of them have some mechanism for encoding an infinite number of states by adding some form of “external state” to the machine’s existing “internal state.”This is very much like a program in a von Neumann machine. Leaving out self-modifying code, the position of the program counter is a program’s internal state, while memory that it reads and writes is its external state.&lt;sup id=&quot;fnref:inf&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:inf&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+        &lt;p&gt;All of them have some mechanism for encoding an infinite number of states by adding some form of “external state” to the machine’s existing “internal state.” This is very much like a program in a von Neumann machine. Leaving out self-modifying code, the position of the program counter is a program’s internal state, while memory that it reads and writes is its external state.&lt;sup id=&quot;fnref:inf&quot; role=&quot;doc-noteref&quot;&gt;&lt;a href=&quot;#fn:inf&quot; class=&quot;footnote&quot; rel=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
         
         &lt;p&gt;The simplest machine that adds external state, which we might think of as being one step more powerful than a DFA, is called a &lt;a href=&quot;https://en.wikipedia.org/wiki/Pushdown_automaton&quot;&gt;Deterministic Pushdown Automaton&lt;/a&gt;, or “DPA.” A DPA is very much like our Deterministic Finite Automaton, but it adds an expandable stack as its external state.&lt;/p&gt;
         
@@ -9195,13 +9195,13 @@
         
         &lt;p&gt;An obvious question is, &lt;em&gt;Do you need to know the difference between a regular language and a context-free language if all you want to do is write some code that recognizes balanced parentheses?&lt;/em&gt;&lt;/p&gt;
         
-        &lt;p&gt;The answer is, &lt;em&gt;Probably not&lt;/em&gt;. Consider cooking. A &lt;a href=&quot;https://en.wikipedia.org/wiki/Food_science&quot;&gt;food scientist&lt;/a&gt; knows all sorts of things about why certain recipes do what they do. A &lt;a href=&quot;https://en.wikipedia.org/wiki/Chef&quot;&gt;chef de cuisine&lt;/a&gt; (or “chef”) knows how to cook and improvise recipes. Good chefs end up acquiring a fair bit of food science in their careers, and they know how to apply it, but they spend most of their time cooking, not thinking about what is going on inside the food when it cooks.&lt;/p&gt;
+        &lt;p&gt;The answer is, &lt;em&gt;probably not&lt;/em&gt;. Consider cooking. A &lt;a href=&quot;https://en.wikipedia.org/wiki/Food_science&quot;&gt;food scientist&lt;/a&gt; knows all sorts of things about why certain recipes do what they do. A &lt;a href=&quot;https://en.wikipedia.org/wiki/Chef&quot;&gt;chef de cuisine&lt;/a&gt; (or “chef”) knows how to cook and improvise recipes. Good chefs end up acquiring a fair bit of food science in their careers, and they know how to apply it, but they spend most of their time cooking, not thinking about what is going on inside the food when it cooks.&lt;/p&gt;
         
         &lt;p&gt;There are some areas where at least a smattering of familiarity with this particular subject is helpful. Writing parsers, to give one example. Armed with this knowledge, and but little more, the practising programmer knows how to design a configuration file’s syntax or a domain-specific language to be amenable to parsing by an &lt;a href=&quot;https://en.wikipedia.org/wiki/LR_parser&quot;&gt;LR(k)&lt;/a&gt; parser, and what implications deviating from a deterministic context-free language will have on the performance of the parser.&lt;/p&gt;
         
         &lt;p&gt;But on a day-to-day basis, if asked to recognize balanced parentheses?&lt;/p&gt;
         
-        &lt;p&gt;The very best answer is probably &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/^(?&apos;balanced&apos;(?:\(\g&apos;balanced&apos;\))*)$/x&lt;/code&gt; for those whose tools support recursive regular expressions, or a simple loop with a counter or a stack.&lt;/p&gt;
+        &lt;p&gt;The very best answer is probably &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/^(?&apos;balanced&apos;(?:\(\g&apos;balanced&apos;\))*)$/x&lt;/code&gt; for those whose tools support recursive regular expressions, a simple loop with a counter, or a stack.&lt;/p&gt;
         
         &lt;hr /&gt;
         
@@ -9224,31 +9224,6 @@
         &lt;hr /&gt;
         
         &lt;p&gt;&lt;a href=&quot;https://www.flickr.com/photos/gnrklk/33574585673&quot;&gt;&lt;img src=&quot;/assets/images/pushdown/beinecke-interior.jpg&quot; alt=&quot;Beinecke Rare Book &amp;amp; Manuscript Library Interior&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-        
-        &lt;hr /&gt;
-        
-        &lt;h3 id=&quot;a-bonus-problem&quot;&gt;a bonus problem&lt;/h3&gt;
-        
-        &lt;p&gt;Enthusiastic readers can try their hand at writing a function or generator that prints/generates all possible valid balanced parentheses strings. Yes, such a function will obviously run to infinity if left unchecked, a generator will be easier to work with.&lt;/p&gt;
-        
-        &lt;p&gt;The main thing to keep in mind is that such a generator must be arranged so that every finite balanced parentheses string must be output after a finite number of iterations. The following pseudo-code will not work:&lt;/p&gt;
-        
-        &lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;balanced&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// the only valid string with no top-level pairs&lt;/span&gt;
-        
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// yield every balanced parentheses string with p top-level parentheses&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-        
-        &lt;p&gt;A generator function written with this structure would first yield an infinite number of strings with a single top-level pair of balanced parentheses, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;(), (()), ((())), (((()))), ...&lt;/code&gt;. Therefore, strings like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;()()&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;()()()&lt;/code&gt;, which are both valid, would not appear within a finite number of iterations.&lt;/p&gt;
-        
-        &lt;p&gt;It’s an interesting exercise, and very much related to grammars and production rules.&lt;/p&gt;
-        
-        &lt;hr /&gt;
-        
-        &lt;p&gt;&lt;a href=&quot;https://www.flickr.com/photos/frmark/5308847783&quot;&gt;&lt;img src=&quot;/assets/images/pushdown/birmingham.jpg&quot; alt=&quot;Birmingham Central Library&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
         
         &lt;hr /&gt;
         
