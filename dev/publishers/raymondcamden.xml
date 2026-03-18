@@ -4,12 +4,233 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 17 Mar 2026 16:35:13 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 18 Mar 2026 16:44:50 GMT</lastBuildDate>
+    <item>
+      <title>Finding Your Most Popular Bluesky Followers</title>
+      <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
+      <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
+        &lt;h2 id=&quot;the-bluesky-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-bluesky-api&quot;&gt;The Bluesky API&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;ve built a number of demos already using &lt;a href=&quot;https://docs.bsky.app/&quot;&gt;Bluesky&apos;s APIs&lt;/a&gt;, and for the most part, they&apos;re easy to use and &amp;quot;just work&amp;quot; - which is all you want from an API. That was my expectation going into this little demo, but what I was really surprised by was the fact that everything I needed to do could be done without any authentication at all. I didn&apos;t need oAuth, I didn&apos;t need an API key, I just hit public endpoints and everything just worked.&lt;/p&gt;
+        &lt;p&gt;My demo makes use of a few different endpoints:&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://docs.bsky.app/docs/api/app-bsky-actor-get-profile&quot;&gt;app.bsky.actor.getProfile&lt;/a&gt; is used to return information about the user you are generating a report on. As an example, this is what it returns for &lt;a href=&quot;https://bsky.app/profile/raymondcamden.com&quot;&gt;me&lt;/a&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;did&amp;quot;: &amp;quot;did:plc:4tan3ugu55i2u3hmtblu7wf5&amp;quot;,
+        &amp;quot;handle&amp;quot;: &amp;quot;raymondcamden.com&amp;quot;,
+        &amp;quot;displayName&amp;quot;: &amp;quot;Raymond Camden&amp;quot;,
+        &amp;quot;avatar&amp;quot;: &amp;quot;https://cdn.bsky.app/img/avatar/plain/did:plc:4tan3ugu55i2u3hmtblu7wf5/bafkreiepx6pemul5jmnbmplgt5nfv43qaaab3admth4hlgt7foondje46m&amp;quot;,
+        &amp;quot;associated&amp;quot;: {
+        &amp;quot;lists&amp;quot;: 0,
+        &amp;quot;feedgens&amp;quot;: 0,
+        &amp;quot;starterPacks&amp;quot;: 0,
+        &amp;quot;labeler&amp;quot;: false,
+        &amp;quot;chat&amp;quot;: {
+        &amp;quot;allowIncoming&amp;quot;: &amp;quot;all&amp;quot;
+        },
+        &amp;quot;activitySubscription&amp;quot;: {
+        &amp;quot;allowSubscriptions&amp;quot;: &amp;quot;followers&amp;quot;
+        }
+        },
+        &amp;quot;labels&amp;quot;: [],
+        &amp;quot;createdAt&amp;quot;: &amp;quot;2023-04-27T14:26:21.272Z&amp;quot;,
+        &amp;quot;description&amp;quot;: &amp;quot;Developer Advocate who spends all his time building demos involving cats. &amp;quot;,
+        &amp;quot;indexedAt&amp;quot;: &amp;quot;2024-01-20T05:45:01.638Z&amp;quot;,
+        &amp;quot;banner&amp;quot;: &amp;quot;https://cdn.bsky.app/img/banner/plain/did:plc:4tan3ugu55i2u3hmtblu7wf5/bafkreidia27zaotxjebruhsjfkrkwaho4jxzkm6gipkx62ggtnerdmvvfq&amp;quot;,
+        &amp;quot;followersCount&amp;quot;: 2145,
+        &amp;quot;followsCount&amp;quot;: 476,
+        &amp;quot;postsCount&amp;quot;: 1379
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;a href=&quot;https://docs.bsky.app/docs/api/app-bsky-graph-get-followers&quot;&gt;app.bsky.graph.getFollowers&lt;/a&gt; - the &lt;code&gt;getFollowers&lt;/code&gt; endpoint returns a paginated list of an account&apos;s followers. This returns basic information about the account, but &lt;em&gt;not&lt;/em&gt; how many followers the account has.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://docs.bsky.app/docs/api/app-bsky-actor-get-profiles&quot;&gt;app.bsky.actor.getProfiles&lt;/a&gt; - this endpoint is like the first, returning detailed information about a profile, but it lets you pass in 25 accounts at once. I use this to &apos;enhance&apos; the results from &lt;code&gt;getFollowers&lt;/code&gt; and add their follower count.&lt;/p&gt;
+        &lt;p&gt;Now let&apos;s look at how I put this together.&lt;/p&gt;
+        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The application is just vanilla HTML, JavaScript, and CSS. The HTML is pretty simple as JavaScript is handling most of the content output:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;./style.css&amp;quot;&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
+        &amp;lt;title&amp;gt;Popular Followers&amp;lt;/title&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;username&amp;quot;&amp;gt;
+        Enter the username to check: 
+        &amp;lt;input type=&amp;quot;search&amp;quot; id=&amp;quot;username&amp;quot; value=&amp;quot;&amp;quot;&amp;gt;
+        &amp;lt;/label&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;button id=&amp;quot;executeUser&amp;quot;&amp;gt;Execute!&amp;lt;/button&amp;gt;
+        &amp;lt;span id=&amp;quot;status&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
+        
+        &amp;lt;div id=&amp;quot;userProfile&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;!-- this should be CSS I believe... --&amp;gt;
+        &amp;lt;br clear=&amp;quot;left&amp;quot;&amp;gt;
+        &amp;lt;div id=&amp;quot;report&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;script src=&amp;quot;./script.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;On the JavaScript side, I begin with a bunch of DOM grabbing and I listen for click events on my button:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;document.addEventListener(&apos;DOMContentLoaded&apos;, init, false);
+        
+        let $username, $executeUser, $status, $userProfile, $report;
+        
+        async function init() {
+        $username = document.querySelector(&apos;#username&apos;);
+        $executeUser = document.querySelector(&apos;#executeUser&apos;);
+        $status = document.querySelector(&apos;#status&apos;);
+        $userProfile = document.querySelector(&apos;#userProfile&apos;);
+        $report = document.querySelector(&apos;#report&apos;);
+        $executeUser.addEventListener(&apos;click&apos;, executeUser);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Yes, &lt;code&gt;executeUser&lt;/code&gt; is a horrible name for a function. I&apos;m ok with that. That function is pretty intense, so let&apos;s check it out:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function executeUser() {
+        let nick = $username.value.trim();
+        if(nick === &apos;&apos;) return;
+        console.log(`going to do ${nick}`);
+        $status.innerHTML = `Looking up ${nick}...`;
+        $executeUser.setAttribute(&apos;disabled&apos;,&apos;disabled&apos;);
+        
+        let user = await getUser(nick);
+        if(user.error) {
+        $status.innerHTML = `Unable to load this user: ${user.message}`;
+        $executeUser.removeAttribute(&apos;disabled&apos;);
+        return;
+        }
+        console.log(user);
+        
+        // yes it is only blank for a sec, but... 
+        $status.innerHTML = &apos;&apos;; 
+        $userProfile.innerHTML = `
+        &amp;lt;p&amp;gt;
+        &amp;lt;img src=&amp;quot;${user.avatar}&amp;quot;&amp;gt;
+        The user, ${nick} has the display name: ${user.displayName}. They are followed by ${numberFormat(user.followersCount)} users. Generating top follower count now.
+        &amp;lt;/p&amp;gt;
+        `;
+        
+        $status.innerHTML = &apos;Loading followers (this may take a while)&apos;;
+        
+        let followers = [];
+        let fList = await getFollowers(nick);
+        console.log(fList);
+        
+        $status.innerHTML = &apos;Now loading info on these users.&apos;;
+        
+        fList = await inflateUsers(fList);
+        
+        fList.sort((a,b) =&amp;gt; {
+        return b.followersCount - a.followersCount;
+        });
+        console.table(fList);
+        
+        $status.innerHTML = &apos;&apos;; 
+        let report = `
+        &amp;lt;h3&amp;gt;Report (Top 100)&amp;lt;/h3&amp;gt;
+        &amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Avatar&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Followers&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        `;
+        
+        fList.slice(0,100).forEach(f =&amp;gt; {
+        report += `
+        &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;img src=&amp;quot;${f.avatar}&amp;quot; class=&amp;quot;reportAvatar&amp;quot;&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;a href=&amp;quot;https://bsky.app/profile/${f.handle}&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;${f.handle}${f.displayName?&apos; (&apos; + f.displayName + &apos;)&apos;:&apos;&apos;}&amp;lt;/a&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;${numberFormat(f.followersCount)}&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        `;
+        });
+        
+        report += &apos;&amp;lt;/tbody&amp;gt;&amp;lt;/table&amp;gt;&apos;;
+        $report.innerHTML = report;
+        $executeUser.removeAttribute(&apos;disabled&apos;);
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is the primary portion of the application. It handles validating your input and ensuring you entered a real user account. After rendering a little bit about the account, it kicks off the process to get your followers and then enhance those results so we know the follower count.&lt;/p&gt;
+        &lt;p&gt;The final step is to sort and render it out in a basic table. I filter to the top 100 but dump the entire result in your console if you want to see. (If you didn&apos;t know about &lt;code&gt;console.table&lt;/code&gt;, it is hella useful for cases like this.)&lt;/p&gt;
+        &lt;p&gt;My three Bluesky API wrappers are pretty trivial outside of intelligently handling both pagination and sending 25 users at a time in slices:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function getUser(u) {	
+        let uReq = await fetch(`https://api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${u}`);
+        return await uReq.json();
+        }
+        
+        /*
+        I grab all the followers, looping over each page
+        */
+        async function getFollowers(u) {
+        let result = [];
+        let hasMore = true;
+        let cursor = &apos;&apos;;
+        
+        while(hasMore) {
+        console.log(`loading for cursor ${cursor}`);
+        let fReq = await fetch(`https://api.bsky.app/xrpc/app.bsky.graph.getFollowers?actor=${u}&amp;amp;cursor=${cursor}&amp;amp;limit=100`);
+        let thisResult = await fReq.json();
+        result.push(...thisResult.followers);
+        if(!thisResult.cursor) hasMore = false;
+        else cursor = thisResult.cursor;
+        // tempf for testing
+        //if(result.length &amp;gt;= 200) hasMore = false;
+        }	
+        return result;
+        }
+        
+        /*
+        Given an array of users, I need to get more info about them, specifically just how many followers they have. 
+        BSky supports getting 25 at a time, so we will use that
+        to lower the # of network calls
+        */
+        async function inflateUsers(users) {
+        for(let i=0; i&amp;lt;users.length;i+=25) {
+        let slice = users.slice(i,i+25);
+        let uList = slice.reduce((list, u) =&amp;gt; {
+        list.push(`&amp;amp;actors=${u.handle}`);
+        return list;
+        },[]);
+        
+        let uReq = await fetch(`https://api.bsky.app/xrpc/app.bsky.actor.getProfiles?${uList.join(&apos;&apos;)}`);
+        let uData = await uReq.json();
+        console.log(&apos;uData!!!&apos;, uData);
+        for(let x=0;x&amp;lt;uData.profiles.length;x++) {
+        users[i+x].followersCount = uData.profiles[x].followersCount;
+        }
+        console.log(`slice starting at ${i} has len ${slice.length}`); 
+        }
+        return users;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If you don&apos;t want to test this yourself, here&apos;s a screen shot of it in action.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/bs1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App view showing the form&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Finally, this was maybe my second or third time using the new CodePen. You can check it out in the embed below. I&apos;m &lt;em&gt;really&lt;/em&gt; digging it, especially the new editing experience. I much prefer having tabs so I can focus on one file at a time. Sure, you could minimize the panels in CodePen before, but this UX just feels closer to Visual Studio Code and is just more enjoyable to me.&lt;/p&gt;
+        &lt;p&gt;Also, as I said in the beginning, this is kind of a pointless tool and mostly exists to stroke your ego a bit, but I &lt;em&gt;can&lt;/em&gt; see some usefulness in reporting on your followers. Not for a personal account like my own, but for brand or larger media accounts perhaps. It wouldn&apos;t be difficult to add different types of sorting or filtering for example. If you end up forking my code, let me know!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;300&quot; data-pen-title=&quot;Top BS Followers&quot; data-version=&quot;2&quot; data-default-tab=&quot;js,result&quot; data-slug-hash=&quot;PwGmgJj&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019cfd52-c2e3-7e3c-9b96-a3b61b27f7b2&quot;&gt;
+        Top BS Followers&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -210,7 +431,7 @@
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -752,7 +973,7 @@
       <title>Links For You (3/8/26)</title>
       <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
       <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
         &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
@@ -806,7 +1027,7 @@
       <title>Dynamically Adjusting Image Text for Contrast</title>
       <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
       <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
         &lt;ul&gt;
@@ -906,7 +1127,7 @@
       <title>Using Astro for a Combined RSS View and Generator</title>
       <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
       <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
         &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
@@ -1114,7 +1335,7 @@
       <title>Using Val Town to Get Me to the Movies</title>
       <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
       <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
@@ -1235,7 +1456,7 @@
       <title>ColdFusion Wrappers for Bluesky and Mastodon</title>
       <link>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</link>
       <guid>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s been a hot minute since I opened a repo for ColdFusion code, but I thought I&apos;d package up my previous wrapper for Mastodon support, port over my BoxLang Bluesky module, and properly release the code on GitHub for folks who want it: &lt;a href=&quot;https://github.com/cfjedimaster/coldfusion-social-wrappers&quot;&gt;https://github.com/cfjedimaster/coldfusion-social-wrappers&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Right now I&apos;m using one repo for both Bluesky and Mastodon. Usually I&apos;d separate them, but with the &amp;quot;support&amp;quot; being a grand total of one file each, I figured no one would mind getting the &amp;quot;extra&amp;quot; code if they only care about one. I&apos;ll also note the code is very much focused on &lt;em&gt;posting&lt;/em&gt;, not reading data, but part of the reason I wanted to package this up was for people to run with it and add additional support. Fire off those PRs folks!&lt;/p&gt;
@@ -1246,7 +1467,7 @@
       <title>Links For You (2/22/26)</title>
       <link>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</link>
       <guid>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is where I&apos;d usually comment about how the past two weeks seemed to fly by in a blink, but I&apos;m tired of saying that so... oh crap, too late. To be fair, part of the reason the time flew by this week was me being out of town for my first offsite with Webflow. I got to meet my boss, coworkers, and learn more about our company and what our plans are for the year. I&apos;m really happy I joined Webflow and I&apos;m looking forward to the future. It feels like it&apos;s been a while since I could say that and damn do I appreciate having a good job.&lt;/p&gt;
         &lt;h2 id=&quot;an-ai-drama-in-four-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-ai-drama-in-four-parts&quot;&gt;An AI Drama in Four Parts&lt;/a&gt;&lt;/h2&gt;
@@ -1272,7 +1493,7 @@
       <title>Three Plug-N-Play CSS Libraries</title>
       <link>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</link>
       <guid>https://www.raymondcamden.com/2026/02/16/three-plug-n-play-css-libraries</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
+      <pubDate>Wed, 18 Mar 2026 16:22:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For probably over a decade, when I wanted to make a demo/site look nice and didn&apos;t really care about making it unique, I&apos;d go to &lt;a href=&quot;https://getbootstrap.com/&quot;&gt;Bootstrap&lt;/a&gt;. Bootstrap had a nice, clean look and as I was usually employing it for demos, or admin screens, I didn&apos;t care if it looked like every other Bootstrap site. While Bootstrap was &lt;em&gt;mostly&lt;/em&gt; simple, it&apos;s also wordy as heck. Bootstrap has an insane love affair with div tags and even a simple Bootstrap page feels like the line number goes up 4X. Again, that&apos;s &lt;em&gt;fine&lt;/em&gt;, but I found myself wishing for something a bit simpler. That&apos;s where the frameworks I&apos;m sharing today come in. For the most part, these libraries require little to no work on your part. You add a CSS library (or two), and everything just gets better. You &lt;em&gt;can&lt;/em&gt; optionally update your markup a bit, but in general, these libraries are great for the &amp;quot;I don&apos;t care, just make it nice and clean&amp;quot; approach that works great for demos and POCs.&lt;/p&gt;
         &lt;p&gt;As an example of what I would &lt;em&gt;not&lt;/em&gt; consider to be &amp;quot;plug-n-play&amp;quot;, is the excellent &lt;a href=&quot;https://shoelace.style/&quot;&gt;Shoelace&lt;/a&gt; library, which requires you to use web components to make use of the library. I really like Shoelace, but the options I&apos;m sharing below are even simpler to use.&lt;/p&gt;
@@ -1436,123 +1657,6 @@
         &lt;h2 id=&quot;more%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#more%3F&quot;&gt;More?&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;If any of yall know of more options like this, I&apos;d love to hear about them. Just drop me a comment below. As I mentioned, Simple.css is my favorite now, but I&apos;m going to give Oat a try in the next demo I build.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://creativecommons.org/publicdomain/zero/1.0/&quot;&gt;CC0&lt;/a&gt; licensed &lt;a href=&quot;https://wordpress.org/photos/photo/8636531357/&quot;&gt;photo&lt;/a&gt; by &lt;a href=&quot;https://wordpress.org/photos/author/benimub/&quot;&gt;Umesh Balayar&lt;/a&gt; from the &lt;a href=&quot;https://wordpress.org/photos/&quot;&gt;WordPress Photo Directory&lt;/a&gt;.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>I threw thousands of files at Astro and you won&apos;t believe what happened next...</title>
-      <link>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</link>
-      <guid>https://www.raymondcamden.com/2026/02/13/i-threw-thousands-of-files-at-astro-and-you-wont-believe-what-happened-next</guid>
-      <pubDate>Tue, 17 Mar 2026 16:13:51 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Ok, forgive me for the &lt;em&gt;incredibly&lt;/em&gt; over the top title there. Yes, it&apos;s clickbait, but I&apos;m also tired after a &lt;em&gt;very&lt;/em&gt; long week and feeling a little crazy, so just go with me here a bit, I promise it will be worth it. I was curious how well &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; could handle a large amount of data and I thought - what happens if I threw this blog (well, the Markdown files) at it and tried to render out a site? Here&apos;s what I did wrong and what eventually worked (better than I expected).&lt;/p&gt;
-        &lt;h2 id=&quot;round-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-one&quot;&gt;Round One&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I began by creating a soft link locally from my blog&apos;s repo of &lt;code&gt;posts&lt;/code&gt; to the &lt;code&gt;src/pages/posts&lt;/code&gt; of a new Astro site. My blog currently has &lt;a href=&quot;https://www.raymondcamden.com/stats&quot;&gt;6742&lt;/a&gt; posts (all high quality I assure you). Each one looks like so:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;---
-        layout: post
-        title: &amp;quot;Creating Reddit Summaries with URL Context and Gemini&amp;quot;
-        date: &amp;quot;2026-02-09T18:00:00&amp;quot;
-        categories: [&amp;quot;development&amp;quot;]
-        tags: [&amp;quot;python&amp;quot;,&amp;quot;generative ai&amp;quot;]
-        banner_image: /images/banners/cat_on_papers2.jpg
-        permalink: /2026/02/09/creating-reddit-summaries-with-url-context-and-gemini
-        description: Using Gemini APIs to create a summary of a subreddit.
-        ---
-        
-        Interesting content no one will probably read here...
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In my Astro site&apos;s &lt;code&gt;index.astro&lt;/code&gt; page, I tried this first:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const allPosts = Object.values(import.meta.glob(&apos;./posts/**/*.md&apos;, { eager: true }));
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And immediately ran into an issue with the &lt;code&gt;layout&lt;/code&gt; front matter. Astro parses this and expects to find a &lt;code&gt;post&lt;/code&gt; component in the same directory. My &amp;quot;fix&amp;quot; was to... remove the symbolic link and make a real copy and then use multi-file search and replace to just delete the line.&lt;/p&gt;
-        &lt;p&gt;That worked... but was incredibly slow. I&apos;d say it took about 70 or so seconds for each load.&lt;/p&gt;
-        &lt;p&gt;This was... obviously... the wrong approach.&lt;/p&gt;
-        &lt;h2 id=&quot;round-two---the-right-approach&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#round-two---the-right-approach&quot;&gt;Round Two - The Right Approach&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The solution was simple - use &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/&quot;&gt;content collections&lt;/a&gt;. This involved moving my content out of the &lt;code&gt;src/pages&lt;/code&gt; directory and creating a file, &lt;code&gt;src/content.config.js&lt;/code&gt; to define the collection:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { defineCollection } from &apos;astro:content&apos;;
-        
-        import { glob, file } from &apos;astro/loaders&apos;;
-        
-        
-        const blog = defineCollection({ 
-        loader: glob({pattern:&amp;quot;**/*.md&amp;quot;,base:&amp;quot;./posts&amp;quot;})
-        });
-        
-        export const collections = { blog  };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;You an see where I define my &lt;code&gt;blog&lt;/code&gt; collection using a glob pattern and a base directory. That&apos;s literally it. This still took a few seconds to load, but was cached and future reloads were zippy zippy.&lt;/p&gt;
-        &lt;h2 id=&quot;but-wait...-there&apos;s-more&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#but-wait...-there&apos;s-more&quot;&gt;But wait... there&apos;s more&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;With this working, I began building out a few pages just to see things in action. First, a home page that shows ten recent posts with excepts:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        import { formatDate, excerpt } from &amp;quot;../utils/formatters.js&amp;quot;
-        
-        import { getCollection } from &apos;astro:content&apos;;
-        
-        const posts = await getCollection(&apos;blog&apos;);
-        const sortedPosts  = posts.sort((a, b) =&amp;gt; {
-        return new Date(b.data.date)-new Date(a.data.date);
-        }).slice(0,10);
-        
-        ---
-        
-        &amp;lt;BaseLayout pageTitle=&amp;quot;Blog&amp;quot;&amp;gt;
-        
-        { sortedPosts.map((post:any) =&amp;gt; 
-        &amp;lt;div&amp;gt;
-        &amp;lt;h3&amp;gt;&amp;lt;a href={ `/posts/${post.id}` }&amp;gt;{post.data.title}&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;i&amp;gt;Published { formatDate(post.data.date)}&amp;lt;/i&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;p set:html={ excerpt(post.rendered.html)}&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        )}
-        &amp;lt;p&amp;gt;
-        &amp;lt;a href=&amp;quot;all.html&amp;quot;&amp;gt;Every Post Ever&amp;lt;/a&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I think the import bits here are on top. You can see I need to sort my posts and I do so such that the most recent posts are on top. (In theory this sort would be faster if I pre-processed the string based dates into Date objects once, but the demo was working so fast now I didn&apos;t bother.)&lt;/p&gt;
-        &lt;p&gt;Now note the the link. To make this work, I created a new file, &lt;code&gt;src/pages/posts/[...id].astro&lt;/code&gt;. The rest parameter in the filename (&lt;code&gt;...id&lt;/code&gt;) is important. I&apos;ll explain after sharing the file contents:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import BaseLayout from &apos;../../layouts/BaseLayout.astro&apos;;
-        
-        import { getCollection, render } from &apos;astro:content&apos;;
-        
-        export async function getStaticPaths() {
-        const posts = await getCollection(&apos;blog&apos;);
-        
-        return posts.map(post =&amp;gt; ({
-        params:{ id: post.id },
-        props: { post },
-        }));
-        
-        }
-        
-        const { post } = Astro.props;
-        const { Content } = await render(post);
-        ---
-        
-        &amp;lt;BaseLayout pageTitle={post.data.title}&amp;gt;
-        &amp;lt;Content /&amp;gt;
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;My &lt;code&gt;id&lt;/code&gt; values are coming from the permalink of my blog posts and look like so: &lt;code&gt;permalink: /2026/02/09/creating-reddit-summaries-with-url-context-and-gemini&lt;/code&gt;. Notice the forward slashes? This was throwing errors in Astro when I originally named my file &lt;code&gt;[id].astro&lt;/code&gt;. The rest parameter version fixed that immediately.&lt;/p&gt;
-        &lt;p&gt;That&apos;s almost the last issue. With this in place, I could browse a few blog posts and see how they looked. I noticed something odd though. I had a header with three dots in it:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;## Temporal is Coming...
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And when rendered out, it turned into trash. I went to Gemini, asked about it, and it turned out to be an issue with Astro&apos;s Markdown processor considering the three dots a Unicode ellipsis character. My app didn&apos;t have a &amp;quot;real&amp;quot; HTML layout at this point (I added &lt;code&gt;BaseLayout&lt;/code&gt; later) and was missing:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;meta charset=&amp;quot;utf-8&amp;quot; /&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;As soon as that was added, it rendered just fine!&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/02/ab1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Blog home page&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;And how well did it perform when building? At near seven thousand pages, &lt;code&gt;npm run build&lt;/code&gt; took...&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/02/ab2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Pause for effect&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;8 seconds. That&apos;s pretty dang good I&apos;d say.&lt;/p&gt;
-        &lt;p&gt;So, if you want to try this yourself, you can find the source here: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/rayblog&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/rayblog&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Note! I thought it was a bit of a waste to check in &lt;em&gt;all&lt;/em&gt; of my blog posts in this repo so I filtered it down to the last three years. If you want to recreate that I did (and heck, you can probably make it quicker, if you do, drop me a line!), you can clone my posts here: &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;https://github.com/cfjedimaster/raymondcamden2023&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@jeremythomasphoto?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Jeremy Thomas&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/the-stars-and-galaxy-as-seen-from-rocky-mountain-national-park-4dpAqfTbvKA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
