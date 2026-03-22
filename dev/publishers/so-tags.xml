@@ -4,7 +4,58 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sat, 21 Mar 2026 16:06:56 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 22 Mar 2026 15:53:54 GMT</lastBuildDate>
+    <item>
+      <title>Vite shared option &apos;define&apos; seems to not work as documented on build mode</title>
+      <link>https://stackoverflow.com/questions/79911959/vite-shared-option-define-seems-to-not-work-as-documented-on-build-mode</link>
+      <guid>https://stackoverflow.com/questions/79911959/vite-shared-option-define-seems-to-not-work-as-documented-on-build-mode</guid>
+      <pubDate>Sat, 21 Mar 2026 16:29:30 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have successfully migrated my small app from Vue 2 + Vue-cli to Vue 3 and Vite (8.0.1). There is just one small annoyance I cannot get around. It is related to the Vite shared option &apos;define&apos;. It seems to not work as documented.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;The Issue&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;Although following the Vite (8.0.1) documentation for the shared option &apos;define&apos;, in env mode this setup is working properly, but in build mode the value is &apos;undefined&apos;. I assume the defined global is not statically replaced  as described in &lt;a href=&quot;https://vite.dev/config/shared-options#define&quot; rel=&quot;nofollow noreferrer&quot;&gt;Vite Config&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Here are short extracts from my code.&lt;/p&gt;
+        &lt;p&gt;I my &apos;package.json&apos; I have the app version specified as&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;&amp;quot;version&amp;quot;: &amp;quot;1.0.0&amp;quot;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In &apos;vite.config.ts&apos; I have defined a global as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import packageJson from `&apos;./package.json&apos;;
+        
+        define: {
+        __APP_VERSION__: JSON.stringify(packageJson.version),
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In &apos;vite-env.d.ts&apos; it is declared as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;declare const __APP_VERSION__: string;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In my &apos;ApplicationStore.ts&apos; it is assigned to &apos;appVersion&apos; as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;state: () =&amp;gt; ({
+        ...
+        appVersion: globalThis.__APP_VERSION__,
+        }),
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and used in component &apos;AboutView.vue&apos; like&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;computed: {
+        ...mapStores(useApplicationStore),
+        appTitle: function () {
+        return &apos;cDirector v&apos; + this.applicationStore.appVersion;
+        },
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and in the template as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;...
+        &amp;lt;NavBarTitle :title=&amp;quot;appTitle&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;Tried Solutions&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;I have tried to not take the version from &apos;package.json&apos; and hardcode it in&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;__APP_VERSION__: JSON.stringify(&apos;1.0.0&apos;),
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But this is not the solution (same issue).&lt;/p&gt;
+        &lt;p&gt;I also added &apos;./package.json&apos; to the include files in &apos;tsconfig.node.json&apos;, but no change as well.&lt;/p&gt;
+        &lt;p&gt;Why is &lt;code&gt;__APP_VERSION__&lt;/code&gt; not statically replaced on build? I have read some of the recommended posts but none does match my issue.&lt;/p&gt;
+        &lt;p&gt;Do I misunderstand the documentation or is there another working approch to the intented feature?&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Vue doesn&apos;t load styles in root</title>
       <link>https://stackoverflow.com/questions/79907317/vue-doesnt-load-styles-in-root</link>
@@ -1530,47 +1581,6 @@
         &lt;p&gt;I want to know which tool to use to debug my web app when it faces an issue.&lt;/p&gt;
         &lt;p&gt;If some of you know more tools useful to recommend me in this case I will be very happy about it.&lt;/p&gt;
         &lt;p&gt;I made some search but I don&apos;t find some tools that can help me. That is the reason that I come in this community to find answer there&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>VS Code stuck on &quot;Initializing &apos;tsconfig.json&quot;</title>
-      <link>https://stackoverflow.com/questions/79857680/vs-code-stuck-on-initializing-tsconfig-json</link>
-      <guid>https://stackoverflow.com/questions/79857680/vs-code-stuck-on-initializing-tsconfig-json</guid>
-      <pubDate>Tue, 30 Dec 2025 16:55:26 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Recently my VS Code seems to have a problem initializing my VueJs workspaces. When a .vue file is open VS Code displays &amp;quot;Initializing &apos;tsconfig.json&apos;&amp;quot; in the the lower left-hand corner and it takes at least 20 minute if it finishes at all. Because of this all intellisense features (code completion, error display) do not work as well. I tried deleting the config folders in my profile (.vscode and AppData\Roaming\Code) and just installing the official Vue extension, but the problem persists.&lt;/p&gt;
-        &lt;p&gt;I tried a couple of suggestions from articles / post with similar problem descriptions but none of those helped.&lt;/p&gt;
-        &lt;p&gt;The issue occurs with all of my VueJS workspaces. On another computer the initialization is finished in less than a minute (same extensions, same version of VS Code).&lt;/p&gt;
-        &lt;p&gt;How do I find out what causes this issue?&lt;/p&gt;
-        &lt;p&gt;Additional info I found while researching this:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Reinstall off VS Code (including deletion of the user data folders) did not help&lt;/li&gt;
-        &lt;li&gt;There is only one typescript version to choose from: 5.9.3 (although once for VS Code and once for the workspace, but this does not make a difference)&lt;/li&gt;
-        &lt;li&gt;This seems to be somehow related to the project folder being a network share. When I copy the folder to the local hard drive the initialization is much faster&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;All of this still does not explain, why is working fine on two other computers. I compared the tsserver logs and found something interesting. While the log messages themselves are more or less identical the computer showing the issues seems to pause the initialization for a couple of seconds once in while:&lt;/p&gt;
-        &lt;p&gt;Working computer:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Info 99   [12:22:26.419] FileWatcher:: Added:: WatchInfo: c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts 500 undefined WatchType: Closed Script info
-        Info 100  [12:22:26.420] event:
-        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:30,&amp;quot;path&amp;quot;:&amp;quot;c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts&amp;quot;}}
-        Info 101  [12:22:26.863] FileWatcher:: Added:: WatchInfo: //server.tld/web_projects/admin/src/locales/de.json 500 undefined WatchType: Closed Script info
-        Info 102  [12:22:26.863] event:
-        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:31,&amp;quot;path&amp;quot;:&amp;quot;//server.tld/web_projects/admin/src/locales/de.json&amp;quot;}}
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Not-working computer:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Info 99   [12:33:33.274] FileWatcher:: Added:: WatchInfo: c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts 500 undefined WatchType: Closed Script info
-        Info 100  [12:33:33.274] event:
-        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:30,&amp;quot;path&amp;quot;:&amp;quot;c:/Users/user/.vscode/extensions/vue.volar-3.2.1/types/props-fallback.d.ts&amp;quot;}}
-        Info 101  [12:34:09.092] FileWatcher:: Added:: WatchInfo: //server.tld/web_projects/admin/src/locales/de.json 500 undefined WatchType: Closed Script info
-        Info 102  [12:34:09.092] event:
-        {&amp;quot;seq&amp;quot;:0,&amp;quot;type&amp;quot;:&amp;quot;event&amp;quot;,&amp;quot;event&amp;quot;:&amp;quot;createFileWatcher&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;id&amp;quot;:31,&amp;quot;path&amp;quot;:&amp;quot;//server.tld/web_projects/admin/src/locales/de.json&amp;quot;}}
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Why is there a pause of 36 seconds? I found other event longer pauses of 3 min, 33 secondes, 35 seconds, 3 min 17 seconds, e.g.:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Info 640  [12:38:18.840] FileWatcher:: Added:: WatchInfo: \\server.tld\web_projekte\admin\node_modules\vue-i18n\package.json 2000 {&amp;quot;excludeDirectories&amp;quot;:[&amp;quot;//server.tld/web_projekte/admin/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/dist&amp;quot;,&amp;quot;//server.tld0/web_projekte/admin/**/dist&amp;quot;]} Project: /dev/null/autoImportProviderProject1* WatchType: File location affecting resolution
-        Info 641  [12:41:35.474] FileWatcher:: Added:: WatchInfo: \\server.tld\web_projekte\node_modules\@types\node\package.json 2000 {&amp;quot;excludeDirectories&amp;quot;:[&amp;quot;//server.tld/web_projekte/admin/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/node_modules&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/dist&amp;quot;,&amp;quot;//server.tld/web_projekte/admin/**/dist&amp;quot;]} Project: /dev/null/autoImportProviderProject1* WatchType: File location affecting resolution
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;On the other computer the pause is slightly over 1 second.&lt;/p&gt;
-        &lt;p&gt;When I restart the TS server the details seem to occur on the same log entries with the same duration.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
