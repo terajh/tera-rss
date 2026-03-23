@@ -4,12 +4,298 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 22 Mar 2026 15:54:04 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 23 Mar 2026 16:33:33 GMT</lastBuildDate>
+    <item>
+      <title>Implementing OAuth in Astro</title>
+      <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
+      <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
+        &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I can remember being &lt;em&gt;incredibly&lt;/em&gt; confused by OAuth in the past. Honestly I felt like I was the only one who didn&apos;t get it. So I forced myself to build a few demos in that area to help it click and I realized it wasn&apos;t terribly difficult to implement at all. My first explorations in this area were back in 2010, almost two decades ago, so it&apos;s definitely not anything new, but on the off chance that one of my readers needs an overview, I figure it can&apos;t hurt to share.&lt;/p&gt;
+        &lt;p&gt;OAuth basically boils down to the idea of using a trusted third party to authenticate a user. &amp;quot;Typical&amp;quot; authentication systems required you to set up a users table in a database, carefully store credentials, and build a login process. OAuth is like saying screw that, if Google says a person is so and so, I trust Google.&lt;/p&gt;
+        &lt;p&gt;With OAuth, you work with a third party (Google, Facebook, or many other services) to hand off the authentication process. You get information about the user (like their email address) and can use that as an identifier when storing data on your site.&lt;/p&gt;
+        &lt;p&gt;OAuth also lets you perform actions based on a user. While you can use OAuth just to identify someone, you can also use it to do things like access their Google calendar, work with Facebook contacts, and so forth. Users see this when they authenticate with the third party as a warning (that they&apos;ll probably ignore) that says, &amp;quot;Once you login, the site will be able to do X, Y, and Z with your data.&amp;quot;&lt;/p&gt;
+        &lt;h2 id=&quot;typical-oauth-flow&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#typical-oauth-flow&quot;&gt;Typical OAuth Flow&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;In most cases, you set up OAuth like so. First, on the third party site, you create an application that represents your site. So if you are building RaymondCamden.com as the go to place for - well whatever - your app will usually have the same name and a description that matches. This is also where you specify the permissions your app needs. It may just need the minimum - a profile that identifiers the user. But if you are building an integration that needs read or write access to data, you&apos;ll specify it there.&lt;/p&gt;
+        &lt;p&gt;As part of the process, you also define a &amp;quot;call back url&amp;quot;, which is where the user is redirected to after authenticating with the third party. This will be your app, and usually you have two - one for development and one for production. Some OAuth providers don&apos;t allow this and you end up creating two apps for your environments.&lt;/p&gt;
+        &lt;p&gt;In your code, you then create a link to the third party. Their docs will tell you how to do this and you - of course - let the user know what&apos;s about to happen:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;a href=&amp;quot;long ass url on Google&amp;quot;&amp;gt;Login with Google&amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;When the user clicks this, they end up at the third part, login, get presented with the &amp;quot;The site will be able to do X with your stuff&amp;quot; prompt, and when confirmed, they return to the call back URL. When they do, a code will be in the URL. You take that code and send it &lt;em&gt;back&lt;/em&gt; to the third party to get an access token. This access token lets you do stuff - stuff being whatever permissions you wanted. The token is short lived so it&apos;s not useful forever, but will work fine for a typical session.&lt;/p&gt;
+        &lt;h2 id=&quot;my-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#my-demo&quot;&gt;My Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;My Astro application makes use of Google as a third party login and will ask for Calendar read permissions. My app has a grand total of three pages:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A home page with a link to login with Google&lt;/li&gt;
+        &lt;li&gt;A callback page the user doesn&apos;t actually &amp;quot;see&amp;quot;, but handles the post-auth stuff&lt;/li&gt;
+        &lt;li&gt;An events page that works with the data the app has access to once the user logs in&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;To make this work, I&apos;ll use:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://docs.astro.build/en/guides/sessions/&quot;&gt;Sessions&lt;/a&gt; to persist the access token.&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://docs.astro.build/en/guides/middleware/&quot;&gt;Middleware&lt;/a&gt; to route you based on your current status.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Ok, let&apos;s get started. I&apos;m not going to show you the Google Cloud Console and such as the UI there is - obviously - unique to Google. But I can say I created an app and got a client id and client secret. I put these, and my callback url, all in a &lt;code&gt;.env&lt;/code&gt; file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;CLIENT_ID=my_client_id_brings_all_the_boys_to_the_yard
+        CLIENT_SECRET=damn_right_its_better_than_yours
+        REDIRECT_URL=http://localhost:4321/callback
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Yes, I named the the callback value &lt;code&gt;REDIRECT_URL&lt;/code&gt;, but I&apos;m ok with that. ;)&lt;/p&gt;
+        &lt;h2 id=&quot;enabling-sessions&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#enabling-sessions&quot;&gt;Enabling Sessions&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Since I knew I would be using sessions through, I started off enabling sessions. I did this by using the Node adapter as I wasn&apos;t planning on actually deploying this live. And literally, that&apos;s all I did. When you add that, your &lt;code&gt;astro.config.mjs&lt;/code&gt; is updating accordingly, but I also added &lt;code&gt;output:&apos;server&apos;&lt;/code&gt; such that every route was dynamic:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// @ts-check
+        import { defineConfig } from &apos;astro/config&apos;;
+        
+        import node from &apos;@astrojs/node&apos;;
+        
+        // https://astro.build/config
+        export default defineConfig({
+        output:&apos;server&apos;,
+        adapter: node({
+        mode: &apos;standalone&apos;
+        })
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2 id=&quot;the-home-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-home-page&quot;&gt;The Home Page&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;A real-world application will usually have a mix of pages that require login and those that do not. My simple app only has (visibly anyway) the home page with login and the page that uses your data. Therefore my homepage is literally just a login link:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
+        
+        const CLIENT_ID = process.env.CLIENT_ID;
+        const REDIRECT_URL = process.env.REDIRECT_URL;
+        
+        const getAuthURL = () =&amp;gt; {
+        let params = new URLSearchParams();
+        params.set(&apos;client_id&apos;, CLIENT_ID);
+        params.set(&apos;redirect_uri&apos;, REDIRECT_URL);
+        params.set(&apos;response_type&apos;,&apos;code&apos;);
+        params.set(&apos;scope&apos;,&apos;https://www.googleapis.com/auth/calendar.readonly&apos;);
+        let url = &apos;https://accounts.google.com/o/oauth2/v2/auth?&apos; + params.toString();
+        return url;
+        }
+        
+        // treat it like a flash var, get it and nuke it
+        let error = await Astro.session?.get(&apos;error&apos;);
+        if(error) Astro.session.set(&apos;error&apos;, null);
+        console.log(&apos;error&apos;,error);
+        ---
+        
+        &amp;lt;BaseLayout&amp;gt;
+        
+        &amp;lt;h1&amp;gt;Login&amp;lt;/h1&amp;gt;
+        
+        { error &amp;amp;&amp;amp; 
+        &amp;lt;p&amp;gt;This error was returned: { error }&amp;lt;/p&amp;gt;
+        }
+        &amp;lt;p&amp;gt;
+        Link to login &amp;lt;a href={ getAuthURL() }&amp;gt;here&amp;lt;/a&amp;gt;.
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;/BaseLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The most complex part here is &lt;code&gt;getAuthURL&lt;/code&gt;, which will almost always look like what you see here - a URL that includes the client id from the third party provider, the callback url (yes, you supply this on the third party site &lt;em&gt;and&lt;/em&gt; in the URL), and permissions. Almost always your code will follow this format but I&apos;ve seen &lt;code&gt;redirect_url&lt;/code&gt; and &lt;code&gt;redirect_uri&lt;/code&gt; pretty interchangeably.&lt;/p&gt;
+        &lt;p&gt;One little trick here I do is look in my session for an &lt;code&gt;error&lt;/code&gt; value. If it exists, I grab it, and remove it. This is a &apos;flash&apos; var, basically a value set on one page and used once in another. Some platforms/frameworks have built-in support for this but doing it by hand isn&apos;t too difficult - I simply delete it if exists.&lt;/p&gt;
+        &lt;p&gt;In the HTML, I render that error if it exists and then the login link. I&apos;d share a screenshot but it&apos;s literally just a link. :)&lt;/p&gt;
+        &lt;p&gt;I will share a screenshot of what you see when clicking:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/oa1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Auth consent form&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This is a fairly standard UI. Each provider will have their own look and feel, but most users should be pretty familiar with it.&lt;/p&gt;
+        &lt;h2 id=&quot;the-callback-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-callback-page&quot;&gt;The Callback Page&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;After logging in, the provider (Google in this case) redirects the user back. This next page doesn&apos;t have any output as it just handles the result:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        const CLIENT_ID = process.env.CLIENT_ID;
+        const CLIENT_SECRET = process.env.CLIENT_SECRET;
+        const REDIRECT_URL = process.env.REDIRECT_URL;
+        
+        const code = Astro.url.searchParams.get(&apos;code&apos;) || &apos;&apos;;
+        const error = Astro.url.searchParams.get(&apos;error&apos;) || &apos;&apos;;
+        
+        if(error !== &apos;&apos;) {
+        console.error(&apos;Error!!&apos;, error);
+        Astro.session?.set(&apos;error&apos;,error);
+        return Astro.redirect(&apos;/&apos;);
+        }
+        
+        // get our access token
+        const params = new URLSearchParams();
+        params.append(&apos;client_id&apos;, CLIENT_ID);
+        params.append(&apos;client_secret&apos;, CLIENT_SECRET);
+        params.append(&apos;grant_type&apos;, &apos;authorization_code&apos;);
+        params.append(&apos;redirect_uri&apos;, REDIRECT_URL);
+        params.append(&apos;code&apos;, code);
+        
+        const atReq = await fetch(&apos;https://oauth2.googleapis.com/token&apos;, {
+        method: &apos;POST&apos;,
+        headers: {
+        &apos;Accept&apos;: &apos;application/json&apos;,
+        &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;
+        }, 
+        body: params
+        });
+        
+        const at = await atReq.json();
+        console.log(&apos;at&apos;, at);
+        
+        if(at.error) {
+        Astro.session?.set(&apos;error&apos;,at.error);
+        return Astro.redirect(&apos;/&apos;);
+        }
+        
+        Astro.session?.set(&apos;access_token&apos;, at.access_token, { ttl: at.expires_in });
+        
+        return Astro.redirect(&apos;/events&apos;);
+        ---
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;From the top, I first look in the URL for either the code or error. If there was an error, I set the value in the session and redirect back to the first page, which as you (hopefully) remember, will pick it up, delete it, and render it.&lt;/p&gt;
+        &lt;p&gt;If there wasn&apos;t an error, I then exchange the code for an access token. As I mentioned, the access token is short lived, and what&apos;s cool is that Astro sessions have a way to handle that - you can see it in the &lt;code&gt;ttl&lt;/code&gt; object when I set the value. I&apos;m going to touch on that in a bit.&lt;/p&gt;
+        &lt;h2 id=&quot;the-events-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-events-page&quot;&gt;The Events Page&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;After logging in, I render the events page. Now technically, you can skip this entire section as it&apos;s less OAuth and more Google API usage, but I&apos;ll show it for completeness. My &amp;quot;demo&amp;quot; looks at your events for the month, filters out all day events, and reports on how many hours you spend in meetings. I used Gemini AI to write those functions for me.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
+        
+        let token = await Astro.session?.get(&apos;access_token&apos;);
+        
+        /**
+        * Fetches Google Calendar events for the current month.
+        * @param {string} accessToken - A valid OAuth2 access token.
+        */
+        async function getCalendarEventsForCurrentMonth(accessToken) {
+        const now = new Date();
+        
+        // Calculate start of current month
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        
+        // Calculate start of next month
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+        
+        const calendarId = &apos;primary&apos;; // Use &apos;primary&apos; for the user&apos;s main calendar
+        const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`);
+        
+        // Set query parameters
+        url.searchParams.append(&apos;timeMin&apos;, startOfMonth);
+        url.searchParams.append(&apos;timeMax&apos;, startOfNextMonth);
+        url.searchParams.append(&apos;singleEvents&apos;, &apos;true&apos;); // Expands recurring events into instances
+        url.searchParams.append(&apos;orderBy&apos;, &apos;startTime&apos;);
+        
+        try {
+        const response = await fetch(url, {
+        method: &apos;GET&apos;,
+        headers: {
+        &apos;Authorization&apos;: `Bearer ${accessToken}`,
+        &apos;Accept&apos;: &apos;application/json&apos;
+        }
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+        throw new Error(`Google API Error: ${data.error.message}`);
+        }
+        
+        return data.items; // This is the array of event objects
+        } catch (error) {
+        console.error(&apos;Failed to fetch events:&apos;, error);
+        }
+        }
+        
+        /**
+        * Calculates the total duration of timed Google Calendar events, skipping all-day events.
+        * @param {Array} events - The &apos;items&apos; array from the Google Calendar API response.
+        * @returns {number} - Total duration in hours.
+        */
+        function calculateTimedHours(events) {
+        if (!events || events.length === 0) return 0;
+        
+        const totalMilliseconds = events.reduce((total, event) =&amp;gt; {
+        // Skip all-day events (they have &apos;date&apos; but no &apos;dateTime&apos;)
+        if (!event.start.dateTime || !event.end.dateTime) {
+        return total;
+        }
+        
+        const start = new Date(event.start.dateTime);
+        const end = new Date(event.end.dateTime);
+        
+        const duration = end.getTime() - start.getTime();
+        
+        return total + (duration &amp;gt; 0 ? duration : 0);
+        }, 0);
+        
+        const hours = totalMilliseconds / (1000 * 60 * 60);
+        
+        // Round to one decimal place and ensure it returns as a number
+        return Math.round(hours * 10) / 10;
+        }
+        
+        const events = await getCalendarEventsForCurrentMonth(token);
+        const totalHours = calculateTimedHours(events);
+        
+        ---
+        
+        &amp;lt;BaseLayout pageTitle=&amp;quot;Events&amp;quot;&amp;gt;
+        
+        &amp;lt;h2&amp;gt;Events&amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        You have { events.length } events this month.
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        Ignoring all day events, you are spending { totalHours} hours in meetings.
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/BaseLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In case your curious, this is my report, but note this does &lt;em&gt;not&lt;/em&gt; include my work calendar nor my wife&apos;s calendar that I share. The real number is probably 10X.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/oa2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Events page output&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;h2 id=&quot;the-middlware&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-middlware&quot;&gt;The Middlware&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The very last bit was the middleware. It has two jobs:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;If the user is not logged in, and they are trying to access &lt;code&gt;/events&lt;/code&gt;, redirect them home.&lt;/li&gt;
+        &lt;li&gt;If the user is logged in and they are &lt;em&gt;not&lt;/em&gt; accessing &lt;code&gt;/events&lt;/code&gt;, push them there.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;This particular logic will, of course, vary on your site and what you allow to be seen while not logged in and vice versa. Astro&apos;s &lt;a href=&quot;https://docs.astro.build/en/guides/middleware/&quot;&gt;middleware&lt;/a&gt; support is really simple. I added &lt;code&gt;src/middleware.js&lt;/code&gt; and used this code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;/*
+        If they have an access token and are NOT on /events, go there
+        If they don&apos;t have one and are ON /events, go to /
+        */
+        
+        export async function onRequest (context, next) {
+        
+        let token = await context.session.get(&apos;access_token&apos;);
+        console.log(&apos;path&apos;, context.url.pathname);
+        
+        if(token) {
+        
+        // are they trying to load / or /callback?
+        if(context.url.pathname === &apos;/&apos; || context.url.pathname === &apos;/callback&apos;) {
+        console.log(&apos;redirecting cuz logged in and not events&apos;);
+        return context.redirect(&apos;/events&apos;);
+        }
+        
+        } else if(context.url.pathname === &apos;/events&apos;) {
+        console.log(&apos;redirecting cuz not logged in and events req&apos;);
+        return context.redirect(&apos;/&apos;);
+        }
+        
+        return next();
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And that&apos;s it!&lt;/p&gt;
+        &lt;h2 id=&quot;conclusion&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, I need to riff a bit on some details that may or may not interest you, so before I do that - here&apos;s a link to the full code: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/oauthtest1&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/oauthtest1&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Alright, there was one thing in this demo that kinda confused me a bit. In my mind, a &apos;session&apos; is usually cookie-based such that a cookie identifies the user and the server associates that with data. I wrote my initial code on Saturday and when I tested on Sunday, my session still persisted, but the access token I had no longer worked. That was easy to fix - I added &lt;code&gt;ttl&lt;/code&gt;, but from what I can tell, when using Astro sessions and the Node adapter specifically, the cookie set on your browser is a Session cookie, which persists as long as the tab is open. The same applies to SessionStorage as well.&lt;/p&gt;
+        &lt;p&gt;None of this is &apos;wrong&apos; of course, it just wasn&apos;t what I was expecting, and I&apos;m curious if the other adapters, like the Netlify and Cloudflare ones, may act differently. I need to test this. If it&apos;s consistent, I could see then always using &lt;code&gt;ttl&lt;/code&gt; when setting session values. The other question I have is - given a value with a &lt;code&gt;ttl&lt;/code&gt;, does it &lt;em&gt;always&lt;/em&gt; expire at that time, or does it auto renew on every hit. If so, and I wasn&apos;t using OAuth, I&apos;d probably have logic to refresh the value one very hit so your session persists as you use the site. Yay - more Astro code to play with!&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@andyjh07?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Andy Holmes&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/galaxy-digital-wallpaper-rCbdp8VCYhQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -30,7 +316,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -251,7 +537,7 @@
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -452,7 +738,7 @@
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -994,7 +1280,7 @@
       <title>Links For You (3/8/26)</title>
       <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
       <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
         &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
@@ -1048,7 +1334,7 @@
       <title>Dynamically Adjusting Image Text for Contrast</title>
       <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
       <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
         &lt;ul&gt;
@@ -1148,7 +1434,7 @@
       <title>Using Astro for a Combined RSS View and Generator</title>
       <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
       <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
         &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
@@ -1356,7 +1642,7 @@
       <title>Using Val Town to Get Me to the Movies</title>
       <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
       <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
@@ -1477,37 +1763,11 @@
       <title>ColdFusion Wrappers for Bluesky and Mastodon</title>
       <link>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</link>
       <guid>https://www.raymondcamden.com/2026/02/27/coldfusion-wrappers-for-bluesky-and-mastodon</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
+      <pubDate>Mon, 23 Mar 2026 16:12:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s been a hot minute since I opened a repo for ColdFusion code, but I thought I&apos;d package up my previous wrapper for Mastodon support, port over my BoxLang Bluesky module, and properly release the code on GitHub for folks who want it: &lt;a href=&quot;https://github.com/cfjedimaster/coldfusion-social-wrappers&quot;&gt;https://github.com/cfjedimaster/coldfusion-social-wrappers&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Right now I&apos;m using one repo for both Bluesky and Mastodon. Usually I&apos;d separate them, but with the &amp;quot;support&amp;quot; being a grand total of one file each, I figured no one would mind getting the &amp;quot;extra&amp;quot; code if they only care about one. I&apos;ll also note the code is very much focused on &lt;em&gt;posting&lt;/em&gt;, not reading data, but part of the reason I wanted to package this up was for people to run with it and add additional support. Fire off those PRs folks!&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ibrahimqandily?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Ibrahim Qandily&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/several-cats-sitting-together-on-a-ledge-xow4E-Mf0XE?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (2/22/26)</title>
-      <link>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</link>
-      <guid>https://www.raymondcamden.com/2026/02/22/links-for-you-22226</guid>
-      <pubDate>Sun, 22 Mar 2026 15:33:16 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This is where I&apos;d usually comment about how the past two weeks seemed to fly by in a blink, but I&apos;m tired of saying that so... oh crap, too late. To be fair, part of the reason the time flew by this week was me being out of town for my first offsite with Webflow. I got to meet my boss, coworkers, and learn more about our company and what our plans are for the year. I&apos;m really happy I joined Webflow and I&apos;m looking forward to the future. It feels like it&apos;s been a while since I could say that and damn do I appreciate having a good job.&lt;/p&gt;
-        &lt;h2 id=&quot;an-ai-drama-in-four-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-ai-drama-in-four-parts&quot;&gt;An AI Drama in Four Parts&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This is, to put it bluntly, a pretty crazy story about AI and automation gone wrong. Start off with &lt;a href=&quot;https://theshamblog.com/an-ai-agent-published-a-hit-piece-on-me/&quot;&gt;&amp;quot;An AI Agent Published a Hit Piece on Me&amp;quot;&lt;/a&gt; and the continue on to the followups. I&apos;m &amp;quot;mostly&amp;quot; pro-AI, which you already know if you&apos;re a regular reader, but I definitely try to be cautious about what I allow AI to do for me. I think we&apos;re going to see a &lt;em&gt;lot&lt;/em&gt; of instances like this going forward. Yay for the future!&lt;/p&gt;
-        &lt;h2 id=&quot;like-astro%3F-try-the-newsletter&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#like-astro%3F-try-the-newsletter&quot;&gt;Like Astro? Try the Newsletter&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Again, if you&apos;re a regular reader you know I&apos;ve been digging &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; lately. As part of my research, I discovered, and immediately signed up for, the &lt;a href=&quot;https://newsletter.astroweekly.dev/&quot;&gt;Astro Weekly&lt;/a&gt; newsletter. I&apos;m a huge fan of newsletters like this as I tend to miss cool things posted on social media (and that was the motivation for my &lt;a href=&quot;https://www.raymondcamden.com/tags/links4you&quot;&gt;links for you&lt;/a&gt; series) and I&apos;ve enjoyed the issues I&apos;ve gotten so far. (And I&apos;ve been featured twice so far, which is pretty cool too!)&lt;/p&gt;
-        &lt;h2 id=&quot;interactive-gaming-experiences-with-amazon-gamelift-and-ivs&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#interactive-gaming-experiences-with-amazon-gamelift-and-ivs&quot;&gt;Interactive Gaming Experiences with Amazon GameLift and IVS&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Last up is a post by my best friend Todd on the AWS blog, &lt;a href=&quot;https://aws.amazon.com/blogs/gametech/creating-interactive-gaming-experiences-with-amazon-gamelift-streams-and-amazon-interactive-video-service/&quot;&gt;Creating interactive gaming experiences with Amazon GameLift Streams and Amazon Interactive Video Service&lt;/a&gt;. That&apos;s quite a mouth full, and it&apos;s a quite deep post, but it&apos;s well worth the read. Todd&apos;s post explores how to enable social aspects in gaming that go far beyond just simple chat, but real participation by the audience.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Last is a &lt;a href=&quot;https://www.mewho.com/&quot;&gt;collection&lt;/a&gt; of very cool ... not screen savers, but full screen web app experiences kinda like screen savers, including multiple Star Trek ones. Actually I lie, there &lt;em&gt;are&lt;/em&gt; some screen savers too, and if you like (and recognize) LCARS, you will be a happy camper.&lt;/p&gt;
-        &lt;p&gt;You can watch a preview below:&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;q6RkBSYLxVQ&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/q6RkBSYLxVQ/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=q6RkBSYLxVQ&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
       </content:encoded>
     </item>
   </channel>
