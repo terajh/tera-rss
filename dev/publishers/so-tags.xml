@@ -4,7 +4,104 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Mon, 23 Mar 2026 16:33:23 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 24 Mar 2026 16:40:10 GMT</lastBuildDate>
+    <item>
+      <title>How to create button hover animations in Nuxt 4 using GSAP like on https://www.museumofmoney.com/?</title>
+      <link>https://stackoverflow.com/questions/79913418/how-to-create-button-hover-animations-in-nuxt-4-using-gsap-like-on-https-www-m</link>
+      <guid>https://stackoverflow.com/questions/79913418/how-to-create-button-hover-animations-in-nuxt-4-using-gsap-like-on-https-www-m</guid>
+      <pubDate>Tue, 24 Mar 2026 10:25:47 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m working on a project using &lt;strong&gt;Nuxt 4&lt;/strong&gt; and I want to create button hover animations similar to the ones on &lt;a href=&quot;https://www.museumofmoney.com/&quot; rel=&quot;nofollow noreferrer&quot;&gt;Museum of Money&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;My questions are:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;How can I structure GSAP animations in Nuxt 4 for buttons to achieve this type of hover effect?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Are there best practices for combining GSAP with Vue’s reactivity for multiple buttons on a page?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;How can I replicate a “fluid background hover” effect similar to the Museum of Money buttons?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any guidance, examples, or references would be very helpful.&lt;/p&gt;
+        &lt;p&gt;I tried this basic GSAP example:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { gsap } from &apos;gsap&apos;;
+        
+        const btn = ref&amp;lt;HTMLElement | null&amp;gt;(null);
+        
+        onMounted(() =&amp;gt; {
+        if (!btn.value) return;
+        
+        const myEase = &amp;quot;power2.out&amp;quot;;
+        
+        const hover = () =&amp;gt; {
+        const tl = gsap.timeline();
+        
+        tl.to(btn.value, {
+        backgroundColor: &amp;quot;#fff&amp;quot;,
+        borderRadius: &amp;quot;8px&amp;quot;,
+        duration: 0.2,
+        ease: myEase,
+        });
+        
+        tl.to(btn.value, { y: -1, duration: 0.1, ease: &amp;quot;power2.out&amp;quot; });
+        tl.to(btn.value, { y: 1, duration: 0.1, ease: &amp;quot;power2.inOut&amp;quot; });
+        tl.to(btn.value, { y: 0, duration: 0.1, ease: &amp;quot;bounce.out&amp;quot; });
+        };
+        
+        const unhover = () =&amp;gt; {
+        const tl = gsap.timeline();
+        
+        tl.to(btn.value, {
+        backgroundColor: &amp;quot;#28a745&amp;quot;,
+        borderRadius: &amp;quot;30px&amp;quot;,
+        duration: 0.2,
+        ease: myEase,
+        });
+        
+        tl.to(btn.value, { y: -6, duration: 0.1, ease: &amp;quot;power2.out&amp;quot; });
+        tl.to(btn.value, { y: 3, duration: 0.08, ease: &amp;quot;power2.inOut&amp;quot; });
+        tl.to(btn.value, { y: 0, duration: 0.1, ease: &amp;quot;bounce.out&amp;quot; });
+        };
+        
+        btn.value.addEventListener(&apos;mouseenter&apos;, hover);
+        btn.value.addEventListener(&apos;mouseleave&apos;, unhover);
+        });
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;btn-wrapper&amp;quot;&amp;gt;
+        &amp;lt;button ref=&amp;quot;btn&amp;quot; class=&amp;quot;fancy-btn&amp;quot;&amp;gt;Click Me&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        .btn-wrapper {
+        display: inline-block;
+        position: relative;
+        }
+        
+        .fancy-btn {
+        height: 50px;
+        padding: 0 1rem;
+        border: 2px solid #333;
+        border-radius: 30px;
+        background: #28a745;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        user-select: none;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Vite shared option &apos;define&apos; seems to not work as documented on build mode</title>
       <link>https://stackoverflow.com/questions/79911959/vite-shared-option-define-seems-to-not-work-as-documented-on-build-mode</link>
@@ -1569,18 +1666,6 @@
         &lt;p&gt;I wrote this code to make an HTTP request in a VUE application, and I use &lt;code&gt;AbortController&lt;/code&gt; to cancel the request. These &lt;code&gt;AbortController&lt;/code&gt;s will be put into a &lt;code&gt;ref([])&lt;/code&gt;, but for some reason, my code causes a memory leak, and I don&apos;t know the reason.&lt;/p&gt;
         &lt;p&gt;If I assign controller = null in the &lt;code&gt;finally&lt;/code&gt; section this issue can be fixed, but I do not know the reason.&lt;/p&gt;
         &lt;p&gt;What causes the memory leak?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vuejs3 debugging technique during coding</title>
-      <link>https://stackoverflow.com/questions/79858046/vuejs3-debugging-technique-during-coding</link>
-      <guid>https://stackoverflow.com/questions/79858046/vuejs3-debugging-technique-during-coding</guid>
-      <pubDate>Wed, 31 Dec 2025 09:04:03 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am working on vuejs3.&lt;/p&gt;
-        &lt;p&gt;I want to know which tool to use to debug my web app when it faces an issue.&lt;/p&gt;
-        &lt;p&gt;If some of you know more tools useful to recommend me in this case I will be very happy about it.&lt;/p&gt;
-        &lt;p&gt;I made some search but I don&apos;t find some tools that can help me. That is the reason that I come in this community to find answer there&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
