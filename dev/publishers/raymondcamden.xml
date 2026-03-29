@@ -4,12 +4,101 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sat, 28 Mar 2026 16:07:31 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 29 Mar 2026 16:09:36 GMT</lastBuildDate>
+    <item>
+      <title>Checking if a Movie has a Post or Mid Credit Scene</title>
+      <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
+      <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Still here? Cool. The app is incredibly simple. I made use of the wonderful &lt;a href=&quot;https://simplecss.org/&quot;&gt;SimpleCSS&lt;/a&gt; for my design and then made use of the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;TMDB API&lt;/a&gt;. The TMDB APIs are pretty easy to use, but finding out how to get this information did take a bit of digging. When you get movie details, there isn&apos;t a property for these stingers, rather, the information is stored in a &apos;keyword&apos;. Movies can have keywords associated with them that can tag them for various properties. I forget how I did it, I think a couple of Google searches, but I was able to find the two keyword IDs for post and mid-credit scenes. They were 179430 and 179431.&lt;/p&gt;
+        &lt;p&gt;Given that, you can search for movies with keywords, but that&apos;s not what I&apos;d be doing in a movie theater - instead I&apos;d be searching for a movie. The &lt;a href=&quot;https://developer.themoviedb.org/reference/search-movie&quot;&gt;movie search API&lt;/a&gt; can return movies based on user input, but does not return keywords. So I had to combine two approaches:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Do a search on the user&apos;s input&lt;/li&gt;
+        &lt;li&gt;For each result, get the details on the movie and include the keywords.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I&apos;ll share all the code below, but here&apos;s the main search function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function doSearch() {
+        let term = $term.value.trim();
+        if(term === &apos;&apos;) return;
+        console.log(`search for ${term}`);
+        $searchBtn.setAttribute(&apos;disabled&apos;, &apos;disabled&apos;);
+        $results.innerHTML = &apos;&amp;lt;i&amp;gt;Searching for matches...&amp;lt;/i&amp;gt;&apos;;
+        
+        let movieReq = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(term)}&amp;amp;include_adult=false&amp;amp;language=en-US`, {
+        headers: {
+        &apos;Accept&apos;:&apos;application/json&apos;, 
+        &apos;Authorization&apos;: `Bearer ${TMDB_KEY}`
+        }
+        });
+        let movies = (await movieReq.json()).results;
+        
+        let resultHTML = &apos;&amp;lt;h2&amp;gt;Results&amp;lt;/h2&amp;gt;&apos;;
+        
+        if(movies.length &amp;gt; 0) {
+        let requests = [];
+        movies.forEach(m =&amp;gt; {
+        requests.push(getMovie(m.id));
+        });
+        
+        let results = await Promise.all(requests);
+        console.log(&apos;DONE&apos;, results);
+        
+        results.forEach(r =&amp;gt; {
+        resultHTML += `
+        &amp;lt;div class=&amp;quot;result&amp;quot;&amp;gt;
+        ${r.title} (${r.release_date})&amp;lt;br&amp;gt;
+        Mid Credit Scene: &amp;lt;strong&amp;gt;${hasMidCreditScene(r)? &apos;Yes&apos;:&apos;No&apos;}&amp;lt;/strong&amp;gt;&amp;lt;br&amp;gt;
+        Post Credit Scene: &amp;lt;strong&amp;gt;${hasPostCreditScene(r)? &apos;Yes&apos;:&apos;No&apos;}&amp;lt;/strong&amp;gt;
+        &amp;lt;/div&amp;gt;
+        `;
+        });
+        } else resultHTML += &apos;&amp;lt;p&amp;gt;No matches found.&amp;lt;/p&amp;gt;&apos;;
+        
+        $results.innerHTML = resultHTML;
+        $searchBtn.removeAttribute(&apos;disabled&apos;);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can see the initial search followed by the request to get details for each. I&apos;m using an array of requests that are then tied to a &lt;code&gt;Promise.all&lt;/code&gt; call to gather the results when done.&lt;/p&gt;
+        &lt;p&gt;To get details, it&apos;s a basic API call, but I do include the query parameter to ask for keywords:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function getMovie(id) {
+        
+        let req = await fetch(`https://api.themoviedb.org/3/movie/${id}?append_to_response=keywords&amp;amp;language=en-US`, {
+        headers: {
+        &apos;Accept&apos;:&apos;application/json&apos;, 
+        &apos;Authorization&apos;: `Bearer ${TMDB_KEY}`
+        }
+        });
+        let movie = await req.json();
+        return movie;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;After I have the details, my two utility methods to check for the mid and post credit scenes look like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function hasMidCreditScene(m) {
+        return m.keywords.keywords.some(k =&amp;gt; k.id === 179431);
+        }
+        
+        function hasPostCreditScene(m) {
+        return m.keywords.keywords.some(k =&amp;gt; k.id === 179430);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You may be wondering why the code uses &lt;code&gt;keywords.keywords&lt;/code&gt;. Me too. Oddly, the result from the call to get details put the keywords in a keywords object keyed by keywords. So... yeah, &lt;code&gt;keywords.keywords&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;And that&apos;s it. CodePen allows you to deploy to a host with a custom domain (see their &lt;a href=&quot;https://blog.codepen.io/docs/pens/deployment/#custom-domains&quot;&gt;docs&lt;/a&gt;) and it was easy to setup a subdomain CNAME for my main domain. You can check out all the code below, and if you fork it, let me know!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;CanHasPostCredit&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;jEMYjLQ&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019d2f61-480c-7c90-a84e-584c3f9da768&quot;&gt;
+        CanHasPostCredit&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -74,7 +163,7 @@
       <title>Implementing OAuth in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
         &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
@@ -360,7 +449,7 @@
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -381,7 +470,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -602,7 +691,7 @@
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -803,7 +892,7 @@
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -1345,7 +1434,7 @@
       <title>Links For You (3/8/26)</title>
       <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
       <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
         &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
@@ -1399,7 +1488,7 @@
       <title>Dynamically Adjusting Image Text for Contrast</title>
       <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
       <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
         &lt;ul&gt;
@@ -1499,7 +1588,7 @@
       <title>Using Astro for a Combined RSS View and Generator</title>
       <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
       <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
+      <pubDate>Sun, 29 Mar 2026 15:48:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
         &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
@@ -1701,127 +1790,6 @@
         &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show Me the Code!&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;Ok, if you want to play with it, don&apos;t forget it lives up here, &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&lt;/a&gt;, and you can see all of the code here: &lt;a href=&quot;https://github.com/Webflow-Examples/wfc-chachachachanges&quot;&gt;https://github.com/Webflow-Examples/wfc-chachachachanges&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@chris_designer?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Christina Radevich&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-red-light-in-a-window-VNmQWlKeskQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Using Val Town to Get Me to the Movies</title>
-      <link>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</link>
-      <guid>https://www.raymondcamden.com/2026/03/01/using-val-town-to-get-me-to-the-movies</guid>
-      <pubDate>Sat, 28 Mar 2026 15:40:30 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;My wife and I both love going to the movies, but sometimes a few months will go by without us making it out there. Mostly we just forget what&apos;s coming out and don&apos;t realize till it&apos;s already on a streaming app. I thought it would be nice to build a tool that could help remind me of upcoming movie releases so we can make our theater going more of a consistent habit. To accomplish this, I used the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;The Movie Database APIs&lt;/a&gt; and &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;the-first-version&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-version&quot;&gt;The First Version&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Before I even considered building a tool like this, I investigated the TMDB reference to see how easy it was to get upcoming releases. Turns out, there&apos;ve got an endpoint just for that: &lt;a href=&quot;https://developer.themoviedb.org/reference/movie-upcoming-list&quot;&gt;Upcoming Movies&lt;/a&gt; If you carefully read the docs, you&apos;ll see this is just a shortcut to the more flexible &lt;a href=&quot;https://developer.themoviedb.org/reference/discover-movie&quot;&gt;Discover&lt;/a&gt; endpoint, but as it was out of the box, it worked fine for me. The only tweak I had to do was add the &lt;code&gt;US&lt;/code&gt; region.&lt;/p&gt;
-        &lt;p&gt;This simple function handled everything for me:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function getUpcomingMovies() {
-        let resp = await fetch(&apos;https://api.themoviedb.org/3/movie/upcoming?language=en-US&amp;amp;page=1&amp;amp;region=US&apos;, {
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${TMDB_KEY}`,
-        &apos;accept&apos;:&apos;application/json&apos;
-        }
-        });
-        let data = await resp.json();
-        return data;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;With the help of &lt;a href=&quot;https://oat.ink/&quot;&gt;Oat&lt;/a&gt;, I built a simple HTML table rendering the results. I started with this HTML:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;html&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;/head&amp;gt;
-        
-        &amp;lt;body data-theme=&amp;quot;dark&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;
-        &amp;lt;h1&amp;gt;Upcoming Movies&amp;lt;/h1&amp;gt;		
-        
-        &amp;lt;div id=&amp;quot;movieDisplay&amp;quot; class=&amp;quot;mb-4&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And then a bit of JavaScript (this is everything &lt;em&gt;except&lt;/em&gt; the function I just shared above):&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let $movieDisplay, $title;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, init, false);
-        async function init() {
-        $movieDisplay = document.querySelector(&apos;#movieDisplay&apos;);
-        $title = document.querySelector(&apos;h1&apos;);
-        
-        let movies = await getUpcomingMovies();
-        let html = &apos;&apos;;
-        
-        movies.results.forEach((m,x) =&amp;gt; {
-        console.log(x,m);
-        if(x === 0) {
-        html += &apos;&amp;lt;div class=&amp;quot;row mt-4&amp;quot;&amp;gt;&apos;;
-        } else if(x % 3 === 0) {
-        html += &apos;&amp;lt;/div&amp;gt;&amp;lt;div class=&amp;quot;row mt-4&amp;quot;&amp;gt;&apos;;
-        }
-        html += `
-        &amp;lt;div class=&amp;quot;col-4&amp;quot;&amp;gt;
-        &amp;lt;article class=&amp;quot;card&amp;quot;&amp;gt;
-        &amp;lt;header&amp;gt;
-        &amp;lt;h3&amp;gt;${m.title}&amp;lt;/h3&amp;gt;
-        &amp;lt;/header&amp;gt;
-        &amp;lt;p&amp;gt;${m.overview}&amp;lt;/p&amp;gt;
-        &amp;lt;img src=&amp;quot;https://image.tmdb.org/t/p/w300/${m.poster_path}&amp;quot;&amp;gt;
-        &amp;lt;footer class=&amp;quot;flex gap-2 mt-4&amp;quot;&amp;gt;
-        Releases ${m.release_date}
-        &amp;lt;/footer&amp;gt;
-        &amp;lt;/article&amp;gt;		
-        &amp;lt;/div&amp;gt;
-        `;
-        });
-        
-        $movieDisplay.innerHTML = html;
-        
-        $title.innerHTML += ` (From ${movies.dates.minimum} to ${movies.dates.maximum})`;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;You can check out the running demo here:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Upcoming Movies&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;ogzNBVL&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/ogzNBVL&quot;&gt;
-        Upcoming Movies&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;You will notice, probably, it depends on when you run this, that some movies have release dates in the past. These are re-releases so the release date value is accurate, if confusing at first. I considered removing these, it would be simple enough to just compare the date to the current date, but both my wife and I have enjoyed watching re-releases so I kept it in.&lt;/p&gt;
-        &lt;p&gt;By the way, we are both &lt;em&gt;super&lt;/em&gt; excited about the Peaky Blinders movie.&lt;/p&gt;
-        &lt;h2 id=&quot;creating-the-reminder-in-val-town&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#creating-the-reminder-in-val-town&quot;&gt;Creating the Reminder in Val Town&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The next bit was trivial - the only real issue I had was just being somewhat rusty with Val Town. I began by creating a new val, just for the movie logic. The only real change is that I&apos;m getting my key from an environment variable rather than hard coding as I did in the CodePen above. (The key is a read only key so I don&apos;t have any concerns there.)&lt;/p&gt;
-        &lt;p&gt;The next bit was to add a val and specify the cron trigger. I then imported the first val, crafted my HTML (a bit simpler than the CodePen demo), and emailed it. Val Town supports emailing yourself on the free plan, and that was perfect for my needs. You can see all the code here:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { getUpcomingMovies } from &amp;quot;./main.ts&amp;quot;;
-        import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
-        
-        // Learn more: https://docs.val.town/vals/cron/
-        export default async function (interval: Interval) {
-        const movies = await getUpcomingMovies();
-        let html = &amp;quot;&amp;quot;;
-        
-        movies.results.forEach((m, x) =&amp;gt; {
-        html += `
-        &amp;lt;h3&amp;gt;${m.title}&amp;lt;/h3&amp;gt;
-        &amp;lt;img src=&amp;quot;https://image.tmdb.org/t/p/w185/${m.poster_path}&amp;quot; style=&amp;quot;align:left&amp;quot;&amp;gt;
-        &amp;lt;p&amp;gt;
-        ${m.overview}
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        Releases ${m.release_date}.
-        &amp;lt;/p&amp;gt;
-        &amp;lt;hr&amp;gt;`;
-        });
-        
-        await email({
-        subject: &amp;quot;Upcoming Movie Releases&amp;quot;,
-        html,
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I specified Sunday at noon, but ran a few quick tests to confirm:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/movie1.png&quot; loading=&quot;lazy&quot; alt=&quot;Sample email&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;You can check out the complete project here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/UpcomingMovies&quot;&gt;https://www.val.town/x/raymondcamden/UpcomingMovies&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
