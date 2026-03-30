@@ -4,7 +4,87 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sun, 29 Mar 2026 16:09:34 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 30 Mar 2026 16:38:38 GMT</lastBuildDate>
+    <item>
+      <title>How to create and implement templates that allow for information to be automatically filled in on envelope creation using Docusign API</title>
+      <link>https://stackoverflow.com/questions/79917163/how-to-create-and-implement-templates-that-allow-for-information-to-be-automatic</link>
+      <guid>https://stackoverflow.com/questions/79917163/how-to-create-and-implement-templates-that-allow-for-information-to-be-automatic</guid>
+      <pubDate>Mon, 30 Mar 2026 14:04:59 GMT</pubDate>
+      <content:encoded>
+        &lt;h2&gt;Problem&lt;/h2&gt;
+        &lt;p&gt;I’m using the DocuSign eSignature API with &lt;strong&gt;composite templates&lt;/strong&gt; and can’t get &lt;strong&gt;prefill (sender-filled) text tabs&lt;/strong&gt; to populate when creating an envelope.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;What I’m Doing&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;I built a template builder that places PDF annotations (via Nutrient)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;These are converted into &lt;strong&gt;anchor-based Text tabs&lt;/strong&gt; in a DocuSign template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Prefill fields are created like:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Anchor: &lt;code&gt;PreFillLegalCompanyName_GUID&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;TabLabel: &lt;code&gt;LegalCompanyName&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;At send time:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;I retrieve the tabs&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Map &lt;code&gt;TabLabel → value&lt;/code&gt; (e.g. &lt;code&gt;&amp;quot;LegalCompanyName&amp;quot; → &amp;quot;Test Customer LLC&amp;quot;&lt;/code&gt;)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Send values using an inline template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;signer.Tabs = new Tabs
+        {
+        TextTabs = new List&amp;lt;Text&amp;gt;
+        {
+        new Text
+        {
+        TabLabel = &amp;quot;LegalCompanyName&amp;quot;,
+        Value = &amp;quot;Test Customer LLC&amp;quot;
+        }
+        }
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Issue&lt;/h2&gt;
+        &lt;p&gt;The tab &lt;strong&gt;exists in the document&lt;/strong&gt;, but the &lt;strong&gt;value is not populated&lt;/strong&gt; when the envelope is created.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;What I’ve Tried&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Matching &lt;code&gt;TabLabel&lt;/code&gt; exactly (verified from template)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Applying tabs on the same recipient as the server template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Using a separate inline template for prefills&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Verifying anchor strings and tab metadata&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;None of these resulted in the value being applied.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Question&lt;/h2&gt;
+        &lt;p&gt;What is the correct way to populate &lt;strong&gt;prefill text tabs&lt;/strong&gt; when using &lt;strong&gt;composite templates&lt;/strong&gt;?&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Do prefill tabs need to be assigned differently in the template?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Should values be applied in a specific inline template or recipient context?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Do anchor-based tabs behave differently when setting values via &lt;code&gt;TabLabel&lt;/code&gt;?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Expected Result&lt;/h2&gt;
+        &lt;p&gt;The document should be pre-filled (e.g. &lt;code&gt;LegalCompanyName = &amp;quot;Test Customer LLC&amp;quot;&lt;/code&gt;) before the recipient views it.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;Any guidance would be appreciated.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to create button hover animations in Nuxt 4 using GSAP like on https://www.museumofmoney.com/?</title>
       <link>https://stackoverflow.com/questions/79913418/how-to-create-button-hover-animations-in-nuxt-4-using-gsap-like-on-https-www-m</link>
@@ -1575,97 +1655,6 @@
         &lt;p&gt;To be clear, I want to get rid of the bordered box and background inside the curly braces.&lt;/p&gt;
         &lt;p&gt;Also I am curious why such a high emphasis on the JavaScript portion of the template is deemed necessary. The two yellow curly braces on each side are more than enough to quickly spot it.&lt;/p&gt;
         &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/KNtU7EGy.png&quot; alt=&quot;A line of code showcasing the background issue&quot; title=&quot;A line of code showcasing the background issue&quot; /&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>why does my vue code will cause a memory leak?</title>
-      <link>https://stackoverflow.com/questions/79860643/why-does-my-vue-code-will-cause-a-memory-leak</link>
-      <guid>https://stackoverflow.com/questions/79860643/why-does-my-vue-code-will-cause-a-memory-leak</guid>
-      <pubDate>Mon, 05 Jan 2026 09:39:36 GMT</pubDate>
-      <content:encoded>
-        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
-        import { ref, onMounted, onBeforeUnmount, toRefs } from &apos;vue&apos;
-        
-        const props = defineProps({
-        sessionUrl: { type: String, required: true },
-        offerData: { type: Object, required: true }
-        })
-        
-        const { sessionUrl, offerData } = toRefs(props)
-        
-        const httpIntervalId = ref(null)
-        const fetchControllers = ref([])
-        
-        const MAX_CONCURRENT = 3
-        
-        const sendHttpRequest = async (candidates) =&amp;gt; {
-        if (fetchControllers.value.length &amp;gt;= MAX_CONCURRENT) return
-        
-        const controller = new AbortController()
-        fetchControllers.value.push(controller)
-        
-        try {
-        const res = await fetch(sessionUrl.value, {
-        method: &apos;PATCH&apos;,
-        headers: {
-        &apos;Content-Type&apos;: &apos;application/trickle-ice-sdpfrag&apos;,
-        &apos;If-Match&apos;: &apos;*&apos;
-        },
-        body: generateSdpFragment(offerData.value, candidates),
-        signal: controller.signal
-        })
-        
-        } catch (err) {
-        if (err.name === &apos;AbortError&apos;) {
-        } else {
-        console.error(&apos;fetch error&apos;, err)
-        }
-        } finally {
-        const idx = fetchControllers.value.indexOf(controller)
-        if (idx !== -1) fetchControllers.value.splice(idx, 1)
-        }
-        }
-        
-        const cancelHttpRequest = (msg) =&amp;gt; {
-        if (!fetchControllers.value || fetchControllers.value.length === 0) return
-        
-        const controllers = fetchControllers.value.slice()
-        controllers.forEach((c) =&amp;gt; {
-        try { c.abort() } catch (e) { /* ignore */ }
-        })
-        
-        fetchControllers.value = []
-        }
-        
-        const generateSdpFragment = (offerData, candidates) =&amp;gt; {
-        return &apos;&apos;
-        }
-        
-        onMounted(() =&amp;gt; {
-        if (httpIntervalId.value) {
-        clearInterval(httpIntervalId.value)
-        httpIntervalId.value = null
-        }
-        
-        httpIntervalId.value = setInterval(() =&amp;gt; {
-        sendHttpRequest()
-        }, 5000)
-        })
-        
-        onBeforeUnmount(() =&amp;gt; {
-        if (httpIntervalId.value) {
-        clearInterval(httpIntervalId.value)
-        httpIntervalId.value = null
-        }
-        cancelHttpRequest()
-        })
-        
-        defineExpose({ cancelHttpRequest })
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I wrote this code to make an HTTP request in a VUE application, and I use &lt;code&gt;AbortController&lt;/code&gt; to cancel the request. These &lt;code&gt;AbortController&lt;/code&gt;s will be put into a &lt;code&gt;ref([])&lt;/code&gt;, but for some reason, my code causes a memory leak, and I don&apos;t know the reason.&lt;/p&gt;
-        &lt;p&gt;If I assign controller = null in the &lt;code&gt;finally&lt;/code&gt; section this issue can be fixed, but I do not know the reason.&lt;/p&gt;
-        &lt;p&gt;What causes the memory leak?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
