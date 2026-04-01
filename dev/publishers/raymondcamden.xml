@@ -4,12 +4,125 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 31 Mar 2026 16:44:48 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 01 Apr 2026 16:37:52 GMT</lastBuildDate>
+    <item>
+      <title>You&apos;ve gained a new achievement</title>
+      <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
+      <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/iamyelling.jpg&quot; loading=&quot;lazy&quot; alt=&quot;A cat by a keyboard saying I AM YELLING, CARL&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;As I mentioned, the book series involves a man (and his cat, the cat is crucial) experiencing a real-world RPG and like a RPG, it&apos;s got achievements as the character progress through the dungeon. For those of you aren&apos;t gamers, most games now will give you an achievement for performing some task. These achievements give you nothing but bragging rights and a slight feeling of accomplishment, but some folks get really excited about them.&lt;/p&gt;
+        &lt;p&gt;In the books, the main characters will also get achievements and typically the achievement is &lt;em&gt;incredibly&lt;/em&gt; snarky and sarcastic. As an example:&lt;/p&gt;
+        &lt;div class=&quot;callout&quot;&gt;
+        &lt;strong&gt;New achievement! Why aren’t you wearing pants?&lt;/strong&gt;&lt;br&gt;
+        You entered the dungeon wearing no pants. Dude. Seriously?
+        &lt;p&gt;&lt;strong&gt;Reward&lt;/strong&gt;: You&apos;ve received a Gold Apparel Box!&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;And another:&lt;/p&gt;
+        &lt;div class=&quot;callout&quot;&gt;
+        &lt;strong&gt;New achievement! You’ve entered a guildhall!&lt;/strong&gt;&lt;br&gt;
+        Congratulations. You know how to open doors.
+        &lt;p&gt;&lt;strong&gt;Reward&lt;/strong&gt;: That sense of fulfillment you feel? That’s reward enough.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;These almost always make me LOL and I thought - what if I could make a simple web tool to generate these on the fly? I did so, using Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; feature, which as of today is still behind a flag, so if you want to play with this, you&apos;ll need to follow the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;instructions&lt;/a&gt; on which flags to enable in your browser. If you&apos;ve done that, and don&apos;t care about &lt;em&gt;how&lt;/em&gt; this tool was built, you can head over to the demo now: &lt;a href=&quot;https://dcc.raymondcamden.com/&quot;&gt;https://dcc.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The code behind this was a rather simple usage of the Chrome &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Here&apos;s the code that initializes the session:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;session = await LanguageModel.create({
+        initialPrompts:[
+        { 
+        role: &apos;system&apos;, 
+        content: 
+        `Generate an achievement announcement in the style of 
+        the Dungeon Crawler Carl series. You will be given a 
+        prompt to base the achievement on, which will be an 
+        ordinary, mundane task. The achievement you generate
+        should have the snarky, over the top prose associated 
+        with the book.
+        
+        do not comment about carl at all, or have any other output 
+        except the achievement title, text, and rewards` 
+        }
+        ],		
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        console.log(`Downloaded ${e.loaded * 100}%`);
+        if(e.loaded === 0 || e.loaded === 1) {
+        $status.innerHTML = &apos;&apos;;
+        return;
+        }
+        $status.innerHTML = `Downloading AI model, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }		
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Make note of the system instruction which is what guides the model when generating content. Your input is basically a &amp;quot;mundane&amp;quot; thing you&apos;ve done, like wash dishes or take out the trash. When you&apos;ve entered that and hit submit, I then simply get the achievement:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let achievement = JSON.parse(await session.prompt(input, {  
+        responseConstraint: schema,
+        }));
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Notice the &lt;code&gt;responseConstraint&lt;/code&gt; value? This is how I get precise results back, in my case an achievement title, the text, and a list of rewards. This is defined earlier in my code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let schema = {
+        &amp;quot;type&amp;quot;: &amp;quot;object&amp;quot;,
+        &amp;quot;properties&amp;quot;: {
+        &amp;quot;title&amp;quot;: {
+        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
+        },
+        &amp;quot;achievementText&amp;quot;: {
+        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
+        },
+        &amp;quot;rewards&amp;quot;: {
+        &amp;quot;type&amp;quot;:&amp;quot;array&amp;quot;,
+        &amp;quot;items&amp;quot;:{
+        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
+        }
+        },
+        },
+        &amp;quot;additionalProperties&amp;quot;: false
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And that&apos;s pretty much it. The rest of the code is straight up DOM manipulation.&lt;/p&gt;
+        &lt;h2 id=&quot;the-design&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-design&quot;&gt;The Design&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;As for the look and feel of the app, I made use of Cursor and one simple prompt:&lt;/p&gt;
+        &lt;blockquote&gt;
+        im going to be building a tool that uses Chrome AI to generate random achievements in the style of Dungeon Crawler Carl. i need your help with a design. i dont need you to do any of the javascript, just create my scaffold for me. its one web page and the title should be, &quot;DCC Achievement Generator&quot;. There is a prompt, &quot;What mundane thing did you get done?&quot;, a form field for the task, and then it will render out the achievment. 
+        &lt;p&gt;Achievements have a title, a body of text, and a list of rewards (bulleted list). Create a nice design for the achievement as well (just make something up for now)&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I&apos;m just now noticing the typo and thankfully Cursor didn&apos;t complain. I let it output my HTML and CSS and then simply copied that over to CodePen so I could start working on the actual implementation. I think the only work I needed to do was add some IDs to the HTML in order for my JavaScript to connect to what it needed to update. The design Cursor created was just fine:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/dcc2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;A screenshot of the app&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;In case you can&apos;t read that, my input was: &lt;code&gt;i wrote a blog post&lt;/code&gt; and the achievement I received was:&lt;/p&gt;
+        &lt;div class=&quot;callout&quot;&gt;
+        &lt;strong&gt;The Scroll of Slightly Above Average Prose&lt;/strong&gt;&lt;br&gt;
+        By the gods...you *authored* a blog post? A digital missive of words, painstakingly crafted (or, let&apos;s be honest, hastily assembled) and disseminated across the ethereal web? A feat of remarkable… mediocrity? Fear not, adventurer! While not slaying a dragon or retrieving a legendary artifact, you have demonstrated a modicum of linguistic dexterity. A tiny flicker of creativity in the vast darkness of internet noise. Consider yourself mildly commended. It&apos;s not much, but it&apos;s… something.
+        &lt;br&gt;&lt;br&gt;
+        &lt;strong&gt;Rewards&lt;/strong&gt;:&lt;br&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A digital badge of… acknowledgment.&lt;/li&gt;
+        &lt;li&gt;The fleeting satisfaction of knowing you’ve added to the collective human output.&lt;/li&gt;
+        &lt;li&gt;A slightly less judgmental stare from your cat.&lt;/li&gt;
+        &lt;li&gt;Potentially, an increase in internet karma. (Results may vary.)&lt;/li&gt;
+        &lt;/div&gt;
+        &lt;h2 id=&quot;results-may-vary&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#results-may-vary&quot;&gt;Results May Vary&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;If you&apos;ve got the flags enabled and try it out, please share your results, and let me know what you think. Feel free to fork the pen and modify to your heart&apos;s content. Also... Mongo is appalled!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;DCC Generator&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;js&quot; data-slug-hash=&quot;qEaxdmg&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019d3084-ca56-7b39-bb6b-5a67093a283e&quot;&gt;
+        DCC Generator&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@giorgiotrovato?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Giorgio Trovato&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/yellow-and-white-trophy-_XTY6lD8jgM?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Checking if a Movie has a Post or Mid Credit Scene</title>
       <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
       <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
         &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
@@ -98,7 +211,7 @@
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -163,7 +276,7 @@
       <title>Implementing OAuth in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
         &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
@@ -449,7 +562,7 @@
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -470,7 +583,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -691,7 +804,7 @@
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -892,7 +1005,7 @@
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -1434,7 +1547,7 @@
       <title>Links For You (3/8/26)</title>
       <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
       <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
         &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
@@ -1488,7 +1601,7 @@
       <title>Dynamically Adjusting Image Text for Contrast</title>
       <link>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</link>
       <guid>https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:02 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I was pleasantly surprised to discover that one of my favorite JavaScript libraries, &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;Color Thief&lt;/a&gt;, had gotten a major update. Color Thief examines an image and can tell you the dominant color as well as the five most used colors. I thought this was pretty cool, and over the past, I kid you not, 14 years, I&apos;ve blogged about it a few times:&lt;/p&gt;
         &lt;ul&gt;
@@ -1582,214 +1695,6 @@
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
         &lt;p&gt;Neat! So - a few caveats, things to think about, etc. I could probably also have used a simple black background on the div element wrapping my text. What I have now though feels a bit less obtrusive. Also note that it&apos;s possible for a dark image to have a &amp;quot;light corner&amp;quot; where your text is. In that case, Color Thief would be thrown off and return a value that&apos;s not helpful. (I plan on filing an issue on their repo suggesting a way to perhaps examine &lt;em&gt;part&lt;/em&gt; of an image.) Finally, this could also be useful if you are using Cloudinary to host your image. Cloudinary can dynamically add text to an image (see my &lt;a href=&quot;https://cloudinary.com/blog/building-infographic-with-cloudinary-and-the-national-park-service-api&quot;&gt;blog post&lt;/a&gt; where I demonstrate this with the National Parks System API) and in theory, you could use this to help determine the best color.&lt;/p&gt;
         &lt;p&gt;Let me know what you think!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Using Astro for a Combined RSS View and Generator</title>
-      <link>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</link>
-      <guid>https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator</guid>
-      <pubDate>Tue, 31 Mar 2026 16:17:51 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Ok, before I start, let me just clarify this demo is kind of a remix of my &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;earlier post&lt;/a&gt; about building an RSS aggregator in Astro. I did run into some interesting issues this time around though and I figured it was worth a share.&lt;/p&gt;
-        &lt;p&gt;At Webflow, our &lt;a href=&quot;https://developers.webflow.com/&quot;&gt;developer docs&lt;/a&gt; are separated into different sections per product. For most of our developer products, we&apos;ve got changelogs. So for example, here&apos;s the &lt;a href=&quot;https://developers.webflow.com/data/v2.0.0/changelog&quot;&gt;changelog for our Data APIs&lt;/a&gt; and here&apos;s one for our &lt;a href=&quot;https://developers.webflow.com/mcp/v1.0.0/changelog&quot;&gt;MCP server&lt;/a&gt;. We try to be good stewards of our developer community and ensure we document everything as clearly as possible.&lt;/p&gt;
-        &lt;p&gt;Each of our changelogs has an RSS feed as well so if you&apos;re using a feed reader, it&apos;s an easy to keep up to date. However, there isn&apos;t &lt;em&gt;one&lt;/em&gt; unified RSS feed for all of our developer products. Given that I just worked on &lt;a href=&quot;http://raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;RSS parsing in Astro&lt;/a&gt;, I thought this would be a fun little utility to build.&lt;/p&gt;
-        &lt;h2 id=&quot;the-application&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-application&quot;&gt;The Application&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;My application is built in &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt; (of course) and runs on the Webflow platform via &lt;a href=&quot;https://developers.webflow.com/webflow-cloud/intro&quot;&gt;Webflow Cloud&lt;/a&gt;. It does two things - present a UI of a combined view of RSS feeds from our docs and serves up it&apos;s own RSS feed.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a look at the UI:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/app1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App view showing all our developer updates&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Nothing too earth shattering but it does exactly what I need - let me see all our developer updates at once.&lt;/p&gt;
-        &lt;p&gt;If you don&apos;t care about the code and just want to see it running, hop on over to where I deployed it: &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Yes, I was thinking Bowie when crafting that URL.&lt;/p&gt;
-        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Alright, so the app is a grand total of one HTML page and two additional routes. The HTML page makes use of &lt;a href=&quot;https://simplecss.org/&quot;&gt;SimpleCSS&lt;/a&gt; for UI, but don&apos;t forget Webflow Cloud apps can adopt the UI of their core site. In this case I didn&apos;t have a site (well, I did, but I&apos;m not using it for anything) so SimpleCSS made it... err... simple.&lt;/p&gt;
-        &lt;p&gt;The home page isn&apos;t too complex, especially with the layout abstracted out, but all it&apos;s doing is hitting my endpoint for the data and then rendering:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import Layout from &apos;../layouts/Layout.astro&apos;;
-        ---
-        
-        &amp;lt;Layout&amp;gt;
-        
-        &amp;lt;style is:global&amp;gt;
-        .card {
-        border: 1px solid var(--border, #d8d8d8);
-        border-radius: 5px;
-        overflow: hidden;
-        margin-bottom: 2rem;
-        }
-        .card-header {
-        background-color: var(--accent-bg, #f2f2f2);
-        padding: 1rem;
-        border-bottom: 1px solid var(--border, #d8d8d8);
-        }
-        .card-header h2 {
-        margin: 0;
-        font-size: 1.5rem;
-        }
-        .card-body {
-        padding: 1rem;
-        }
-        .card-footer {
-        padding: 1rem;
-        border-top: 1px solid var(--border, #d8d8d8);
-        }
-        
-        #content {
-        padding-top: 25px;
-        }
-        &amp;lt;/style&amp;gt;
-        
-        &amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;i&amp;gt;Loading greatness...&amp;lt;/i&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;script&amp;gt;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
-        
-        let $content = document.querySelector(&apos;#content&apos;);
-        // I had issues with the relative pathing - this SHOULD work. In WFC, I&apos;m always at (root)/(path) with no / at the dn
-        let itemReq = await fetch (document.URL + &apos;/changes.json&apos;);
-        let items = await itemReq.json();
-        
-        let html = &apos;&apos;;
-        items.forEach(i =&amp;gt; {
-        html += `
-        &amp;lt;div class=&amp;quot;card&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;card-header&amp;quot;&amp;gt;
-        &amp;lt;h2&amp;gt;${i.title}&amp;lt;/h2&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;card-body&amp;quot;&amp;gt;
-        ${i.content}
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Published:&amp;lt;/strong&amp;gt; ${formatDate(i.pubDate)}&amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;card-footer&amp;quot;&amp;gt;
-        &amp;lt;a href=&amp;quot;${i.link}&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;Read More&amp;lt;/a&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        `;
-        })
-        console.log(items);
-        
-        $content.innerHTML = html;
-        });
-        
-        function formatDate(d) {
-        d = new Date(d);
-        return Intl.DateTimeFormat(&apos;en-US&apos;, {
-        dateStyle: &apos;long&apos;
-        }).format(d);
-        }
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;/Layout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;When the document loads, I hit my endpoint, which I defined in &lt;code&gt;changes.json.js&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import getFeeds from &apos;./getfeed.js&apos;;
-        
-        export async function GET({ request }) {
-        
-        let items = await getFeeds();
-        
-        return new Response(JSON.stringify(items), {
-        status: 200,
-        headers: {
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;,
-        },
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Yeah, not much there, that&apos;s because the core logic of &amp;quot;hit X RSS feeds and combine them&amp;quot; in defined in a helper function. The reason why will make sense in a sec. Here&apos;s that code, which makes use of the &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;rss-parser&lt;/a&gt; package:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import Parser from &apos;rss-parser&apos;;
-        import { feeds } from &apos;./feeds.config.js&apos;;
-        let parser;
-        
-        export default async () =&amp;gt; {
-        
-        parser = new Parser();
-        let items = [];
-        
-        let reqs = [];
-        for (const feedUrl of feeds) {
-        reqs.push(parseURL(feedUrl.url));
-        }
-        
-        const results = await Promise.allSettled(reqs);
-        for (const result of results) {
-        if (result.status === &apos;fulfilled&apos;) {
-        const feed = result.value;
-        console.log(`Fetched feed: ${feed.title} with ${feed.items.length} items.`);
-        let newItems = [];
-        feed.items.forEach(item =&amp;gt; {
-        let content = item.contentSnippet || item.summary || item.content || &apos;&apos;;
-        newItems.push({
-        title: item.title,
-        link: item.link,
-        content: content,
-        pubDate: item.pubDate,
-        feedTitle: feed.title
-        });
-        });
-        
-        items.push(...newItems);
-        
-        } else {
-        console.error(&apos;Error fetching/parsing feed:&apos;, result.reason);
-        }
-        }
-        
-        // now sort items by pubDate descending
-        items.sort((a, b) =&amp;gt; new Date(b.pubDate) - new Date(a.pubDate));
-        
-        return items;
-        };
-        
-        async function parseURL(u) {
-        let xmlReq = await fetch(u);
-        let xml = await xmlReq.text();
-        return parser.parseString(xml);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I set the RSS feeds as a config file so I could easily tweak it in the future - it&apos;s just an array of feed names and URLs. I expect there&apos;s nothing too interesting here, but note &lt;code&gt;parseURL&lt;/code&gt;. Why am I doing this?&lt;/p&gt;
-        &lt;p&gt;Webflow Cloud apps run on Cloudflare, and Cloudflare doesn&apos;t run the &amp;quot;full&amp;quot; Node environment, which means some packages/code won&apos;t work out of the box. I&apos;ve run into this before, and simply forgot when I was building this app. You can read more about this in our docs, &lt;a href=&quot;https://developers.webflow.com/webflow-cloud/environment/nodejs-compatibility&quot;&gt;Node.js compatibility&lt;/a&gt;, but honestly, the only time this impacted me at Cloudflare was, literally, the &lt;code&gt;rss-parser&lt;/code&gt; package. It makes use of &lt;code&gt;http&lt;/code&gt; and Cloudflare wants you to use &lt;code&gt;fetch&lt;/code&gt; instead. Most modern Node packages do, but you will, from time to time, run into cases like I did here.&lt;/p&gt;
-        &lt;p&gt;Luckily, &lt;code&gt;rss-parser&lt;/code&gt; supports a &amp;quot;give me the XML string&amp;quot; method so I used &lt;code&gt;fetch&lt;/code&gt; and and passed the XML string to it. Easy fix once I realized what was going on.&lt;/p&gt;
-        &lt;p&gt;The last part of the app was taking that combined set of items and creating an RSS feed for it. To handle that, I used a npm package named &lt;a href=&quot;https://www.npmjs.com/package/feed&quot;&gt;feed&lt;/a&gt; which lets you create an RSS feed (of different flavors even) on the fly. I served this from a file named &lt;code&gt;feed.xml.js&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import getFeeds from &apos;./getfeed.js&apos;;
-        import { Feed } from &apos;feed&apos;;
-        
-        export async function GET({ request }) {
-        
-        let items = await getFeeds();
-        
-        const feed = new Feed({
-        title:&amp;quot;Combined Webflow Changelog Feed&amp;quot;,
-        });
-        
-        items.forEach(i =&amp;gt; {
-        feed.addItem({
-        title: i.title, 
-        id: i.link, 
-        link: i.link, 
-        content: i.content, 
-        date: new Date(i.pubDate)
-        })
-        });
-        
-        return new Response(feed.rss2(), {
-        status: 200,
-        headers: {
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/rss+xml&amp;quot;,
-        },
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I should note that the feed package supports a heck of a lot more options for creating RSS feeds than I needed, so keep in mind I did the bare minimum here. You can see this here: &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges/feed.xml&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges/feed.xml&lt;/a&gt;&lt;/p&gt;
-        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show Me the Code!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, if you want to play with it, don&apos;t forget it lives up here, &lt;a href=&quot;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&quot;&gt;https://raymonds-webflow-cloud-space.webflow.io/chachachachanges&lt;/a&gt;, and you can see all of the code here: &lt;a href=&quot;https://github.com/Webflow-Examples/wfc-chachachachanges&quot;&gt;https://github.com/Webflow-Examples/wfc-chachachachanges&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@chris_designer?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Christina Radevich&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-red-light-in-a-window-VNmQWlKeskQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

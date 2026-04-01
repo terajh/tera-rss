@@ -4,7 +4,88 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Tue, 31 Mar 2026 16:44:46 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 01 Apr 2026 16:37:50 GMT</lastBuildDate>
+    <item>
+      <title>Enumeration warning when using VS Code debug console in a Vue project</title>
+      <link>https://stackoverflow.com/questions/79918150/enumeration-warning-when-using-vs-code-debug-console-in-a-vue-project</link>
+      <guid>https://stackoverflow.com/questions/79918150/enumeration-warning-when-using-vs-code-debug-console-in-a-vue-project</guid>
+      <pubDate>Wed, 01 Apr 2026 05:32:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have a minimal Vue 3 application created using &lt;code&gt;npm create vue@latest&lt;/code&gt;. The application contains a simple &lt;code&gt;App.vue&lt;/code&gt; file with the following contents:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script&amp;gt;  
+        export default {  
+        data: function() {  
+        return  {  
+        x: &amp;quot;hello&amp;quot;  
+        }  
+        },  
+        methods: {  
+        runMethod: function() {  
+        this.x = this.thx + &amp;quot; hello&amp;quot;  
+        }  
+        }  
+        }  
+        &amp;lt;/script&amp;gt;  
+        
+        &amp;lt;template&amp;gt;  
+        &amp;lt;button v-on:click=&amp;quot;runMethod&amp;quot;&amp;gt;Click&amp;lt;/button&amp;gt;  
+        &amp;lt;h1&amp;gt;{{ x }}&amp;lt;/h1&amp;gt;  
+        &amp;lt;/template&amp;gt;  
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I perform the following steps:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Launch the debug configuration&lt;/li&gt;
+        &lt;li&gt;Place a break point on line 10&lt;/li&gt;
+        &lt;li&gt;Click the button on the browser so that execution stops at the breakpoint&lt;/li&gt;
+        &lt;li&gt;Type &lt;code&gt;this.&lt;/code&gt; in the VS Code debug console&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The following warning appears:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;[Vue warn]: Avoid app logic that relies on enumerating keys on a component instance. The keys will be empty in production mode to avoid performance overhead.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This warning only appears in the VS Code debug console during debugging. I have checked in the Chrome developer tools and the warning never appears.&lt;/p&gt;
+        &lt;p&gt;Here is the VS Code launch configuration:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{  
+        &amp;quot;name&amp;quot;: &amp;quot;VUE&amp;quot;,  
+        &amp;quot;type&amp;quot;: &amp;quot;chrome&amp;quot;,  
+        &amp;quot;request&amp;quot;: &amp;quot;launch&amp;quot;,  
+        &amp;quot;url&amp;quot;: &amp;quot;http://localhost:5173&amp;quot;,  
+        &amp;quot;cwd&amp;quot;: &amp;quot;${workspaceFolder}&amp;quot;,  
+        &amp;quot;webRoot&amp;quot;: &amp;quot;${workspaceFolder}&amp;quot;,  
+        &amp;quot;preLaunchTask&amp;quot;: &amp;quot;npm: dev - frontend&amp;quot;,  
+        &amp;quot;runtimeArgs&amp;quot;: [  
+        &amp;quot;--incognito&amp;quot;  
+        ],  
+        }  
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The launch task is as follows:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{  
+        &amp;quot;label&amp;quot;: &amp;quot;npm: dev - frontend&amp;quot;,  
+        &amp;quot;type&amp;quot;: &amp;quot;npm&amp;quot;,  
+        &amp;quot;script&amp;quot;: &amp;quot;dev&amp;quot;,  
+        &amp;quot;path&amp;quot;: &amp;quot;&amp;quot;,  
+        &amp;quot;isBackground&amp;quot;: true,  
+        &amp;quot;problemMatcher&amp;quot;: {  
+        &amp;quot;pattern&amp;quot;: [  
+        {  
+        &amp;quot;regexp&amp;quot;: &amp;quot;.&amp;quot;,  
+        &amp;quot;file&amp;quot;: 1,  
+        &amp;quot;message&amp;quot;: 0,  
+        &amp;quot;kind&amp;quot;: &amp;quot;file&amp;quot;  
+        }  
+        ],  
+        &amp;quot;background&amp;quot;: {  
+        &amp;quot;activeOnStart&amp;quot;: true,  
+        &amp;quot;beginsPattern&amp;quot;: &amp;quot;vite v&amp;quot;,  
+        &amp;quot;endsPattern&amp;quot;: &amp;quot;help&amp;quot;  
+        }  
+        }  
+        }  
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The warning is very annoying and interferes with everything I do in the debug console.&lt;/p&gt;
+        &lt;p&gt;Crossposting from &lt;a href=&quot;https://github.com/orgs/vuejs/discussions/14665&quot; rel=&quot;nofollow noreferrer&quot;&gt;GitHub discussions&lt;/a&gt;.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to create and implement templates that allow for information to be automatically filled in on envelope creation using Docusign API</title>
       <link>https://stackoverflow.com/questions/79917163/how-to-create-and-implement-templates-that-allow-for-information-to-be-automatic</link>
@@ -1643,18 +1724,6 @@
         return { progress };
         }
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to get rid of the background inside Vue.js double curly braces (mustache) in Visual Studio Code</title>
-      <link>https://stackoverflow.com/questions/79863375/how-to-get-rid-of-the-background-inside-vue-js-double-curly-braces-mustache-in</link>
-      <guid>https://stackoverflow.com/questions/79863375/how-to-get-rid-of-the-background-inside-vue-js-double-curly-braces-mustache-in</guid>
-      <pubDate>Thu, 08 Jan 2026 13:36:34 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Sorry, I really tried, but I can&apos;t find the corresponding setting inside the Visual Studio Code settings. After an update, it was just there, and I think it’s ugly and also distracting.&lt;/p&gt;
-        &lt;p&gt;To be clear, I want to get rid of the bordered box and background inside the curly braces.&lt;/p&gt;
-        &lt;p&gt;Also I am curious why such a high emphasis on the JavaScript portion of the template is deemed necessary. The two yellow curly braces on each side are more than enough to quickly spot it.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/KNtU7EGy.png&quot; alt=&quot;A line of code showcasing the background issue&quot; title=&quot;A line of code showcasing the background issue&quot; /&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

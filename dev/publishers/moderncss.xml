@@ -4,695 +4,12 @@
     <title>dev RSS - Stephanie Eckles</title>
     <link>https://moderncss.dev/</link>
     <description>Stephanie Eckles RSS 피드</description>
-    <lastBuildDate>Tue, 31 Mar 2026 16:44:46 GMT</lastBuildDate>
-    <item>
-      <title>Providing Type Definitions for CSS with @property</title>
-      <link>https://moderncss.dev/providing-type-definitions-for-css-with-at-property/</link>
-      <guid>https://moderncss.dev/providing-type-definitions-for-css-with-at-property/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;A cross-browser feature as of the release of Firefox 128 in July 2024 is a new at-rule - &lt;code&gt;@property&lt;/code&gt; - which allows defining types as well as inheritance and an initial value for your custom properties.&lt;/p&gt;
-        &lt;p&gt;We&apos;ll learn when and why traditional fallback values can fail, and how &lt;code&gt;@property&lt;/code&gt; features allow us to write safer, more resilient CSS custom property definitions.&lt;/p&gt;
-        &lt;div class=&quot;carbon-ad&quot;&gt;
-        &lt;script async=&quot;&quot; type=&quot;text/javascript&quot; src=&quot;https://cdn.carbonads.com/carbon.js?serve=CE7I52QE&amp;placement=moderncssdev&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;standard-use-of-custom-properties&quot;&gt;Standard Use of Custom Properties&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#standard-use-of-custom-properties&quot; aria-labelledby=&quot;standard-use-of-custom-properties&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Custom properties - aka &amp;quot;CSS variables&amp;quot; - are useful because they allow creating references to values similar to variables in other programming languages.&lt;/p&gt;
-        &lt;p&gt;Consider the following scenario which creates and assigns the &lt;code&gt;--color-blue&lt;/code&gt; property, which then is implemented as a class and applied to a paragraph.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Standard use case for custom properties&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        .demo-801 {
-        --color-blue: blue;
-        
-        padding: 0.5rem;
-        }
-        
-        .color-blue-801 {
-        color: var(--color-blue);
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-801&quot;&gt;
-        &lt;p class=&quot;color-blue-801&quot;&gt;I&apos;m blue dabadee&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;The paragraph renders as blue. Excellent! Ship it.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;common-error-conditions-using-custom-properties&quot;&gt;Common Error Conditions Using Custom Properties&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#common-error-conditions-using-custom-properties&quot; aria-labelledby=&quot;common-error-conditions-using-custom-properties&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Now, you and I both know that &amp;quot;blue&amp;quot; is a color. And it also may seem obvious that you would only apply the class that uses this color to text we intend to be &lt;em&gt;blue&lt;/em&gt;.&lt;/p&gt;
-        &lt;p&gt;But, the real world isn&apos;t perfect, and sometimes the downstream consumers of our CSS end-up with a reason to re-define the value. Or perhaps they accidentally introduce a typo that impacts the original value.&lt;/p&gt;
-        &lt;p&gt;The outcome of either of these scenarios could be:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;the text ends up a color besides blue, as that author intended&lt;/li&gt;
-        &lt;li&gt;the text surprisingly renders as black&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;If the rendered color is surprisingly black, it&apos;s likely that we&apos;ve hit the unique scenario of &lt;em&gt;invalid at computed value time&lt;/em&gt;.&lt;/p&gt;
-        &lt;p&gt;When the browser is assessing CSS rules and working out what value to apply to each property based on the cascade, inheritance, specificity and so forth, it will retain a custom property as the winning value as long as it understands the general way it&apos;s being used.&lt;/p&gt;
-        &lt;p&gt;In our &lt;code&gt;--color-blue&lt;/code&gt; example, the browser definitely understands the &lt;code&gt;color&lt;/code&gt; property, so it assumes all will be ok with the use of the variable as well.&lt;/p&gt;
-        &lt;p&gt;But, what happens if someone redefines &lt;code&gt;--color-blue&lt;/code&gt; to an invalid color?&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Defining an invalid color&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        .demo-99 {
-        --color-blue: blue;
-        
-        padding: 0.5rem;
-        }
-        
-        .color-blue-99 {
-        color: var(--color-blue);
-        }
-        
-        .demo-99 p {
-        --color-blue: notacolor;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-99&quot;&gt;
-        &lt;p class=&quot;color-blue-99&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Uh oh - it&apos;s surprisingly rendering as black.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;why-traditional-fallbacks-can-fail&quot;&gt;Why Traditional Fallbacks Can Fail&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#why-traditional-fallbacks-can-fail&quot; aria-labelledby=&quot;why-traditional-fallbacks-can-fail&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Ok, before we learn what that scary-sounding phrase means, let&apos;s take a look in DevTools and see if it gives us a clue about what&apos;s going on.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://moderncss.dev/img/posts/35/devtools-notacolor.png&quot; alt=&quot;Styles panel in DevTools shows .color-blue and the paragraph rule, with no error apparent&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;That looks pretty normal, and doesn&apos;t seem to reveal that anything is wrong, making troubleshooting the error a lot trickier.&lt;/p&gt;
-        &lt;p&gt;You might know that custom properties allow a fallback value as second parameter, so perhaps that will help! Let&apos;s try.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Attempt resolution with custom property fallback&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        .demo-634 {
-        --color-blue: blue;
-        
-        padding: 0.5rem;
-        }
-        
-        .color-blue-634 {
-        color: var(--color-blue, blue);
-        }
-        
-        .demo-634 p {
-        --color-blue: notacolor;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-634&quot;&gt;
-        &lt;p class=&quot;color-blue-634&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Unfortunately, the text still renders as black.&lt;/p&gt;
-        &lt;p&gt;Ok, but our good friend the cascade exists, and back in the day we used to put things like vendor prefixed properties prior to the unprefixed ones. So, perhaps if we use a similar method and supply an extra &lt;code&gt;color&lt;/code&gt; definition before the one that has the custom property it can fallback to that?&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Attempt resolution with extra color definition&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        .demo-116 {
-        --color-blue: blue;
-        
-        padding: 0.5rem;
-        }
-        
-        .color-blue-116 {
-        color: blue;
-        color: var(--color-blue);
-        }
-        
-        .demo-116 p {
-        --color-blue: notacolor;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-116&quot;&gt;
-        &lt;p class=&quot;color-blue-116&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Bummer, we don&apos;t seem to be making progress towards preventing this issue.&lt;/p&gt;
-        &lt;p&gt;This is because of the (slightly scary sounding) scenario &lt;em&gt;invalid at computed value time&lt;/em&gt;.&lt;/p&gt;
-        &lt;p&gt;Although the browser has kept our definition that expects a custom property value, it&apos;s not until later that the browser tries to actually compute that value.&lt;/p&gt;
-        &lt;p&gt;In this case, it looks at both the &lt;code&gt;.color-blue&lt;/code&gt; class and the value provided for the &lt;code&gt;p&lt;/code&gt; element rule and attempts to apply the computed value of &lt;code&gt;notacolor&lt;/code&gt;. At this stage, it has discarded the alternate value of &lt;code&gt;blue&lt;/code&gt; originally provided by the class. Consequently, since &lt;code&gt;notacolor&lt;/code&gt; is in fact not a color and therefore &lt;em&gt;invalid&lt;/em&gt;, the best it can do is use either:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;an &lt;em&gt;inherited value&lt;/em&gt; if the property is allowed to inherit and an ancestor has provided a value; or&lt;/li&gt;
-        &lt;li&gt;the &lt;em&gt;initial value&lt;/em&gt; as defined in the CSS spec&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;While &lt;code&gt;color&lt;/code&gt; is an inheritable property, we haven&apos;t defined it on any ancestors, so the rendered color of &lt;code&gt;black&lt;/code&gt; is due to the &lt;em&gt;initial&lt;/em&gt; value.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Refer to this earlier Modern CSS article about &lt;a href=&quot;https://moderncss.dev/how-custom-property-values-are-computed/&quot;&gt;how custom property values are computed&lt;/a&gt; and learn more deeply about the condition of invalid at computed value time.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;defining-types-for-safer-css&quot;&gt;Defining Types for Safer CSS&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#defining-types-for-safer-css&quot; aria-labelledby=&quot;defining-types-for-safer-css&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;It&apos;s time to introduce &lt;code&gt;@property&lt;/code&gt; to help solve this issue of what you may perceive as a surprising rendered value.&lt;/p&gt;
-        &lt;p&gt;The critical features &lt;code&gt;@property&lt;/code&gt; provides are:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;defining acceptable types for specific custom properties&lt;/li&gt;
-        &lt;li&gt;enabling or disabling inheritance&lt;/li&gt;
-        &lt;li&gt;providing an initial value as a failsafe for invalid or undefined values&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;This at-rule is defined on a per-custom property basis, meaning a unique definition is needed for each property for which you want to leverage these benefits.&lt;/p&gt;
-        &lt;p&gt;It is &lt;em&gt;not&lt;/em&gt; a requirement, and you can certainly continue using custom properties without ever bringing in &lt;code&gt;@property&lt;/code&gt;.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Please note that at time of writing, &lt;code&gt;@property&lt;/code&gt; is very newly cross-browser and I would advise you to consider it a progressive enhancement to benefit users in supporting browsers.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Let&apos;s apply it to our blue dilemma and see how it fixes the issue of the otherwise invalid color supplied in the element rule.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Apply @property to --color-blue&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token comment&quot;&gt;/* Prior rules also apply */&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --c-blue {
-        syntax: &quot;&lt;color&gt;&quot;;
-        inherits: true;
-        initial-value: blue;
-        }
-        
-        .demo-403 {
-        --c-blue: blue;
-        
-        padding: 0.5rem;
-        }
-        
-        .color-blue-403 {
-        color: var(--c-blue);
-        }
-        
-        .demo-403 p {
-        --c-blue: notacolor;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-403&quot;&gt;
-        &lt;p class=&quot;color-blue-403&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Success, our text is still blue despite the invalid definition!&lt;/p&gt;
-        &lt;p&gt;Additionally, DevTools is now helpful again:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://moderncss.dev/img/posts/35/devtools-with-at-property.png&quot; alt=&quot;DevTools displays the invalid value within the paragraph rule as crossed out and with an error icon, and also provides a hover overlay for the --color-blue custom property with the full definition provided in @property&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;We can observe both that the invalid value is clearly an error, and we also are provided the full definition of the custom property via the hover overlay.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;providing-types-via-syntax&quot;&gt;Providing Types via &lt;code&gt;syntax&lt;/code&gt;&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#providing-types-via-syntax&quot; aria-labelledby=&quot;providing-types-via-syntax&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Why would we need types for custom properties? Here are a few reasons:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;types help verify what makes a valid vs. invalid value&lt;/li&gt;
-        &lt;li&gt;without types, custom properties are very open-ended and can take nearly any value, including a blank space&lt;/li&gt;
-        &lt;li&gt;lack of types prevents browser DevTools from providing the optimal level of detail about which value is in use for a custom property&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;In our &lt;code&gt;@property&lt;/code&gt; definition, the &lt;code&gt;syntax&lt;/code&gt; descriptor enables providing the allowed types for the custom property. We used &lt;code&gt;&amp;quot;&amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt;, but other types include:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;&amp;quot;&lt;/code&gt; - numbers with units attached, ex. &lt;code&gt;4px&lt;/code&gt; or &lt;code&gt;3vw&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;integer&amp;gt;&amp;quot;&lt;/code&gt; - decimal units 0 through 9 (aka &amp;quot;whole numbers&amp;quot;)&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;number&amp;gt;&amp;quot;&lt;/code&gt; - numbers which may have a fraction, ex. &lt;code&gt;1.25&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;percentage&amp;gt;&amp;quot;&lt;/code&gt; - numbers with a percentage sign attached, ex. &lt;code&gt;24%&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;length-percentage&amp;gt;&amp;quot;&lt;/code&gt; - accepts valid &lt;code&gt;&amp;lt;length&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;percentage&amp;gt;&lt;/code&gt; values&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;A special case is &lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt; which stands for &amp;quot;universal syntax&amp;quot; and enables accepting any value, similar to the default behavior. This means you skip the typing benefit, but perhaps want the inheritance and/or initial value control.&lt;/p&gt;
-        &lt;p&gt;These types and more are listed for &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/@property/syntax&quot;&gt;the syntax descriptor on MDN&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;The type applies to the &lt;em&gt;computed value&lt;/em&gt; of the custom property, so the &lt;code&gt;&amp;quot;&amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt; type would be happy with both &lt;code&gt;blue&lt;/code&gt; as well as &lt;code&gt;light-dark(blue, cyan)&lt;/code&gt; (although only one of those is accepted into the &lt;code&gt;initial-value&lt;/code&gt; as we will soon learn).&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
-        &lt;h3 id=&quot;stronger-typing-with-lists&quot;&gt;Stronger Typing With Lists&lt;/h3&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#stronger-typing-with-lists&quot; aria-labelledby=&quot;stronger-typing-with-lists&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Let&apos;s say we want to provide a little flexibility for our &lt;code&gt;--color-blue&lt;/code&gt; custom property.&lt;/p&gt;
-        &lt;p&gt;We can use a list to provide valid options. Anything other than these &lt;em&gt;exact&lt;/em&gt; values would be considered invalid, and use the &lt;code&gt;initial-value&lt;/code&gt; instead (if inheritance didn&apos;t apply). These are called &amp;quot;custom idents&amp;quot;, are case sensitive, and can be any value.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Defining a list within syntax&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;blue | cyan | dodgerblue&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.demo p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dodgerblue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --c2-blue {
-        syntax: &quot;blue | cyan | dodgerblue&quot;;
-        inherits: true;
-        initial-value: blue;
-        }
-        
-        .demo-72 {
-        padding: 0.5rem;
-        }
-        
-        .color-blue-72 {
-        color: var(--c2-blue);
-        }
-        
-        .demo-72 p {
-        --c2-blue: dodgerblue;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content&quot;&gt;
-        &lt;div class=&quot;demo-72&quot;&gt;
-        &lt;p class=&quot;color-blue-72&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
-        &lt;h3 id=&quot;typing-for-mixed-values&quot;&gt;Typing for Mixed Values&lt;/h3&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-mixed-values&quot; aria-labelledby=&quot;typing-for-mixed-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;The pipe character (&lt;code&gt;|&lt;/code&gt;) used in the previous list indicates an &amp;quot;or&amp;quot; condition. While we used explicit color names, it can also be used to say &amp;quot;any of these syntax types are valid.&amp;quot;&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt; | &amp;lt;length&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
-        &lt;h3 id=&quot;typing-for-multiple-values&quot;&gt;Typing for Multiple Values&lt;/h3&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-multiple-values&quot; aria-labelledby=&quot;typing-for-multiple-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;So far, we&apos;ve only typed custom properties that expect a &lt;em&gt;single&lt;/em&gt; value.&lt;/p&gt;
-        &lt;p&gt;Two additional cases can be covered with an additional &amp;quot;multiplier&amp;quot; character, which should immediately follow the syntax component name.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Use &lt;code&gt;+&lt;/code&gt; to support a space-separated list, ex. &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;+&amp;quot;&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;Use &lt;code&gt;#&lt;/code&gt; to support a comma-separated list, ex. &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;#&amp;quot;&lt;/code&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;This can be useful for properties that allow multiple definitions, such as &lt;code&gt;background-image&lt;/code&gt;.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Support multiple values for syntax&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --bg-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;image&gt;#&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 
-        &lt;span class=&quot;token function&quot;&gt;repeating-linear-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;to right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue 10px 12px&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; transparent 12px 22px&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 
-        &lt;span class=&quot;token function&quot;&gt;repeating-linear-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;to bottom&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue 10px 12px&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; transparent 12px 22px&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;background-image&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--bg-gradient&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        
-        &lt;span class=&quot;token property&quot;&gt;inline-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1px solid&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --bg-gradient{
-        syntax: &quot;&lt;image&gt;#&quot;;
-        inherits: false;
-        initial-value: 
-        repeating-linear-gradient(to right, blue 10px 12px, transparent 12px 22px), 
-        repeating-linear-gradient(to bottom, blue 10px 12px, transparent 12px 22px);
-        }
-        
-        .box-162 {
-        background-image: var(--bg-gradient);
-        
-        inline-size: 5rem;
-        aspect-ratio: 1;
-        border-radius: 4px;
-        border: 1px solid;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
-        &lt;div class=&quot;box-162&quot;&gt;&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
-        &lt;h3 id=&quot;typing-for-multi-part-mixed-values&quot;&gt;Typing for Multi-Part Mixed Values&lt;/h3&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-multi-part-mixed-values&quot; aria-labelledby=&quot;typing-for-multi-part-mixed-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Some properties accept mixed types to develop the full value, such as &lt;code&gt;box-shadow&lt;/code&gt; which has potential types of &lt;code&gt;inset&lt;/code&gt;, a series of &lt;code&gt;&amp;lt;length&amp;gt;&lt;/code&gt; values, and a &lt;code&gt;&amp;lt;color&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;Presently, it&apos;s not possible to type this in a single &lt;code&gt;@property&lt;/code&gt; definition, although you may attempt to try something like &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;+ &amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt;. However, this effectively invalidates the &lt;code&gt;@property&lt;/code&gt; definition itself.&lt;/p&gt;
-        &lt;p&gt;One alternative is to break up the custom property definitions so that we can allow a series of lengths, and then allow a color. While slightly more cumbersome, this allows us to still get the benefit of typing which relieves the potential errors we covered earlier.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Support multi-part mixed values for syntax&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow-length&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length&gt;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0px 0px 8px 2px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow-color&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;hsl&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;0 0% 75%&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;box-shadow&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-shadow-length&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-shadow-color&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        
-        &lt;span class=&quot;token property&quot;&gt;inline-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --box-shadow-length {
-        syntax: &quot;&lt;length&gt;+&quot;;
-        inherits: false;
-        initial-value: 0px 0px 8px 2px;
-        }
-        
-        @property --box-shadow-color {
-        syntax: &quot;&lt;color&gt;&quot;;
-        inherits: false;
-        initial-value: hsl(0 0% 75%);
-        }
-        
-        .box-530 {
-        box-shadow: var(--box-shadow-length) var(--box-shadow-color);
-        
-        inline-size: 5rem;
-        aspect-ratio: 1;
-        border-radius: 4px;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
-        &lt;div class=&quot;box-530&quot;&gt;&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
-        &lt;h3 id=&quot;allowing-any-type&quot;&gt;Allowing Any Type&lt;/h3&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#allowing-any-type&quot; aria-labelledby=&quot;allowing-any-type&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;If you&apos;re less concerned about the &amp;quot;type&amp;quot; of a property for something like &lt;code&gt;box-shadow&lt;/code&gt; and care more about inheritance or the initial value, you can instead use the universal syntax definition to allow any value. This negates the problem we just mitigated by splitting up the parts.&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0px 0px 8px 2px &lt;span class=&quot;token function&quot;&gt;hsl&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;0 0% 75%&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Because the universal syntax accepts any value, an additional &amp;quot;multiplier&amp;quot; is not needed.&lt;/p&gt;
-        &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: The &lt;code&gt;initial-value&lt;/code&gt; is still required to be &lt;em&gt;computationally independent&lt;/em&gt; as we&apos;ll learn about soon under &lt;a href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#limitations-of-initial-value&quot;&gt;limitations of initial-value&lt;/a&gt;.&lt;/p&gt;
-        &lt;div class=&quot;promo promo--centered&quot;&gt;&lt;p&gt;&lt;strong style=&quot;color: var(--color-blue);&quot;&gt;Join my newsletter&lt;/strong&gt; for article updates, CSS tips, and front-end resources!&lt;/p&gt;
-        &lt;script async=&quot;&quot; data-uid=&quot;31fb09b748&quot; src=&quot;https://moderncss.kit.com/31fb09b748/index.js&quot;&gt;&lt;/script&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;modifying-inheritance&quot;&gt;Modifying Inheritance&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#modifying-inheritance&quot; aria-labelledby=&quot;modifying-inheritance&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;&lt;a href=&quot;https://web.dev/learn/css/inheritance#which_properties_are_inherited_by_default&quot;&gt;A subset of CSS properties are inheritable&lt;/a&gt;, such as &lt;code&gt;color&lt;/code&gt;. The &lt;code&gt;inherits&lt;/code&gt; descriptor for your &lt;code&gt;@property&lt;/code&gt; registration allows you to control that behavior for your custom property.&lt;/p&gt;
-        &lt;p&gt;If &lt;code&gt;true&lt;/code&gt;, the computed value can look to an ancestor for its value if the property is not explicitly set, and if a value isn&apos;t found it will use the initial value.&lt;/p&gt;
-        &lt;p&gt;If &lt;code&gt;false&lt;/code&gt;, the computed value will use the initial value if the property is not explicitly set for the element, such as via a class or element rule.&lt;/p&gt;
-        &lt;p&gt;In this demonstration, the &lt;code&gt;--box-bg&lt;/code&gt; has been set to &lt;code&gt;inherits: false&lt;/code&gt;, and only the outer box has an explicit definition via the applied class. The inner box uses the initial value since inheritance is not allowed.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Result of setting inherits: false&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-bg&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; cyan&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-bg&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        
-        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1.5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.outer-box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--box-bg&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; purple&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --box-bg {
-        syntax: &quot;&lt;color&gt;&quot;;
-        inherits: false;
-        initial-value: cyan;
-        }
-        
-        .box-335 {
-        background-color: var(--box-bg);
-        
-        aspect-ratio: 1;
-        border-radius: 4px;
-        padding: 1.5rem;
-        }
-        
-        .outer-box-335 {
-        --box-bg: purple;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
-        &lt;div class=&quot;box-335 outer-box-335&quot;&gt;
-        &lt;div class=&quot;box-335&quot;&gt;&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;valid-use-of-initial-value&quot;&gt;Valid Use of &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#valid-use-of-initial-value&quot; aria-labelledby=&quot;valid-use-of-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;Unless your syntax is open to any value using the universal syntax definition - &lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt; - then it is required to set an &lt;code&gt;initial-value&lt;/code&gt; to gain the benefits of registering a custom property.&lt;/p&gt;
-        &lt;p&gt;As we&apos;ve already experienced, use of &lt;code&gt;initial-value&lt;/code&gt; was critical in preventing the condition of a completely broken render due to &lt;em&gt;invalid at computed value time&lt;/em&gt;. Here are some other benefits of using &lt;code&gt;@property&lt;/code&gt; with an &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;When building design systems or UI libraries, it&apos;s important to ensure your custom properties are robust and reliable. Providing an &lt;code&gt;initial-value&lt;/code&gt; can help prevent a broken experience. Plus, typing properties also meshes nicely with keeping the intent of design tokens which may be expressed as custom properties.&lt;/p&gt;
-        &lt;p&gt;Dynamic computation scenarios such as the use of &lt;code&gt;clamp()&lt;/code&gt; have the potential to include an invalid value, whether through an error or from the browser not supporting something within the function. Having a fallback via &lt;code&gt;initial-value&lt;/code&gt; ensures that your design remains functional. This fallback behavior is a safeguard for unsupported features as well, though that can be limited by whether the &lt;code&gt;@property&lt;/code&gt; rule is supported in the browser being used.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Review additional ways to &lt;a href=&quot;https://moderncss.dev/how-custom-property-values-are-computed/#preventing-invalid-at-computed-value-time&quot;&gt;prevent invalid at computed time&lt;/a&gt; that may be more appropriate for your browser support matrix, especially for critical scenarios.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Incorporating &lt;code&gt;@property&lt;/code&gt; with &lt;code&gt;initial-value&lt;/code&gt; not only enhances the reliability of your CSS but also opens the door to the possibility of better tooling around custom properties. We&apos;ve previewed the behavior change in browser DevTools, but I&apos;m hopeful for an expansion of tooling including IDE plugins.&lt;/p&gt;
-        &lt;p&gt;The added layer of security from using &lt;code&gt;@property&lt;/code&gt; with &lt;code&gt;initial-value&lt;/code&gt; helps maintain the intent of your design, even if it isn&apos;t perfect for every context.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;limitations-of-initial-value&quot;&gt;Limitations of &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#limitations-of-initial-value&quot; aria-labelledby=&quot;limitations-of-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;The &lt;code&gt;initial-value&lt;/code&gt; is subject to the &lt;code&gt;syntax&lt;/code&gt; you define for &lt;code&gt;@property&lt;/code&gt;. Beyond that, &lt;code&gt;syntax&lt;/code&gt; itself doesn&apos;t support every possible value combination, which we previously covered. So, sometimes a little creativity is needed to get the benefit.&lt;/p&gt;
-        &lt;p&gt;Also, &lt;code&gt;initial-value&lt;/code&gt; values must be &lt;a href=&quot;https://www.w3.org/TR/css-properties-values-api-1/#the-registerproperty-function&quot;&gt;what the spec calls &lt;em&gt;computationally independent&lt;/em&gt;&lt;/a&gt;. Simplified, this means relative values like &lt;code&gt;em&lt;/code&gt; or dynamic functions like &lt;code&gt;clamp()&lt;/code&gt; or &lt;code&gt;light-dark()&lt;/code&gt; are unfortunately not allowed. However, in these scenarios you can still set an acceptable initial value, and then use a relative or dynamic value when you &lt;em&gt;use&lt;/em&gt; the custom property, such as in the &lt;code&gt;:root&lt;/code&gt; assignment.&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --heading-font-size&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 24px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--heading-font-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;clamp&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;1.25rem&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 5cqi&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 2rem&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This limitation on relative units or dynamic functions also means other custom properties cannot be used in the &lt;code&gt;initial-value&lt;/code&gt; assignment. The previous technique can still be used to mitigate this, where the preferred outcome is composed in the use of the property.&lt;/p&gt;
-        &lt;p&gt;Finally, custom properties registered via &lt;code&gt;@property&lt;/code&gt; are still locked into the rules of regular properties, such as that they cannot be used to enable variables in media or container query at-rules. For example, &lt;code&gt;@media (min-width: var(--mq-md))&lt;/code&gt; would still be invalid.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;unsupported-initial-value-can-crash-the-page&quot;&gt;Unsupported &lt;code&gt;initial-value&lt;/code&gt; Can Crash the Page&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#unsupported-initial-value-can-crash-the-page&quot; aria-labelledby=&quot;unsupported-initial-value-can-crash-the-page&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;As of time of writing, using a property or function value that a browser may not support as part of the &lt;code&gt;initial-value&lt;/code&gt; definition can cause the entire page to crash!&lt;/p&gt;
-        &lt;p&gt;Fortunately, we can use &lt;code&gt;@supports&lt;/code&gt; to test for ultra-modern properties or features before we try to use them as the &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@supports&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;[property|feature]&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token comment&quot;&gt;/* Feature is supported, use for initial-value */&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@supports&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;[property|feature]&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token comment&quot;&gt;/* Feature unsupported, use alternate for initial-value */&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;There may still be some surprises where &lt;code&gt;@supports&lt;/code&gt; reports true, but testing will reveal a crash or other error (ex. &lt;code&gt;currentColor&lt;/code&gt; used with &lt;code&gt;color-mix()&lt;/code&gt; in Safari). Be sure to test your solutions cross-browser!&lt;/p&gt;
-        &lt;p&gt;Learn more about ways to &lt;a href=&quot;https://moderncss.dev/testing-feature-support-for-modern-css/&quot;&gt;test feature support for modern CSS&lt;/a&gt;.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;exceptions-to-dynamic-limitations&quot;&gt;Exceptions to Dynamic Limitations&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#exceptions-to-dynamic-limitations&quot; aria-labelledby=&quot;exceptions-to-dynamic-limitations&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;There are a few conditions which may feel like exceptions to the requirement of &amp;quot;computationally independent&amp;quot; values when used for the &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;First, &lt;code&gt;currentColor&lt;/code&gt; is accepted. Unlike a relative value such as &lt;code&gt;em&lt;/code&gt; which requires computing &lt;code&gt;font-size&lt;/code&gt; of ancestors to compute itself, the value of &lt;code&gt;currentColor&lt;/code&gt; can be computed without depending on context.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Use of currentColor as initial-value&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --border-color&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; currentColor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;h2&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 3px solid &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--border-color&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --border-color {
-        syntax: &quot;&lt;color&gt;&quot;;
-        inherits: false;
-        initial-value: currentColor;
-        }
-        
-        .demo-210 h2 {
-        color: blue;
-        border: 3px solid var(--border-color);
-        padding: 1em;
-        }
-        
-        .demo-210 code {
-        color: mediumvioletred;
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
-        &lt;div class=&quot;demo-210&quot;&gt;
-        &lt;h2&gt;My border is set to &lt;code&gt;currentColor&lt;/code&gt;&lt;/h2&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;Second, use of &lt;code&gt;&amp;quot;&amp;lt;length-percentage&amp;gt;&amp;quot;&lt;/code&gt; enables the use of &lt;code&gt;calc()&lt;/code&gt;, which is mentioned in the spec. This allows a calculation that includes what is considered a global, computationally independent unit set even though we often use them for dynamic behavior. That is, the use of viewport units.&lt;/p&gt;
-        &lt;p&gt;For a scenario such as fluid type, this provides a better fallback that keeps the spirit of the intended outcome even though it&apos;s overall less ideal for most scenarios.&lt;/p&gt;
-        &lt;details open=&quot;&quot;&gt;
-        &lt;summary&gt;CSS for &quot;Use of calc() with vi for initial-value&quot;&lt;/summary&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --heading-font-size&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length-percentage&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;calc&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;18px + 1.5vi&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token comment&quot;&gt;/* In practice, define your ideal sizing function
-        using `clamp()` via an assignment on `:root` */&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;h2&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;font-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--heading-font-size&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;/details&gt;
-        &lt;style&gt;
-        @property --heading-font-size {
-        syntax: &quot;&lt;length-percentage&gt;&quot;;
-        inherits: true;
-        initial-value: calc(18px + 1.5vi);
-        }
-        
-        .demo-646 h2 {
-        font-size: var(--heading-font-size);
-        }
-        &lt;/style&gt;
-        &lt;div class=&quot;demo no-resize&quot;&gt;
-        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
-        &lt;div class=&quot;demo-646&quot;&gt;
-        &lt;h2&gt;Resize the window to see the fluid behavior&lt;/h2&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: While we typically recommend using &lt;code&gt;rem&lt;/code&gt; for &lt;code&gt;font-size&lt;/code&gt; definitions, it is considered a relative value and not accepted for use in &lt;code&gt;initial-value&lt;/code&gt;, hence the use of &lt;code&gt;px&lt;/code&gt; in the calculation.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;consequences-of-setting-initial-value&quot;&gt;Consequences of Setting &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#consequences-of-setting-initial-value&quot; aria-labelledby=&quot;consequences-of-setting-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;In some scenarios, registering a property without the universal syntax - which means an &lt;code&gt;initial-value&lt;/code&gt; is required - has consequences, and limits the property&apos;s use.&lt;/p&gt;
-        &lt;p&gt;Some reasons for preferring optional component properties include:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;to use the regular custom property fallback method for your default value, especially if the fallback should be another custom property (ex. a design token)&lt;/li&gt;
-        &lt;li&gt;an &lt;code&gt;initial-value&lt;/code&gt; may result in an unwanted default condition, particularly since it can&apos;t include another custom property&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;A technique I love to use for flexible component styles is including an intentionally undefined custom property so that variants can efficiently be created just by updating the custom property value. Or, purposely using entirely undefined properties to make the base class more inclusive of various scenarios by treating custom properties like a component style API.&lt;/p&gt;
-        &lt;p&gt;For example, if I registered &lt;code&gt;--button-background&lt;/code&gt; here as a color, it would never use the correct fallback when my intention was for the default variant to use the fallback.&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;.button&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token comment&quot;&gt;/* Use of initial-value would prevent ever using the fallback */&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--button-background&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-primary&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        
-        &lt;span class=&quot;token comment&quot;&gt;/* Intended to be undefined and therefore considered invalid until set */&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--button-border-radius&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.button--secondary&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--button-background&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-secondary&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;.button--rounded&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--button-border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;If you also have these scenarios, you may consider using a mixed approach of typing your primitive properties - like &lt;code&gt;--color-primary&lt;/code&gt; - but not the component-specific properties.&lt;/p&gt;
-        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
-        &lt;h2 id=&quot;considerations-for-using-property&quot;&gt;Considerations For Using &lt;code&gt;@property&lt;/code&gt;&lt;/h2&gt;
-        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#considerations-for-using-property&quot; aria-labelledby=&quot;considerations-for-using-property&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-        &lt;p&gt;While some of the demos in this article intentionally were set up to have the rendered output use &lt;em&gt;only&lt;/em&gt; the &lt;code&gt;initial-value&lt;/code&gt;, in practice it would be best to separately define the custom property. Again, this is presently a new feature, so without an additional definition such as in &lt;code&gt;:root&lt;/code&gt; you risk not having a value at all if you swap to only relying on &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;You should also be aware that it is possible to register the same property multiple times, and that cascade rules mean the last one will win. This raises the potential for conflicts from accidental overrides. There isn&apos;t a way to &amp;quot;scope&amp;quot; the &lt;code&gt;@property&lt;/code&gt; rule within a selector.&lt;/p&gt;
-        &lt;p&gt;However, use of cascade layers can modify this behavior since unlayered styles win over layered styles, which includes at-rules. Cascade layers might be a way to manage registration of &lt;code&gt;@property&lt;/code&gt; rules if you assign a &amp;quot;properties&amp;quot; layer early on and commit to assigning all registrations to that layer.&lt;/p&gt;
-        &lt;p&gt;Custom properties can also be &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static&quot;&gt;registered via JavaScript&lt;/a&gt;. In fact, this was the original way to do it since this capability was originally coupled with the Houdini APIs. If a property is registered via JS, that definition is likely to win over the one in your stylesheets. That said, if your actual intent is to change a custom property value via JS, learn the more appropriate way to &lt;a href=&quot;https://12daysofweb.dev/2021/css-custom-properties/#accessing-and-setting-custom-properties-with-javascript&quot;&gt;access and set custom properties with JS&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;Use of &lt;code&gt;@property&lt;/code&gt; has the potential for strengthening container style queries, especially if you are registering properties to act as toggles or enums. In this example, the use of &lt;code&gt;@property&lt;/code&gt; helps by typing our theme values, and ensures a fallback of &amp;quot;light&amp;quot;.&lt;/p&gt;
-        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --theme&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;light | dark&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; light&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;--theme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        
-        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@container&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;--theme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token selector&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; black&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; white&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;em&gt;Learn more about this particular idea of &lt;a href=&quot;https://thinkdobecreate.com/articles/simplified-dark-mode-with-style-queries/&quot;&gt;using style queries for simplified dark mode&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
-        &lt;p&gt;Although it&apos;s a bit outside the scope of this article, another benefit of typing custom properties is that they become animatable. This is because the type turns the value into something CSS knows how to work with, vs. the mysterious open-ended value it would otherwise be. Here&apos;s a CodePen example of how registering a color custom property allows &lt;a href=&quot;https://codepen.io/5t3ph/pen/LYgWQgL&quot;&gt;animating a range of colors&lt;/a&gt; for the background.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;Use of &lt;code&gt;@property&lt;/code&gt; enables writing safer CSS custom properties, which improves the reliability of your system design, and defends against errors that could impact user experience. A reminder that for now they are a progressive enhancement and should almost always be used in conjunction with an explicit definition of the property.&lt;/p&gt;
-        &lt;p&gt;Be sure to test to ensure your intended outcome of both the allowed syntax, and the result if the &lt;code&gt;initial-value&lt;/code&gt; is used in the final render.&lt;/p&gt;
-      </content:encoded>
-    </item>
+    <lastBuildDate>Wed, 01 Apr 2026 16:37:50 GMT</lastBuildDate>
     <item>
       <title>12 Modern CSS One-Line Upgrades</title>
       <link>https://moderncss.dev/12-modern-css-one-line-upgrades/</link>
       <guid>https://moderncss.dev/12-modern-css-one-line-upgrades/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sometimes, improving your application CSS just takes a one-line upgrade or enhancement! Learn about 12 properties to start incorporating into your projects, and enjoy reducing technical debt, removing JavaScript, and scoring easy wins for user experience.&lt;/p&gt;
         &lt;p&gt;Properties are explored for the following categories:&lt;/p&gt;
@@ -1182,7 +499,7 @@
       <title>How Custom Property Values are Computed</title>
       <link>https://moderncss.dev/how-custom-property-values-are-computed/</link>
       <guid>https://moderncss.dev/how-custom-property-values-are-computed/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Custom properties - aka “CSS variables” - seem fairly straightforward. However, there are some behaviors to be aware of regarding how the browser computes the final values. A misunderstanding of this process may lead to an unexpected or missing value and difficulty troubleshooting and resolving the issue.&lt;/p&gt;
         &lt;p&gt;To help you use custom properties confidently and troubleshoot efficiently, we’ll review:&lt;/p&gt;
@@ -1464,7 +781,7 @@
       <title>Modern CSS For Dynamic Component-Based Architecture</title>
       <link>https://moderncss.dev/modern-css-for-dynamic-component-based-architecture/</link>
       <guid>https://moderncss.dev/modern-css-for-dynamic-component-based-architecture/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;The language of CSS has had an explosion of new features and improvements in the last few years. As a result, feature parity between browsers is at an all-time high, and &lt;a href=&quot;https://webkit.org/blog/13706/interop-2023/&quot;&gt;efforts are being made&lt;/a&gt; to continue releasing features consistently and synchronously among evergreen browsers.&lt;/p&gt;
         &lt;p&gt;Today, we will explore modern project architecture, emphasizing theming, responsive layouts, and component design. We&apos;ll learn about features to improve code organization and dig into layout techniques such as grid and container queries. Finally, we&apos;ll review real-world examples of context-aware components that use cutting-edge CSS techniques. You&apos;re sure to be inspired to expand your CSS skills and ready to create scalable, future-friendly web projects.&lt;/p&gt;
@@ -4240,7 +3557,7 @@
       <title>Testing Feature Support for Modern CSS</title>
       <link>https://moderncss.dev/testing-feature-support-for-modern-css/</link>
       <guid>https://moderncss.dev/testing-feature-support-for-modern-css/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;The pace of the CSS language can be challenging to keep up with! Browsers release features and fixes monthly, and the CSS Working Group is constantly working on specifications. So, how do you know using a new feature is &amp;quot;safe&amp;quot; to use? And what are the considerations around making that choice?&lt;/p&gt;
         &lt;p&gt;Let&apos;s review how to:&lt;/p&gt;
@@ -4467,7 +3784,7 @@
       <title>Container Query Units and Fluid Typography</title>
       <link>https://moderncss.dev/container-query-units-and-fluid-typography/</link>
       <guid>https://moderncss.dev/container-query-units-and-fluid-typography/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Fluid typography is the term for designing &lt;code&gt;font-size&lt;/code&gt; rules that responsively adapt the size based on the amount of available inline space. Before the availability of container query units, techniques usually relied on the viewport width - &lt;code&gt;vw&lt;/code&gt; - unit. The viewport method is excellent for main page type, such as article headlines. However, viewport-based fluid typography doesn&apos;t quite work for narrower spaces that flex independently of the viewport, such as a grid of cards.&lt;/p&gt;
         &lt;p&gt;We&apos;ll explore three ways to create dynamic fluid typography rules by leveraging container query units and CSS custom properties. You&apos;ll learn more about:&lt;/p&gt;
@@ -5287,7 +4604,7 @@
       <title>Contextual Spacing For Intrinsic Web Design</title>
       <link>https://moderncss.dev/contextual-spacing-for-intrinsic-web-design/</link>
       <guid>https://moderncss.dev/contextual-spacing-for-intrinsic-web-design/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;The user&apos;s browsing environment is not predictable. Tell other developers, and for goodness sakes, tell your designers. Let&apos;s learn how to coexist with that unpredictability by using adaptive, contextual spacing techniques.&lt;/p&gt;
         &lt;div class=&quot;carbon-ad&quot;&gt;
@@ -5765,7 +5082,7 @@
       <title>Practical Uses of CSS Math Functions: calc, clamp, min, max</title>
       <link>https://moderncss.dev/practical-uses-of-css-math-functions-calc-clamp-min-max/</link>
       <guid>https://moderncss.dev/practical-uses-of-css-math-functions-calc-clamp-min-max/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;There are currently &lt;a href=&quot;https://caniuse.com/css-math-functions&quot;&gt;four well-supported math functions in CSS&lt;/a&gt;. I&apos;ve found each of them to be extremely useful in my daily work. These CSS functions can be used in perhaps unexpected ways, such as within gradients and color functions and in combination with CSS custom properties. We&apos;ll learn the syntax for each, view basic demos of their functionality, and explore practical use cases.&lt;/p&gt;
         &lt;div class=&quot;carbon-ad&quot;&gt;
@@ -6068,7 +5385,7 @@
       <title>Modern CSS Upgrades To Improve Accessibility</title>
       <link>https://moderncss.dev/modern-css-upgrades-to-improve-accessibility/</link>
       <guid>https://moderncss.dev/modern-css-upgrades-to-improve-accessibility/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Accessibility is a critical skill for developers doing work at any point in the stack. For front-end tasks, modern CSS provides capabilities we can leverage to make layouts more accessibly inclusive for users of all abilities across any device.&lt;/p&gt;
         &lt;p&gt;This post will cover a range of topics:&lt;/p&gt;
@@ -6684,7 +6001,7 @@
       <title>Developing For Imperfect: Future Proofing CSS Styles</title>
       <link>https://moderncss.dev/developing-for-imperfect-future-proofing-css-styles/</link>
       <guid>https://moderncss.dev/developing-for-imperfect-future-proofing-css-styles/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;How do we plan future-proof styles in a world with an infinite degree of device and user ability variance? Let&apos;s explore how things can break and how modern CSS provides solutions.&lt;/p&gt;
         &lt;p&gt;This episode will cover handling for:&lt;/p&gt;
@@ -7580,7 +6897,7 @@
       <title>Guide to Advanced CSS Selectors - Part Two</title>
       <link>https://moderncss.dev/guide-to-advanced-css-selectors-part-two/</link>
       <guid>https://moderncss.dev/guide-to-advanced-css-selectors-part-two/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;a href=&quot;https://moderncss.dev/guide-to-advanced-css-selectors-part-one/&quot;&gt;Continuing from part one&lt;/a&gt;, this episode will focus on the advanced CSS selectors categorized as pseudo classes and pseudo elements and practical applications for each. We&apos;ll especially try to make sense of the syntax for &lt;code&gt;nth-child&lt;/code&gt;.&lt;/p&gt;
         &lt;div class=&quot;heading-wrapper h2&quot;&gt;
@@ -7829,7 +7146,7 @@
       <title>Guide to Advanced CSS Selectors - Part One</title>
       <link>https://moderncss.dev/guide-to-advanced-css-selectors-part-one/</link>
       <guid>https://moderncss.dev/guide-to-advanced-css-selectors-part-one/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whether you choose to completely write your own CSS, or use a framework, or be required to build within a design system - understanding selectors, the cascade, and specificity are critical to developing CSS and modifying existing style rules.&lt;/p&gt;
         &lt;p&gt;You&apos;re probably quite familiar with creating CSS selectors based on IDs, classes, and element types. And you&apos;ve likely often used the humble space character to select descendants.&lt;/p&gt;
@@ -8089,7 +7406,7 @@
       <title>The 3 CSS Methods for Adding Element Borders</title>
       <link>https://moderncss.dev/the-3-css-methods-for-adding-element-borders/</link>
       <guid>https://moderncss.dev/the-3-css-methods-for-adding-element-borders/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;When it comes to CSS, sometimes a &lt;code&gt;border&lt;/code&gt; is not really a &lt;code&gt;border&lt;/code&gt;.&lt;/p&gt;
         &lt;p&gt;In this episode, we&apos;ll cover the differences between:&lt;/p&gt;
@@ -8257,7 +7574,7 @@
       <title>Pure CSS Shapes 3 Ways</title>
       <link>https://moderncss.dev/pure-css-shapes-3-ways/</link>
       <guid>https://moderncss.dev/pure-css-shapes-3-ways/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Modern CSS - and modern browser support - provides us three excellent methods to create pure, basic CSS shapes. In this tutorial, we will examine how to create CSS triangles using:&lt;/p&gt;
         &lt;ul&gt;
@@ -8392,7 +7709,7 @@
       <title>Custom CSS Styles for Form Inputs and Textareas</title>
       <link>https://moderncss.dev/custom-css-styles-for-form-inputs-and-textareas/</link>
       <guid>https://moderncss.dev/custom-css-styles-for-form-inputs-and-textareas/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;We&apos;re going to create custom form input and textarea styles that have a near-identical appearance across the top browsers. We&apos;ll specifically style the input types of &lt;code&gt;text&lt;/code&gt;, &lt;code&gt;date&lt;/code&gt;, and &lt;code&gt;file&lt;/code&gt;, and style the &lt;code&gt;readonly&lt;/code&gt; and &lt;code&gt;disabled&lt;/code&gt; states.&lt;/p&gt;
         &lt;p&gt;Read on to learn how to:&lt;/p&gt;
@@ -8597,7 +7914,7 @@
       <title>Custom Select Styles with Pure CSS</title>
       <link>https://moderncss.dev/custom-select-styles-with-pure-css/</link>
       <guid>https://moderncss.dev/custom-select-styles-with-pure-css/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Modern CSS gives us a range of properties to achieve custom select styles that have a near-identical initial appearance for single, multiple, and disabled &lt;code&gt;select&lt;/code&gt; elements across the top browsers.&lt;/p&gt;
         &lt;p&gt;A few properties and techniques our solution will use:&lt;/p&gt;
@@ -8874,7 +8191,7 @@
       <title>Pure CSS Custom Checkbox Style</title>
       <link>https://moderncss.dev/pure-css-custom-checkbox-style/</link>
       <guid>https://moderncss.dev/pure-css-custom-checkbox-style/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;We&apos;ll create custom, cross-browser, theme-able, scalable checkboxes in pure CSS with the following:&lt;/p&gt;
         &lt;ul&gt;
@@ -9613,7 +8930,7 @@
       <title>Pure CSS Custom Styled Radio Buttons</title>
       <link>https://moderncss.dev/pure-css-custom-styled-radio-buttons/</link>
       <guid>https://moderncss.dev/pure-css-custom-styled-radio-buttons/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Using a combination of the following properties, we can create custom, accessible, cross-browser, theme-able, scalable radio buttons in pure CSS:&lt;/p&gt;
         &lt;ul&gt;
@@ -10288,7 +9605,7 @@
       <title>Announcing Style Stage: A Community CSS Showcase</title>
       <link>https://moderncss.dev/announcing-style-stage-a-community-css-showcase/</link>
       <guid>https://moderncss.dev/announcing-style-stage-a-community-css-showcase/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Dear CSS community:&lt;/p&gt;
         &lt;p&gt;I invite you to participate in a new project where you have the opportunity to challenge both your CSS and web design skills while learning in public.&lt;/p&gt;
@@ -10363,7 +9680,7 @@
       <title>3 Popular Website Heroes Created With CSS Grid Layout</title>
       <link>https://moderncss.dev/3-popular-website-heroes-created-with-css-grid-layout/</link>
       <guid>https://moderncss.dev/3-popular-website-heroes-created-with-css-grid-layout/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This episode explores creating website heroes - aka &amp;quot;headers&amp;quot; - with one of my favorite ways to use CSS grid layout: by turning it into a canvas.&lt;/p&gt;
         &lt;div class=&quot;carbon-ad&quot;&gt;
@@ -10679,7 +9996,7 @@
       <title>3 CSS Grid Techniques to Make You a Grid Convert</title>
       <link>https://moderncss.dev/3-css-grid-techniques-to-make-you-a-grid-convert/</link>
       <guid>https://moderncss.dev/3-css-grid-techniques-to-make-you-a-grid-convert/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;CSS grid layout can feel daunting. In fact, I avoided it for several years and was a &lt;em&gt;diehard&lt;/em&gt; flexbox fan.&lt;/p&gt;
         &lt;p&gt;Then I found the following 3 powerful properties/techniques in grid that completely changed my tune.&lt;/p&gt;
@@ -10806,7 +10123,7 @@
       <title>Expanded Use of `box-shadow` and `border-radius`</title>
       <link>https://moderncss.dev/expanded-use-of-box-shadow-and-border-radius/</link>
       <guid>https://moderncss.dev/expanded-use-of-box-shadow-and-border-radius/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This episode will explore expanded usage of &lt;code&gt;box-shadow&lt;/code&gt; and &lt;code&gt;border-radius&lt;/code&gt; and conclude with a landing page demo using these properties to enhance the image presentation.&lt;/p&gt;
         &lt;p&gt;You will learn:&lt;/p&gt;
@@ -10928,7 +10245,7 @@
       <title>Container Query Solutions with CSS Grid and Flexbox</title>
       <link>https://moderncss.dev/container-query-solutions-with-css-grid-and-flexbox/</link>
       <guid>https://moderncss.dev/container-query-solutions-with-css-grid-and-flexbox/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;True container queries are a much asked for CSS feature that would be a complement to media queries but be placed on container elements instead of the viewport.&lt;/p&gt;
         &lt;blockquote&gt;
@@ -11239,7 +10556,7 @@
       <title>Generating `font-size` CSS Rules and Creating a Fluid Type Scale</title>
       <link>https://moderncss.dev/generating-font-size-css-rules-and-creating-a-fluid-type-scale/</link>
       <guid>https://moderncss.dev/generating-font-size-css-rules-and-creating-a-fluid-type-scale/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Let&apos;s take the mystery out of sizing type. Typography is both foundational to any stylesheet and the quickest way to elevate an otherwise minimal layout from drab to fab. If you&apos;re looking for type design theory or how to select a font, that&apos;s outside the scope of this article. The goal for today is to give you a foundation for developing essential type styles in CSS, and terms to use if you wish to explore any topics deeper.&lt;/p&gt;
         &lt;p&gt;This episode covers:&lt;/p&gt;
@@ -11453,7 +10770,7 @@
       <title>Resource: The Complete Guide to Centering in CSS</title>
       <link>https://moderncss.dev/resource-the-complete-guide-to-centering-in-css/</link>
       <guid>https://moderncss.dev/resource-the-complete-guide-to-centering-in-css/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;How could I write a series called &amp;quot;Modern CSS Solutions &lt;em&gt;to old CSS problems&lt;/em&gt;&amp;quot; without covering the classic question:&lt;/p&gt;
         &lt;blockquote&gt;
@@ -11501,7 +10818,7 @@
       <title>Icon Button CSS Styling Guide</title>
       <link>https://moderncss.dev/icon-button-css-styling-guide/</link>
       <guid>https://moderncss.dev/icon-button-css-styling-guide/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This guide will build on the previous episode &lt;a href=&quot;https://moderncss.dev/css-button-styling-guide/&quot;&gt;&amp;quot;CSS Button Styling Guide&amp;quot;&lt;/a&gt; to explore the use case of icon buttons. We&apos;ll cover icon + text as well as icon-only buttons.&lt;/p&gt;
         &lt;div class=&quot;carbon-ad&quot;&gt;
@@ -11666,7 +10983,7 @@
       <title>CSS Button Styling Guide</title>
       <link>https://moderncss.dev/css-button-styling-guide/</link>
       <guid>https://moderncss.dev/css-button-styling-guide/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This guide will explore the ins and outs of styling an accessible, extensible button appearance for both link and button elements.&lt;/p&gt;
         &lt;p&gt;Topics covered include:&lt;/p&gt;
@@ -11903,7 +11220,7 @@
       <title>Solutions to Replace the 12-Column Grid</title>
       <link>https://moderncss.dev/solutions-to-replace-the-12-column-grid/</link>
       <guid>https://moderncss.dev/solutions-to-replace-the-12-column-grid/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Let&apos;s create simplified responsive grid systems using both CSS grid and flexbox and ditch the bulk of 12-column grid systems from heavy frameworks.&lt;/p&gt;
         &lt;p&gt;If you haven&apos;t really looked into grid, or rely on frameworks to think about flexbox for you, this will help you level up your understanding 🚀&lt;/p&gt;
@@ -12103,7 +11420,7 @@
       <title>CSS-Only Accessible Dropdown Navigation Menu</title>
       <link>https://moderncss.dev/css-only-accessible-dropdown-navigation-menu/</link>
       <guid>https://moderncss.dev/css-only-accessible-dropdown-navigation-menu/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This technique explores using:&lt;/p&gt;
         &lt;ul&gt;
@@ -12385,7 +11702,7 @@
       <title>Responsive Image Gallery With Animated Captions</title>
       <link>https://moderncss.dev/responsive-image-gallery-with-animated-captions/</link>
       <guid>https://moderncss.dev/responsive-image-gallery-with-animated-captions/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;style&gt;.demo .demo--content { background-color: transparent; padding: 1rem; }&lt;/style&gt;
         &lt;p&gt;Responsively resizing images is a common need, and modern CSS provides tools for ensuring a consistent &lt;code&gt;aspect-ratio&lt;/code&gt; while not distorting the images. And grid gives us flexibility for a gallery layout as well as positioning multiple elements in a shared space.&lt;/p&gt;
@@ -13596,7 +12913,7 @@
       <title>Totally Custom List Styles</title>
       <link>https://moderncss.dev/totally-custom-list-styles/</link>
       <guid>https://moderncss.dev/totally-custom-list-styles/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This tutorial will show how to use CSS grid layout for easy custom list styling in addition to:&lt;/p&gt;
         &lt;ul&gt;
@@ -13818,7 +13135,7 @@
       <title>Pure CSS Smooth-Scroll  &quot;Back to Top &quot;</title>
       <link>https://moderncss.dev/pure-css-smooth-scroll-back-to-top/</link>
       <guid>https://moderncss.dev/pure-css-smooth-scroll-back-to-top/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;Back to top&amp;quot; links may not be in use often these days, but there are two modern CSS features that the technique demonstrates well:&lt;/p&gt;
         &lt;ul&gt;
@@ -13966,7 +13283,7 @@
       <title>CSS-Only Full-Width Responsive Images 2 Ways</title>
       <link>https://moderncss.dev/css-only-full-width-responsive-images-2-ways/</link>
       <guid>https://moderncss.dev/css-only-full-width-responsive-images-2-ways/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In the not to distant past when jQuery was King of the Mountain and CSS3 was still worth being designated as such, the most popular tool for responsive background images was the &lt;a href=&quot;https://www.jquery-backstretch.com/&quot;&gt;Backstretch jQuery plugin&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;I used this plugin on ~30 sites prior to the following property becoming more supported (aka IE &amp;lt; 9 dropping in total market share):&lt;/p&gt;
@@ -14059,7 +13376,7 @@
       <title>Equal Height Elements: Flexbox vs. Grid</title>
       <link>https://moderncss.dev/equal-height-elements-flexbox-vs-grid/</link>
       <guid>https://moderncss.dev/equal-height-elements-flexbox-vs-grid/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Once upon a time (approximately 2013), I wrote a jQuery plugin to calculate equal height columns. It ensured that the very specific scenario of a row with three columns would keep the content boxes equal height no matter the length of the content they contained. The dominant layout method at the time - floats - did not handle this problem.&lt;/p&gt;
         &lt;div class=&quot;carbon-ad&quot;&gt;
@@ -14140,7 +13457,7 @@
       <title>Keep the Footer at the Bottom: Flexbox vs. Grid</title>
       <link>https://moderncss.dev/keep-the-footer-at-the-bottom-flexbox-vs-grid/</link>
       <guid>https://moderncss.dev/keep-the-footer-at-the-bottom-flexbox-vs-grid/</guid>
-      <pubDate>Tue, 31 Mar 2026 16:18:41 GMT</pubDate>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For many years, I constantly referred to &lt;a href=&quot;https://matthewjamestaylor.com/bottom-footer&quot;&gt;this article&lt;/a&gt; by Matthew James Taylor for a method to keep a webpage footer at the bottom of the page regardless of the main content length. This method relied on setting an explicit footer height, which is not scalable but a very good solution BF (Before Flexbox).&lt;/p&gt;
         &lt;p&gt;If you mostly deal with SPA development, you may be confused about why this problem is still around, but it&apos;s still a possibility to find your footer floating up for:&lt;/p&gt;
@@ -14217,6 +13534,689 @@
         &lt;p&gt;After seeing grid, you may have a moment of thinking it&apos;s clearly superior. However, if you add more elements between the header and footer you need to update your template (or ensure there&apos;s always a wrapping element such as a &lt;code&gt;div&lt;/code&gt; to not affect any nested semantics/hierarchy).&lt;/p&gt;
         &lt;p&gt;On the other hand, the flexbox method is usable across various templates with multiple block elements in the midsection - for example, a series of &lt;code&gt;&amp;lt;article&amp;gt;&lt;/code&gt; elements instead of a single &lt;code&gt;&amp;lt;main&amp;gt;&lt;/code&gt; for an archive page.&lt;/p&gt;
         &lt;p&gt;So as with all techniques, it depends on the project :) But we can all agree it&apos;s amazing to have these modern CSS layout methods!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Providing Type Definitions for CSS with @property</title>
+      <link>https://moderncss.dev/providing-type-definitions-for-css-with-at-property/</link>
+      <guid>https://moderncss.dev/providing-type-definitions-for-css-with-at-property/</guid>
+      <pubDate>Wed, 01 Apr 2026 16:17:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A cross-browser feature as of the release of Firefox 128 in July 2024 is a new at-rule - &lt;code&gt;@property&lt;/code&gt; - which allows defining types as well as inheritance and an initial value for your custom properties.&lt;/p&gt;
+        &lt;p&gt;We&apos;ll learn when and why traditional fallback values can fail, and how &lt;code&gt;@property&lt;/code&gt; features allow us to write safer, more resilient CSS custom property definitions.&lt;/p&gt;
+        &lt;div class=&quot;carbon-ad&quot;&gt;
+        &lt;script async=&quot;&quot; type=&quot;text/javascript&quot; src=&quot;https://cdn.carbonads.com/carbon.js?serve=CE7I52QE&amp;placement=moderncssdev&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;standard-use-of-custom-properties&quot;&gt;Standard Use of Custom Properties&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#standard-use-of-custom-properties&quot; aria-labelledby=&quot;standard-use-of-custom-properties&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Custom properties - aka &amp;quot;CSS variables&amp;quot; - are useful because they allow creating references to values similar to variables in other programming languages.&lt;/p&gt;
+        &lt;p&gt;Consider the following scenario which creates and assigns the &lt;code&gt;--color-blue&lt;/code&gt; property, which then is implemented as a class and applied to a paragraph.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Standard use case for custom properties&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        .demo-801 {
+        --color-blue: blue;
+        
+        padding: 0.5rem;
+        }
+        
+        .color-blue-801 {
+        color: var(--color-blue);
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-801&quot;&gt;
+        &lt;p class=&quot;color-blue-801&quot;&gt;I&apos;m blue dabadee&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;The paragraph renders as blue. Excellent! Ship it.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;common-error-conditions-using-custom-properties&quot;&gt;Common Error Conditions Using Custom Properties&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#common-error-conditions-using-custom-properties&quot; aria-labelledby=&quot;common-error-conditions-using-custom-properties&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Now, you and I both know that &amp;quot;blue&amp;quot; is a color. And it also may seem obvious that you would only apply the class that uses this color to text we intend to be &lt;em&gt;blue&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;But, the real world isn&apos;t perfect, and sometimes the downstream consumers of our CSS end-up with a reason to re-define the value. Or perhaps they accidentally introduce a typo that impacts the original value.&lt;/p&gt;
+        &lt;p&gt;The outcome of either of these scenarios could be:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;the text ends up a color besides blue, as that author intended&lt;/li&gt;
+        &lt;li&gt;the text surprisingly renders as black&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;If the rendered color is surprisingly black, it&apos;s likely that we&apos;ve hit the unique scenario of &lt;em&gt;invalid at computed value time&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;When the browser is assessing CSS rules and working out what value to apply to each property based on the cascade, inheritance, specificity and so forth, it will retain a custom property as the winning value as long as it understands the general way it&apos;s being used.&lt;/p&gt;
+        &lt;p&gt;In our &lt;code&gt;--color-blue&lt;/code&gt; example, the browser definitely understands the &lt;code&gt;color&lt;/code&gt; property, so it assumes all will be ok with the use of the variable as well.&lt;/p&gt;
+        &lt;p&gt;But, what happens if someone redefines &lt;code&gt;--color-blue&lt;/code&gt; to an invalid color?&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Defining an invalid color&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        .demo-99 {
+        --color-blue: blue;
+        
+        padding: 0.5rem;
+        }
+        
+        .color-blue-99 {
+        color: var(--color-blue);
+        }
+        
+        .demo-99 p {
+        --color-blue: notacolor;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-99&quot;&gt;
+        &lt;p class=&quot;color-blue-99&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Uh oh - it&apos;s surprisingly rendering as black.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;why-traditional-fallbacks-can-fail&quot;&gt;Why Traditional Fallbacks Can Fail&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#why-traditional-fallbacks-can-fail&quot; aria-labelledby=&quot;why-traditional-fallbacks-can-fail&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Ok, before we learn what that scary-sounding phrase means, let&apos;s take a look in DevTools and see if it gives us a clue about what&apos;s going on.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://moderncss.dev/img/posts/35/devtools-notacolor.png&quot; alt=&quot;Styles panel in DevTools shows .color-blue and the paragraph rule, with no error apparent&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;That looks pretty normal, and doesn&apos;t seem to reveal that anything is wrong, making troubleshooting the error a lot trickier.&lt;/p&gt;
+        &lt;p&gt;You might know that custom properties allow a fallback value as second parameter, so perhaps that will help! Let&apos;s try.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Attempt resolution with custom property fallback&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        .demo-634 {
+        --color-blue: blue;
+        
+        padding: 0.5rem;
+        }
+        
+        .color-blue-634 {
+        color: var(--color-blue, blue);
+        }
+        
+        .demo-634 p {
+        --color-blue: notacolor;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-634&quot;&gt;
+        &lt;p class=&quot;color-blue-634&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Unfortunately, the text still renders as black.&lt;/p&gt;
+        &lt;p&gt;Ok, but our good friend the cascade exists, and back in the day we used to put things like vendor prefixed properties prior to the unprefixed ones. So, perhaps if we use a similar method and supply an extra &lt;code&gt;color&lt;/code&gt; definition before the one that has the custom property it can fallback to that?&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Attempt resolution with extra color definition&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; notacolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        .demo-116 {
+        --color-blue: blue;
+        
+        padding: 0.5rem;
+        }
+        
+        .color-blue-116 {
+        color: blue;
+        color: var(--color-blue);
+        }
+        
+        .demo-116 p {
+        --color-blue: notacolor;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-116&quot;&gt;
+        &lt;p class=&quot;color-blue-116&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Bummer, we don&apos;t seem to be making progress towards preventing this issue.&lt;/p&gt;
+        &lt;p&gt;This is because of the (slightly scary sounding) scenario &lt;em&gt;invalid at computed value time&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Although the browser has kept our definition that expects a custom property value, it&apos;s not until later that the browser tries to actually compute that value.&lt;/p&gt;
+        &lt;p&gt;In this case, it looks at both the &lt;code&gt;.color-blue&lt;/code&gt; class and the value provided for the &lt;code&gt;p&lt;/code&gt; element rule and attempts to apply the computed value of &lt;code&gt;notacolor&lt;/code&gt;. At this stage, it has discarded the alternate value of &lt;code&gt;blue&lt;/code&gt; originally provided by the class. Consequently, since &lt;code&gt;notacolor&lt;/code&gt; is in fact not a color and therefore &lt;em&gt;invalid&lt;/em&gt;, the best it can do is use either:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;an &lt;em&gt;inherited value&lt;/em&gt; if the property is allowed to inherit and an ancestor has provided a value; or&lt;/li&gt;
+        &lt;li&gt;the &lt;em&gt;initial value&lt;/em&gt; as defined in the CSS spec&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;While &lt;code&gt;color&lt;/code&gt; is an inheritable property, we haven&apos;t defined it on any ancestors, so the rendered color of &lt;code&gt;black&lt;/code&gt; is due to the &lt;em&gt;initial&lt;/em&gt; value.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Refer to this earlier Modern CSS article about &lt;a href=&quot;https://moderncss.dev/how-custom-property-values-are-computed/&quot;&gt;how custom property values are computed&lt;/a&gt; and learn more deeply about the condition of invalid at computed value time.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;defining-types-for-safer-css&quot;&gt;Defining Types for Safer CSS&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#defining-types-for-safer-css&quot; aria-labelledby=&quot;defining-types-for-safer-css&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;It&apos;s time to introduce &lt;code&gt;@property&lt;/code&gt; to help solve this issue of what you may perceive as a surprising rendered value.&lt;/p&gt;
+        &lt;p&gt;The critical features &lt;code&gt;@property&lt;/code&gt; provides are:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;defining acceptable types for specific custom properties&lt;/li&gt;
+        &lt;li&gt;enabling or disabling inheritance&lt;/li&gt;
+        &lt;li&gt;providing an initial value as a failsafe for invalid or undefined values&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;This at-rule is defined on a per-custom property basis, meaning a unique definition is needed for each property for which you want to leverage these benefits.&lt;/p&gt;
+        &lt;p&gt;It is &lt;em&gt;not&lt;/em&gt; a requirement, and you can certainly continue using custom properties without ever bringing in &lt;code&gt;@property&lt;/code&gt;.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Please note that at time of writing, &lt;code&gt;@property&lt;/code&gt; is very newly cross-browser and I would advise you to consider it a progressive enhancement to benefit users in supporting browsers.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Let&apos;s apply it to our blue dilemma and see how it fixes the issue of the otherwise invalid color supplied in the element rule.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Apply @property to --color-blue&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token comment&quot;&gt;/* Prior rules also apply */&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --c-blue {
+        syntax: &quot;&lt;color&gt;&quot;;
+        inherits: true;
+        initial-value: blue;
+        }
+        
+        .demo-403 {
+        --c-blue: blue;
+        
+        padding: 0.5rem;
+        }
+        
+        .color-blue-403 {
+        color: var(--c-blue);
+        }
+        
+        .demo-403 p {
+        --c-blue: notacolor;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-403&quot;&gt;
+        &lt;p class=&quot;color-blue-403&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Success, our text is still blue despite the invalid definition!&lt;/p&gt;
+        &lt;p&gt;Additionally, DevTools is now helpful again:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://moderncss.dev/img/posts/35/devtools-with-at-property.png&quot; alt=&quot;DevTools displays the invalid value within the paragraph rule as crossed out and with an error icon, and also provides a hover overlay for the --color-blue custom property with the full definition provided in @property&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;We can observe both that the invalid value is clearly an error, and we also are provided the full definition of the custom property via the hover overlay.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;providing-types-via-syntax&quot;&gt;Providing Types via &lt;code&gt;syntax&lt;/code&gt;&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#providing-types-via-syntax&quot; aria-labelledby=&quot;providing-types-via-syntax&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Why would we need types for custom properties? Here are a few reasons:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;types help verify what makes a valid vs. invalid value&lt;/li&gt;
+        &lt;li&gt;without types, custom properties are very open-ended and can take nearly any value, including a blank space&lt;/li&gt;
+        &lt;li&gt;lack of types prevents browser DevTools from providing the optimal level of detail about which value is in use for a custom property&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In our &lt;code&gt;@property&lt;/code&gt; definition, the &lt;code&gt;syntax&lt;/code&gt; descriptor enables providing the allowed types for the custom property. We used &lt;code&gt;&amp;quot;&amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt;, but other types include:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;&amp;quot;&lt;/code&gt; - numbers with units attached, ex. &lt;code&gt;4px&lt;/code&gt; or &lt;code&gt;3vw&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;integer&amp;gt;&amp;quot;&lt;/code&gt; - decimal units 0 through 9 (aka &amp;quot;whole numbers&amp;quot;)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;number&amp;gt;&amp;quot;&lt;/code&gt; - numbers which may have a fraction, ex. &lt;code&gt;1.25&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;percentage&amp;gt;&amp;quot;&lt;/code&gt; - numbers with a percentage sign attached, ex. &lt;code&gt;24%&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;&amp;quot;&amp;lt;length-percentage&amp;gt;&amp;quot;&lt;/code&gt; - accepts valid &lt;code&gt;&amp;lt;length&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;percentage&amp;gt;&lt;/code&gt; values&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;A special case is &lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt; which stands for &amp;quot;universal syntax&amp;quot; and enables accepting any value, similar to the default behavior. This means you skip the typing benefit, but perhaps want the inheritance and/or initial value control.&lt;/p&gt;
+        &lt;p&gt;These types and more are listed for &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/@property/syntax&quot;&gt;the syntax descriptor on MDN&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;The type applies to the &lt;em&gt;computed value&lt;/em&gt; of the custom property, so the &lt;code&gt;&amp;quot;&amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt; type would be happy with both &lt;code&gt;blue&lt;/code&gt; as well as &lt;code&gt;light-dark(blue, cyan)&lt;/code&gt; (although only one of those is accepted into the &lt;code&gt;initial-value&lt;/code&gt; as we will soon learn).&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
+        &lt;h3 id=&quot;stronger-typing-with-lists&quot;&gt;Stronger Typing With Lists&lt;/h3&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#stronger-typing-with-lists&quot; aria-labelledby=&quot;stronger-typing-with-lists&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Let&apos;s say we want to provide a little flexibility for our &lt;code&gt;--color-blue&lt;/code&gt; custom property.&lt;/p&gt;
+        &lt;p&gt;We can use a list to provide valid options. Anything other than these &lt;em&gt;exact&lt;/em&gt; values would be considered invalid, and use the &lt;code&gt;initial-value&lt;/code&gt; instead (if inheritance didn&apos;t apply). These are called &amp;quot;custom idents&amp;quot;, are case sensitive, and can be any value.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Defining a list within syntax&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;blue | cyan | dodgerblue&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.color-blue&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-blue&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.demo p&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--color-blue&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dodgerblue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --c2-blue {
+        syntax: &quot;blue | cyan | dodgerblue&quot;;
+        inherits: true;
+        initial-value: blue;
+        }
+        
+        .demo-72 {
+        padding: 0.5rem;
+        }
+        
+        .color-blue-72 {
+        color: var(--c2-blue);
+        }
+        
+        .demo-72 p {
+        --c2-blue: dodgerblue;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content&quot;&gt;
+        &lt;div class=&quot;demo-72&quot;&gt;
+        &lt;p class=&quot;color-blue-72&quot;&gt;I&apos;m blue dabadee (maybe)&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
+        &lt;h3 id=&quot;typing-for-mixed-values&quot;&gt;Typing for Mixed Values&lt;/h3&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-mixed-values&quot; aria-labelledby=&quot;typing-for-mixed-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;The pipe character (&lt;code&gt;|&lt;/code&gt;) used in the previous list indicates an &amp;quot;or&amp;quot; condition. While we used explicit color names, it can also be used to say &amp;quot;any of these syntax types are valid.&amp;quot;&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt; | &amp;lt;length&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
+        &lt;h3 id=&quot;typing-for-multiple-values&quot;&gt;Typing for Multiple Values&lt;/h3&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-multiple-values&quot; aria-labelledby=&quot;typing-for-multiple-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;So far, we&apos;ve only typed custom properties that expect a &lt;em&gt;single&lt;/em&gt; value.&lt;/p&gt;
+        &lt;p&gt;Two additional cases can be covered with an additional &amp;quot;multiplier&amp;quot; character, which should immediately follow the syntax component name.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Use &lt;code&gt;+&lt;/code&gt; to support a space-separated list, ex. &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;+&amp;quot;&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;Use &lt;code&gt;#&lt;/code&gt; to support a comma-separated list, ex. &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;#&amp;quot;&lt;/code&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;This can be useful for properties that allow multiple definitions, such as &lt;code&gt;background-image&lt;/code&gt;.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Support multiple values for syntax&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --bg-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;image&gt;#&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 
+        &lt;span class=&quot;token function&quot;&gt;repeating-linear-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;to right&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue 10px 12px&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; transparent 12px 22px&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 
+        &lt;span class=&quot;token function&quot;&gt;repeating-linear-gradient&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;to bottom&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; blue 10px 12px&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; transparent 12px 22px&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;background-image&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--bg-gradient&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        
+        &lt;span class=&quot;token property&quot;&gt;inline-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1px solid&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --bg-gradient{
+        syntax: &quot;&lt;image&gt;#&quot;;
+        inherits: false;
+        initial-value: 
+        repeating-linear-gradient(to right, blue 10px 12px, transparent 12px 22px), 
+        repeating-linear-gradient(to bottom, blue 10px 12px, transparent 12px 22px);
+        }
+        
+        .box-162 {
+        background-image: var(--bg-gradient);
+        
+        inline-size: 5rem;
+        aspect-ratio: 1;
+        border-radius: 4px;
+        border: 1px solid;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
+        &lt;div class=&quot;box-162&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
+        &lt;h3 id=&quot;typing-for-multi-part-mixed-values&quot;&gt;Typing for Multi-Part Mixed Values&lt;/h3&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#typing-for-multi-part-mixed-values&quot; aria-labelledby=&quot;typing-for-multi-part-mixed-values&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Some properties accept mixed types to develop the full value, such as &lt;code&gt;box-shadow&lt;/code&gt; which has potential types of &lt;code&gt;inset&lt;/code&gt;, a series of &lt;code&gt;&amp;lt;length&amp;gt;&lt;/code&gt; values, and a &lt;code&gt;&amp;lt;color&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Presently, it&apos;s not possible to type this in a single &lt;code&gt;@property&lt;/code&gt; definition, although you may attempt to try something like &lt;code&gt;&amp;quot;&amp;lt;length&amp;gt;+ &amp;lt;color&amp;gt;&amp;quot;&lt;/code&gt;. However, this effectively invalidates the &lt;code&gt;@property&lt;/code&gt; definition itself.&lt;/p&gt;
+        &lt;p&gt;One alternative is to break up the custom property definitions so that we can allow a series of lengths, and then allow a color. While slightly more cumbersome, this allows us to still get the benefit of typing which relieves the potential errors we covered earlier.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Support multi-part mixed values for syntax&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow-length&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length&gt;+&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0px 0px 8px 2px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow-color&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;hsl&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;0 0% 75%&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;box-shadow&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-shadow-length&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-shadow-color&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        
+        &lt;span class=&quot;token property&quot;&gt;inline-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --box-shadow-length {
+        syntax: &quot;&lt;length&gt;+&quot;;
+        inherits: false;
+        initial-value: 0px 0px 8px 2px;
+        }
+        
+        @property --box-shadow-color {
+        syntax: &quot;&lt;color&gt;&quot;;
+        inherits: false;
+        initial-value: hsl(0 0% 75%);
+        }
+        
+        .box-530 {
+        box-shadow: var(--box-shadow-length) var(--box-shadow-color);
+        
+        inline-size: 5rem;
+        aspect-ratio: 1;
+        border-radius: 4px;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
+        &lt;div class=&quot;box-530&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h3&quot;&gt;
+        &lt;h3 id=&quot;allowing-any-type&quot;&gt;Allowing Any Type&lt;/h3&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#allowing-any-type&quot; aria-labelledby=&quot;allowing-any-type&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;If you&apos;re less concerned about the &amp;quot;type&amp;quot; of a property for something like &lt;code&gt;box-shadow&lt;/code&gt; and care more about inheritance or the initial value, you can instead use the universal syntax definition to allow any value. This negates the problem we just mitigated by splitting up the parts.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-shadow&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 0px 0px 8px 2px &lt;span class=&quot;token function&quot;&gt;hsl&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;0 0% 75%&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Because the universal syntax accepts any value, an additional &amp;quot;multiplier&amp;quot; is not needed.&lt;/p&gt;
+        &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: The &lt;code&gt;initial-value&lt;/code&gt; is still required to be &lt;em&gt;computationally independent&lt;/em&gt; as we&apos;ll learn about soon under &lt;a href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#limitations-of-initial-value&quot;&gt;limitations of initial-value&lt;/a&gt;.&lt;/p&gt;
+        &lt;div class=&quot;promo promo--centered&quot;&gt;&lt;p&gt;&lt;strong style=&quot;color: var(--color-blue);&quot;&gt;Join my newsletter&lt;/strong&gt; for article updates, CSS tips, and front-end resources!&lt;/p&gt;
+        &lt;script async=&quot;&quot; data-uid=&quot;31fb09b748&quot; src=&quot;https://moderncss.kit.com/31fb09b748/index.js&quot;&gt;&lt;/script&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;modifying-inheritance&quot;&gt;Modifying Inheritance&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#modifying-inheritance&quot; aria-labelledby=&quot;modifying-inheritance&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;&lt;a href=&quot;https://web.dev/learn/css/inheritance#which_properties_are_inherited_by_default&quot;&gt;A subset of CSS properties are inheritable&lt;/a&gt;, such as &lt;code&gt;color&lt;/code&gt;. The &lt;code&gt;inherits&lt;/code&gt; descriptor for your &lt;code&gt;@property&lt;/code&gt; registration allows you to control that behavior for your custom property.&lt;/p&gt;
+        &lt;p&gt;If &lt;code&gt;true&lt;/code&gt;, the computed value can look to an ancestor for its value if the property is not explicitly set, and if a value isn&apos;t found it will use the initial value.&lt;/p&gt;
+        &lt;p&gt;If &lt;code&gt;false&lt;/code&gt;, the computed value will use the initial value if the property is not explicitly set for the element, such as via a class or element rule.&lt;/p&gt;
+        &lt;p&gt;In this demonstration, the &lt;code&gt;--box-bg&lt;/code&gt; has been set to &lt;code&gt;inherits: false&lt;/code&gt;, and only the outer box has an explicit definition via the applied class. The inner box uses the initial value since inheritance is not allowed.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Result of setting inherits: false&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --box-bg&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; cyan&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--box-bg&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        
+        &lt;span class=&quot;token property&quot;&gt;aspect-ratio&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 1.5rem&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.outer-box&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--box-bg&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; purple&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --box-bg {
+        syntax: &quot;&lt;color&gt;&quot;;
+        inherits: false;
+        initial-value: cyan;
+        }
+        
+        .box-335 {
+        background-color: var(--box-bg);
+        
+        aspect-ratio: 1;
+        border-radius: 4px;
+        padding: 1.5rem;
+        }
+        
+        .outer-box-335 {
+        --box-bg: purple;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
+        &lt;div class=&quot;box-335 outer-box-335&quot;&gt;
+        &lt;div class=&quot;box-335&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;valid-use-of-initial-value&quot;&gt;Valid Use of &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#valid-use-of-initial-value&quot; aria-labelledby=&quot;valid-use-of-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;Unless your syntax is open to any value using the universal syntax definition - &lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt; - then it is required to set an &lt;code&gt;initial-value&lt;/code&gt; to gain the benefits of registering a custom property.&lt;/p&gt;
+        &lt;p&gt;As we&apos;ve already experienced, use of &lt;code&gt;initial-value&lt;/code&gt; was critical in preventing the condition of a completely broken render due to &lt;em&gt;invalid at computed value time&lt;/em&gt;. Here are some other benefits of using &lt;code&gt;@property&lt;/code&gt; with an &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;When building design systems or UI libraries, it&apos;s important to ensure your custom properties are robust and reliable. Providing an &lt;code&gt;initial-value&lt;/code&gt; can help prevent a broken experience. Plus, typing properties also meshes nicely with keeping the intent of design tokens which may be expressed as custom properties.&lt;/p&gt;
+        &lt;p&gt;Dynamic computation scenarios such as the use of &lt;code&gt;clamp()&lt;/code&gt; have the potential to include an invalid value, whether through an error or from the browser not supporting something within the function. Having a fallback via &lt;code&gt;initial-value&lt;/code&gt; ensures that your design remains functional. This fallback behavior is a safeguard for unsupported features as well, though that can be limited by whether the &lt;code&gt;@property&lt;/code&gt; rule is supported in the browser being used.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Review additional ways to &lt;a href=&quot;https://moderncss.dev/how-custom-property-values-are-computed/#preventing-invalid-at-computed-value-time&quot;&gt;prevent invalid at computed time&lt;/a&gt; that may be more appropriate for your browser support matrix, especially for critical scenarios.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Incorporating &lt;code&gt;@property&lt;/code&gt; with &lt;code&gt;initial-value&lt;/code&gt; not only enhances the reliability of your CSS but also opens the door to the possibility of better tooling around custom properties. We&apos;ve previewed the behavior change in browser DevTools, but I&apos;m hopeful for an expansion of tooling including IDE plugins.&lt;/p&gt;
+        &lt;p&gt;The added layer of security from using &lt;code&gt;@property&lt;/code&gt; with &lt;code&gt;initial-value&lt;/code&gt; helps maintain the intent of your design, even if it isn&apos;t perfect for every context.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;limitations-of-initial-value&quot;&gt;Limitations of &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#limitations-of-initial-value&quot; aria-labelledby=&quot;limitations-of-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;The &lt;code&gt;initial-value&lt;/code&gt; is subject to the &lt;code&gt;syntax&lt;/code&gt; you define for &lt;code&gt;@property&lt;/code&gt;. Beyond that, &lt;code&gt;syntax&lt;/code&gt; itself doesn&apos;t support every possible value combination, which we previously covered. So, sometimes a little creativity is needed to get the benefit.&lt;/p&gt;
+        &lt;p&gt;Also, &lt;code&gt;initial-value&lt;/code&gt; values must be &lt;a href=&quot;https://www.w3.org/TR/css-properties-values-api-1/#the-registerproperty-function&quot;&gt;what the spec calls &lt;em&gt;computationally independent&lt;/em&gt;&lt;/a&gt;. Simplified, this means relative values like &lt;code&gt;em&lt;/code&gt; or dynamic functions like &lt;code&gt;clamp()&lt;/code&gt; or &lt;code&gt;light-dark()&lt;/code&gt; are unfortunately not allowed. However, in these scenarios you can still set an acceptable initial value, and then use a relative or dynamic value when you &lt;em&gt;use&lt;/em&gt; the custom property, such as in the &lt;code&gt;:root&lt;/code&gt; assignment.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --heading-font-size&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 24px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--heading-font-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;clamp&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;1.25rem&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 5cqi&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 2rem&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This limitation on relative units or dynamic functions also means other custom properties cannot be used in the &lt;code&gt;initial-value&lt;/code&gt; assignment. The previous technique can still be used to mitigate this, where the preferred outcome is composed in the use of the property.&lt;/p&gt;
+        &lt;p&gt;Finally, custom properties registered via &lt;code&gt;@property&lt;/code&gt; are still locked into the rules of regular properties, such as that they cannot be used to enable variables in media or container query at-rules. For example, &lt;code&gt;@media (min-width: var(--mq-md))&lt;/code&gt; would still be invalid.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;unsupported-initial-value-can-crash-the-page&quot;&gt;Unsupported &lt;code&gt;initial-value&lt;/code&gt; Can Crash the Page&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#unsupported-initial-value-can-crash-the-page&quot; aria-labelledby=&quot;unsupported-initial-value-can-crash-the-page&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;As of time of writing, using a property or function value that a browser may not support as part of the &lt;code&gt;initial-value&lt;/code&gt; definition can cause the entire page to crash!&lt;/p&gt;
+        &lt;p&gt;Fortunately, we can use &lt;code&gt;@supports&lt;/code&gt; to test for ultra-modern properties or features before we try to use them as the &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@supports&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;[property|feature]&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;/* Feature is supported, use for initial-value */&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@supports&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;[property|feature]&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;/* Feature unsupported, use alternate for initial-value */&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There may still be some surprises where &lt;code&gt;@supports&lt;/code&gt; reports true, but testing will reveal a crash or other error (ex. &lt;code&gt;currentColor&lt;/code&gt; used with &lt;code&gt;color-mix()&lt;/code&gt; in Safari). Be sure to test your solutions cross-browser!&lt;/p&gt;
+        &lt;p&gt;Learn more about ways to &lt;a href=&quot;https://moderncss.dev/testing-feature-support-for-modern-css/&quot;&gt;test feature support for modern CSS&lt;/a&gt;.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;exceptions-to-dynamic-limitations&quot;&gt;Exceptions to Dynamic Limitations&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#exceptions-to-dynamic-limitations&quot; aria-labelledby=&quot;exceptions-to-dynamic-limitations&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;There are a few conditions which may feel like exceptions to the requirement of &amp;quot;computationally independent&amp;quot; values when used for the &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;First, &lt;code&gt;currentColor&lt;/code&gt; is accepted. Unlike a relative value such as &lt;code&gt;em&lt;/code&gt; which requires computing &lt;code&gt;font-size&lt;/code&gt; of ancestors to compute itself, the value of &lt;code&gt;currentColor&lt;/code&gt; can be computed without depending on context.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Use of currentColor as initial-value&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --border-color&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;color&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; false&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; currentColor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;h2&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; blue&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 3px solid &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--border-color&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --border-color {
+        syntax: &quot;&lt;color&gt;&quot;;
+        inherits: false;
+        initial-value: currentColor;
+        }
+        
+        .demo-210 h2 {
+        color: blue;
+        border: 3px solid var(--border-color);
+        padding: 1em;
+        }
+        
+        .demo-210 code {
+        color: mediumvioletred;
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
+        &lt;div class=&quot;demo-210&quot;&gt;
+        &lt;h2&gt;My border is set to &lt;code&gt;currentColor&lt;/code&gt;&lt;/h2&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Second, use of &lt;code&gt;&amp;quot;&amp;lt;length-percentage&amp;gt;&amp;quot;&lt;/code&gt; enables the use of &lt;code&gt;calc()&lt;/code&gt;, which is mentioned in the spec. This allows a calculation that includes what is considered a global, computationally independent unit set even though we often use them for dynamic behavior. That is, the use of viewport units.&lt;/p&gt;
+        &lt;p&gt;For a scenario such as fluid type, this provides a better fallback that keeps the spirit of the intended outcome even though it&apos;s overall less ideal for most scenarios.&lt;/p&gt;
+        &lt;details open=&quot;&quot;&gt;
+        &lt;summary&gt;CSS for &quot;Use of calc() with vi for initial-value&quot;&lt;/summary&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --heading-font-size&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&amp;lt;length-percentage&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;calc&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;18px + 1.5vi&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token comment&quot;&gt;/* In practice, define your ideal sizing function
+        using `clamp()` via an assignment on `:root` */&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;h2&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;font-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--heading-font-size&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/details&gt;
+        &lt;style&gt;
+        @property --heading-font-size {
+        syntax: &quot;&lt;length-percentage&gt;&quot;;
+        inherits: true;
+        initial-value: calc(18px + 1.5vi);
+        }
+        
+        .demo-646 h2 {
+        font-size: var(--heading-font-size);
+        }
+        &lt;/style&gt;
+        &lt;div class=&quot;demo no-resize&quot;&gt;
+        &lt;div class=&quot;demo--content demo--place-center&quot;&gt;
+        &lt;div class=&quot;demo-646&quot;&gt;
+        &lt;h2&gt;Resize the window to see the fluid behavior&lt;/h2&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: While we typically recommend using &lt;code&gt;rem&lt;/code&gt; for &lt;code&gt;font-size&lt;/code&gt; definitions, it is considered a relative value and not accepted for use in &lt;code&gt;initial-value&lt;/code&gt;, hence the use of &lt;code&gt;px&lt;/code&gt; in the calculation.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;consequences-of-setting-initial-value&quot;&gt;Consequences of Setting &lt;code&gt;initial-value&lt;/code&gt;&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#consequences-of-setting-initial-value&quot; aria-labelledby=&quot;consequences-of-setting-initial-value&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;In some scenarios, registering a property without the universal syntax - which means an &lt;code&gt;initial-value&lt;/code&gt; is required - has consequences, and limits the property&apos;s use.&lt;/p&gt;
+        &lt;p&gt;Some reasons for preferring optional component properties include:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;to use the regular custom property fallback method for your default value, especially if the fallback should be another custom property (ex. a design token)&lt;/li&gt;
+        &lt;li&gt;an &lt;code&gt;initial-value&lt;/code&gt; may result in an unwanted default condition, particularly since it can&apos;t include another custom property&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;A technique I love to use for flexible component styles is including an intentionally undefined custom property so that variants can efficiently be created just by updating the custom property value. Or, purposely using entirely undefined properties to make the base class more inclusive of various scenarios by treating custom properties like a component style API.&lt;/p&gt;
+        &lt;p&gt;For example, if I registered &lt;code&gt;--button-background&lt;/code&gt; here as a color, it would never use the correct fallback when my intention was for the default variant to use the fallback.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;.button&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;/* Use of initial-value would prevent ever using the fallback */&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--button-background&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-primary&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        
+        &lt;span class=&quot;token comment&quot;&gt;/* Intended to be undefined and therefore considered invalid until set */&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--button-border-radius&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.button--secondary&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--button-background&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--color-secondary&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;.button--rounded&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--button-border-radius&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 4px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If you also have these scenarios, you may consider using a mixed approach of typing your primitive properties - like &lt;code&gt;--color-primary&lt;/code&gt; - but not the component-specific properties.&lt;/p&gt;
+        &lt;div class=&quot;heading-wrapper h2&quot;&gt;
+        &lt;h2 id=&quot;considerations-for-using-property&quot;&gt;Considerations For Using &lt;code&gt;@property&lt;/code&gt;&lt;/h2&gt;
+        &lt;a class=&quot;anchor&quot; href=&quot;https://moderncss.dev/providing-type-definitions-for-css-with-at-property/#considerations-for-using-property&quot; aria-labelledby=&quot;considerations-for-using-property&quot;&gt;&lt;span hidden=&quot;&quot;&gt;#&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;p&gt;While some of the demos in this article intentionally were set up to have the rendered output use &lt;em&gt;only&lt;/em&gt; the &lt;code&gt;initial-value&lt;/code&gt;, in practice it would be best to separately define the custom property. Again, this is presently a new feature, so without an additional definition such as in &lt;code&gt;:root&lt;/code&gt; you risk not having a value at all if you swap to only relying on &lt;code&gt;initial-value&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;You should also be aware that it is possible to register the same property multiple times, and that cascade rules mean the last one will win. This raises the potential for conflicts from accidental overrides. There isn&apos;t a way to &amp;quot;scope&amp;quot; the &lt;code&gt;@property&lt;/code&gt; rule within a selector.&lt;/p&gt;
+        &lt;p&gt;However, use of cascade layers can modify this behavior since unlayered styles win over layered styles, which includes at-rules. Cascade layers might be a way to manage registration of &lt;code&gt;@property&lt;/code&gt; rules if you assign a &amp;quot;properties&amp;quot; layer early on and commit to assigning all registrations to that layer.&lt;/p&gt;
+        &lt;p&gt;Custom properties can also be &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static&quot;&gt;registered via JavaScript&lt;/a&gt;. In fact, this was the original way to do it since this capability was originally coupled with the Houdini APIs. If a property is registered via JS, that definition is likely to win over the one in your stylesheets. That said, if your actual intent is to change a custom property value via JS, learn the more appropriate way to &lt;a href=&quot;https://12daysofweb.dev/2021/css-custom-properties/#accessing-and-setting-custom-properties-with-javascript&quot;&gt;access and set custom properties with JS&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Use of &lt;code&gt;@property&lt;/code&gt; has the potential for strengthening container style queries, especially if you are registering properties to act as toggles or enums. In this example, the use of &lt;code&gt;@property&lt;/code&gt; helps by typing our theme values, and ensures a fallback of &amp;quot;light&amp;quot;.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@property&lt;/span&gt; --theme&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;syntax&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;light | dark&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;inherits&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; true&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;initial-value&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; light&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--theme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        
+        &lt;span class=&quot;token atrule&quot;&gt;&lt;span class=&quot;token rule&quot;&gt;@container&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token property&quot;&gt;--theme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; dark&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token selector&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; black&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; white&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;em&gt;Learn more about this particular idea of &lt;a href=&quot;https://thinkdobecreate.com/articles/simplified-dark-mode-with-style-queries/&quot;&gt;using style queries for simplified dark mode&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Although it&apos;s a bit outside the scope of this article, another benefit of typing custom properties is that they become animatable. This is because the type turns the value into something CSS knows how to work with, vs. the mysterious open-ended value it would otherwise be. Here&apos;s a CodePen example of how registering a color custom property allows &lt;a href=&quot;https://codepen.io/5t3ph/pen/LYgWQgL&quot;&gt;animating a range of colors&lt;/a&gt; for the background.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;Use of &lt;code&gt;@property&lt;/code&gt; enables writing safer CSS custom properties, which improves the reliability of your system design, and defends against errors that could impact user experience. A reminder that for now they are a progressive enhancement and should almost always be used in conjunction with an explicit definition of the property.&lt;/p&gt;
+        &lt;p&gt;Be sure to test to ensure your intended outcome of both the allowed syntax, and the result if the &lt;code&gt;initial-value&lt;/code&gt; is used in the final render.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
