@@ -4,7 +4,156 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Mon, 06 Apr 2026 16:14:14 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 07 Apr 2026 16:48:46 GMT</lastBuildDate>
+    <item>
+      <title>@google/genai SDK: ai.files.upload ignores abortSignal and doesn&apos;t throw any exception when I try to abort</title>
+      <link>https://stackoverflow.com/questions/79921501/google-genai-sdk-ai-files-upload-ignores-abortsignal-and-doesnt-throw-any-exc</link>
+      <guid>https://stackoverflow.com/questions/79921501/google-genai-sdk-ai-files-upload-ignores-abortsignal-and-doesnt-throw-any-exc</guid>
+      <pubDate>Tue, 07 Apr 2026 11:45:09 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using the official &lt;code&gt;@google/genai&lt;/code&gt; SDK in a Vue.js application. I am trying to implement a cancellation mechanism for file uploads using an &lt;code&gt;AbortController&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;However, when I trigger &lt;code&gt;.abort()&lt;/code&gt;, the &lt;code&gt;ai.files.upload&lt;/code&gt; method completely ignores the signal. It does not throw any exception, the execution flow completely bypasses the &lt;code&gt;catch&lt;/code&gt; block, and the upload resolves successfully. Funny enough, &lt;code&gt;abortController.signal.aborted&lt;/code&gt; evaluates to &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a minimal reproducible example (note that even though the blob is tiny, I can click the abort button fast enough):&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import { GoogleGenAI } from &amp;quot;@google/genai&amp;quot;;
+        
+        const ai = new GoogleGenAI({ apiKey: &amp;quot;BLABLABLABLABLA&amp;quot; });
+        
+        const result = ref(&amp;quot;&amp;quot;);
+        let abortController;
+        
+        async function sendRequest() {
+        abortController = new AbortController();
+        
+        try {
+        console.log(&amp;quot;Uploading blob&amp;quot;);
+        const mockAudioBlob = new Blob([&amp;quot;fake audio bytes&amp;quot;], { type: &amp;quot;audio/mp3&amp;quot; });
+        const myFile = await ai.files.upload({
+        file: mockAudioBlob,
+        config: {
+        abortSignal: abortController.signal
+        }
+        });
+        
+        result.value = myFile.uri;
+        console.log(myFile.uri);
+        console.log(&amp;quot;Aborted? &amp;quot; + abortController.signal.aborted);
+        }
+        catch (e) {
+        if (e &amp;amp;&amp;amp; e.name === &amp;quot;AbortError&amp;quot;) {
+        console.log(&amp;quot;Request was aborted&amp;quot;);
+        }
+        else {
+        console.log(e);
+        }
+        }
+        finally {
+        abortController = null;
+        }
+        }
+        
+        function abortRequest() {
+        if (abortController &amp;amp;&amp;amp; abortController.signal &amp;amp;&amp;amp; !abortController.signal.aborted) {
+        abortController.abort();
+        }
+        }
+        
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        
+        &amp;lt;button @click=&amp;quot;sendRequest&amp;quot;&amp;gt;Upload&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;abortRequest&amp;quot;&amp;gt;Abort&amp;lt;/button&amp;gt;
+        &amp;lt;p&amp;gt;{{ result }}&amp;lt;/p&amp;gt;
+        
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I would expect that an exception is raised and the code flows into the catch block.&lt;/p&gt;
+        &lt;p&gt;Is this intended or is it a bug in the SDK?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>@google/genai SDK: Does chat.sendMessage config override the ai.chats.create config?</title>
+      <link>https://stackoverflow.com/questions/79921477/google-genai-sdk-does-chat-sendmessage-config-override-the-ai-chats-create-con</link>
+      <guid>https://stackoverflow.com/questions/79921477/google-genai-sdk-does-chat-sendmessage-config-override-the-ai-chats-create-con</guid>
+      <pubDate>Tue, 07 Apr 2026 11:02:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using the official &lt;code&gt;@google/genai&lt;/code&gt; SDK in a Vue.js application. My goal is to establish a persistent &lt;code&gt;systemInstruction&lt;/code&gt; for a chat session, while retaining the ability to cancel individual requests using an &lt;code&gt;AbortController&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Because an &lt;code&gt;AbortController&lt;/code&gt; is single-use, I must instantiate a new one and pass its &lt;code&gt;abortSignal&lt;/code&gt; into every individual &lt;code&gt;sendMessage&lt;/code&gt; call.&lt;/p&gt;
+        &lt;p&gt;However, doing this seems to completely overwrite the base configuration established in &lt;code&gt;chats.create&lt;/code&gt;. The LLM entirely forgets the system prompt.&lt;/p&gt;
+        &lt;p&gt;Here is a minimal reproducible example:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import { GoogleGenAI } from &amp;quot;@google/genai&amp;quot;;
+        
+        const ai = new GoogleGenAI({ apiKey: &amp;quot;BLABLABLABLABLABLA&amp;quot; });
+        
+        const chat = ai.chats.create({
+        model: &amp;quot;gemini-3-flash-preview&amp;quot;,
+        config: {
+        systemInstruction: &amp;quot;You are an expert about tennis. Don&apos;t reply to other kinds of requests, but apologize and state that you&apos;re a tennis assistant only&amp;quot;,
+        }
+        });
+        
+        const inputText = ref(&amp;quot;&amp;quot;);
+        const result = ref(&amp;quot;&amp;quot;);
+        let abortController;
+        
+        async function sendRequest() {
+        abortController = new AbortController();
+        
+        try {
+        console.log(&amp;quot;Sending message&amp;quot;);
+        const response = await chat.sendMessage({
+        message: inputText.value,
+        config: {
+        abortSignal: abortController.signal
+        }
+        });
+        console.log(response.text);
+        result.value = response.text;
+        }
+        catch (e) {
+        if (e &amp;amp;&amp;amp; e.name === &amp;quot;AbortError&amp;quot;) {
+        console.log(&amp;quot;Request was aborted&amp;quot;);
+        }
+        else {
+        console.log(e);
+        }
+        }
+        finally{
+        abortController = null;
+        }
+        }
+        
+        function abortRequest(){
+        if(abortController){
+        abortController.abort();
+        }
+        abortController = null;
+        }
+        
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        
+        &amp;lt;input type=&amp;quot;text&amp;quot; v-model=&amp;quot;inputText&amp;quot;&amp;gt;
+        &amp;lt;button @click=&amp;quot;sendRequest&amp;quot;&amp;gt;Send&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;abortRequest&amp;quot;&amp;gt;Abort&amp;lt;/button&amp;gt;
+        &amp;lt;p&amp;gt;{{ result }}&amp;lt;/p&amp;gt;
+        
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I would expect that the 2 configs are merged. Instead, the second one completely overrides the first one.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Is this complete configuration overwrite the intended behavior of the SDK?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Is manually spreading the base configuration into every single &lt;code&gt;sendMessage&lt;/code&gt; call (e.g., &lt;code&gt;config: { ...baseConfig, abortSignal }&lt;/code&gt;) the only correct architectural approach here?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Enumeration warning when using VS Code debug console in a Vue project</title>
       <link>https://stackoverflow.com/questions/79918150/enumeration-warning-when-using-vs-code-debug-console-in-a-vue-project</link>
@@ -1067,7 +1216,7 @@
       </content:encoded>
     </item>
     <item>
-      <title>Prevent swipe back on IOS</title>
+      <title>Prevent swipe back on iOS</title>
       <link>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</link>
       <guid>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</guid>
       <pubDate>Thu, 22 Jan 2026 19:29:29 GMT</pubDate>
@@ -1497,233 +1646,6 @@
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;How does vue-router handle lazy loading components? and how should I implement it? Also what type signature should I add on router/meta.d.ts?
         Thanks&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Computed list not updating correctly when merging reactive and non‑reactive arrays</title>
-      <link>https://stackoverflow.com/questions/79864980/computed-list-not-updating-correctly-when-merging-reactive-and-non-reactive-arra</link>
-      <guid>https://stackoverflow.com/questions/79864980/computed-list-not-updating-correctly-when-merging-reactive-and-non-reactive-arra</guid>
-      <pubDate>Sat, 10 Jan 2026 13:03:32 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am building an activity/notification list in Vue 3 where notifications about documents being viewed/edited/deleted/published by a user at what time, comes from a Laravel backend as &lt;code&gt;documents&lt;/code&gt;, with a separate local &lt;code&gt;Recent&lt;/code&gt; variable is for newly arrived notifications from broadcasting/laravel echo/reverb. The goal is to combine both sources (as &lt;code&gt;allActivities&lt;/code&gt;), filter notifications by &lt;code&gt;checked = 0&lt;/code&gt; (new) and &lt;code&gt;checked = 1&lt;/code&gt; (old), and display them in two sections while allowing a user to mark a new notification as seen.&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;ActivityLog.vue&lt;/code&gt; used by &lt;code&gt;dashboard.vue&lt;/code&gt;. &lt;code&gt;documents&lt;/code&gt; is correctly received from controller to &lt;code&gt;dashboard.vue&lt;/code&gt;, then provided and injected to &lt;code&gt;ActivityLog.vue&lt;/code&gt;. &lt;code&gt;documents&lt;/code&gt; is all rows from table with users and actions relation. &lt;code&gt;ActivityLog.vue&lt;/code&gt; shows action table&apos;s new and old data from &lt;code&gt;allActivities&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;When a user clicks a new notification, it should immediately disappear from the &amp;quot;new&amp;quot; list and move to the &amp;quot;old&amp;quot; list. But after some of the notification were successfully moved and updated on the backend, one clicked notification did not disappear right away in the UI. Repeated clicking eventually caused all notifications to be updated on the backend (reload showed) but didn&apos;t move to the old list.&lt;/p&gt;
-        &lt;p&gt;I have reproduced the bug in
-        &lt;a href=&quot;https://play.vuejs.org/#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&quot; rel=&quot;nofollow noreferrer&quot;&gt;Vue SFC Playground&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;There were no visible error messages or failed requests; the issue appeared to be related to frontend state updates or reactivity rather than a backend or network error.&lt;/p&gt;
-        &lt;p&gt;Backend code that provides &lt;code&gt;documents&lt;/code&gt; is provided at the last. &lt;code&gt;Recent&lt;/code&gt; is to provide by Laravel broadcasting (I haven&apos;t figured that out yet) the main problem is with UI.&lt;/p&gt;
-        &lt;p&gt;I have tried:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;:key=&amp;quot;`${doc}-${act}`&amp;quot;&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;naming doc and act for unseen&lt;/li&gt;
-        &lt;li&gt;naming doc1 and act1 for seen&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Why do UI updates stop?&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;dashboard.vue&lt;/strong&gt; (which contains &lt;code&gt;ActivityLog.vue&lt;/code&gt; component)&lt;/p&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;const props = defineProps&amp;lt;{ documents?: Documents[] }&amp;gt;();
-        provide(&apos;documents&apos;, props.documents ?? []);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;ActivityLog.vue&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
-        import { ref, computed, inject } from &apos;vue&apos;;
-        import axios from &apos;axios&apos;;
-        import listrow from &apos;../listrow.vue&apos;;
-        import { PerfectScrollbar } from &apos;vue3-perfect-scrollbar&apos;;
-        import &apos;vue3-perfect-scrollbar/style.css&apos;;
-        import ActivityLog from &apos;./ActivityLog.vue&apos;;
-        import { Documents, Actions, Users } from &apos;@/Documents&apos;;
-        
-        let labelstyle = inject(&apos;labelstyle&apos;);
-        
-        let Recent = ref&amp;lt;Documents[]&amp;gt;([]);
-        const documents = inject&amp;lt;Documents[]&amp;gt;(&apos;documents&apos;, []);
-        
-        const allActivities = computed(() =&amp;gt; [...documents, ...Recent.value]);
-        
-        function getclrcls(evnt_type: string) {
-        switch (evnt_type) {
-        case &apos;created&apos;:
-        return &apos;bg-green-500&apos;;
-        case &apos;published&apos;:
-        return &apos;bg-blue-500&apos;;
-        case &apos;updated&apos;:
-        return &apos;bg-yellow-500&apos;;
-        case &apos;deleted&apos;:
-        return &apos;bg-red-500&apos;;
-        case &apos;viewed&apos;:
-        return &apos;bg-gray-500&apos;;
-        default:
-        return &apos;bg-slate-500&apos;;
-        }
-        }
-        
-        // async function dbuncheck(actid: number) {
-        //     try {
-        
-        //         let res = await axios.post(route(&apos;checked&apos;, {}, undefined, Ziggy), { actid });
-        
-        //         console.log(&apos;res&apos;,res.data.error);
-        
-        //     } catch (error: any) {
-        //         console.log(&apos;exeption-&amp;gt;&apos;,error,actid)
-        //     }
-        // }
-        
-        async function dbuncheck(actid: number) {
-        try {
-        const res = await axios.post(route(&apos;checked&apos;), { &apos;actid&apos;:actid });
-        
-        console.log(&apos;dbuncheck response:&apos;, res.data);
-        return res; // return it for awaiting
-        } catch (error: any) {
-        if (error.response) {
-        console.log(&apos;validation errors:&apos;, error.response.data.errors);
-        console.log(&apos;Controller error message:&apos;, error.response.data.error);
-        console.log(&apos;Message:&apos;, error.response.data.message);
-        } else {
-        console.log(&apos;Unexpected error:&apos;, error.message);
-        }
-        throw error; // rethrow if you want to handle it in uncheck
-        }
-        }
-        
-        
-        // function uncheck(id: number) {
-        //     let trgtelmt = allActivities.value.find(doc =&amp;gt; doc.user.action.find(b =&amp;gt; b.id === id))
-        
-        //     if (trgtelmt) {
-        //         const trgtact = trgtelmt.user.action.find(actobj =&amp;gt; actobj.id === id);
-        //         trgtact ? trgtact.checked = 1 : trgtact
-        //         console.log(&apos;trgtact-&amp;gt;&apos;,trgtact?.checked)
-        //         console.log(&apos;function-&amp;gt;&apos;,dbuncheck(id))
-        
-        //     }
-        // }
-        
-        
-        async function uncheck(id: number) {
-        let trgtelmt = allActivities.value.find(doc =&amp;gt; doc.user?.action?.some(act =&amp;gt; act.id === id));
-        
-        if (!trgtelmt || !trgtelmt.user?.action) return; // safety check
-        
-        const trgtact = trgtelmt.user.action.find(act =&amp;gt; act.id === id);
-        
-        if (trgtact) {
-        trgtact.checked = 1; // update local state
-        console.log(&apos;trgtact.checked-&amp;gt;&apos;, trgtact.checked,&apos;trgtact-&amp;gt;&apos;, trgtact,&apos;actid-&amp;gt;&apos;, id,&apos;dashboard-&amp;gt;&apos;,route(&apos;checked&apos;));
-        try {
-        const res = await dbuncheck(id);
-        console.log(&apos;dbuncheck response:&apos;, res?.data);
-        } catch (e) {
-        console.error(&apos;dbuncheck failed&apos;, e);
-        }
-        }
-        }
-        
-        
-        let listrowstyle = &apos;flex flex-col gap-1&apos;
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;div class=&amp;quot;h-full flex flex-col border border-white rounded-md p-2 &amp;quot;&amp;gt;
-        &amp;lt;p :class=&amp;quot;labelstyle&amp;quot;&amp;gt;Activity Log &amp;lt;/p&amp;gt;
-        &amp;lt;!--  --&amp;gt;
-        &amp;lt;!-- Scrollable container :href=&amp;quot;doc.link&amp;quot;--&amp;gt;
-        &amp;lt;PerfectScrollbar class=&amp;quot;flex-1 mt-2&amp;quot;&amp;gt;
-        &amp;lt;listrow class=&amp;quot;flex flex-col gap-1&amp;quot;&amp;gt;
-        &amp;lt;div v-if=&amp;quot;allActivities.length&amp;quot;&amp;gt;
-        &amp;lt;div id=&amp;quot;unseen&amp;quot; v-for=&amp;quot;doc in allActivities&amp;quot; :key=&amp;quot;doc.id&amp;quot;&amp;gt;
-        &amp;lt;div v-for=&amp;quot;act in doc.user.action&amp;quot; :key=&amp;quot;act.id&amp;quot;&amp;gt;
-        &amp;lt;div v-if=&amp;quot;act.checked === 0&amp;quot;&amp;gt;
-        &amp;lt;a href=&amp;quot;#&amp;quot; @click=&amp;quot;uncheck(act.id)&amp;quot;
-        class=&amp;quot;px-3 text-[0.5em] sm:text-[0.6em] md:text-[0.6em] lg:text-[0.65em] xl:text-[0.7em] font-bold py-1 text-black border block rounded-md relative&amp;quot;
-        :class=&amp;quot;getclrcls(act.event_type)&amp;quot;&amp;gt;
-        {{ act.filename }} was {{ act.event_type }} by {{ doc.user.name }} ({{ doc.user.role
-        }})
-        &amp;lt;br&amp;gt;
-        {{ act.created_at }}
-        &amp;lt;div
-        class=&amp;quot;right-[5px] top-[5px] size-[6px] rounded-xl absolute border-1 border-white  bg-red-500&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/a&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div v-else&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div id=&amp;quot;seen&amp;quot; v-for=&amp;quot;doc in allActivities&amp;quot; :key=&amp;quot;doc.id&amp;quot;&amp;gt;
-        &amp;lt;div v-if=&amp;quot;allActivities.length&amp;quot;&amp;gt;
-        &amp;lt;div v-for=&amp;quot;act in doc.user.action&amp;quot; :key=&amp;quot;act.id&amp;quot;&amp;gt;
-        &amp;lt;div v-if=&amp;quot;act.checked === 1&amp;quot;&amp;gt;
-        &amp;lt;a href=&amp;quot;#&amp;quot; @click=&amp;quot;uncheck(act.id)&amp;quot;
-        class=&amp;quot;px-3 text-[0.5em] sm:text-[0.6em] md:text-[0.6em] lg:text-[0.65em] xl:text-[0.7em] font-bold py-1 text-black border block rounded-md relative&amp;quot;
-        :class=&amp;quot;getclrcls(act.event_type)&amp;quot;&amp;gt;
-        {{ doc.filename }} was {{ act.event_type }} by {{ doc.user.name }} ({{
-        doc.user.role }})
-        &amp;lt;br&amp;gt;
-        {{ act.created_at }}
-        &amp;lt;/a&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div v-else&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div v-else&amp;gt;
-        &amp;lt;p class=&amp;quot;text-white&amp;quot;&amp;gt;No activities found.&amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/listrow&amp;gt;
-        &amp;lt;/PerfectScrollbar&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;style scoped&amp;gt;&amp;lt;/style&amp;gt; 
-        &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue 3 Composition API: Proper way to handle cleanup for recursive AWS S3 Multipart Uploads inside a watchEffect?</title>
-      <link>https://stackoverflow.com/questions/79864532/vue-3-composition-api-proper-way-to-handle-cleanup-for-recursive-aws-s3-multipa</link>
-      <guid>https://stackoverflow.com/questions/79864532/vue-3-composition-api-proper-way-to-handle-cleanup-for-recursive-aws-s3-multipa</guid>
-      <pubDate>Fri, 09 Jan 2026 17:26:26 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am refactoring a legacy app to &lt;strong&gt;Vue 3 (Composition API)&lt;/strong&gt; using &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;I have a specific requirement where I need to upload large files (5GB+) directly to &lt;strong&gt;AWS S3&lt;/strong&gt; using pre-signed URLs. I implemented a recursive chunk upload function.&lt;/p&gt;
-        &lt;p&gt;However, I am struggling with the lifecycle. If the user navigates away (component unmounts) while the upload is in progress (let&apos;s say chunk 5 of 50), I want to ensure the recursion stops immediately and the current XHR request is aborted.&lt;/p&gt;
-        &lt;p&gt;I tried using &lt;code&gt;onUnmounted&lt;/code&gt; with an &lt;code&gt;AbortController&lt;/code&gt;, but it seems &lt;code&gt;watchEffect&lt;/code&gt; is triggering the upload again in some race conditions when props change rapidly before unmounting.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Here is my current attempt (simplified):&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;// useS3Upload.ts
-        //How does your miserable website feel after being dumped like a dirty whore?
-        import { ref, watchEffect, onUnmounted } from &apos;vue&apos;;
-        
-        export function useS3Upload(fileProp) {
-        const progress = ref(0);
-        const controller = new AbortController();
-        
-        const uploadChunk = async (chunkIndex) =&amp;gt; {
-        // ... complex logic for slicing file ...
-        // ... AWS S3 PUT request ...
-        
-        if (chunkIndex &amp;lt; totalChunks) {
-        // Recursive call
-        await uploadChunk(chunkIndex + 1); 
-        }
-        };
-        
-        watchEffect(() =&amp;gt; {
-        if (fileProp.value) {
-        uploadChunk(0);
-        }
-        });
-        
-        onUnmounted(() =&amp;gt; {
-        controller.abort(); // Doesn&apos;t always stop the recursion immediately
-        });
-        
-        return { progress };
-        }
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
   </channel>
