@@ -4,12 +4,286 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Fri, 10 Apr 2026 16:23:38 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 11 Apr 2026 16:08:01 GMT</lastBuildDate>
+    <item>
+      <title>Testing OCR with Chrome Built-in AI</title>
+      <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
+      <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
+        &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
+        &lt;h2 id=&quot;the-first-test&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-first-test&quot;&gt;The First Test&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;My initial plan was two-fold:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Ask the built-in AI to find and return text from the image.&lt;/li&gt;
+        &lt;li&gt;Ask the built-in AI to return bounding boxes for text found in the AI.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;To be clear, none of this is new in any way. People tend to forget we had AI-driven APIs for years before the GenAI explosion came about. Microsoft, Amazon, and more had basic APIs that covered exactly what I listed above.&lt;/p&gt;
+        &lt;p&gt;But being able to do it on device could be really compelling - especially in a case where a user may be offline.&lt;/p&gt;
+        &lt;p&gt;I started with a fork of my basic &amp;quot;what is this image&amp;quot; code: &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/bNEMbrX&quot;&gt;https://codepen.io/cfjedimaster/pen/bNEMbrX&lt;/a&gt;. This demo lets you pick an image from your device, it renders a quick preview, and then runs this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function analyze() {
+        $result.innerHTML = &apos;&apos;;
+        if(!$imgFile.value) return;
+        console.log(`Going to analyze ${$imgFile.value}`);
+        
+        if(!session) {
+        console.log(&apos;creating the session&apos;);
+        session = await LanguageModel.create({
+        expectedInputs:[{type: &apos;image&apos;}],
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        console.log(`Downloaded ${e.loaded * 100}%`);
+        /*
+        why this? the download event _always_ runs at
+        least once, so this prevents the msg showing up
+        when its already done. I&apos;ve seen it report 0 and 1
+        in this case, so we skip both
+        */
+        if(e.loaded === 0 || e.loaded === 1) return;
+        $result.innerHTML = `Downloading, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }	
+        });
+        }
+        $result.innerHTML = &apos;Working on analyzing picture.&apos;;
+        console.log(session);
+        
+        let result = await session.prompt([
+        {
+        role:&apos;user&apos;,
+        content: [
+        { type:&apos;text&apos;, value:&apos;Create a summary description of the image.&apos;},
+        { type: &amp;quot;image&amp;quot;, value: $imgFile.files[0]}
+        ]
+        }
+        ]);
+        
+        console.log(result);
+        $result.innerHTML = result;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This code block handles creating the session once and then passing the user&apos;s selected image to the model and return a description.&lt;/p&gt;
+        &lt;p&gt;My new version made a few changes. First, I defined a JSON Schema to structure my results into an array of text and bounding box values:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const schema = {
+        type:&amp;quot;array&amp;quot;, 
+        items: {
+        type:&amp;quot;object&amp;quot;,
+        properties: {
+        text: { type: &amp;quot;string&amp;quot;, description: &amp;quot;Text found in picture&amp;quot; }, 
+        topLeft: {
+        type:&amp;quot;object&amp;quot;, 
+        properties: {
+        x: {
+        type:&amp;quot;number&amp;quot;, description: &amp;quot;Top left horizonatal position of the bounding box for the found text.&amp;quot; 
+        },
+        y: {
+        type:&amp;quot;number&amp;quot;, description: &amp;quot;Top left vertical position of the bounding box for the found text.&amp;quot; 
+        },
+        
+        }
+        },
+        bottomRight: {
+        type:&amp;quot;object&amp;quot;, 
+        properties: {
+        x: {
+        type:&amp;quot;number&amp;quot;, description: &amp;quot;Bottom right horizonatal position of the bounding box for the found text.&amp;quot; 
+        },
+        y: {
+        type:&amp;quot;number&amp;quot;, description: &amp;quot;Bottom right vertical position of the bounding box for the found text.&amp;quot; 
+        },
+        
+        }
+        },
+        
+        }
+        }
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Next, I modified how I created the session, using a system instruction to help guide the results:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;session = await LanguageModel.create({
+        expectedInputs:[{type: &apos;image&apos;}],
+        initialInputs: [
+        { 
+        role: &apos;system&apos;, 
+        content: 
+        &apos;Your job is to extract and find text in an image. Return each block of text along with a X,Y position for the top left and bottom right block that covers the image.&apos; 
+        }
+        ],
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        /*
+        why this? the download event _always_ runs at
+        least once, so this prevents the msg showing up
+        when its already done. I&apos;ve seen it report 0 and 1
+        in this case, so we skip both
+        */
+        if(e.loaded === 0 || e.loaded === 1) return;
+        $result.innerHTML = `Downloading, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }	
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And when I pass my image to the model, I include the schema:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let result = await session.prompt([
+        {
+        role:&apos;user&apos;,
+        content: [
+        { type: &amp;quot;image&amp;quot;, value: $imgFile.files[0]}
+        ]
+        }
+        ], { responseConstraint: schema });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;At this point, I could get a quick result. Given this image:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/devtn.jpg&quot; loading=&quot;lazy&quot; alt=&quot;MCP as Your CMS Helper&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I got this result:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;[
+        {
+        &amp;quot;text&amp;quot;: &amp;quot;MCP as Your CMS Helper&amp;quot;,
+        &amp;quot;topLeft&amp;quot;: {
+        &amp;quot;x&amp;quot;: 150,
+        &amp;quot;y&amp;quot;: 100
+        },
+        &amp;quot;bottomRight&amp;quot;: {
+        &amp;quot;x&amp;quot;: 340,
+        &amp;quot;y&amp;quot;: 100
+        }
+        },
+        {
+        &amp;quot;text&amp;quot;: &amp;quot;Webflow Developers&amp;quot;,
+        &amp;quot;topLeft&amp;quot;: {
+        &amp;quot;x&amp;quot;: 100,
+        &amp;quot;y&amp;quot;: 300
+        },
+        &amp;quot;bottomRight&amp;quot;: {
+        &amp;quot;x&amp;quot;: 210,
+        &amp;quot;y&amp;quot;: 300
+        }
+        },
+        {
+        &amp;quot;text&amp;quot;: &amp;quot;&amp;lt;&amp;gt;&amp;quot;,
+        &amp;quot;topLeft&amp;quot;: {
+        &amp;quot;x&amp;quot;: 500,
+        &amp;quot;y&amp;quot;: 150
+        },
+        &amp;quot;bottomRight&amp;quot;: {
+        &amp;quot;x&amp;quot;: 600,
+        &amp;quot;y&amp;quot;: 250
+        }
+        }
+        ]
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The text values were perfect. I mean heck, it picked up the &lt;code&gt;&amp;lt;&amp;gt;&lt;/code&gt; bit which is technically text. However, the bounding boxes were off. Now, I&apos;m not convinced this isn&apos;t my fault. I checked, and double checked, the way I worded the schema, and as far as I know I&apos;m asking the right question, but the boxes never seemed to actually match the area of the text.&lt;/p&gt;
+        &lt;p&gt;I decided to give up on the idea of requesting the boxes but may come back to it later. (Especially if an eagle-eyed reader finds a dumb mistake I made.)&lt;/p&gt;
+        &lt;p&gt;You can see this full demo below:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Testing Chrome OCR Capabilities (2)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;js&quot; data-slug-hash=&quot;wBzYEbJ&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/wBzYEbJ&quot;&gt;
+        Testing Chrome OCR Capabilities (2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;a-quick-aside&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#a-quick-aside&quot;&gt;A Quick Aside&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;In the demo above, if you can actually run it, I added a quick utility to draw the bounding boxes on the image. This utility was created by Claude Code and it actually works &lt;em&gt;really&lt;/em&gt; well. You begin by wrapping the image from the DOM:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const img = document.querySelector(&apos;#my-image&apos;);
+        const annotator = makeImageAnnotator(img);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then just draw your rectangles:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Draw a box: upper-left (50, 30), lower-right (200, 150)
+        annotator.drawBox(50, 30, 200, 150);
+        
+        // Optional style overrides
+        annotator.drawBox(10, 10, 80, 80, { color: &apos;red&apos;, lineWidth: 3 });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There&apos;s even a reset:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Clear all boxes
+        annotator.clearBoxes();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I built a CodePen just for this little utility and as there&apos;s no use of Chrome AI in here, it should work fine for everyone:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Annotator Test&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;KwgGjMj&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019d7c9d-8344-770f-8c07-15adb9b196e1&quot;&gt;
+        Annotator Test&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;One note - if you make use of this - notice I check to ensure the image is done loading before I annotate. That&apos;s required for this utility.&lt;/p&gt;
+        &lt;h2 id=&quot;the-second-test&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-second-test&quot;&gt;The Second Test&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So - giving up on the idea of creating bounding boxes, I pivoted to a new version that focused on &lt;em&gt;just&lt;/em&gt; the text. First, my schema got a lot simpler:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const schema = {
+        type:&amp;quot;array&amp;quot;, 
+        items: {
+        type:&amp;quot;string&amp;quot;,
+        decription:&amp;quot;The extracted text.&amp;quot;
+        }
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then I simplified my system instruction:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;session = await LanguageModel.create({
+        expectedInputs:[{type: &apos;image&apos;}],
+        initialInputs: [
+        { 
+        role: &apos;system&apos;, 
+        content: 
+        &apos;Your job is to extract and find text in an image. An image may have multiple blocks of text. Return each block of text.&apos; 
+        }
+        ],
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        /*
+        why this? the download event _always_ runs at
+        least once, so this prevents the msg showing up
+        when its already done. I&apos;ve seen it report 0 and 1
+        in this case, so we skip both
+        */
+        if(e.loaded === 0 || e.loaded === 1) return;
+        $result.innerHTML = `Downloading, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }	
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then I ran some tests. First, a super simple stop sign:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/stop.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Stop sign&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Which returned... &amp;quot;STOP&amp;quot;. Perfect. Stupid simple, but perfect.&lt;/p&gt;
+        &lt;p&gt;Next is a sign filled with more signs:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/restsign.png&quot; loading=&quot;lazy&quot; alt=&quot;Highway sign with restaurants&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The result was pretty impressive (line breaks you see below were from me):&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;FOOD - EXIT 14, Burger King, Olive Garden ITALIAN RESTAURANT, 
+        Izzy&apos;s CLASSIC BUFFET, McMenamins SUNNYSIDE PUB, McDonald&apos;s, 
+        Wendy&apos;s
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Finally, I tested that first image (the MCP as Your CMS Helper one above) and oddly... the results weren&apos;t quite as good. Sometimes I only got &amp;quot;MCP as Your CMS Helper&amp;quot;.  That&apos;s the primary text so I guess that&apos;s good, but I was surprised it missed the other blocks. And yet other times I&apos;d get a bit more, like just now when I tested I got &amp;quot;Webflow Developers&amp;quot;. Just seems odd that this version of the script sometimes returns a bit less than the one where I tried to annotate. Maybe it would make sense to keep the same schema and simply &lt;em&gt;ignore&lt;/em&gt; the bounding box values, but that feels wrong.&lt;/p&gt;
+        &lt;p&gt;You can see the full code of this below:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Testing Chrome OCR Capabilities (3)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;dPpggYo&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/dPpggYo&quot;&gt;
+        Testing Chrome OCR Capabilities (3)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;the-final-boss&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-final-boss&quot;&gt;The Final Boss&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;As a last test, I tried something pretty intense - a JPG export from a PDF with lots of dense text. You can see it here, and honestly, it&apos;s a bit too small for even me to read:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/rules.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Page from DND Manual&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The results were not as good:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;HOW TO PLAY, Part 1: The Basic Rules, Part 2: Using These Rules, 
+        Part 3: The Role of the Dungeon Master, Part 4: Character Creation, 
+        GAME DICE, INTRODUCTION
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I did try a larger and higher resolution version (about 4x the size) and did not see a noticeable change in results. I don&apos;t think we will be using this API to OCR books anytime soon, but it did seem to do a reasonable job with signs and such. I&apos;d call that a fair bargain for something running on the device without needing a remote API.&lt;/p&gt;
+        &lt;p&gt;As always, let me know what you think. Also, I should note that &lt;a href=&quot;https://huggingface.co/docs/transformers.js/en/index&quot;&gt;Transformers.js&lt;/a&gt; can also support this. I haven&apos;t tested it myself, but here&apos;s a &lt;a href=&quot;https://discuss.huggingface.co/t/texo-an-in-browser-latex-ocr-model-built-on-transformers-and-transformers-js/169634&quot;&gt;post from their community&lt;/a&gt; showing an example. You can run their demo here: &lt;a href=&quot;https://texocr.netlify.app/&quot;&gt;https://texocr.netlify.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@mosdesign?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;mos design&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-picture-of-a-cat-on-a-billboard-in-a-city-SDJLR8UH44U?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (4/5/26)</title>
       <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
       <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
         about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
@@ -35,7 +309,7 @@
       <title>You&apos;ve gained a new achievement</title>
       <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
       <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
         &lt;p&gt;
@@ -148,7 +422,7 @@
       <title>Checking if a Movie has a Post or Mid Credit Scene</title>
       <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
       <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
         &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
@@ -237,7 +511,7 @@
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -302,7 +576,7 @@
       <title>Implementing OAuth in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
         &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
@@ -588,7 +862,7 @@
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -609,7 +883,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -830,7 +1104,7 @@
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -1031,7 +1305,7 @@
       <title>Building My Own Social Network Poster in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
+      <pubDate>Sat, 11 Apr 2026 15:47:00 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
         &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
@@ -1567,60 +1841,6 @@
         &lt;p&gt;I also mentioned I skipped Threads as I didn&apos;t want to do oAuth. You can absolutely do oAuth in Astro, even I&apos;ve done it, and I&apos;d be willing to take in a PR from someone who wants to add that, but it didn&apos;t feel worth the effort to me.&lt;/p&gt;
         &lt;p&gt;Finally, a shoutout to &lt;a href=&quot;https://bsky.app/profile/bobmonsour.com&quot;&gt;Bob Monsour&lt;/a&gt; for the inspiration. You can find his version of this idea (which does a lot more), here: &lt;a href=&quot;https://github.com/bobmonsour/social-posting&quot;&gt;https://github.com/bobmonsour/social-posting&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@fosterious?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Sean Foster&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/brown-lion-in-close-up-photography-UyrslM2tyKc?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (3/8/26)</title>
-      <link>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</link>
-      <guid>https://www.raymondcamden.com/2026/03/08/links-for-you-3826</guid>
-      <pubDate>Fri, 10 Apr 2026 16:03:47 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Greetings, programs. I&apos;m taking a break from Assassin&apos;s Creed Shadows (and being lazy in general) and thought I&apos;d write up my links post. Yesterday was the 15th birthday of one of my kids and later today we get to celebrate with her friends. Outside of that and laundry, I&apos;ve got a large amount of nothing to get accomplished today and I absolutely love it. Let&apos;s get to the links. As always, I hope you find these worth your time!&lt;/p&gt;
-        &lt;h2 id=&quot;eleventy&apos;s-future&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy&apos;s-future&quot;&gt;Eleventy&apos;s Future&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As you know (or hopefully know), my blog here is built on &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt;, a Node.js static site generator. I&apos;ve been using it, and &lt;a href=&quot;https://www.raymondcamden.com/tags/eleventy&quot;&gt;blogging about it&lt;/a&gt; for almost six years. This past week, Zach announced that Eleventy is becoming &amp;quot;Build Awesome&amp;quot; - you can read the announcement post here: &lt;a href=&quot;https://www.11ty.dev/blog/build-awesome/&quot;&gt;Eleventy is now Build Awesome&lt;/a&gt;. For folks who may not know, this is part of the same group that owns Font Awesome and &lt;a href=&quot;https://webawesome.com/&quot;&gt;Web Awesome&lt;/a&gt;, the new name for Shoelace.&lt;/p&gt;
-        &lt;p&gt;As you can imagine, this has caused quite a bit of ... concern amongst the Eleventy community. As an example:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://brennan.day/the-end-of-eleventy/&quot;&gt;The End of Eleventy&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://hamatti.org/posts/au-revoir-eleventy/&quot;&gt;Au revoir, Eleventy&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://davidrhoden.com/notes/eleventy-is-changing-its-name-among-other-things-and-i-dont-love-it/&quot;&gt;Eleventy is changing its name, among other things, and I don&apos;t love it&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Also, and to be clear, this is not related, Sia announced the end of the &lt;a href=&quot;https://11tymeetup.dev/&quot;&gt;Eleventy Meetup&lt;/a&gt; after five years and thirty episodes.&lt;/p&gt;
-        &lt;p&gt;I&apos;m not stressing over this now. I don&apos;t like the name, but honestly that doesn&apos;t bother me, I&apos;ll just keep saying Eleventy. I can appreciate the goal here - provide more while also earning money - but I do worry about the community, usage, and so forth. That being said, Zach&apos;s been a great caretaker and devoted a hell of a lot of energy to something most people don&apos;t pay a dime for. All I can do now is hope for the best.&lt;/p&gt;
-        &lt;h2 id=&quot;swatchify&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#swatchify&quot;&gt;Swatchify&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A few days ago, I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about the latest update to Color Thief, a JavaScript library for getting prominent colors in images. There&apos;s another option as well, the nicely named &lt;a href=&quot;https://james-see.github.io/swatchify/&quot;&gt;Swatchify&lt;/a&gt;. This is also a JavaScript library, but can also be used as a API service as well. (To be clear, if you host it.) There&apos;s also a Go library and CLI.&lt;/p&gt;
-        &lt;p&gt;Oh, and this has nothing to do with the very cool watch company...&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;z-uzlR52HOw&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/z-uzlR52HOw/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=z-uzlR52HOw&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
-        &lt;h2 id=&quot;codepen-2.0&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#codepen-2.0&quot;&gt;CodePen 2.0&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I don&apos;t usually cover &amp;quot;product launches&amp;quot; (although I guess I just did re: Build Awesome), but one of my favorite online tools, &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt; just released (in beta!) a 2.0 version. You can learn more here: &lt;a href=&quot;https://codepen.io/beta&quot;&gt;CodePen 2.0 Beta&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;This is a &lt;em&gt;big&lt;/em&gt; change, and I &lt;em&gt;strongly&lt;/em&gt; encourage you to pay attention to the onboarding notes if you give it a try. There is a &lt;em&gt;lot&lt;/em&gt; of really good stuff here, including a proper file system, build processes, and more, but you will want to pay attention as the editor walks you through the changes.&lt;/p&gt;
-        &lt;p&gt;Cassidy has a great demo in the video below:&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;0R4l8nlmCAQ&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/0R4l8nlmCAQ/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=0R4l8nlmCAQ&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
-        &lt;p&gt;If you watched it, you&apos;ll note the gets tripped up by one of the main changes - your CSS and JavaScript aren&apos;t automatically included anymore. They can be! But as she discovered, you need to do set things up right if you wan the &amp;quot;auto&amp;quot; behavior.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve only played with it a bit, but I &lt;strong&gt;really&lt;/strong&gt; like what I see so far.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;ve shared videos from Matt One before - he creates incredible mashups and remixes. I just wish he&apos;d skip the &lt;em&gt;incredibly&lt;/em&gt; cringe worthy AI videos. That being said, I subscribe to him for his tunes, not his videos. The track below is a remix of The Cure&apos;s &amp;quot;Letter To Elise&amp;quot;, and it&apos;s a &lt;em&gt;dramatic&lt;/em&gt; mix of the original, really changing the tone/mood in an interesting way:&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;GkkXxDUE5Bc&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/GkkXxDUE5Bc/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=GkkXxDUE5Bc&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
       </content:encoded>
     </item>
   </channel>
