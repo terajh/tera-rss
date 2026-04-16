@@ -4,7 +4,96 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Wed, 15 Apr 2026 16:37:53 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 16 Apr 2026 16:55:29 GMT</lastBuildDate>
+    <item>
+      <title>When using the DynamicScroller of vue-virtual-list, there is unexpected gap between sub-list items</title>
+      <link>https://stackoverflow.com/questions/79926795/when-using-the-dynamicscroller-of-vue-virtual-list-there-is-unexpected-gap-betw</link>
+      <guid>https://stackoverflow.com/questions/79926795/when-using-the-dynamicscroller-of-vue-virtual-list-there-is-unexpected-gap-betw</guid>
+      <pubDate>Thu, 16 Apr 2026 16:16:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Screenshot of actual effect：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/gwo8ilrI.png&quot; alt=&quot;enter image description here&quot; title=&quot;unexpected gap&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;The abnormal blank space is circled in red。The template and CSS code are as follows:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;      &amp;lt;DynamicScroller
+        :items=&amp;quot;msg_list&amp;quot;
+        :min-item-size=&amp;quot;50&amp;quot;
+        id=&amp;quot;chat-box-container&amp;quot;&amp;gt;
+        &amp;lt;template v-slot=&amp;quot;{ item, index, active }&amp;quot;&amp;gt;
+        &amp;lt;DynamicScrollerItem
+        :item=&amp;quot;item&amp;quot;
+        :active=&amp;quot;active&amp;quot;
+        :size-dependencies=&amp;quot;[item.message]&amp;quot;
+        :data-index=&amp;quot;index&amp;quot;
+        :key=&amp;quot;item.id&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-box&amp;quot;&amp;gt;
+        &amp;lt;img class=&amp;quot;avatar&amp;quot; :src=&amp;quot;item.avatar&amp;quot; /&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-content-container&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;name&amp;quot;&amp;gt;{{ item.username }}&amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-content&amp;quot;&amp;gt;{{ item.content }}&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/DynamicScrollerItem&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/DynamicScroller&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;lang-css prettyprint-override&quot;&gt;&lt;code&gt;.chat-box {
+        display: flex;
+        }
+        .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: aqua;
+        }
+        
+        .chat-content-container {
+        margin-left: 10px;
+        }
+        .name {
+        color: #d1d5db;
+        }
+        .chat-content {
+        display: inline-block;
+        margin-top: 10px;
+        border: 2px solid rgba(185, 172, 172, 0.527);
+        border-radius: 6px;
+        background-color: rgba(185, 172, 172, 0.527);
+        padding: 5px 10px;
+        direction: ltr;
+        
+        color: #d1d5db;
+        }
+        #chat-box-container {
+        border: 1px solid #fff;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 20px 20px;
+        
+        background-color: #36393f;
+        overflow: auto;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Format of data source：&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;id&amp;quot;: 1,
+        &amp;quot;userID&amp;quot;: 2,
+        &amp;quot;avatar&amp;quot;: &amp;quot;https://ts3.tc.mm.bing.net/th/id/OIP-C.7GLMYPqMlt2LgkbPsOnDIAAAAA?cb=ucfimg2ucfimg=1&amp;amp;rs=1&amp;amp;pid=ImgDetMain&amp;amp;o=7&amp;amp;rm=3&amp;quot;,
+        &amp;quot;content&amp;quot;: &amp;quot;hello，我是管理员&amp;quot;,
+        &amp;quot;username&amp;quot;: &amp;quot;admin&amp;quot;,
+        &amp;quot;createTime&amp;quot;: &amp;quot;2026-04-05T13:14:18.000+00:00&amp;quot;,
+        &amp;quot;isDelete&amp;quot;: 0
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Since I haven&apos;t set any padding or margin in CSS, I expect the layout to follow the normal document flow, as shown in the image(The effect without using DynamicScroller)：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/B3SoMwzu.png&quot; alt=&quot;enter image description here&quot; title=&quot;without using DynamicScroller&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;When I inspected the page structure, I found that the transformY property had been added to each sub-item, and it was precisely this property that caused the gap (because when I manually changed the transformY to 0, the gap disappeared)：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/cc0D07gY.png&quot; alt=&quot;enter image description here&quot; title=&quot;F12 screenshot&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;All items are 56px in height in this case.&lt;br /&gt;
+        I don&apos;t know why there is such a transformY, and there are only four elements on the page shown in the image above, yet all the data has been rendered.This is clearly incorrect.&lt;/p&gt;
+        &lt;p&gt;I would like to know where I went wrong, as well as the reasons behind the unexpected gaps and incorrect rendering behavior.&lt;br /&gt;
+        I would be very grateful if you could help me with this : )&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How should I migrate a Vue 2 + Vuetify 2 legacy project to Vue 3 + Vuetify 3 without redesigning everything? [closed]</title>
       <link>https://stackoverflow.com/questions/79923418/how-should-i-migrate-a-vue-2-vuetify-2-legacy-project-to-vue-3-vuetify-3-wit</link>
@@ -1431,45 +1520,6 @@
         
         &amp;lt;/script&amp;gt;
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Better Auth Plugin Typescript Errors in VueJS</title>
-      <link>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</link>
-      <guid>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</guid>
-      <pubDate>Tue, 13 Jan 2026 14:35:02 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I created a normal VueJS App and try to implement Better Auth Client &lt;a href=&quot;https://www.better-auth.com/docs/concepts/client&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://www.better-auth.com/docs/concepts/client&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;The problem is, my linter and typescript builder showing errors by usage of some plugin logic.&lt;/p&gt;
-        &lt;p&gt;Here is the code which i used to initiate the client instance.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { createAuthClient } from &apos;better-auth/vue&apos;;
-        import { multiSessionClient } from &apos;better-auth/client/plugins&apos;;
-        import { organizationClient } from &apos;better-auth/client/plugins&apos;;
-        
-        export const authClient = createAuthClient({
-        baseURL: &apos;http://localhost:8080&apos;, // The base URL of your auth server
-        plugins: [multiSessionClient(), organizationClient()],
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;But in the component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;async function loadDeviceSessions() {
-        try {
-        const { data, error: sessionError } =
-        await authClient.multiSession.listDeviceSessions();
-        if (sessionError) {
-        throw sessionError;
-        }
-        
-        sessions.value = data || [];
-        } catch (err) {
-        error.value = err;
-        } finally {
-        loading.value = false;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;typescript dont find authClient.multiSession. The logic works but building the app is not possible with this errors and the implementation of many @ts-ignore is not a solution for me.&lt;/p&gt;
-        &lt;p&gt;How can i solve this issue?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

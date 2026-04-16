@@ -4,7 +4,156 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 15 Apr 2026 16:38:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 16 Apr 2026 16:55:37 GMT</lastBuildDate>
+    <item>
+      <title>Personal website redesign project post: Completing the WordPress headless CMS integration</title>
+      <link>https://piccalil.li/projects/personal-site/5/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/5/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 16 Apr 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Let&apos;s work out what I need to account for here by referring back to our existing page audit.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/penpot-page-audit.jpg&quot; alt=&quot;A Penpot file that has every page type from my existing site mapped out next to each other in labelled sections&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;I need to account for the following:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Post listings, limited by a defined items per page&lt;/li&gt;
+        &lt;li&gt;Pagination to render each page of post listings&lt;/li&gt;
+        &lt;li&gt;The actual blog items themselves&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;With those, I&apos;d consider this base implementation done, which is where I want to be in this iteration.&lt;/p&gt;
+        
+        I&apos;ll tackle RSS in a follow-up post. There&apos;s other content to rig up first, so I can do it all in one pass.
+        
+        &lt;h2&gt;A pagination shell component&lt;/h2&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        const { next, previous } = Astro.props;
+        ---
+        
+        {
+        (previous || next) &amp;amp;&amp;amp; (
+        &amp;lt;div class=&quot;wrapper&quot;&amp;gt;
+        &amp;lt;nav class=&quot;repel&quot; aria-label=&quot;Pagination links&quot;&amp;gt;
+        {previous ? &amp;lt;a href={previous}&amp;gt;Newer posts&amp;lt;/a&amp;gt; : &amp;lt;&amp;gt;&amp;amp;nbsp;&amp;lt;/&amp;gt;}
+        {next &amp;amp;&amp;amp; &amp;lt;a href={next}&amp;gt;Older posts&amp;lt;/a&amp;gt;}
+        &amp;lt;/nav&amp;gt;
+        &amp;lt;/div&amp;gt;
+        )
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;ve used a &lt;code&gt;&amp;lt;nav&amp;gt;&lt;/code&gt; here, so it needs an appropriate label: &quot;Pagination links&quot;. The logic is quite straightforward here:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Attempt to grab &lt;code&gt;next&lt;/code&gt; and &lt;code&gt;previous&lt;/code&gt; props, which are URLs&lt;/li&gt;
+        &lt;li&gt;Test if &lt;em&gt;either&lt;/em&gt; &lt;code&gt;next&lt;/code&gt; or &lt;code&gt;previous&lt;/code&gt; have anything for us&lt;/li&gt;
+        &lt;li&gt;If so, we&apos;re safe to render any wrapping markup because there will be at least one link&lt;/li&gt;
+        &lt;li&gt;If &lt;code&gt;previous&lt;/code&gt; is good to go, render the link, if not render a &lt;a href=&quot;https://en.wikipedia.org/wiki/Non-breaking_space&quot;&gt;non-breaking space&lt;/a&gt; (I&apos;ll explain in a moment)&lt;/li&gt;
+        &lt;li&gt;If &lt;code&gt;next&lt;/code&gt; is good to go, render the link&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;The &lt;code&gt;repel&lt;/code&gt; CSS class is a composable layout, which is part of our CSS system, that pushes items away from each other on the inline axis where there&apos;s available space. If there&apos;s not enough space available, the elements stack vertically, with configurable space.&lt;/p&gt;
+        
+        &lt;p&gt;I&apos;m using flexible layout compositions a &lt;em&gt;lot&lt;/em&gt; in this build, so &lt;a href=&quot;https://piccalil.li/complete-css/lessons/8&quot;&gt;I&apos;ve got you covered with an explainer here&lt;/a&gt;.&lt;/p&gt;
+        
+        &lt;p&gt;The reason there&apos;s a non-breaking space is if there&apos;s no &lt;code&gt;previous&lt;/code&gt; link, we still want to push the &quot;&lt;em&gt;Older posts&lt;/em&gt;&quot; link out to the right. You might see a hack here but I see it as using the tools the browser gives us to keep everything simple.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Rigging up the paginated blog index&lt;/h2&gt;
+        &lt;p&gt;All the parts are ready now, so I can wire it up and move on to the next thing.&lt;/p&gt;
+        &lt;p&gt;Astro comes with &lt;a href=&quot;https://docs.astro.build/en/reference/routing-reference/#paginate&quot;&gt;handy pre-baked pagination functionality&lt;/a&gt; so all I need to do here is let the system know what pages I need building. This is done with a &lt;code&gt;[...page].astro&lt;/code&gt; file, &lt;a href=&quot;https://docs.astro.build/en/reference/routing-reference/#params&quot;&gt;which tells Astro to use rest parameters for this dynamic route&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;I could use &lt;code&gt;[page].astro&lt;/code&gt; but I prefer to use the ellipsis pattern. Life&apos;s short, innit.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import { fetchAllWordPressPosts } from &apos;@repo/data/wordPressData&apos;;
+        import PageLayout from &apos;src/layouts/PageLayout.astro&apos;;
+        import PostListRegion from &apos;@repo/ui/PostListRegion&apos;;
+        import Pagination from &apos;@repo/ui/Pagination&apos;;
+        
+        export async function getStaticPaths({ paginate }) {
+        const posts = await fetchAllWordPressPosts();
+        return paginate(posts, { pageSize: 10 });
+        }
+        
+        const { page } = Astro.props;
+        ---
+        
+        &amp;lt;PageLayout title=&quot;Blog&quot; summary=&quot;&quot; socialImage=&quot;&quot; allowRobots={true}&amp;gt;
+        &amp;lt;PostListRegion posts={page.data} /&amp;gt;
+        &amp;lt;Pagination previous={page.url.prev} next={page.url.next} /&amp;gt;
+        &amp;lt;/PageLayout&amp;gt;
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is it. It&apos;s all we need to have a paginated blog index. The perks of building in small parts, eh?&lt;/p&gt;
+        &lt;p&gt;Let&apos;s just zoom in on this part:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export async function getStaticPaths({ paginate }) {
+        const posts = await fetchAllWordPressPosts();
+        return paginate(posts, { pageSize: 10 });
+        }
+        
+        const { page } = Astro.props;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My website is going to be 99% statically generated, which means the output is HTML pages in directories. In order for Astro to render these pages, it needs to know about them. To do that, we need to return paths (AKA relative URLs) to the system, using the &lt;code&gt;getStaticPaths&lt;/code&gt; function.&lt;/p&gt;
+        &lt;p&gt;Using a &lt;a href=&quot;https://css-tricks.com/javascript-for-everyone-destructuring/&quot;&gt;destructuring assignment&lt;/a&gt; we can pull out the &lt;code&gt;paginate&lt;/code&gt; function from the available arguments. We then use that to paginate &lt;code&gt;posts&lt;/code&gt; — which is our familiar &lt;code&gt;fetchAllWordPressPosts()&lt;/code&gt; data — limiting each page to 10 items. Paginate then supplies each path, which results in pages, like &lt;a href=&quot;https://bell.bz/blog/page/2/&quot;&gt;this one on the live website&lt;/a&gt;.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;I&apos;m not going to get into the &lt;code&gt;&amp;lt;PostListRegion /&amp;gt;&lt;/code&gt; stuff &lt;em&gt;yet&lt;/em&gt; because it&apos;s literally just a list of links right now. We&apos;ll cover in more details later in the series instead!&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Blog post items&lt;/h2&gt;
+        &lt;p&gt;We&apos;ve got the means to navigate around the blog now, but not the means to actually read the posts. Let&apos;s fix that with another simple astro file.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import { fetchAllWordPressPosts } from &apos;@repo/data/wordPressData&apos;;
+        import { stripHTML, decodeHTMLEntities } from &apos;../utils/helpers&apos;;
+        import PageLayout from &apos;src/layouts/PageLayout.astro&apos;;
+        import PostRegion from &apos;@repo/ui/PostRegion&apos;;
+        
+        export async function getStaticPaths() {
+        const posts = await fetchAllWordPressPosts();
+        return posts.map((entry) =&amp;gt; ({
+        params: { slug: entry.slug },
+        props: { entry },
+        }));
+        }
+        
+        const { entry } = Astro.props;
+        ---
+        
+        &amp;lt;PageLayout
+        title={decodeHTMLEntities(entry.title.rendered)}
+        summary={decodeHTMLEntities(stripHTML(entry.excerpt.rendered))}
+        socialImage={entry?.jetpack_featured_media_url}
+        allowRobots={true}
+        &amp;gt;
+        &amp;lt;PostRegion
+        title={decodeHTMLEntities(entry.title.rendered)}
+        date={entry.date}
+        content={entry.content.rendered}
+        /&amp;gt;
+        &amp;lt;/PageLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is all very familiar, right? Fundamentally, there&apos;s not much difference going on here than in the paginated blog index file. Instead of paginating the WordPress data, we&apos;re rendering a page for each blog post and passing the data into other components to do the rendering for us.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;Like the &lt;code&gt;&amp;lt;PostListRegion /&amp;gt;&lt;/code&gt;, I&apos;ll break down the &lt;code&gt;&amp;lt;PostRegion /&amp;gt;&lt;/code&gt; in more detail later in the series. There&apos;s going to be a &lt;em&gt;lot&lt;/em&gt; of changes made to our base code when we actually build the UI.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h3&gt;Cleaning up content&lt;/h3&gt;
+        &lt;p&gt;Let&apos;s just take a look at a couple of helper functions which might have caught your attention &lt;code&gt;decodeHTMLEntities()&lt;/code&gt; and &lt;code&gt;stripHTML()&lt;/code&gt;. Unfortunately, there&apos;s quite a lot of &lt;em&gt;crap&lt;/em&gt; when it comes to WordPress content, especially over the API.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export function decodeHTMLEntities(input) {
+        return input.replace(/&amp;amp;#(\d+);/g, (match, dec) =&amp;gt; {
+        return String.fromCharCode(dec);
+        });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This function grabs the unicode number from each encoded match then replaces the encoded part with a proper, readable character. It&apos;s mainly titles and summaries where this applies because WordPress does some weird stuff with those.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export function stripHTML(input) {
+        return input.replace(/&amp;lt;[^&amp;gt;]*&amp;gt;?/gm, &apos;&apos;);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is the Ronseal of JavaScript functions: &lt;a href=&quot;https://www.youtube.com/watch?v=tqNQDRQv1kI&quot;&gt;it does exactly what it says on the tin&lt;/a&gt;. It takes a string of HTML and returns back plain text.&lt;/p&gt;
+        &lt;p&gt;I used this function in conjunction with &lt;code&gt;decodeHTMLEntities()&lt;/code&gt; because &lt;code&gt;entry.excerpt.rendered&lt;/code&gt; is both HTML and riddled with HTML entities — both of which I don&apos;t want.&lt;/p&gt;
+        &lt;p&gt;There&apos;s no need to clean up &lt;code&gt;entry.content.rendered&lt;/code&gt; because we &lt;em&gt;do&lt;/em&gt; want the HTML for that. I&apos;m using Astro&apos;s &lt;code&gt;set:html&lt;/code&gt; in that context again, in the  &lt;code&gt;&amp;lt;PostRegion /&amp;gt;&lt;/code&gt;, which accounts for any nasties for me.&lt;/p&gt;
+        &lt;p&gt;Here we have it, the paginated index:
+        &lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-paginated-posts.jpg&quot; alt=&quot;A very rough looking list of blog post links, with newer and older pagination links&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;And here&apos;s an item:
+        &lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-basic-blog-post.jpg&quot; alt=&quot;A very rough looking blog post, rendered as simple HTML&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Looks pretty bland! But that&apos;s fine, we&apos;ll come to that later.&lt;/p&gt;
+        &lt;p&gt;It&apos;s all about &lt;a href=&quot;https://atproto.com/&quot;&gt;AT protocol&lt;/a&gt;/Bluesky integration now, while I&apos;m already in the mood to integrate 3rd party stuff.&lt;/p&gt;
+        &lt;p&gt;See you in the next one!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #177</title>
       <link>https://piccalil.li/the-index/177/?ref=main-rss-feed</link>
@@ -449,31 +598,6 @@
         &lt;li&gt;&lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc4287&quot;&gt;RFC 4287: The Atom Syndication Format&lt;/a&gt;&lt;/li&gt;
         &lt;li&gt;&lt;a href=&quot;https://www.jsonfeed.org/version/1.1/&quot;&gt;JSON Feed Version 1.1 Explainer&lt;/a&gt;&lt;/li&gt;
         &lt;/ul&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #175</title>
-      <link>https://piccalil.li/the-index/175/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/175/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 27 Mar 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://css-tricks.com/javascript-for-everyone-destructuring/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;JavaScript for Everyone: Destructuring&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Mat explains the ever-useful, but sometimes hard to understand destructuring assignment in JavaScript.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://mode.place/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Mise en Mode&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A very good methodology for design systems now has a book!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://tylergaw.com/blog/the-old-internet-is-still-here/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The old internet is still here&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A great reminder for us all. Don&apos;t get nostalgic and get surfing instead.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://report.zeroheight.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;2026 design systems report&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Another year and another design systems report, this time delivered with a lovely, texture-rich UI.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://orionmagazine.org/article/paper-birds/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Paper birds&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Some stunning, physical art for you to enjoy.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://mbbischoff.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalil.li/courses?utm_source=the-index&amp;utm_campaign=next-level-2026&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/next-level-event-newsletter.png&quot; alt=&quot;Save 20% on all courses&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Take your career to the next level by taking our premium courses and save 20%&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;Use the code &lt;code&gt;NEXTLEVEL&lt;/code&gt; at checkout to get our courses for only &lt;strong&gt;£199.20&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;By taking our courses, you’re supporting independent publishing, rooted in doing right for workers in design, development and leadership.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://piccalil.li/courses?utm_source=the-index&amp;utm_campaign=next-level-2026&quot;&gt;Take your career to the next level&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
