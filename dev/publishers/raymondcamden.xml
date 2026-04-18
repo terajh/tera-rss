@@ -4,12 +4,207 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Fri, 17 Apr 2026 16:50:44 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Apr 2026 16:06:07 GMT</lastBuildDate>
+    <item>
+      <title>Summarizing Docs with Built-in AI</title>
+      <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
+      <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
+        &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
+        &lt;h2 id=&quot;officeparser-ftw&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#officeparser-ftw&quot;&gt;officeParser FTW&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So here comes the fun part. Last weekend I had this demo completely done using a few different libraries. Then - earlier this week one of the developer newsletters I subscribe to shared &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;. This nifty library handles Office, PDF, even Open Office formats. It also includes the metadata for files which is handy as heck. I forked my initial demo and removed all the extra libraries, leaving only officeParser.&lt;/p&gt;
+        &lt;p&gt;The library can return incredibly detailed information about the structure of the your doc as well as a plain text view. What I found in my testing is that the plain text view didn&apos;t seem like it would work well in my demo. For example, an XLS file was kinda glommed all together. I reached out to the developer and he is planning on a &lt;code&gt;toMarkdown&lt;/code&gt; feature that will make this easier, but for now what I did was get the complex data and write my own custom code to &apos;shape&apos; it well for AI.&lt;/p&gt;
+        &lt;p&gt;Generally speaking the first part was stupid easy - and I got this from the docs:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now let&apos;s dig into the code a bit.&lt;/p&gt;
+        &lt;h2 id=&quot;working-with-docs&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#working-with-docs&quot;&gt;Working with Docs&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;m going to skip over the DOM manipulation aspects as that&apos;s not terribly interesting. My code basically has a file input field and when you select a file, a process is fired off to:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;get the text, again, with formatting to hopefully make it better for AI&lt;/li&gt;
+        &lt;li&gt;pass it to the Summary API for... summarization. :)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Let&apos;s focus on the &amp;quot;get text&amp;quot; aspect. My file input handler has this logic:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;if(file.name.toLowerCase().endsWith(&apos;.doc&apos;) || file.name.toLowerCase().endsWith(&apos;.docx&apos;)) {
+        summary = await processDoc(file);
+        } else if(file.name.toLowerCase().endsWith(&apos;.pdf&apos;)) {
+        summary = await processPDF(file);
+        } else if(file.name.toLowerCase().endsWith(&apos;.ppt&apos;) || file.name.toLowerCase().endsWith(&apos;.pptx&apos;)) {
+        summary = await processPPT(file);
+        // i add a flag to powerpoint so my summary func knows it has to deal with the text
+        summary.powerpoint = true;
+        } else if(file.name.toLowerCase().endsWith(&apos;.xls&apos;) || file.name.toLowerCase().endsWith(&apos;.xlsx&apos;)) {
+        summary = await processXLS(file);
+        // i add a flag to powerpoint so my summary func knows it has to deal with the text
+        summary.excel = true;
+        } else {
+        // in theory we can&apos;t get here, so just a return is fine
+        return;
+        }
+        
+        doSummary(summary);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My expectation is that the &lt;code&gt;summary&lt;/code&gt; will be an object with two fields: &lt;code&gt;text&lt;/code&gt; and &lt;code&gt;title&lt;/code&gt;. I also use a flag for PowerPoint and Excel to help direct the Summary API to more properly handle the text.&lt;/p&gt;
+        &lt;p&gt;Now let&apos;s break down these functions. Doc and PDF are the easiest:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processDoc(f) {
+        let arrayBuffer = await f.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        
+        return {
+        text: data.toText(), 
+        title:data.metadata?.title ?? &apos;No Title&apos;
+        }
+        
+        }
+        
+        async function processPDF(f) {
+        const arrayBuffer = await f.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        console.log(data, data.toText());
+        
+        return {
+        text: data.toText(), 
+        title:data.metadata?.title ?? &apos;No Title&apos;
+        }
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For Excel, as I mentioned earlier I got the raw data and examined it, and then wrote some utility bits to turn my sheets into (roughly) CSV form:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processXLS(f) {
+        let arrayBuffer = await f.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        
+        const getCSV = s =&amp;gt; {
+        let result = &apos;&apos;;
+        let rows = s.children.filter(c =&amp;gt; c.type === &apos;row&apos;);
+        console.log(rows[0]);
+        rows.forEach(r =&amp;gt; {
+        let data = [];
+        let cells = r.children.filter(c =&amp;gt; c.type === &apos;cell&apos;);
+        cells.forEach(c =&amp;gt; data.push(c.text));
+        result += data.join(&apos;, &apos;) + &apos;\n&apos;;
+        
+        });
+        return result;
+        };
+        
+        let result = {
+        text:&apos;&apos;,
+        title:data.metadata?.title ?? &apos;No Title&apos;
+        }
+        
+        let sheets = data.content.filter(c =&amp;gt; c.type === &apos;sheet&apos;);
+        sheets.forEach(s =&amp;gt; {
+        result.text += getCSV(s);
+        result.text += &apos;\n\n&apos;;
+        });
+        
+        return result;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;PowerPoint was a bit more complex as I had to create a separation between slides, and get deeply nested text nodes. I ignored anything that wasn&apos;t text.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processPPT(f) {
+        let arrayBuffer = await f.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        let result = {
+        text:&apos;&apos;,
+        title:data.metadata?.title ?? &apos;No Title&apos;
+        }
+        
+        const getText = c =&amp;gt; {
+        let result = &apos;&apos;;
+        
+        c.forEach(kid =&amp;gt; {
+        if(kid.text) {
+        result += kid.text;
+        if(kid.type === &apos;paragraph&apos;) result += &apos;\n&apos;;
+        else result += &apos; &apos;;
+        }
+        if(kid.children) {
+        kid.children.forEach(gk =&amp;gt; {
+        if(gk.text) {
+        result += gk.text;
+        if(gk.type === &apos;paragraph&apos;) result += &apos;\n&apos;;
+        else result += &apos; &apos;;
+        }
+        });
+        }
+        });
+        return result;
+        }
+        
+        let content = data.content.filter(c =&amp;gt; c.type === &apos;slide&apos;);
+        result.text = content.reduce((prev, cur) =&amp;gt; {
+        return prev += getText(cur.children) + &apos;\n-------------\n&apos;;
+        }, &apos;&apos;);
+        
+        return result;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;One thing special here is that sometimes items on the same line were two nodes, hence me only adding newlines after paragraphs.&lt;/p&gt;
+        &lt;h2 id=&quot;the-fancy-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-fancy-ai&quot;&gt;The Fancy AI&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The code to do summarization is something I&apos;ve shown before, the only thing I did unique here was try to warn the system about my PowerPoint and Excel data:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function doSummary(summaryOb) {
+        console.log(summaryOb);
+        $output.innerHTML = &amp;quot;&amp;lt;i&amp;gt;File text extracted, working on the summary.&amp;quot;;
+        let sharedContext = null;
+        
+        if(summaryOb.powerpoint) {
+        sharedContext = &apos;This is extracted text from a Powerpoint file. Slides are separated by ----&apos;;
+        } else if(summaryOb.excel) {
+        sharedContext = &apos;This is extracted text from a Excel file in CSV format.&apos;
+        }
+        
+        let summarizer = await window.Summarizer.create({
+        type:&apos;tldr&apos;,
+        length:&apos;long&apos;,
+        sharedContext, 
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        /*
+        why this? the download event _always_ runs at
+        least once, so this prevents the msg showing up
+        when its already done. I&apos;ve seen it report 0 and 1
+        in this case, so we skip both
+        */
+        if(e.loaded === 0 || e.loaded === 1) return;
+        $output.innerHTML = `Downloading the Summary model, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }
+        });
+        
+        
+        try {
+        let summary = await summarizer.summarize(summaryOb.text);
+        $output.innerHTML = `&amp;lt;h3&amp;gt;Summary for ${summaryOb.title}&amp;lt;/h3&amp;gt;${marked.parse(summary)}`;
+        } catch(e) {
+        if(e.name === &apos;QuotaExceededError&apos;) {
+        $output.innerHTML = &apos;Unfortunately this document was too large!&apos;;
+        } else {
+        $output.innerHTML = `Some other error was thrown: ${e}`;
+        }
+        console.log(e);
+        }
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;All in all, it worked well. It did feel like I filled the context window with Excel pretty quickly. My initial text file had 1000 rows and that threw a quota error. I had to get it down to 200 to properly parse.&lt;/p&gt;
+        &lt;p&gt;If you are on the latest Chrome, in theory, this will work for you, but as always, let me know!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Chrome AI, Doc Summaries (V2)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;MYjxbrv&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height:600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/MYjxbrv&quot;&gt;
+        Chrome AI, Doc Summaries (V2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Testing OCR with Chrome Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
         &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
@@ -283,7 +478,7 @@
       <title>Links For You (4/5/26)</title>
       <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
       <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
         about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
@@ -309,7 +504,7 @@
       <title>You&apos;ve gained a new achievement</title>
       <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
       <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
         &lt;p&gt;
@@ -422,7 +617,7 @@
       <title>Checking if a Movie has a Post or Mid Credit Scene</title>
       <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
       <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
         &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
@@ -511,7 +706,7 @@
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -576,7 +771,7 @@
       <title>Implementing OAuth in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
         &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
@@ -862,7 +1057,7 @@
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -883,7 +1078,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -1104,7 +1299,7 @@
       <title>Testing Live Content Collections in Astro V6</title>
       <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
       <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
+      <pubDate>Sat, 18 Apr 2026 15:45:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
         &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
@@ -1299,548 +1494,6 @@
         &lt;p&gt;As a quick note - a &amp;quot;live&amp;quot; view of movie genres is &lt;strong&gt;not&lt;/strong&gt; the most sensible example of this feature. Most likely the movie genre data itself changes incredibly rarely. But this goes back to what I said above - I really dig that Astro would make it easy to have build time data (genres) and live data (moves in that genre) with minimal effort on my part.&lt;/p&gt;
         &lt;p&gt;Let me know what you think, and if you are already an Astro user, have you moved to V6 yet?&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@wansan_99?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Wan San Yip&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/people-sitting-on-chair-inside-room-ID1yWa1Wpx0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building My Own Social Network Poster in Astro</title>
-      <link>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</link>
-      <guid>https://www.raymondcamden.com/2026/03/10/building-my-own-social-network-poster-in-astro</guid>
-      <pubDate>Fri, 17 Apr 2026 16:15:30 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Today is a big day for &lt;a href=&quot;https://astro.build/&quot;&gt;Astro&lt;/a&gt;, not only do you get Astro v6 (it just released a few hours ago!), you also get one of my demos! Ok, one of these is more important than the other, but, I&apos;m really excited about v6 and hope to have a demo of the new features to share soon. With that being said, I&apos;m also sharing a demo I started work on a few weeks ago and finally wrapped up this past weekend - Social Beast.&lt;/p&gt;
-        &lt;h2 id=&quot;what-is-social-beast&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-is-social-beast&quot;&gt;What is Social Beast&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Social Beast is a web app meant to be run locally (although I have some thoughts on that restriction and will share at the end) that handles posting to multiple social networks at once. Right now &amp;quot;multiple&amp;quot; is two:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Mastodon&lt;/li&gt;
-        &lt;li&gt;Bluesky&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;It doesn&apos;t support Twitter because Twitter is a dumpster, on fire, inside another burning dumpster. It was initially going to support Threads as well, but as I wanted to skip oAuth (more on that too), I decided against it.&lt;/p&gt;
-        &lt;p&gt;And that&apos;s it - literally. It doesn&apos;t show you latest posts and stats, it&apos;s just meant to give me a quick way to post to both networks at once. There &lt;em&gt;are&lt;/em&gt; tools for this of course, many of which cost money. There&apos;s also &lt;a href=&quot;https://openvibe.social/&quot;&gt;openvibe&lt;/a&gt;, which has a good mobile app, but I wasn&apos;t happy with the web/desktop experience.&lt;/p&gt;
-        &lt;p&gt;After setting up your authentication, you run the app, open it in your browser, and you&apos;re ready to go:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/sb1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App view showing the form&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;You simply enter your text, optionally include an image (with required alt text), and then hit post:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/sb2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App view showing a filled out form&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;The little activity window on the right updates when done:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/sb3.jpg&quot; loading=&quot;lazy&quot; alt=&quot;App activity log&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;You can see the result below. I haven&apos;t used the default embedding experience for Bluesky and Mastodon in a while, so here goes nothing:&lt;/p&gt;
-        &lt;h3 id=&quot;bluesky&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#bluesky&quot;&gt;Bluesky&lt;/a&gt;&lt;/h3&gt;
-        &lt;blockquote class=&quot;bluesky-embed&quot; data-bluesky-uri=&quot;at://did:plc:4tan3ugu55i2u3hmtblu7wf5/app.bsky.feed.post/3mgpk65ei7d2u&quot; data-bluesky-cid=&quot;bafyreiffl5jkmm4sjnbagu75lyp7dtg4cc4do2xolc6tbthqook3iunjwe&quot; data-bluesky-embed-color-mode=&quot;system&quot;&gt;&lt;p lang=&quot;&quot;&gt;Good morning good people - just a quick test from my Astro app that posts to Mastodon and Bluesky at the same time.&lt;br&gt;&lt;br&gt;&lt;a href=&quot;https://bsky.app/profile/did:plc:4tan3ugu55i2u3hmtblu7wf5/post/3mgpk65ei7d2u?ref_src=embed&quot;&gt;[image or embed]&lt;/a&gt;&lt;/p&gt;&amp;mdash; Raymond Camden (&lt;a href=&quot;https://bsky.app/profile/did:plc:4tan3ugu55i2u3hmtblu7wf5?ref_src=embed&quot;&gt;@raymondcamden.com&lt;/a&gt;) &lt;a href=&quot;https://bsky.app/profile/did:plc:4tan3ugu55i2u3hmtblu7wf5/post/3mgpk65ei7d2u?ref_src=embed&quot;&gt;March 10, 2026 at 9:06 AM&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://embed.bsky.app/static/embed.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
-        &lt;h3 id=&quot;mastodon&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon&quot;&gt;Mastodon&lt;/a&gt;&lt;/h3&gt;
-        &lt;blockquote class=&quot;mastodon-embed&quot; data-embed-url=&quot;https://mastodon.social/@raymondcamden/116205264348332986/embed&quot; style=&quot;background: #FCF8FF; border-radius: 8px; border: 1px solid #C9C4DA; margin: 0; max-width: 540px; min-width: 270px; overflow: hidden; padding: 0;&quot;&gt; &lt;a href=&quot;https://mastodon.social/@raymondcamden/116205264348332986&quot; target=&quot;_blank&quot; style=&quot;align-items: center; color: #1C1A25; display: flex; flex-direction: column; font-family: system-ui, -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Oxygen, Ubuntu, Cantarell, &apos;Fira Sans&apos;, &apos;Droid Sans&apos;, &apos;Helvetica Neue&apos;, Roboto, sans-serif; font-size: 14px; justify-content: center; letter-spacing: 0.25px; line-height: 20px; padding: 24px; text-decoration: none;&quot;&gt; &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;32&quot; height=&quot;32&quot; viewBox=&quot;0 0 79 75&quot;&gt;&lt;path d=&quot;M63 45.3v-20c0-4.1-1-7.3-3.2-9.7-2.1-2.4-5-3.7-8.5-3.7-4.1 0-7.2 1.6-9.3 4.7l-2 3.3-2-3.3c-2-3.1-5.1-4.7-9.2-4.7-3.5 0-6.4 1.3-8.6 3.7-2.1 2.4-3.1 5.6-3.1 9.7v20h8V25.9c0-4.1 1.7-6.2 5.2-6.2 3.8 0 5.8 2.5 5.8 7.4V37.7H44V27.1c0-4.9 1.9-7.4 5.8-7.4 3.5 0 5.2 2.1 5.2 6.2V45.3h8ZM74.7 16.6c.6 6 .1 15.7.1 17.3 0 .5-.1 4.8-.1 5.3-.7 11.5-8 16-15.6 17.5-.1 0-.2 0-.3 0-4.9 1-10 1.2-14.9 1.4-1.2 0-2.4 0-3.6 0-4.8 0-9.7-.6-14.4-1.7-.1 0-.1 0-.1 0s-.1 0-.1 0 0 .1 0 .1 0 0 0 0c.1 1.6.4 3.1 1 4.5.6 1.7 2.9 5.7 11.4 5.7 5 0 9.9-.6 14.8-1.7 0 0 0 0 0 0 .1 0 .1 0 .1 0 0 .1 0 .1 0 .1.1 0 .1 0 .1.1v5.6s0 .1-.1.1c0 0 0 0 0 .1-1.6 1.1-3.7 1.7-5.6 2.3-.8.3-1.6.5-2.4.7-7.5 1.7-15.4 1.3-22.7-1.2-6.8-2.4-13.8-8.2-15.5-15.2-.9-3.8-1.6-7.6-1.9-11.5-.6-5.8-.6-11.7-.8-17.5C3.9 24.5 4 20 4.9 16 6.7 7.9 14.1 2.2 22.3 1c1.4-.2 4.1-1 16.5-1h.1C51.4 0 56.7.8 58.1 1c8.4 1.2 15.5 7.5 16.6 15.6Z&quot; fill=&quot;currentColor&quot;/&gt;&lt;/svg&gt; &lt;div style=&quot;color: #787588; margin-top: 16px;&quot;&gt;Post by @raymondcamden@mastodon.social&lt;/div&gt; &lt;div style=&quot;font-weight: 500;&quot;&gt;View on Mastodon&lt;/div&gt; &lt;/a&gt; &lt;/blockquote&gt; &lt;script data-allowed-prefixes=&quot;https://mastodon.social/&quot; async src=&quot;https://mastodon.social/embed.js&quot;&gt;&lt;/script&gt;
-        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show Me The Code!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, as always, you can find this demo (and others) up on my &lt;code&gt;astro-tests&lt;/code&gt; repo. Here is the link to this one: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/social-beast&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/social-beast&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;The application is a single page with a few routes for API calls. I made use of &lt;a href=&quot;https://oat.ink/&quot;&gt;Oat&lt;/a&gt; for the design. Here&apos;s the main HTML page, containing the form and two panels on the right:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        ---
-        
-        &amp;lt;BaseLayout pageTitle=&amp;quot;Social Beast&amp;quot;&amp;gt;
-        &amp;lt;h1&amp;gt;Welcome to Social Beast&amp;lt;/h1&amp;gt;
-        
-        &amp;lt;div class=&amp;quot;row&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;col-8&amp;quot;&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;postContent&amp;quot;&amp;gt;What&apos;s on your mind?&amp;lt;/label&amp;gt;
-        &amp;lt;textarea id=&amp;quot;postContent&amp;quot;&amp;gt;&amp;lt;/textarea&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;div class=&amp;quot;row&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;col-4&amp;quot;&amp;gt;
-        &amp;lt;label for=&amp;quot;postImage&amp;quot;&amp;gt;Add an image (optional)&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;postImage&amp;quot; accept=&amp;quot;image/*&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;col-4&amp;quot;&amp;gt;
-        &amp;lt;label for=&amp;quot;altText&amp;quot;&amp;gt;Alt text for image (&amp;lt;strong&amp;gt;required&amp;lt;/strong&amp;gt;)&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; id=&amp;quot;altText&amp;quot; placeholder=&amp;quot;Describe the image for accessibility&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;col-4&amp;quot;&amp;gt;
-        &amp;lt;img id=&amp;quot;imagePreview&amp;quot; src=&amp;quot;&amp;quot; alt=&amp;quot;Image preview&amp;quot; style=&amp;quot;max-width: 100%; display: none;&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;button id=&amp;quot;postButton&amp;quot; class=&amp;quot;mt-6&amp;quot;&amp;gt;Post&amp;lt;/button&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;col-4&amp;quot;&amp;gt;
-        
-        &amp;lt;article class=&amp;quot;card&amp;quot;&amp;gt;
-        &amp;lt;header&amp;gt;
-        &amp;lt;h3&amp;gt;Connection Status&amp;lt;/h3&amp;gt;
-        &amp;lt;/header&amp;gt;
-        &amp;lt;div class=&amp;quot;row mb-6 items-center&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;col-6&amp;quot;&amp;gt;
-        Mastodon
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;col-6&amp;quot;&amp;gt;
-        &amp;lt;span class=&amp;quot;badge secondary&amp;quot; id=&amp;quot;mastodonStatus&amp;quot;&amp;gt;Unknown&amp;lt;/span&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;row mb-6 items-center&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;col-6&amp;quot;&amp;gt;
-        Bluesky
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;col-6&amp;quot;&amp;gt;
-        &amp;lt;span class=&amp;quot;badge secondary&amp;quot; id=&amp;quot;blueskyStatus&amp;quot;&amp;gt;Unknown&amp;lt;/span&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/article&amp;gt;
-        
-        &amp;lt;article class=&amp;quot;card mt-6&amp;quot;&amp;gt;
-        &amp;lt;header&amp;gt;
-        &amp;lt;h3&amp;gt;Activity&amp;lt;/h3&amp;gt;
-        &amp;lt;div id=&amp;quot;activityFeed&amp;quot;&amp;gt;
-        &amp;lt;p&amp;gt;No activity yet.&amp;lt;/p&amp;gt;
-        &amp;lt;/header&amp;gt;
-        &amp;lt;/article&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Most of the work is done in JavaScript. Let&apos;s break that down.&lt;/p&gt;
-        &lt;p&gt;First, on document load I&apos;m creating a bunch of variables for DOM manipulation and such, and I fire off a few status checks:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let $mastodonStatus;
-        let $blueskyStatus;
-        let $postButton, $postContent, $postImage, $altText, $imagePreview;
-        let $activityFeed;
-        
-        let MASTODON = false;
-        let BLUESKY = false;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, function() {
-        
-        $mastodonStatus = document.querySelector(&apos;#mastodonStatus&apos;);
-        $blueskyStatus = document.querySelector(&apos;#blueskyStatus&apos;);
-        $postButton = document.querySelector(&apos;#postButton&apos;);
-        $postContent = document.querySelector(&apos;#postContent&apos;);
-        $postImage = document.querySelector(&apos;#postImage&apos;);
-        $altText = document.querySelector(&apos;#altText&apos;);
-        $imagePreview = document.querySelector(&apos;#imagePreview&apos;);
-        $activityFeed = document.querySelector(&apos;#activityFeed&apos;);
-        
-        // Begin by checking the status of the 2 networks
-        checkMastodonStatus();
-        checkBlueskyStatus();
-        
-        $postButton.addEventListener(&apos;click&apos;, handlePost);
-        $postImage.addEventListener(&apos;change&apos;, doPreview);
-        
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note the two status methods. These two functions honestly could have been one, but here they are:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function checkMastodonStatus() {
-        try {
-        const response = await fetch(&apos;/api/mastodon/check.json&apos;);
-        const data = await response.json();
-        if (data.ready) {
-        $mastodonStatus.textContent = &apos;Connected&apos;;
-        $mastodonStatus.classList.remove(&apos;secondary&apos;);
-        $mastodonStatus.classList.add(&apos;success&apos;);
-        MASTODON = true;
-        } else {
-        $mastodonStatus.textContent = &apos;Not Connected&apos;;
-        $mastodonStatus.classList.remove(&apos;secondary&apos;);
-        $mastodonStatus.classList.add(&apos;danger&apos;);
-        $mastodonStatus.title = data.error || &apos;Unknown error&apos;;
-        console.error(data.error);
-        }
-        } catch (error) {
-        console.error(&apos;Error checking Mastodon status:&apos;, error);
-        $mastodonStatus.textContent = &apos;Error&apos;;
-        $mastodonStatus.classList.remove(&apos;secondary&apos;);
-        $mastodonStatus.classList.add(&apos;danger&apos;);
-        }
-        }
-        
-        async function checkBlueskyStatus() {
-        try {
-        const response = await fetch(&apos;/api/bluesky/check.json&apos;);
-        const data = await response.json();
-        if (data.ready) {
-        $blueskyStatus.textContent = &apos;Connected&apos;;
-        $blueskyStatus.classList.remove(&apos;secondary&apos;);
-        $blueskyStatus.classList.add(&apos;success&apos;);
-        BLUESKY = true;
-        } else {
-        $blueskyStatus.textContent = &apos;Not Connected&apos;;
-        $blueskyStatus.classList.remove(&apos;secondary&apos;);
-        $blueskyStatus.classList.add(&apos;danger&apos;);
-        $blueskyStatus.title = data.error || &apos;Unknown error&apos;;
-        console.error(data.error);
-        }
-        } catch (error) {
-        console.error(&apos;Error checking Bluesky status:&apos;, error);
-        $blueskyStatus.textContent = &apos;Error&apos;;
-        $blueskyStatus.classList.remove(&apos;secondary&apos;);
-        $blueskyStatus.classList.add(&apos;danger&apos;);
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Both call an endpoint and based on the result, update the UI. You &lt;em&gt;can&lt;/em&gt; run the app with only one network available.&lt;/p&gt;
-        &lt;p&gt;Now, let&apos;s leave the front end and demonstrate how the status checks are done. Both Mastodon and Bluesky support are provided via environment variables. Here&apos;s my &lt;code&gt;.env&lt;/code&gt; file as an example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;MASTODON_TOKEN=mytokenbringsalltheboystotheyard
-        MASTODON_SERVER=https://mastodon.social
-        
-        BLUESKY_USERNAME=raymondcamden.com
-        BLUESKY_PASSWORD=damnrightitsbetterthanyours
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Each of my social networks is stored in the &lt;code&gt;api&lt;/code&gt; folder of my app. Mastdon&apos;s status route looks like so:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export const prerender = false;
-        
-        const MASTODON_TOKEN = process.env.MASTODON_TOKEN;
-        const MASTODON_SERVER = process.env.MASTODON_SERVER;
-        
-        export async function GET({ params, request }) {
-        
-        let response = {
-        ready: false
-        }
-        
-        // check for env values 
-        if(!MASTODON_TOKEN || !MASTODON_SERVER) {
-        response.error = &apos;Missing env values for MASTODON_TOKEN or MASTODON_SERVER&apos;;
-        } else {
-        // try to fetch account info using the token and server
-        await fetch(`${MASTODON_SERVER}/api/v1/accounts/verify_credentials`, {
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${MASTODON_TOKEN}`
-        }
-        })
-        .then(res =&amp;gt; {
-        if(res.ok) {
-        response.ready = true;
-        } else {
-        response.error = `Mastodon API error: ${res.status} ${res.statusText}`;
-        }
-        })
-        .catch(error =&amp;gt; {
-        response.error = `Error connecting to Mastodon API: ${error.message}`;
-        })
-        }
-        
-        return new Response(
-        JSON.stringify(response),
-        );
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Mastodon has a handy &lt;code&gt;verify_credentials&lt;/code&gt; API so I simply use that to see if the provided auth is correct.&lt;/p&gt;
-        &lt;p&gt;For Bluesky, I did it a bit differently. You exchange your auth for an auth token, so I built it out in two files. First, &lt;code&gt;login.js&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export async function loginToBluesky() {
-        
-        const BLUESKY_USERNAME = process.env.BLUESKY_USERNAME;
-        const BLUESKY_PASSWORD = process.env.BLUESKY_PASSWORD;
-        
-        if(!BLUESKY_USERNAME || !BLUESKY_PASSWORD) {   
-        console.error(&apos;Missing env values for BLUESKY_USERNAME or BLUESKY_PASSWORD&apos;);
-        return null;
-        }
-        
-        let body = {
-        identifier: BLUESKY_USERNAME,
-        password: BLUESKY_PASSWORD
-        };
-        
-        try {
-        let response = await fetch(&apos;https://bsky.social/xrpc/com.atproto.server.createSession&apos;, {
-        method: &apos;POST&apos;,
-        headers: {
-        &apos;Content-Type&apos;: &apos;application/json&apos;
-        },
-        body: JSON.stringify(body)
-        });
-        
-        if(response.ok) {
-        let data = await response.json();
-        //console.log(&apos;Bluesky session data:&apos;, data);
-        return { auth: data };
-        } else {
-        console.error(`Bluesky API error: ${response.status} ${response.statusText}`);
-        return { error : `Bluesky API error: ${response.status} ${response.statusText}` };
-        }
-        } catch (error) {
-        console.error(`Error connecting to Bluesky API: ${error.message}`);
-        return { error: `Error connecting to Bluesky API: ${error.message}` };
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Which makes &lt;code&gt;check.json.js&lt;/code&gt; pretty short:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { loginToBluesky } from &amp;quot;./logon&amp;quot;;
-        
-        export const prerender = false;
-        
-        export async function GET({ params, request }) {
-        
-        let response = {
-        ready: false
-        }
-        
-        let authCheck = await loginToBluesky();
-        if(authCheck &amp;amp;&amp;amp; authCheck.auth) {
-        response.ready = true;
-        } else if(authCheck &amp;amp;&amp;amp; authCheck.error) {
-        response.error = authCheck.error;
-        }
-        
-        return new Response(
-        JSON.stringify(response),
-        );
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Alright, so back to the front end, the post logic begins with a bit of validation, and then passing off the calls to helper methods:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function handlePost() {
-        let post = {};
-        
-        // First, a sanity check
-        if(!MASTODON &amp;amp;&amp;amp; !BLUESKY &amp;amp;&amp;amp; !THREADS) {
-        ot.toast(&apos;No social networks are configured! Please set up at least one network to post.&apos;, &apos;Action Stopped&apos;, {
-        variant: &apos;danger&apos;,
-        duration: 6000
-        });
-        
-        return;
-        }
-        
-        const content = $postContent.value.trim();
-        if(!content) {
-        ot.toast(&apos;No content. Type something!&apos;, &apos;Action Stopped&apos;, {
-        variant: &apos;danger&apos;,
-        duration: 3000
-        });
-        
-        return;
-        }
-        
-        post.content = content;
-        
-        let caption = $altText.value.trim();   
-        if($postImage.files.length &amp;gt; 0) {
-        if(!caption) {
-        ot.toast(&apos;Image requires alt text. Please add alt text for the image and try again.&apos;, &apos;Action Stopped&apos;, {
-        variant: &apos;danger&apos;,
-        duration: 3000
-        });
-        return;
-        }
-        
-        post.image = await fileToBase64($postImage.files[0]);
-        post.altText = caption;
-        }
-        
-        $postButton.setAttribute(&apos;disabled&apos;, &apos;disabled&apos;);
-        // Call all 3 networks, and wait for the results
-        $activityFeed.innerHTML = &apos;Posting to enabled networks...&apos;;
-        
-        let results = [];
-        
-        if(MASTODON) {
-        results.push(postToMastodon(post));
-        }
-        
-        if(BLUESKY) {
-        results.push(postToBluesky(post));
-        }
-        
-        let settledResults = await Promise.allSettled(results);
-        console.log(&apos;Settled results:&apos;, settledResults);
-        let resultHTML = &apos;&apos;;
-        for(let result of settledResults) {
-        if(result.status === &apos;fulfilled&apos;) {
-        let data = result.value;
-        if(data.ok) {
-        resultHTML += `Successfully posted to ${data.network}!&amp;lt;br&amp;gt;`;
-        } else {
-        resultHTML += `Failed to post to ${data.network}: ${data.error}&amp;lt;br&amp;gt;`;
-        }
-        } else {
-        resultHTML += `Error posting to a network: ${result.reason}&amp;lt;br&amp;gt;`;
-        }
-        }
-        
-        $activityFeed.innerHTML = resultHTML;
-        
-        // cleanup
-        $postContent.value = &apos;&apos;;
-        $postImage.value = &apos;&apos;;
-        $altText.value = &apos;&apos;;
-        $imagePreview.src = &apos;&apos;;
-        $imagePreview.style.display = &apos;none&apos;;
-        $postButton.removeAttribute(&apos;disabled&apos;);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I&apos;ll skip showing you &lt;code&gt;postToMastodon&lt;/code&gt; and &lt;code&gt;postToBluesky&lt;/code&gt; as they simply call API routes on the back end and gather the results. Mastodon posting is pretty simple:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export const prerender = false;
-        
-        const MASTODON_TOKEN = process.env.MASTODON_TOKEN;
-        const MASTODON_SERVER = process.env.MASTODON_SERVER;
-        
-        export async function POST({ params, request }) {
-        
-        const body = await request.json();
-        
-        let response = {
-        ok: false
-        }
-        
-        // check for env values (this shouldn&apos;t ever run as check returns false, but just in case
-        if(!MASTODON_TOKEN || !MASTODON_SERVER) {
-        response.error = &apos;Missing env values for MASTODON_TOKEN or MASTODON_SERVER&apos;;
-        } else if(!body.post.content) {
-        response.error = &apos;Missing content in request body&apos;;
-        } else {
-        
-        let postData = new FormData();
-        postData.append(&apos;status&apos;, body.post.content);
-        
-        // check for image
-        if(body.post.image) {
-        let mediaPost = new FormData();
-        mediaPost.append(&apos;file&apos;, body.post.image);
-        mediaPost.append(&apos;description&apos;, body.post.altText || &apos;&apos;);
-        
-        let mediaResponse = await fetch(`${MASTODON_SERVER}/api/v2/media`, {
-        method: &apos;POST&apos;,
-        headers: { 
-        &apos;Authorization&apos;: `Bearer ${MASTODON_TOKEN}`
-        },
-        body: mediaPost
-        });
-        
-        let mediaResult = await mediaResponse.json();
-        
-        postData.append(&apos;media_ids[]&apos;, mediaResult.id);
-        }
-        
-        
-        await fetch(`${MASTODON_SERVER}/api/v1/statuses`, {
-        method: &apos;POST&apos;,
-        body: postData,
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${MASTODON_TOKEN}`
-        }
-        })
-        .then(res =&amp;gt; {
-        if(res.ok) {
-        response.ok = true;
-        } else {
-        response.error = `Mastodon API error: ${res.status} ${res.statusText}`;
-        }
-        })
-        .catch(error =&amp;gt; {
-        response.error = `Error connecting to Mastodon API: ${error.message}`;
-        })
-        }
-        
-        return new Response(
-        JSON.stringify(response),
-        );
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And here&apos;s Bluesky:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export const prerender = false;
-        
-        import { loginToBluesky } from &amp;quot;./logon&amp;quot;;
-        
-        const BLUESKY_USERNAME = process.env.BLUESKY_USERNAME;
-        
-        export async function POST({ params, request }) {
-        
-        const body = await request.json();
-        
-        let response = {
-        ok: false
-        }
-        
-        let authCheck = await loginToBluesky();
-        if(authCheck &amp;amp;&amp;amp; authCheck.error) {
-        response.error = authCheck.error;
-        
-        } else {
-        
-        let postBody = {
-        repo:BLUESKY_USERNAME, 
-        collection:&amp;quot;app.bsky.feed.post&amp;quot;, 
-        record: {
-        text:body.post.content,
-        createdAt: new Date().toISOString()
-        
-        }
-        };
-        
-        // check for image
-        if(body.post.image) {
-        
-        body.post.image = body.post.image.replace(/^data:image\/\w+;base64,/, &amp;quot;&amp;quot;);
-        let imageBuffer = Buffer.from(body.post.image, &apos;base64&apos;);
-        
-        let mediaResponse = await fetch(&apos;https://bsky.social/xrpc/com.atproto.repo.uploadBlob&apos;, {
-        method: &apos;POST&apos;,
-        headers: { 
-        &apos;Authorization&apos;: `Bearer ${authCheck.auth.accessJwt}`,
-        &apos;Content-Type&apos;: &apos;image/jpeg&apos;
-        },
-        body: imageBuffer
-        });
-        
-        let mediaResult = await mediaResponse.json();
-        //console.log(&apos;Media upload result:&apos;, mediaResult);
-        
-        // modify postBody to include image 
-        postBody.record.embed = {
-        &amp;quot;$type&amp;quot;: &amp;quot;app.bsky.embed.images&amp;quot;,
-        images: [
-        {
-        alt:body.post.altText || &apos;&apos;,
-        image: mediaResult.blob
-        }
-        ]
-        }
-        
-        }
-        
-        await fetch(&apos;https://bsky.social/xrpc/com.atproto.repo.createRecord&apos;, {
-        method: &apos;POST&apos;,
-        headers: {
-        &apos;Content-Type&apos;: &apos;application/json&apos;, 
-        &apos;Authorization&apos;: `Bearer ${authCheck.auth.accessJwt}`
-        },
-        body: JSON.stringify(postBody)
-        })
-        .then(res =&amp;gt; {
-        if(res.ok) {
-        response.ok = true;
-        } else {
-        response.error = `Bluesky API error: ${res.status} ${res.statusText}`;
-        }
-        })
-        .catch(error =&amp;gt; {
-        response.error = `Error connecting to Bluesky API: ${error.message}`;
-        })
-        
-        }
-        
-        return new Response(
-        JSON.stringify(response),
-        );
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note that each post to Bluesky runs the login method and I &lt;em&gt;could&lt;/em&gt; cache the auth token returned, but I figured even a person posting a lot won&apos;t necessarily get a lot of benefit from that. That being said - there&apos;s room for improvement...&lt;/p&gt;
-        &lt;h2 id=&quot;what-else%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-else%3F&quot;&gt;What Else?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, so, this is pretty simple, as I wanted it to be, but there&apos;s a few things I&apos;d consider good changes.&lt;/p&gt;
-        &lt;p&gt;I mentioned that the idea here was to run this locally with hard coded auth in your environment. I &lt;em&gt;could&lt;/em&gt; prompt the user to paste in the values and cache it in LocalStorage, but that felt iffy to me.&lt;/p&gt;
-        &lt;p&gt;I also mentioned I skipped Threads as I didn&apos;t want to do oAuth. You can absolutely do oAuth in Astro, even I&apos;ve done it, and I&apos;d be willing to take in a PR from someone who wants to add that, but it didn&apos;t feel worth the effort to me.&lt;/p&gt;
-        &lt;p&gt;Finally, a shoutout to &lt;a href=&quot;https://bsky.app/profile/bobmonsour.com&quot;&gt;Bob Monsour&lt;/a&gt; for the inspiration. You can find his version of this idea (which does a lot more), here: &lt;a href=&quot;https://github.com/bobmonsour/social-posting&quot;&gt;https://github.com/bobmonsour/social-posting&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@fosterious?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Sean Foster&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/brown-lion-in-close-up-photography-UyrslM2tyKc?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

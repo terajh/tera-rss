@@ -137,19 +137,6 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Vue doesn't load styles in root",
-    "partialText": "<p>My <code>/index.html</code> simply tries to load fontawesome located in <code>/public/fonts/&lt;url&gt;</code></p>\n<pre class=\"lang-html prettyprint-override\"><code>&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;&quot;&gt;\n  &lt;head&gt;\n    &lt;meta charset=&quot;UTF-8&quot;&gt;\n    &lt;style&gt;\n        @font-face {\n            font-family: &quot;FontAwesome&quot;;\n            src: url(&quot;/fonts/fa-regular-400.woff2&quot;) format(&quot;woff2&quot;),\n                 url(&quot;/fonts/fa-solid-900.woof2&quot;) format(&quot;woff2&quot;),\n                 url(&quot;/fonts/fa-brands-400.woff2&quot;) format(&quot;woff2&quot;);\n        }\n    &lt;/style&gt;\n    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;\n    &lt;script type=&quot;module&quot; src=&quot;/src/main.js&quot;&gt;&lt;/script&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n</code></pre>\n<p>But firefox never makes any requests for the files or loads the font. A previous version of the root loaded the style from <code>/public/style.css</code></p>\n<pre class=\"lang-html prettyprint-override\"><code>&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;&quot;&gt;\n  &lt;head&gt;\n    &lt;meta charset=&quot;UTF-8&quot;&gt;\n    &lt;link rel=&quot;stylesheet&quot; href=&quot;/style.css&quot;&gt;\n    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;\n    &lt;script type=&quot;module&quot; src=&quot;/src/main.js&quot;&gt;&lt;/script&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n</code></pre>\n<p>But that also refused to load. Why is vue blocking these requests and how to I force it to allow this?</p>",
-    "date": "2026-03-14T03:58:09.000Z",
-    "url": "https://stackoverflow.com/questions/79907317/vue-doesnt-load-styles-in-root"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "Vue 3 component's v-html doesn't update after hydration",
     "partialText": "<p>I am experiencing a strange hydration behaviour in Vue 3 (Nuxt/SSR context). In my component, I have a reactive variable that initialises with a timestamp.</p>\n<p>On the initial client-side render, the standard mustache interpolation <code>{{ processedHtml }}</code> updates to the client-side time correctly, but the content inside <code>v-html</code> stays stuck on the server-side value. Both only &quot;sync up&quot; once a subsequent reactive change occurs (e.g., via a <code>setTimeout</code>).</p>\n<p><strong>The Problem:</strong></p>\n<ol>\n<li><p><strong>Server Renders:</strong> Both values show Server Time (e.g., <code>12:00:00</code>).</p>\n</li>\n<li><p><strong>Client Hydration:</strong> <code>{{ processedHtml }}</code> updates to Client Time (<code>12:00:01</code>), but <code>v-html</code> <strong>remains</strong> <code>12:00:00</code>.</p>\n</li>\n<li><p><strong>After 2000ms:</strong> Both update to the new timestamp and are finally in sync.</p>\n</li>\n</ol>\n<p><strong>Minimal reproducable component:</strong></p>\n<pre><code>&lt;template&gt;\n  {{ processedHtml }}\n  &lt;div v-html=&quot;processedHtml&quot; class=&quot;prose max-w-none prose-a:text-blue-600 hover:prose-a:underline&quot;&gt;&lt;/div&gt;\n&lt;/template&gt;\n\n&lt;script setup lang=&quot;ts&quot;&gt;\nimport { computed } from 'vue';\n\nconst props = defineProps&lt;{\n  node: any;\n}&gt;();\n\n\nconst nowDate = ref&lt;string&gt;(Date.now().toString());\n\nsetTimeout(() =&gt; {\n  nowDate.value = Date.now().toString();\n}, (2000));\n\nconst processedHtml = computed(() =&gt; {\n  return `&lt;p&gt;${nowDate.value}&lt;/p&gt;`;\n});\n&lt;/script&gt;\n</code></pre>\n<p>I suspect Vue's hydration algorithm is skipping the <code>v-html</code> update because the root element tag matches, but I'm not sure why it differs from the mustache interpolation behavior.</p>\n<p>How can I ensure <code>v-html</code> stays in sync with the client-side reactive state immediately upon hydration?</p>",
     "date": "2026-03-06T16:50:50.000Z",
@@ -388,5 +375,18 @@
     "partialText": "<p>I have a Nuxt 3 project where my base url is /travel and the page for that path is in pages/travel/index.vue\nAlso I have another index.vue file in pages folder like this pages/index.vue</p>\n<p>In <strong>nuxt.config.ts file</strong>,\nI added this to set the base url</p>\n<pre><code>app:{\n    baseURL:'/travel'\n  }\n</code></pre>\n<p>Due to certain conditions (This is a multi tenancy project) I can’t move <strong>pages/travel/index.vue</strong> content to the <strong>pages/index.vue</strong> and remove the baseURL.</p>\n<p>Now the problem is if a user visits <strong>http://localhost:3000/travel</strong> I can see <strong>301 redirect</strong> and then resolve the page in <strong>http://localhost:3000/travel/</strong> path.\nThis cause the SEO issues.</p>\n<p>Then I added</p>\n<pre><code>app:{\n    baseURL:'/travel',\n    router: {\n    options: {\n      strict: true\n    }\n  }\n</code></pre>\n<p>And this didn’t worked. Then I created a middleware server/middleware/noBaseSlash.ts and tried this</p>\n<pre><code>import { defineEventHandler, send } from 'h3'\n\nexport default defineEventHandler((event) =&gt; {\n  const url = event.node.req.url || ''\n\n  if (url === '/') {\n    // rewrite to /travel/\n    event.node.req.url = '/travel/'\n  }\n})\n</code></pre>\n<p>Both didn’t worked still I can see the re-direct. How to fix this with minimum effort?</p>",
     "date": "2026-01-21T06:49:28.000Z",
     "url": "https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "vue 3 JS unselect all 'selected' options on a form on click",
+    "partialText": "<p>I have several select options inputs on a form. I want to 'unselect' all selected option on the click of a button.</p>\n<p>jquery has a method for this.</p>\n<pre><code>$(&quot;option:selected&quot;).removeAttr(&quot;selected&quot;); \n</code></pre>\n<p>is there a similar way to do this in vue.</p>\n<p>these are my select options:</p>\n<pre><code>&lt;template&gt;\n&lt;form id=&quot;myform&quot;&gt;\n&lt;select  @change=&quot;clearOptions($event)&quot; id=&quot;mySelect&quot;&gt;\n  &lt;option&gt;Pineapple&lt;/option&gt;\n  &lt;option&gt;Banana&lt;/option&gt;\n&lt;/select&gt;\n\n&lt;select  @change=&quot;clearOptions($event)&quot; id=&quot;mySelectTwo&quot;&gt;\n  &lt;option&gt;Apple&lt;/option&gt;\n  &lt;option&gt;Orange&lt;/option&gt;\n&lt;/select&gt;\n&lt;/template&gt;\n\n&lt;script setup&gt;\nconst clearOptions = (e) =&gt; {\n    e.preventDefault()\n    $(&quot;option:selected&quot;).removeAttr(&quot;selected&quot;);\n}\n\n&lt;/script&gt;\n</code></pre>",
+    "date": "2026-01-17T09:30:09.000Z",
+    "url": "https://stackoverflow.com/questions/79870002/vue-3-js-unselect-all-selected-options-on-a-form-on-click"
   }
 ]
