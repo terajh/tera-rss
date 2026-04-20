@@ -1,5 +1,5 @@
 import { sleep } from "./deps.ts";
-import { loadFeedSpecs, fetchFeeds, discoverGroups } from "./parser.ts";
+import { loadAllFeedSpecs, fetchFeeds, discoverGroups } from "./parser.ts";
 import type { FeedItem } from "./parser.ts";
 
 const BASE_DIR = new URL("../", import.meta.url).pathname;
@@ -10,10 +10,7 @@ async function collectGroup(group: string) {
 
   await Deno.mkdir(outputDir, { recursive: true });
 
-  const specs = await loadFeedSpecs(
-    `${feedsDir}publishers.csv`,
-    `${feedsDir}feed_specs.csv`
-  );
+  const specs = await loadAllFeedSpecs(feedsDir);
 
   console.log(`[${group}] Loaded ${specs.length} feed specs`);
 

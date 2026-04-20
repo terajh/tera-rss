@@ -240,6 +240,35 @@ export function groupByCategory(
   return result;
 }
 
+// --- Multi-file Spec Loading ---
+
+// Loads every `feed_specs*.csv` in the group dir EXCEPT `feed_specs_archive.csv`.
+// The archive file holds dormant/dead feeds that are intentionally excluded from
+// daily collection. See docs/FEED_MANAGEMENT.md.
+export async function loadAllFeedSpecs(feedsDir: string): Promise<readonly FeedSpec[]> {
+  const publishersPath = `${feedsDir}publishers.csv`;
+  const specFiles: string[] = [];
+
+  for await (const entry of Deno.readDir(feedsDir)) {
+    if (!entry.isFile) continue;
+    if (!entry.name.startsWith("feed_specs")) continue;
+    if (!entry.name.endsWith(".csv")) continue;
+    if (entry.name === "feed_specs_archive.csv") continue;
+    specFiles.push(entry.name);
+  }
+
+  specFiles.sort();
+
+  const all: FeedSpec[] = [];
+  for (const file of specFiles) {
+    const specs = await loadFeedSpecs(publishersPath, `${feedsDir}${file}`);
+    console.log(`  loaded ${specs.length} specs from ${file}`);
+    all.push(...specs);
+  }
+
+  return all;
+}
+
 // --- Group Discovery ---
 
 export async function discoverGroups(feedsDir: string): Promise<string[]> {

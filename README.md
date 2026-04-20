@@ -14,13 +14,16 @@
 인수 없이 실행하면 `feeds/` 하위의 모든 그룹을 자동 탐색해 처리합니다.
 그룹명을 인수로 주면 해당 그룹만 처리합니다.
 
-## 현재 그룹 현황 (2026-02-18 기준)
+## 현재 그룹 현황 (2026-04-21 기준)
 
-| 그룹 | 소스(publishers) | 피드(feed_specs) | 카테고리 수 |
-|---|---:|---:|---:|
-| `economy` | 15 | 104 | 13 |
-| `dev` | 254 | 279 | 6 |
-| `anime` | 8 | 12 | 5 |
+| 그룹 | 소스(publishers) | 피드 합계 | active | slow | archive |
+|---|---:|---:|---:|---:|---:|
+| `economy` | 15 | 104 | — | — | — |
+| `dev` | 271 | 296 | 153 | 33 | 110 |
+| `anime` | 8 | 12 | — | — | — |
+
+> `dev` 그룹은 [활성도 기반 청크 분리](docs/FEED_MANAGEMENT.md)를 적용 중이다.
+> `feed_specs.csv` = active, `feed_specs_slow.csv` = slow, `feed_specs_archive.csv` = 수집 제외.
 
 카테고리는 각 그룹의 `feeds/{group}/feed_specs.csv`의 `categories` 컬럼(`|` 구분)에서 `_all_`을 제외한 값을 사용합니다.
 
@@ -40,15 +43,22 @@ tera-rss/
 │   │   └── feed_specs.csv
 │   ├── dev/
 │   │   ├── publishers.csv
-│   │   └── feed_specs.csv
+│   │   ├── feed_specs.csv              # active (<90d)
+│   │   ├── feed_specs_slow.csv         # slow (90~365d)
+│   │   ├── feed_specs_archive.csv      # archive (수집 제외)
+│   │   └── classification.json         # classifier 스냅샷
 │   └── anime/
 │       ├── publishers.csv
 │       └── feed_specs.csv
 ├── src/
 │   ├── parser.ts
 │   ├── collect.ts
+│   ├── classify.ts                     # 피드 활성도 분류
+│   ├── split.ts                        # 분류 결과로 CSV 분할
 │   ├── merge.ts
 │   └── tests/parser_test.ts
+├── docs/
+│   └── FEED_MANAGEMENT.md              # 3단계 청크 관리 가이드
 ├── bins/
 │   ├── collect.sh
 │   └── merge.sh
@@ -83,6 +93,10 @@ deno task merge:dev
 
 # 테스트
 deno task test
+
+# 피드 활성도 분류 (dev 그룹 예시) — 상세는 docs/FEED_MANAGEMENT.md
+deno task classify:dev       # feed_specs.csv의 피드를 fetch해서 classification.json 생성
+deno task split dev          # classification.json을 읽어 3단계 CSV로 재구성
 ```
 
 ## 출력 파일
