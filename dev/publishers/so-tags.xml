@@ -4,7 +4,7 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sun, 19 Apr 2026 16:14:56 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Apr 2026 15:55:40 GMT</lastBuildDate>
     <item>
       <title>Why does IntelliJ IDEA mark `.router-link-active` as unused in Nuxt project but not in pure Vue project?</title>
       <link>https://stackoverflow.com/questions/79927052/why-does-intellij-idea-mark-router-link-active-as-unused-in-nuxt-project-but</link>
@@ -116,16 +116,6 @@
         I don&apos;t know why there is such a transformY, and there are only four elements on the page shown in the image above, yet all the data has been rendered.This is clearly incorrect.&lt;/p&gt;
         &lt;p&gt;I would like to know where I went wrong, as well as the reasons behind the unexpected gaps and incorrect rendering behavior.&lt;br /&gt;
         I would be very grateful if you could help me with this : )&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How should I migrate a Vue 2 + Vuetify 2 legacy project to Vue 3 + Vuetify 3 without redesigning everything? [closed]</title>
-      <link>https://stackoverflow.com/questions/79923418/how-should-i-migrate-a-vue-2-vuetify-2-legacy-project-to-vue-3-vuetify-3-wit</link>
-      <guid>https://stackoverflow.com/questions/79923418/how-should-i-migrate-a-vue-2-vuetify-2-legacy-project-to-vue-3-vuetify-3-wit</guid>
-      <pubDate>Fri, 10 Apr 2026 09:57:29 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m upgrading a legacy Vue 2 + Vuetify 2 application to Vue 3 + Vuetify 3. The migration is causing many design and component changes, so I keep needing custom classes and manual fixes just to preserve the original UI.&lt;/p&gt;
-        &lt;p&gt;Is there a recommended strategy for migrating a large existing codebase efficiently without redesigning everything? I want to keep the current business logic and layout as intact as possible while minimizing time spent on one-off Vuetify styling fixes.&lt;/p&gt;
       </content:encoded>
     </item>
     <item>
@@ -1500,6 +1490,45 @@
         
         &amp;lt;/script&amp;gt;
         &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Better Auth Plugin Typescript Errors in VueJS</title>
+      <link>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</link>
+      <guid>https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs</guid>
+      <pubDate>Tue, 13 Jan 2026 14:35:02 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I created a normal VueJS App and try to implement Better Auth Client &lt;a href=&quot;https://www.better-auth.com/docs/concepts/client&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://www.better-auth.com/docs/concepts/client&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;The problem is, my linter and typescript builder showing errors by usage of some plugin logic.&lt;/p&gt;
+        &lt;p&gt;Here is the code which i used to initiate the client instance.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createAuthClient } from &apos;better-auth/vue&apos;;
+        import { multiSessionClient } from &apos;better-auth/client/plugins&apos;;
+        import { organizationClient } from &apos;better-auth/client/plugins&apos;;
+        
+        export const authClient = createAuthClient({
+        baseURL: &apos;http://localhost:8080&apos;, // The base URL of your auth server
+        plugins: [multiSessionClient(), organizationClient()],
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But in the component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;async function loadDeviceSessions() {
+        try {
+        const { data, error: sessionError } =
+        await authClient.multiSession.listDeviceSessions();
+        if (sessionError) {
+        throw sessionError;
+        }
+        
+        sessions.value = data || [];
+        } catch (err) {
+        error.value = err;
+        } finally {
+        loading.value = false;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;typescript dont find authClient.multiSession. The logic works but building the app is not possible with this errors and the implementation of many @ts-ignore is not a solution for me.&lt;/p&gt;
+        &lt;p&gt;How can i solve this issue?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
