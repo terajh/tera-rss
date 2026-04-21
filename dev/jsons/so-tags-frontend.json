@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "Astro for design system + Vue for interactivity, is this correct approach?",
+    "partialText": "<p>I’m building my first real website, and I’d like some architectural advice.</p>\n<p>I’m using Astro to build a small design system: buttons, inputs, cards, surfaces, typography, etc, and they look great. I really like this workflow for styling and layout.</p>\n<p>Now I want to add interactivity like modals, forms, notifications and API-requested content. For that, I started using Vue islands inside Astro via ant-design-vue package which provides all I need except one thing.</p>\n<p>When I create a Vue component (for example, a modal), I can’t directly reuse my beautiful Astro components inside Vue like:</p>\n<p><code>&lt;template&gt;</code><br />\n<code>  &lt;Button =&quot;open = true&quot;&gt;Open form&lt;/Button&gt;</code></p>\n<p><code>  &lt;Modal v-if=&quot;open&quot;&gt;</code><br />\n<code>    &lt;Input v-model=&quot;name&quot; /&gt;</code><br />\n<code>  &lt;/Modal&gt;</code><br />\n<code>&lt;/template&gt;</code></p>\n<p><code>&lt;script setup&gt;</code><br />\n<code>import { ref } from &quot;vue&quot;;</code><br />\n<code>const open = ref(false);</code><br />\n<code>const name = ref(&quot;&quot;);</code><br />\n<code>&lt;/script&gt;</code></p>\n<p>But of course, Astro components don’t run in the browser, so this doesn’t work (and yes, Button, Input, etc is not just div with styles and can't be replaced by simple css class).</p>\n<p>So, now I doubt about this entire approach. Is it correct? What about best practices? How real projects combine astro and interactivity?</p>\n<p>Thanks!</p>",
+    "date": "2026-04-21T10:54:20.000Z",
+    "url": "https://stackoverflow.com/questions/79929396/astro-for-design-system-vue-for-interactivity-is-this-correct-approach"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "Why does IntelliJ IDEA mark `.router-link-active` as unused in Nuxt project but not in pure Vue project?",
     "partialText": "<p>I'm encountering a difference in IntelliJ IDEA's behavior between pure Vue and Nuxt projects regarding the CSS class <code>.router-link-active</code>.</p>\n<p>In a <strong>pure Vue</strong> project using <code>&lt;RouterLink&gt;</code>, IDEA correctly recognizes <code>.router-link-active</code> as a class that will be automatically applied to active links. There is no &quot;Unused selector&quot; warning.</p>\n<p>However, in my <strong>Nuxt</strong> project, when I use <code>&lt;NuxtLink&gt;</code>, IDEA marks the <code>.router-link-active</code> selector in my <code>&lt;style scoped&gt;</code> block as grey/unused (inspection: &quot;Unused selector&quot; / <code>CssUnusedSymbol</code>), even though the style works perfectly at runtime.</p>\n<p><strong>Why does IDEA recognize the class from <code>&lt;RouterLink&gt;</code> but not from <code>&lt;NuxtLink&gt;</code>?</strong> Is there a way to make IDEA understand that <code>&lt;NuxtLink&gt;</code> outputs the same standard Vue Router classes without resorting to suppression comments?</p>\n<p><strong>Code Example (Nuxt):</strong></p>\n<pre class=\"lang-js prettyprint-override\"><code>&lt;template&gt;\n  &lt;NuxtLink to=&quot;/about&quot; class=&quot;nav-link&quot;&gt;About&lt;/NuxtLink&gt;\n&lt;/template&gt;\n\n&lt;style scoped&gt;\n/* IDEA marks .router-link-active as unused in Nuxt project */\n.nav-link.router-link-active {\n  color: blue;\n}\n&lt;/style&gt;\n</code></pre>",
     "date": "2026-04-17T04:21:00.000Z",
@@ -375,18 +388,5 @@
     "partialText": "<p>I have several select options inputs on a form. I want to 'unselect' all selected option on the click of a button.</p>\n<p>jquery has a method for this.</p>\n<pre><code>$(&quot;option:selected&quot;).removeAttr(&quot;selected&quot;); \n</code></pre>\n<p>is there a similar way to do this in vue.</p>\n<p>these are my select options:</p>\n<pre><code>&lt;template&gt;\n&lt;form id=&quot;myform&quot;&gt;\n&lt;select  @change=&quot;clearOptions($event)&quot; id=&quot;mySelect&quot;&gt;\n  &lt;option&gt;Pineapple&lt;/option&gt;\n  &lt;option&gt;Banana&lt;/option&gt;\n&lt;/select&gt;\n\n&lt;select  @change=&quot;clearOptions($event)&quot; id=&quot;mySelectTwo&quot;&gt;\n  &lt;option&gt;Apple&lt;/option&gt;\n  &lt;option&gt;Orange&lt;/option&gt;\n&lt;/select&gt;\n&lt;/template&gt;\n\n&lt;script setup&gt;\nconst clearOptions = (e) =&gt; {\n    e.preventDefault()\n    $(&quot;option:selected&quot;).removeAttr(&quot;selected&quot;);\n}\n\n&lt;/script&gt;\n</code></pre>",
     "date": "2026-01-17T09:30:09.000Z",
     "url": "https://stackoverflow.com/questions/79870002/vue-3-js-unselect-all-selected-options-on-a-form-on-click"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Better Auth Plugin Typescript Errors in VueJS",
-    "partialText": "<p>I created a normal VueJS App and try to implement Better Auth Client <a href=\"https://www.better-auth.com/docs/concepts/client\" rel=\"nofollow noreferrer\">https://www.better-auth.com/docs/concepts/client</a></p>\n<p>The problem is, my linter and typescript builder showing errors by usage of some plugin logic.</p>\n<p>Here is the code which i used to initiate the client instance.</p>\n<pre><code>import { createAuthClient } from 'better-auth/vue';\nimport { multiSessionClient } from 'better-auth/client/plugins';\nimport { organizationClient } from 'better-auth/client/plugins';\n\nexport const authClient = createAuthClient({\n    baseURL: 'http://localhost:8080', // The base URL of your auth server\n    plugins: [multiSessionClient(), organizationClient()],\n});\n</code></pre>\n<p>But in the component:</p>\n<pre><code>async function loadDeviceSessions() {\n        try {\n            const { data, error: sessionError } =\n                await authClient.multiSession.listDeviceSessions();\n            if (sessionError) {\n                throw sessionError;\n            }\n\n            sessions.value = data || [];\n        } catch (err) {\n            error.value = err;\n        } finally {\n            loading.value = false;\n        }\n    }\n</code></pre>\n<p>typescript dont find authClient.multiSession. The logic works but building the app is not possible with this errors and the implementation of many @ts-ignore is not a solution for me.</p>\n<p>How can i solve this issue?</p>",
-    "date": "2026-01-13T14:35:02.000Z",
-    "url": "https://stackoverflow.com/questions/79867032/better-auth-plugin-typescript-errors-in-vuejs"
   }
 ]

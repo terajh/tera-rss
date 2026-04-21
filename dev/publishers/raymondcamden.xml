@@ -4,12 +4,117 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 20 Apr 2026 16:25:39 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 21 Apr 2026 16:32:22 GMT</lastBuildDate>
+    <item>
+      <title>Building a Simple Markdown PWA App</title>
+      <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
+      <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
+        &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
+        &lt;p&gt;If you don&apos;t care how I built it, you can go to the app right now and install it: &lt;a href=&quot;https://mdviewerpwa.netlify.app/&quot;&gt;https://mdviewerpwa.netlify.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Alright, let&apos;s break it down.&lt;/p&gt;
+        &lt;h2 id=&quot;the-ui&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-ui&quot;&gt;The UI&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;When I had Claude design the application for me, it went with an incredibly simple UI. I felt no reason to add to that so when I began the web app, I copied over the generated HTML/CSS from the Electron app into my new folder. Here&apos;s an example of how it looks with no file selected:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa1.png&quot; loading=&quot;lazy&quot; alt=&quot;App with nothing loaded&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;And here&apos;s how it looks after a Markdown file is opened:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa2.png&quot; loading=&quot;lazy&quot; alt=&quot;App with MD loaded&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Now let&apos;s look at the code a bit.&lt;/p&gt;
+        &lt;h2 id=&quot;markdown-support&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#markdown-support&quot;&gt;Markdown Support&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;This normally would be the boring part. Just drop in &lt;a href=&quot;https://www.npmjs.com/package/marked&quot;&gt;marked&lt;/a&gt; and be done with it. But so many Markdown files I use have frontmatter I wanted to do something special for it. My fix was incredibly simple. If a file begins with three dashes and has another three dashes, replace them with backticks:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const renderMarkdown = content =&amp;gt; {
+        rawContent = content;
+        /*
+        Special tweak for frontmatter. If our content starts with &apos;---&apos; and 
+        contains &apos;---&apos; again, we assume it&apos;s frontmatter and wrap it in and
+        swap the --- to ```.
+        */
+        contentToRender = content.trim();
+        // also, making a copy so we can keep the View Source version working
+        if (contentToRender.startsWith(&apos;---&apos;)) {
+        console.log(&apos;detected frontmatter, applying special formatting&apos;);
+        const parts = content.split(&apos;---&apos;);
+        if (parts.length &amp;gt;= 3) {
+        const frontmatter = parts[1];
+        const rest = parts.slice(2).join(&apos;---&apos;);
+        contentToRender = `\`\`\`yaml${frontmatter}\`\`\`\n\n${rest}`;
+        console.log(contentToRender);
+        }
+        }
+        renderedEl.innerHTML = marked.parse(contentToRender);
+        sourceEl.textContent = content;
+        
+        emptyState.style.display = &apos;none&apos;;
+        renderedEl.style.display = &apos;block&apos;;
+        sourceEl.style.display = &apos;none&apos;;
+        toggleBtn.style.display = &apos;inline-block&apos;;
+        showingSource = false;
+        toggleBtn.textContent = &apos;View Source&apos;;
+        
+        document.title = `MD Viewer — ${fileNameEl.textContent}`;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Honestly most of that code is UI crap, but you can see the frontmatter support on top. I think it came out &lt;em&gt;perfect&lt;/em&gt; - it stands out and I think most folks will recognize it for what it represents, but in theory I could possibly add a small graphical label or something to the block.&lt;/p&gt;
+        &lt;p&gt;So again, there&apos;s UI handling code in here that&apos;s not that interesting, so let me turn to the real cool part. Yes, Virginia, a PWA can absolutely associate itself with files. I added a manifest.json and basic service worker. For bot of these I relied on Claude and it &lt;em&gt;mostly&lt;/em&gt; did a good job, I had to tweak a few things.&lt;/p&gt;
+        &lt;p&gt;After the basics worked, I did some Googling and came across this excellent MDN resource: &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Associate_files_with_your_PWA&quot;&gt;Associate files with your PWA&lt;/a&gt;. Adding file support took two steps.&lt;/p&gt;
+        &lt;p&gt;First, I added the following to my manifest:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;&amp;quot;file_handlers&amp;quot;: [
+        {
+        &amp;quot;action&amp;quot;: &amp;quot;/&amp;quot;, 
+        &amp;quot;accept&amp;quot;: {
+        &amp;quot;text/markdown&amp;quot;: [&amp;quot;.md&amp;quot;, &amp;quot;.markdown&amp;quot;]
+        }
+        }
+        ]
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;action&lt;/code&gt; step there tells my app what URL to go to when being opened via a file. As my app has one page/view, I just used &lt;code&gt;/&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;The next step was to look for this in JavaScript. My application does this when starting up:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;if(&amp;quot;launchQueue&amp;quot; in window) {
+        console.log(&apos;Launch Queue API is supported, setting up consumer&apos;);
+        window.launchQueue.setConsumer(launchParams =&amp;gt; {
+        if (!launchParams.files.length) {
+        return;
+        }
+        const fileHandle = launchParams.files[0];
+        console.log(&apos;File launched:&apos;, fileHandle);
+        fileHandle.getFile().then(file =&amp;gt; {
+        const reader = new FileReader();
+        reader.onload = e =&amp;gt; {
+        const content = e.target.result;
+        fileNameEl.textContent = file.name;
+        renderMarkdown(content);
+        };
+        reader.readAsText(file);
+        }).catch(error =&amp;gt; {
+        console.error(&apos;Error reading file:&apos;, error);
+        });
+        });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Basically, if I can use &lt;code&gt;launchQueue&lt;/code&gt;, it will consist of a list of files, each of which is a file handle. I&apos;ve used File objects in JavaScript before, but not file handles, but you can quickly go to a real file object using &lt;code&gt;getFile()&lt;/code&gt;. Once you have that, the regular &lt;code&gt;FileReader&lt;/code&gt; approach works to get the contents and render it.&lt;/p&gt;
+        &lt;p&gt;I deployed the app to Netlify, opened it in my browser, and clicked the install icon.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa3.png&quot; loading=&quot;lazy&quot; alt=&quot;Install dialog&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;After I confirmed I had the application, I right clicked on a MD file, used open with, navigated to my PWA, and selected it:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa4.png&quot; loading=&quot;lazy&quot; alt=&quot;Open file prompt&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I told it to remember my choice and that was literally it. So now I&apos;ve got a web-based app I can use locally, heck even offline, to render my Markdown files in a nice reading experience. (Well, nice to me anyway. ;) Oh, and the size is about 400k, of which most is one of the icons. Significantly smaller than the Electron app. (But to be fair, Electron was overkill for what I was doing.)&lt;/p&gt;
+        &lt;p&gt;Once again, the link to the site is here, &lt;a href=&quot;https://mdviewerpwa.netlify.app/&quot;&gt;https://mdviewerpwa.netlify.app/&lt;/a&gt;, and you can find all the code here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@anniespratt?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Annie Spratt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/shelf-with-art-supplies-books-and-decorations-ModHj41WZhg?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Summarizing Docs with Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
         &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
@@ -204,7 +309,7 @@
       <title>Testing OCR with Chrome Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
         &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
@@ -409,7 +514,7 @@
         type:&amp;quot;array&amp;quot;, 
         items: {
         type:&amp;quot;string&amp;quot;,
-        decription:&amp;quot;The extracted text.&amp;quot;
+        description:&amp;quot;The extracted text.&amp;quot;
         }
         };
         &lt;/code&gt;&lt;/pre&gt;
@@ -478,7 +583,7 @@
       <title>Links For You (4/5/26)</title>
       <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
       <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
         about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
@@ -504,7 +609,7 @@
       <title>You&apos;ve gained a new achievement</title>
       <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
       <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
         &lt;p&gt;
@@ -617,7 +722,7 @@
       <title>Checking if a Movie has a Post or Mid Credit Scene</title>
       <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
       <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
         &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
@@ -706,7 +811,7 @@
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -771,7 +876,7 @@
       <title>Implementing OAuth in Astro</title>
       <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
       <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
         &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
@@ -1057,7 +1162,7 @@
       <title>Links For You (3/22/26)</title>
       <link>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</link>
       <guid>https://www.raymondcamden.com/2026/03/22/links-for-you-32226</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I just shared this on my socials, but this weekend is one of those rare ones where I got not one, but two days of decent sleep, and honestly my body doesn&apos;t even know what to think about it. &amp;quot;Rested&amp;quot; is some foreign concept that is both confusing and incredibly appreciated by my body. I&apos;d love to say I&apos;m going to take this well rested state and get loads of things done, but outside of this post and laundry, I don&apos;t plan on accomplishing anything else of note.&lt;/p&gt;
         &lt;h2 id=&quot;groovy-pretty-maths&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#groovy-pretty-maths&quot;&gt;Groovy Pretty Maths&lt;/a&gt;&lt;/h2&gt;
@@ -1078,7 +1183,7 @@
       <title>Finding Your Most Popular Bluesky Followers</title>
       <link>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</link>
       <guid>https://www.raymondcamden.com/2026/03/18/finding-your-most-popular-bluesky-followers</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
+      <pubDate>Tue, 21 Apr 2026 16:17:28 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A long time, like, a &lt;em&gt;really&lt;/em&gt; long time ago, I &lt;a href=&quot;https://www.raymondcamden.com/2012/08/20/new-site-popularfollowerscom&quot;&gt;created a web app&lt;/a&gt; that would take your Twitter followers and then sort them by the number of followers they had. This was, of course, next to useless but was a fun excursion into the Twitter API and kinda cool to see &amp;quot;big names&amp;quot; following me. We all know what happened to the Twitter API, and Twitter itself, but last night I decided to take a stab at building something similar for Bluesky. If you don&apos;t care about the &lt;em&gt;how&lt;/em&gt; and just want to see the result, you can play with it here: &lt;a href=&quot;https://happy-mountain-lamb.codepen.app/&quot;&gt;https://happy-mountain-lamb.codepen.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Still here? Ok, let&apos;s talk &lt;strike&gt;turkey&lt;/strike&gt;code!&lt;/p&gt;
@@ -1293,207 +1398,6 @@
         on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
         &lt;/p&gt;
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Testing Live Content Collections in Astro V6</title>
-      <link>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</link>
-      <guid>https://www.raymondcamden.com/2026/03/11/testing-live-content-collections-in-astro-v6</guid>
-      <pubDate>Mon, 20 Apr 2026 16:10:36 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Yesterday, &lt;a href=&quot;https://astro.build/blog/astro-6/&quot;&gt;Astro V6&lt;/a&gt; formally launched. I say &amp;quot;formally&amp;quot; as it&apos;s been available to test for a little while, but with me still being pretty new to Astro I&apos;ve kept to the main release only. Now that V6 is the default, I thought it was time to dig into it a bit. One feature in particular stood out as being really useful to me - &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;live content collections&lt;/a&gt;. One of the reasons I&apos;ve been digging Astro so much is that it nicely straddles the SSG world and Node.js server worlds. When building your app, you can make logical decisions about what should be done at build time versus what should be done dynamically. It&apos;s like having Express and Eleventy rolled into one solution.&lt;/p&gt;
-        &lt;p&gt;Astro already let you easily use live data in your application. The &amp;quot;multi RSS into one&amp;quot; app I shared last week (&lt;a href=&quot;https://www.raymondcamden.com/2026/03/03/using-astro-for-a-combined-rss-view-and-generator&quot;&gt;&amp;quot;Using Astro for a Combined RSS View and Generator&amp;quot;&lt;/a&gt;) is an example of that. What Live Content Collections provides is a way to have on demand data while still using Astro&apos;s &amp;quot;content collection&amp;quot; metaphor.&lt;/p&gt;
-        &lt;p&gt;To test this, I created an app that wrapped the &lt;a href=&quot;https://developer.themoviedb.org/docs/getting-started&quot;&gt;TMDB API&lt;/a&gt; to provide the following features:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;A home page that rendered a list of movie genres.&lt;/li&gt;
-        &lt;li&gt;A detail page for each genre showing recently released movies in that genre.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Here&apos;s how I built it.&lt;/p&gt;
-        &lt;h2 id=&quot;the-live-loader&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-live-loader&quot;&gt;The Live Loader&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The &lt;a href=&quot;https://docs.astro.build/en/guides/content-collections/#live-content-collections&quot;&gt;docs&lt;/a&gt; are a great guide to how this feature works and you should absolutely spend some time there, but at a high level, this feature requires:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;A loader script that handles returning all items in your collection or one particular item.&lt;/li&gt;
-        &lt;li&gt;A definition file for your app that defines all the live loaders.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Let&apos;s start with the later. Unlike static content collections which are defined in &lt;code&gt;content.config.ts&lt;/code&gt;, Astro looks like live collections in &lt;code&gt;live.config.ts&lt;/code&gt;. Here&apos;s mine:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Define live collections for accessing real-time data
-        import { defineLiveCollection } from &apos;astro:content&apos;;
-        import { genreLoader } from &apos;./loaders/tmdbloader&apos;;
-        
-        const genres = defineLiveCollection({
-        loader: genreLoader({
-        apiKey: process.env.TMDB_API_KEY!
-        }),
-        });
-        
-        export const collections = { genres };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;There isn&apos;t much here as I&apos;ve only got one loader. Let&apos;s now take a look at that loader:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import type { LiveLoader } from &apos;astro/loaders&apos;;
-        
-        interface Genre {
-        id: string;
-        name: string;
-        }
-        
-        interface EntryFilter {
-        id: string;
-        }
-        
-        export function genreLoader(config: { apiKey: string }): LiveLoader&amp;lt;Genre, EntryFilter, never&amp;gt; {
-        return {
-        name: &apos;genre-loader&apos;,
-        loadCollection: async () =&amp;gt; {
-        try {
-        
-        let genreReq = await fetch(&apos;https://api.themoviedb.org/3/genre/movie/list&apos;, {
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${config.apiKey}`, 
-        &apos;accept&apos;:&apos;application/json&apos;
-        }
-        });
-        
-        let genreData = await genreReq.json();
-        console.log(`Got ${genreData.genres.length} genres`);
-        return {
-        entries: genreData.genres.map((g:Genre) =&amp;gt; ({
-        id: g.id,
-        data: g,
-        })),
-        };
-        } catch (error) {
-        console.log(&apos;------------- ERROR --------&apos;);
-        return {
-        error: new Error(&apos;Failed to load genres &apos;, { cause: error }),
-        };
-        }
-        },
-        loadEntry: async ({ filter }) =&amp;gt; {
-        console.log(&apos;loadEntry called with filter&apos;, filter);
-        
-        try {
-        let movieReq = await fetch(`https://api.themoviedb.org/3/discover/movie?region=US&amp;amp;language=en-US&amp;amp;with_genres=${filter.id}&amp;amp;sort_by=primary_release_date.desc`, {
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${config.apiKey}`, 
-        &apos;accept&apos;:&apos;application/json&apos;
-        }
-        });
-        
-        let movieData = await movieReq.json();
-        console.log(`Loaded movies for ${filter.id}`);
-        return {
-        id: filter.id,
-        data: movieData.results
-        }
-        
-        } catch (error) {
-        return {
-        error: new Error(&apos;Failed to load movies&apos;, { cause: error }),
-        };
-        }
-        
-        },
-        };
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Per the docs, your loader needs to define a name, a &lt;code&gt;loadCollection&lt;/code&gt; method that returns an array, and a &lt;code&gt;loadEntry&lt;/code&gt; method that returns an object representing one part of your collection. For me, this came down to hitting the TMDB &lt;a href=&quot;https://developer.themoviedb.org/reference/genre-movie-list&quot;&gt;genre list for movies API&lt;/a&gt; and then following up with the &lt;a href=&quot;https://developer.themoviedb.org/reference/discover-movie&quot;&gt;discover movies API&lt;/a&gt; that filtered to the genre. (As well as English movies and sorted by release date.)&lt;/p&gt;
-        &lt;h2 id=&quot;using-the-live-collection&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#using-the-live-collection&quot;&gt;Using the Live Collection&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I first used the collection in my home page, &lt;code&gt;index.astro&lt;/code&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        export const prerender = false; 
-        
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        import { getLiveCollection } from &apos;astro:content&apos;;
-        
-        const { entries } = await getLiveCollection(&apos;genres&apos;);
-        ---
-        
-        &amp;lt;BaseLayout pageTitle=&amp;quot;List of Genres&amp;quot;&amp;gt;
-        
-        &amp;lt;ul&amp;gt;
-        { entries.map((genre:any) =&amp;gt; 
-        &amp;lt;li&amp;gt;&amp;lt;a href={&amp;quot;genre/&amp;quot; + genre.id + &amp;quot;?l=&amp;quot; + genre.data.name}&amp;gt;{genre.data.name}&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
-        )}
-        &amp;lt;/ul&amp;gt;
-        
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This is pretty much the exact same way I&apos;d use a static collection. Get the entries - iterate - done. For details, you&apos;ll note I&apos;m linkking to &amp;quot;genre/X?l=NAME&amp;quot; for each genre. I created &lt;code&gt;pages\genre\[id].astro&lt;/code&gt; to support that. You&apos;ll notice I&apos;m passing the name of the genre in the query string. That&apos;s just so I can use it for display purposes. Here&apos;s the code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
-        export const prerender = false; 
-        
-        import BaseLayout from &apos;../../layouts/BaseLayout.astro&apos;;
-        import { getLiveEntry } from &apos;astro:content&apos;;
-        const { entry, error } = await getLiveEntry(&apos;genres&apos;, Astro.params.id);
-        
-        if (error) {
-        return Astro.rewrite(&apos;/404&apos;);
-        }
-        
-        const title = Astro.url.searchParams.get(&amp;quot;l&amp;quot;);
-        ---
-        
-        &amp;lt;BaseLayout pageTitle={title}&amp;gt;
-        
-        &amp;lt;div class=&amp;quot;movieWrapper&amp;quot;&amp;gt;
-        { entry.data.map((movie:any) =&amp;gt; 
-        &amp;lt;article class=&amp;quot;movie&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;{movie.title}&amp;lt;/h3&amp;gt;
-        &amp;lt;p&amp;gt;
-        {movie.overview}
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        Releases {movie.release_date}
-        &amp;lt;/p&amp;gt;
-        { movie.poster_path ?
-        &amp;lt;p&amp;gt;&amp;lt;img src={&amp;quot;https://image.tmdb.org/t/p/w300/&amp;quot;+movie.poster_path}&amp;gt;&amp;lt;/p&amp;gt; : &apos;&apos;
-        }
-        &amp;lt;/article&amp;gt;
-        )}
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And... that&apos;s it. I fired it up, ran it, and it worked perfectly. After adding the Netlify adapter, I pushed it up here: &lt;a href=&quot;https://tmdb-movie-browser-v6.netlify.app/&quot;&gt;https://tmdb-movie-browser-v6.netlify.app/&lt;/a&gt;&lt;/p&gt;
-        &lt;h2 id=&quot;but-wait...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#but-wait...&quot;&gt;But wait...&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This isn&apos;t the most complex example of course, and I was ready to write up the blog post when I noticed something interesting in the V6 post - &lt;a href=&quot;https://astro.build/blog/astro-6/#experimental-route-caching&quot;&gt;route caching&lt;/a&gt;. This is still marked as experimental so I&apos;m not sure I&apos;d use it in a production app, but it looked super easy so I thought I&apos;d give it a try.&lt;/p&gt;
-        &lt;p&gt;In both pages, I added this to my front matter:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;Astro.cache.set({
-        maxAge: 120, // Cache for 2 minutes
-        swr: 60, // Serve stale for 1 minute while revalidating
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And modified my &lt;code&gt;astro.config.mjs&lt;/code&gt; to load it:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// @ts-check
-        import { defineConfig } from &apos;astro/config&apos;;
-        import { memoryCache } from &apos;astro/config&apos;;
-        
-        import netlify from &apos;@astrojs/netlify&apos;;
-        
-        // https://astro.build/config
-        export default defineConfig({
-        adapter: netlify(),
-        experimental: {
-        cache: { provider: memoryCache() },
-        },
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And... it did nothing! Complete failure! Astro sucks!&lt;/p&gt;
-        &lt;p&gt;After taking a minute to chill out, I looked closer at the &lt;a href=&quot;https://docs.astro.build/en/reference/experimental-flags/route-caching/&quot;&gt;docs&lt;/a&gt; for this feature and noticed this important line (emphasis mine):&lt;/p&gt;
-        &lt;blockquote&gt;
-        Use `cache.enabled` to check whether a cache provider is configured and active.
-        This returns false when no provider is configured, or in &lt;u style=&quot;color:red&quot;&gt;development mode:&lt;/u&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I killed my locally running Astro app and did this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;npm run build
-        npm run preview
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That was the first time I&apos;d done that with an Astro app and it worked perfectly - and - the caching worked perfectly as well. Literally a line of code to each page and the work was done!&lt;/p&gt;
-        &lt;h2 id=&quot;show-me-the-code-(and-more-stuff)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code-(and-more-stuff)&quot;&gt;Show Me the Code (and More Stuff)&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;If you want to see everything, the repo is here: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/tmdb-movie-browser-v6&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/tmdb-movie-browser-v6&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;As a quick note - a &amp;quot;live&amp;quot; view of movie genres is &lt;strong&gt;not&lt;/strong&gt; the most sensible example of this feature. Most likely the movie genre data itself changes incredibly rarely. But this goes back to what I said above - I really dig that Astro would make it easy to have build time data (genres) and live data (moves in that genre) with minimal effort on my part.&lt;/p&gt;
-        &lt;p&gt;Let me know what you think, and if you are already an Astro user, have you moved to V6 yet?&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@wansan_99?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Wan San Yip&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/people-sitting-on-chair-inside-room-ID1yWa1Wpx0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
