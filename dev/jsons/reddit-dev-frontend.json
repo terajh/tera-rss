@@ -7,6 +7,84 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "I built vue-rbac — a full-featured RBAC library for Vue 3 with guard component, TTL cache and more. Feedback & contributors welcome!",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey There!</p> <p>Authorization logic is one of those things that starts simple and ends up scattered everywhere - <code>v-if=&quot;user.role === &#39;admin&#39;&quot;</code> in 40 different components, no inheritance, no fallback states. I&#39;ve been there too many times, so I built <strong>vue-rbac</strong> to fix it properly.</p> <p><strong>What it does</strong></p> <p>vue-rbac is a lightweight, dependency-free RBAC plugin for Vue 3 that gives you a consistent, declarative way to handle roles and permissions.</p> <p><strong>Full feature list</strong></p> <ul> <li>Role &amp; permission system with <strong>inheritance chains</strong> (admin → editor → viewer) </li> <li>5 directives: <code>v-rbac</code>, <code>v-rbac:role</code>, <code>v-rbac:any</code>, <code>v-rbac:all</code>, <code>v-rbac:not</code></li> <li><strong>Wildcard permissions</strong> — <code>users:*</code> grants all actions on a resource </li> <li><code>&lt;RbacGuard&gt;</code> <strong>component</strong> with <code>#fallback</code> and <code>#loading</code> slots </li> <li><code>useRBAC()</code> composable for programmatic access &amp; reactive state </li> <li>3 config modes: static, dynamic (fetch from API), and hybrid </li> <li>Built-in storage adapters: localStorage, sessionStorage, cookies </li> <li><strong>TTL-based caching</strong> with manual invalidation </li> <li>Retry with exponential backoff for failed fetches </li> <li>Configurable log levels </li> <li>Zero dependencies, TypeScript-first</li> </ul> <p><strong>Install</strong></p> <pre><code>pnpm add @nangazaki/vue-rbac </code></pre> <p><strong>Basic setup</strong></p> <pre><code>app.use(VueRBAC, { config: { mode: CONFIG_MODE.STATIC, roles: { admin: { permissions: [&#39;users:create&#39;, &#39;posts:create&#39;], inherits: [&#39;editor&#39;], }, editor: { permissions: [&#39;posts:edit&#39;], inherits: [&#39;viewer&#39;], }, viewer: { permissions: [&#39;posts:view&#39;] }, }, }, }) </code></pre> <p><strong>Directives — keep your templates clean</strong></p> <pre><code>&lt;button v-rbac=&quot;&#39;users:create&#39;&quot;&gt;Add User&lt;/button&gt; &lt;div v-rbac:role=&quot;&#39;admin&#39;&quot;&gt;Admin Panel&lt;/div&gt; &lt;div v-rbac:any=&quot;[&#39;posts:edit&#39;, &#39;posts:create&#39;]&quot;&gt;Editor or Admin&lt;/div&gt; &lt;div v-rbac:all=&quot;[&#39;posts:edit&#39;, &#39;posts:publish&#39;]&quot;&gt;Full Editor Access&lt;/div&gt; &lt;div v-rbac:not=&quot;&#39;admin&#39;&quot;&gt;Visible to non-admins only&lt;/div&gt; </code></pre> <p><strong>Wildcard permissions</strong></p> <p>Assign <code>resource:*</code> to grant all actions on that resource:</p> <pre><code>roles: { superadmin: { permissions: [&#39;users:*&#39;] } } rbac.hasPermission(&#39;users:create&#39;) // true rbac.hasPermission(&#39;users:delete&#39;) // true rbac.hasPermission(&#39;posts:create&#39;) // false — different resource </code></pre> <p><strong>RbacGuard component — with fallback &amp; loading slots</strong></p> <p>When directives aren&#39;t enough (e.g. you need to show something on denial, or handle a loading state while roles are fetched):</p> <pre><code>&lt;RbacGuard permission=&quot;users:create&quot;&gt; &lt;CreateUserForm /&gt; &lt;template #fallback&gt; &lt;p&gt;You don&#39;t have access to this.&lt;/p&gt; &lt;/template&gt; &lt;template #loading&gt; &lt;Spinner /&gt; &lt;/template&gt; &lt;/RbacGuard&gt; </code></pre> <p>Supports the same props as the directives: <code>role</code>, <code>permission</code>, <code>any</code>, <code>all</code>, <code>not</code>.</p> <p><strong>TTL cache + retry with exponential backoff</strong></p> <p>In dynamic mode, fetched roles are cached to avoid redundant API calls. You control the TTL and can invalidate manually:</p> <pre><code>app.use(VueRBAC, { config: { mode: CONFIG_MODE.DYNAMIC, fetchRoles: async () =&gt; (await fetch(&#39;/api/roles&#39;)).json(), cacheTtl: 30 * 60 * 1000, // 30 minutes (set 0 to disable) retry: { attempts: 3, delay: 1000, backoff: 2 }, // 1s → 2s → 4s }, }) // Invalidate manually (e.g. after login/logout): const { invalidateCache } = useRBAC() invalidateCache() </code></pre> <p><strong>useRBAC() composable</strong></p> <pre><code>const { state, setUserRoles, hasRole, hasPermission, hasAnyPermission } = useRBAC() state.isLoading // true while roles are being fetched state.userRoles // reactive list of active roles setUserRoles([&#39;admin&#39;, &#39;editor&#39;]) hasPermission(&#39;posts:create&#39;) // true hasAnyPermission([&#39;posts:edit&#39;, &#39;posts:view&#39;]) // true </code></pre> <p><strong>GitHub:</strong> <a href=\"https://github.com/nangazaki/vue-rbac\">https://github.com/nangazaki/vue-rbac</a> </p> <p><strong>Docs:</strong> <a href=\"https://vue-rbac.nangazaki.io\">https://vue-rbac.nangazaki.io</a></p> <p><strong>I&#39;d love your feedback on:</strong></p> <ul> <li>Is the API intuitive? Anything that feels awkward? </li> <li>Use cases that aren&#39;t covered yet? </li> <li>Performance or architecture concerns? </li> </ul> <p>Thanks for checking it out!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Confident_Act5884\"> /u/Confident_Act5884 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy268p/i_built_vuerbac_a_fullfeatured_rbac_library_for/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy268p/i_built_vuerbac_a_fullfeatured_rbac_library_for/\">[comments]</a></span>",
+    "date": "2026-04-28T13:56:14.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sy268p/i_built_vuerbac_a_fullfeatured_rbac_library_for/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "After years working mostly with React, I spent a month building in Vue. Here's what surprised me (and what didn't).",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;m a full-stack dev and React has been my default for a long time. Recently I had to work on a Vue codebase for a client project and ended up actually enjoying it more than I expected. Wanted to share some honest takeaways — no &quot;X is better than Y&quot; nonsense.</p> <p>What surprised me (positively):</p> <p>\\- The single-file component (.vue) approach is genuinely nice. Template, script, and style colocated feels obvious in hindsight.</p> <p>\\- Reactivity &quot;just works.&quot; No useState/useEffect/useMemo gymnastics. You mutate a ref, the UI updates. That&#39;s it.</p> <p>\\- Built-in directives (v-if, v-for, v-model) cover 80% of what you&#39;d reach for in React.</p> <p>\\- The DX in Vite + Vue is incredibly fast.</p> <p>What I missed from React:</p> <p>\\- The ecosystem. Almost any niche library exists in React; in Vue you sometimes hit a dead end and have to roll your own.</p> <p>\\- TypeScript support is solid in Vue 3, but React&#39;s TS story is still more mature for complex generic components.</p> <p>\\- Job market reality — most contracts I see are React. Vue is great but commercially narrower.</p> <p>What I expected to matter but didn&#39;t:</p> <p>\\- The syntax difference. After 2 days it&#39;s just muscle memory.</p> <p>\\- &quot;Magic&quot; reactivity. I thought it&#39;d feel like black magic. It just feels like less boilerplate.</p> <p>Conclusion:</p> <p>React is still my default for big apps because of ecosystem and team familiarity. But for solo projects or quick MVPs? Vue is genuinely a better experience in some ways and I&#39;d reach for it more often if the market made it easier to.</p> <p>Anyone else made the switch in either direction recently? Curious what you noticed.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/BalgitTuber\"> /u/BalgitTuber </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxhstz/after_years_working_mostly_with_react_i_spent_a/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxhstz/after_years_working_mostly_with_react_i_spent_a/\">[comments]</a></span>",
+    "date": "2026-04-27T21:45:09.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sxhstz/after_years_working_mostly_with_react_i_spent_a/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Playwright and Github Actions",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/\"> <img src=\"https://external-preview.redd.it/fTYIAgY0JO5ZmZlRNOaf-lI5LagEksVGLRLGtSSja1I.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=7de701d6ae581bbe53463c0b3dc9886cc319fef9\" alt=\"Playwright and Github Actions\" title=\"Playwright and Github Actions\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/xhxpS100H5Q\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-04-28T07:21:12.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Light weight local agent for Vue?",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I have a m3pro macbook pro with 18gb ram (also have a base m1 studio I could use to remote into if 18gb wont cut it). Anyone running an agent locally on their machine while developing? Is it useful or are we still not there yet? Any insights and recommendations are welcome. I am loosing my job in August and trying to get skills up with AI. Copilot cutting the plans really put a damper in my day/plan. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Druber13\"> /u/Druber13 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxzlif/light_weight_local_agent_for_vue/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxzlif/light_weight_local_agent_for_vue/\">[comments]</a></span>",
+    "date": "2026-04-28T12:12:11.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sxzlif/light_weight_local_agent_for_vue/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "site de Filmes e Series",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Olá! Sou desenvolvedor web e algum tempo venho trabalhando em um site de filmes e series e lancei ele recentemente, gostaria de opinião de vocês do que posso fazer para melhorar. Sugestões e dicas são sempre bem vindas.</p> <p>link: <a href=\"https://www.ferreirafilmes.com.br/\">FFilmes</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Western_Fig2325\"> /u/Western_Fig2325 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy0kst/site_de_filmes_e_series/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy0kst/site_de_filmes_e_series/\">[comments]</a></span>",
+    "date": "2026-04-28T12:53:32.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sy0kst/site_de_filmes_e_series/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "A Disappearing JSX Framework",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sxitk1/a_disappearing_jsx_framework/\"> <img src=\"https://preview.redd.it/6t4ghccm6txg1.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=710cde4d7bdf23cfd96f5a9af0eed684da777a2e\" alt=\"A Disappearing JSX Framework\" title=\"A Disappearing JSX Framework\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p><a href=\"https://x.com/dashersw/status/2048719900013732232\">https://x.com/dashersw/status/2048719900013732232</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/arbayi\"> /u/arbayi </a> <br/> <span><a href=\"https://i.redd.it/6t4ghccm6txg1.jpeg\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxitk1/a_disappearing_jsx_framework/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-04-27T22:24:43.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1sxitk1/a_disappearing_jsx_framework/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "Playwright - Record the tests to generate the code",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1swwgoz/playwright_record_the_tests_to_generate_the_code/\"> <img src=\"https://external-preview.redd.it/akUG6InxfambgN5TMcIwC_kGR4FGEfXx8bUe-_gXCEQ.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=f52cccc85ea68406bd498eb96a47a5f3e478b5c8\" alt=\"Playwright - Record the tests to generate the code\" title=\"Playwright - Record the tests to generate the code\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/WAtQ_ALQv5c\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1swwgoz/playwright_record_the_tests_to_generate_the_code/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-04-27T07:18:09.000Z",
@@ -34,7 +112,7 @@
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "Help with optimizing a page",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I have been maintaining a vue project for a while now and the performance of the webpage has gotten really slow. I am looking for tips on what I can do to optimize. </p> <p>Tech stack vue3 with composition API and element plus. </p> <p>I am pretty much inexperienced with vue so I need some help on how to troubleshoot what exactly causes the performance hit, if there are any tools that can trace. </p> <p>I also believe based on intuition these things might be contributing to the poor performance.</p> <ol> <li><p>A lot of refs(30+): the main component is an el-table that renders about 100 to 150 rows of data with about 50 columns. Refs are used to handle some actions (such as toggling to show or hide a dialog box/iframe, performing actions on the cell clicked on by the user)</p></li> <li><p>A few watch (mostly for validation of data filled in forms)</p></li> <li><p>A lot of iframes open or close based on the value of a ref</p></li> <li><p>This was very recent, on clicking a particular cell in the table a dialog box appears to fill some information. A watch is added to trigger to certain actions based on the value of some fields. I suspect the watch is a major contributor, are there any better ways to do this. </p></li> <li><p>A lot of v-if and v- show (maybe there exists a better way to achieve this)</p></li> </ol> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/retiredfplplayer\"> /u/retiredfplplayer </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1swklh9/help_with_optimizing_a_page/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1swklh9/help_with_optimizing_a_page/\">[comments]</a></span>",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I have been maintaining a vue project for a while now and the performance of the webpage has gotten really slow. I am looking for tips on what I can do to optimize. </p> <p>Tech stack vue3 with composition API and element plus. </p> <p>I am pretty much inexperienced with vue so I need some help on how to troubleshoot what exactly causes the performance hit, if there are any tools that can trace. </p> <p>I also believe based on intuition these things might be contributing to the poor performance.</p> <ol> <li><p>A lot of refs(30+): the main component is an el-table that renders about 100 to 150 rows of data with about 50 columns. Refs are used to handle some actions (such as toggling to show or hide a dialog box/iframe, performing actions on the cell clicked on by the user)</p></li> <li><p>A few watch (mostly for validation of data filled in forms)</p></li> <li><p>A lot of iframes open or close based on the value of a ref</p></li> <li><p>This was very recent, on clicking a particular cell in the table a dialog box appears to fill some information. A watch is added to trigger to certain actions based on the value of some fields. I suspect the watch is a major contributor, are there any better ways to do this. </p></li> <li><p>A lot of v-if and v- show (maybe there exists a better way to achieve this)</p></li> </ol> <p>Edit: The major issue is the table rendering about 150 rows. Adding a pagination speeds up the responsiveness. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/retiredfplplayer\"> /u/retiredfplplayer </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1swklh9/help_with_optimizing_a_page/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1swklh9/help_with_optimizing_a_page/\">[comments]</a></span>",
     "date": "2026-04-26T21:45:43.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1swklh9/help_with_optimizing_a_page/"
   },
@@ -245,83 +323,5 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/\"> <img src=\"https://external-preview.redd.it/j0zqyU4iUt0Z6hnPeBBJJZzbuKTwpFhelKrk6FdMMaM.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=41ab00cc674bc0780aa00a20bf7e3906111ee947\" alt=\"Playwright and Webstorm - E2E tests made easy to create and maintain\" title=\"Playwright and Webstorm - E2E tests made easy to create and maintain\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/3GbOccRg5m8\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-04-20T07:24:26.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "[ Removed by Reddit ]",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>[ Removed by Reddit on account of violating the <a href=\"/help/contentpolicy\">content policy</a>. ]</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Ok_Specialist6450\"> /u/Ok_Specialist6450 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sq1ksi/removed_by_reddit/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sq1ksi/removed_by_reddit/\">[comments]</a></span>",
-    "date": "2026-04-19T18:51:48.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sq1ksi/removed_by_reddit/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Built this task aggregator web app in Django + Vue.js. it fetches tasks from different platforms you use & also use AI to reschedule tasks or assign tags + other metadata to tasks.",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sph1sn/built_this_task_aggregator_web_app_in_django/\"> <img src=\"https://external-preview.redd.it/bnZ5aXJ5eDc5MndnMS_zBYn7oSkLCKPUvpAMi-tiHoAkruEBEEPYvCyIFvMh.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=18d93485df12b9f4e39656f05bddd0e14f4ae057\" alt=\"Built this task aggregator web app in Django + Vue.js. it fetches tasks from different platforms you use &amp; also use AI to reschedule tasks or assign tags + other metadata to tasks.\" title=\"Built this task aggregator web app in Django + Vue.js. it fetches tasks from different platforms you use &amp; also use AI to reschedule tasks or assign tags + other metadata to tasks.\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I built this productivity app in django + vue.js &amp; hosted on vps with nginx as reverse proxy.</p> <p>I&#39;m using<br/> celery - for auto moving incomplete task to next &amp; other periodic tasks.<br/> django channels - publishing tasks updates back to vue.js frontend</p> <p>fernet - for encrypting tasks</p> <p>resend - for emails ( provides a generous free tier )<br/> uvicorn - async server</p> <p>postgres - database</p> <p>vue specific libraries:</p> <p>vuedraggable: for dragging tasks b/w kanban columns</p> <p>dompurify: prevent xss</p> <p>fullcalendar: calendar sidebar</p> <p>floating-ui/dom: for floating buttons</p> <p>vue3-popper: show tooltips in a better way</p> <p>hosted on <a href=\"https://lazyplanner.app\">https://lazyplanner.app</a> </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Secure-Composer-9458\"> /u/Secure-Composer-9458 </a> <br/> <span><a href=\"https://v.redd.it/efrvuix792wg1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sph1sn/built_this_task_aggregator_web_app_in_django/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-04-19T02:52:05.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sph1sn/built_this_task_aggregator_web_app_in_django/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "vue-toastflow 1.1.9 is out!",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sp70f4/vuetoastflow_119_is_out/\"> <img src=\"https://preview.redd.it/44er1z1410wg1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=69c48fd3840c721d866bd4746fd546ff002ee2e3\" alt=\"vue-toastflow 1.1.9 is out!\" title=\"vue-toastflow 1.1.9 is out!\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>New release of Toastflow, my open-source toast library for Vue 3 and Nuxt. Here&#39;s what changed:</p> <p><strong>API</strong></p> <ul> <li>🎨 CSS variable overrides directly on toasts, inline theming without custom CSS classes</li> <li>🔘 Boolean prop to show/hide the toast icon per-toast</li> <li>🖌️ Custom theme support per toast instance</li> </ul> <p><strong>Performance</strong></p> <ul> <li>⚡ Progress bar now uses <code>transform</code> instead of <code>width</code> (GPU composited, no layout thrash)</li> <li>📱 Mobile: hold to pause progress bar (previously tap, which was awkward)</li> </ul> <p><strong>Fixes</strong></p> <ul> <li>Color now cascades correctly to title and description</li> <li>Deep merge in <code>#update</code>, all fields optional since title/description already exist</li> <li>z-index fix so dismissed toasts won&#39;t appear above active ones</li> <li>All <code>package.json</code> entrypoints point to <code>dist/</code> outputs</li> </ul> <p>👨‍💻 GitHub: <a href=\"https://github.com/adrianjanocko/toastflow\">https://github.com/adrianjanocko/toastflow</a><br/> 🎮 Playground: <a href=\"https://toastflow.top\">https://toastflow.top</a><br/> 📕 Docs: <a href=\"https://docs.toastflow.top/guide/live-examples\">https://docs.toastflow.top/guide/live-examples</a><br/> 🆚 Comparisons: <a href=\"https://docs.toastflow.top/comparisons/overview\">https://docs.toastflow.top/comparisons/overview</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Ill_Swan_4265\"> /u/Ill_Swan_4265 </a> <br/> <span><a href=\"https://i.redd.it/44er1z1410wg1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sp70f4/vuetoastflow_119_is_out/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-04-18T19:31:01.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sp70f4/vuetoastflow_119_is_out/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "If you like to have music to focus while coding check this out",
-    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/itsachillaccount\"> /u/itsachillaccount </a> <br/> <span><a href=\"https://www.reddit.com/r/itsachillaccount/comments/1sej91h/coding_playlists_for_my_learning_journey/oeqat6s/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sptqbt/if_you_like_to_have_music_to_focus_while_coding/\">[comments]</a></span>",
-    "date": "2026-04-19T13:58:53.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sptqbt/if_you_like_to_have_music_to_focus_while_coding/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "I built VueDigest to keep up with everything in the Vue ecosystem (releases, events, content)",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey all,</p> <p>I kept running into the same problem: staying up to date with Vue.js &amp; Nuxt without constantly checking GitHub, Twitter, blogs, and event pages.</p> <p>So I built <strong>VueDigest</strong> 👉 <a href=\"https://vuedigest.com\">https://vuedigest.com</a></p> <p>It brings everything into one place:</p> <ul> <li>📦 Latest releases from Vue, Nuxt, and key ecosystem projects (with AI summaries)</li> <li>🗓️ Upcoming Vue/Nuxt conferences &amp; events</li> <li>📚 Latest articles &amp; videos from a curated list of quality sources</li> </ul> <p>The idea is to cut through the noise and make it easy to quickly see what matters.</p> <p>Would love your feedback — anything missing that you’d want in a tool like this?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/mokkapps\"> /u/mokkapps </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sooj38/i_built_vuedigest_to_keep_up_with_everything_in/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sooj38/i_built_vuedigest_to_keep_up_with_everything_in/\">[comments]</a></span>",
-    "date": "2026-04-18T05:17:28.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sooj38/i_built_vuedigest_to_keep_up_with_everything_in/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "My Own Personal Portfolio Website in VueJS",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hello, I created a portfolio website using VueJS, Firebase, Cloudinary and to add some flair, TSParticles.</p> <p>Would love your feedback and critique on it. I uploaded the live link and repo link for ya’ll to check it out.</p> <p>Love VueJS, I wish it could have more love.</p> <p>Live Link: <a href=\"https://jherogr.github.io/portfolio-website\">https://jherogr.github.io/portfolio-website</a></p> <p>Repo Link: <a href=\"https://github.com/JHeroGR/portfolio-website\">https://github.com/JHeroGR/portfolio-website</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/JHeroGR\"> /u/JHeroGR </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1somesz/my_own_personal_portfolio_website_in_vuejs/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1somesz/my_own_personal_portfolio_website_in_vuejs/\">[comments]</a></span>",
-    "date": "2026-04-18T03:31:26.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1somesz/my_own_personal_portfolio_website_in_vuejs/"
   }
 ]
