@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Porfolio website by Vue developer",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone. I finally shipped my personal site after years of dormancy. It’s a fully static Nuxt site with GSAP scrolling animations and a few interactive service cards. Would love to hear your thoughts and critique. Feel free to throw stones😄</p> <p>Link: <a href=\"https://www.arabdaev.com\">https://www.arabdaev.com</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/first_asian_in_space\"> /u/first_asian_in_space </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1syoh2c/porfolio_website_by_vue_developer/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1syoh2c/porfolio_website_by_vue_developer/\">[comments]</a></span>",
+    "date": "2026-04-29T04:32:21.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1syoh2c/porfolio_website_by_vue_developer/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "I built vue-rbac — a full-featured RBAC library for Vue 3 with guard component, TTL cache and more. Feedback & contributors welcome!",
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey There!</p> <p>Authorization logic is one of those things that starts simple and ends up scattered everywhere - <code>v-if=&quot;user.role === &#39;admin&#39;&quot;</code> in 40 different components, no inheritance, no fallback states. I&#39;ve been there too many times, so I built <strong>vue-rbac</strong> to fix it properly.</p> <p><strong>What it does</strong></p> <p>vue-rbac is a lightweight, dependency-free RBAC plugin for Vue 3 that gives you a consistent, declarative way to handle roles and permissions.</p> <p><strong>Full feature list</strong></p> <ul> <li>Role &amp; permission system with <strong>inheritance chains</strong> (admin → editor → viewer) </li> <li>5 directives: <code>v-rbac</code>, <code>v-rbac:role</code>, <code>v-rbac:any</code>, <code>v-rbac:all</code>, <code>v-rbac:not</code></li> <li><strong>Wildcard permissions</strong> — <code>users:*</code> grants all actions on a resource </li> <li><code>&lt;RbacGuard&gt;</code> <strong>component</strong> with <code>#fallback</code> and <code>#loading</code> slots </li> <li><code>useRBAC()</code> composable for programmatic access &amp; reactive state </li> <li>3 config modes: static, dynamic (fetch from API), and hybrid </li> <li>Built-in storage adapters: localStorage, sessionStorage, cookies </li> <li><strong>TTL-based caching</strong> with manual invalidation </li> <li>Retry with exponential backoff for failed fetches </li> <li>Configurable log levels </li> <li>Zero dependencies, TypeScript-first</li> </ul> <p><strong>Install</strong></p> <pre><code>pnpm add @nangazaki/vue-rbac </code></pre> <p><strong>Basic setup</strong></p> <pre><code>app.use(VueRBAC, { config: { mode: CONFIG_MODE.STATIC, roles: { admin: { permissions: [&#39;users:create&#39;, &#39;posts:create&#39;], inherits: [&#39;editor&#39;], }, editor: { permissions: [&#39;posts:edit&#39;], inherits: [&#39;viewer&#39;], }, viewer: { permissions: [&#39;posts:view&#39;] }, }, }, }) </code></pre> <p><strong>Directives — keep your templates clean</strong></p> <pre><code>&lt;button v-rbac=&quot;&#39;users:create&#39;&quot;&gt;Add User&lt;/button&gt; &lt;div v-rbac:role=&quot;&#39;admin&#39;&quot;&gt;Admin Panel&lt;/div&gt; &lt;div v-rbac:any=&quot;[&#39;posts:edit&#39;, &#39;posts:create&#39;]&quot;&gt;Editor or Admin&lt;/div&gt; &lt;div v-rbac:all=&quot;[&#39;posts:edit&#39;, &#39;posts:publish&#39;]&quot;&gt;Full Editor Access&lt;/div&gt; &lt;div v-rbac:not=&quot;&#39;admin&#39;&quot;&gt;Visible to non-admins only&lt;/div&gt; </code></pre> <p><strong>Wildcard permissions</strong></p> <p>Assign <code>resource:*</code> to grant all actions on that resource:</p> <pre><code>roles: { superadmin: { permissions: [&#39;users:*&#39;] } } rbac.hasPermission(&#39;users:create&#39;) // true rbac.hasPermission(&#39;users:delete&#39;) // true rbac.hasPermission(&#39;posts:create&#39;) // false — different resource </code></pre> <p><strong>RbacGuard component — with fallback &amp; loading slots</strong></p> <p>When directives aren&#39;t enough (e.g. you need to show something on denial, or handle a loading state while roles are fetched):</p> <pre><code>&lt;RbacGuard permission=&quot;users:create&quot;&gt; &lt;CreateUserForm /&gt; &lt;template #fallback&gt; &lt;p&gt;You don&#39;t have access to this.&lt;/p&gt; &lt;/template&gt; &lt;template #loading&gt; &lt;Spinner /&gt; &lt;/template&gt; &lt;/RbacGuard&gt; </code></pre> <p>Supports the same props as the directives: <code>role</code>, <code>permission</code>, <code>any</code>, <code>all</code>, <code>not</code>.</p> <p><strong>TTL cache + retry with exponential backoff</strong></p> <p>In dynamic mode, fetched roles are cached to avoid redundant API calls. You control the TTL and can invalidate manually:</p> <pre><code>app.use(VueRBAC, { config: { mode: CONFIG_MODE.DYNAMIC, fetchRoles: async () =&gt; (await fetch(&#39;/api/roles&#39;)).json(), cacheTtl: 30 * 60 * 1000, // 30 minutes (set 0 to disable) retry: { attempts: 3, delay: 1000, backoff: 2 }, // 1s → 2s → 4s }, }) // Invalidate manually (e.g. after login/logout): const { invalidateCache } = useRBAC() invalidateCache() </code></pre> <p><strong>useRBAC() composable</strong></p> <pre><code>const { state, setUserRoles, hasRole, hasPermission, hasAnyPermission } = useRBAC() state.isLoading // true while roles are being fetched state.userRoles // reactive list of active roles setUserRoles([&#39;admin&#39;, &#39;editor&#39;]) hasPermission(&#39;posts:create&#39;) // true hasAnyPermission([&#39;posts:edit&#39;, &#39;posts:view&#39;]) // true </code></pre> <p><strong>GitHub:</strong> <a href=\"https://github.com/nangazaki/vue-rbac\">https://github.com/nangazaki/vue-rbac</a> </p> <p><strong>Docs:</strong> <a href=\"https://vue-rbac.nangazaki.io\">https://vue-rbac.nangazaki.io</a></p> <p><strong>I&#39;d love your feedback on:</strong></p> <ul> <li>Is the API intuitive? Anything that feels awkward? </li> <li>Use cases that aren&#39;t covered yet? </li> <li>Performance or architecture concerns? </li> </ul> <p>Thanks for checking it out!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Confident_Act5884\"> /u/Confident_Act5884 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy268p/i_built_vuerbac_a_fullfeatured_rbac_library_for/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sy268p/i_built_vuerbac_a_fullfeatured_rbac_library_for/\">[comments]</a></span>",
     "date": "2026-04-28T13:56:14.000Z",
@@ -37,6 +50,19 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/\"> <img src=\"https://external-preview.redd.it/fTYIAgY0JO5ZmZlRNOaf-lI5LagEksVGLRLGtSSja1I.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=7de701d6ae581bbe53463c0b3dc9886cc319fef9\" alt=\"Playwright and Github Actions\" title=\"Playwright and Github Actions\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/xhxpS100H5Q\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-04-28T07:21:12.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1sxu80d/playwright_and_github_actions/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Nice check this! Consuming backend api has never been so easy not in REST nor gRPC it beats even encore and tRPC 🤯",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p><a href=\"https://x.com/pladynski/status/2049222504842170535?s=46\">https://x.com/pladynski/status/2049222504842170535?s=46</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/pladynski\"> /u/pladynski </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1syda03/nice_check_this_consuming_backend_api_has_never/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1syda03/nice_check_this_consuming_backend_api_has_never/\">[comments]</a></span>",
+    "date": "2026-04-28T20:29:32.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1syda03/nice_check_this_consuming_backend_api_has_never/"
   },
   {
     "publisherId": "reddit-dev",
@@ -297,31 +323,5 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>For the last 4 or 5 years my day job has been pretty much locked in. A mix of Next.js, Java, .NET, different tools, but it all kind of feels like the same setup after a while. I know all have their place and I&#39;m not complaining about either</p> <p>But recently I&#39;ve picked up a few freelance clients and ended up working with Vue on Vite with Laravel on the backend. And it&#39;s hard to put into words how fresh it feels</p> <p>The speed alone is one thing but it&#39;s more than that. The whole setup just feels lighter. Like the tools aren&#39;t fighting you. Hot reload that actually JUST works, config that doesn&#39;t take a morning to figure out, everything just sitting where you expect it</p> <p>I know I&#39;m probably just experiencing the grass is greener effect to some extent. But coming back to this stack after years of enterprise stuff reminded me why I liked building things in the first place</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Motor_Ordinary336\"> /u/Motor_Ordinary336 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sqnafm/i_slept_on_vue_for_way_too_long/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sqnafm/i_slept_on_vue_for_way_too_long/\">[comments]</a></span>",
     "date": "2026-04-20T12:02:54.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1sqnafm/i_slept_on_vue_for_way_too_long/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "What makes Vue fit Laravel so well for so many teams",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>there&#39;s something about the Vue and Laravel combo that just works in a way that&#39;s hard to explain to someone outside the ecosystem</p> <p>the templates feel natural if you come from a backend background. the reactivity doesn&#39;t get in your way. and the whole Inertia layer makes it feel like one coherent thing rather than two separate tools awkwardly stitched together</p> <p>I&#39;ve used React on other projects and it&#39;s fine, but it always feels like a different world from the backend. With Vue and Laravel it feels like the same team made both, even though they didn&#39;t</p> <p>anyone else feel this or is it just familiarity at this point?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Motor_Ordinary336\"> /u/Motor_Ordinary336 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1spy0dw/what_makes_vue_fit_laravel_so_well_for_so_many/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1spy0dw/what_makes_vue_fit_laravel_so_well_for_so_many/\">[comments]</a></span>",
-    "date": "2026-04-19T16:41:48.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1spy0dw/what_makes_vue_fit_laravel_so_well_for_so_many/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Playwright and Webstorm - E2E tests made easy to create and maintain",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/\"> <img src=\"https://external-preview.redd.it/j0zqyU4iUt0Z6hnPeBBJJZzbuKTwpFhelKrk6FdMMaM.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=41ab00cc674bc0780aa00a20bf7e3906111ee947\" alt=\"Playwright and Webstorm - E2E tests made easy to create and maintain\" title=\"Playwright and Webstorm - E2E tests made easy to create and maintain\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/3GbOccRg5m8\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-04-20T07:24:26.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1sqi9m4/playwright_and_webstorm_e2e_tests_made_easy_to/"
   }
 ]

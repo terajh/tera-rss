@@ -4,12 +4,193 @@
     <title>dev RSS - 네이버 D2</title>
     <link>https://d2.naver.com</link>
     <description>네이버 D2 RSS 피드</description>
-    <lastBuildDate>Tue, 28 Apr 2026 17:10:22 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 29 Apr 2026 16:47:42 GMT</lastBuildDate>
+    <item>
+      <title>비개발자의 AI 협업 도전기 — 생산성 측정하려다 서버까지 띄운 9일</title>
+      <link>https://d2.naver.com/helloworld/2017402</link>
+      <guid>https://d2.naver.com/helloworld/2017402</guid>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&quot;조직이 잘하고 있는지 어떻게 알 수 있을까?&quot; 이 질문에서 출발해 사내 가이드 문서와 AI를 붙들고 직접 측정 도구를 완성하기까지 9일이 걸렸습니다. 그 과정을 기록으로 남깁니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;사내 생산성 측정에 관한 고민&lt;/h2&gt;
+        
+        &lt;p&gt;기술 PM으로 일하면서 조직과 프로젝트의 생산성을 어떻게 측정할지는 늘 풀리지 않는 과제였습니다. 스프린트를 원활하게 진행하는 것 같아도 막상 이를 수치로 보여달라고 하면 난감했습니다. 속도가 빨라지는지, 병목이 어디서 발생하는지, 지난 분기보다 나아지고 있는지 감각적으로는 알 수 있었지만 데이터로 명확히 설명하기는 어려웠습니다.&lt;/p&gt;
+        
+        &lt;p&gt;사내에는 이미 &apos;DevOps board&apos;라는 시스템이 있어 배포 빈도와 리드타임을 포함한 DORA 지표를 제공하고 있습니다. 소프트웨어 딜리버리 흐름을 측정한다는 점에서 제가 찾던 도구에 가까웠습니다. 다만 저는 분석 지표와 상황에 맞추어 조금 더 세분화된 데이터를 들여다보고 싶었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;그래서 먼저 Jira 대시보드를 만들어 리치 필터(rich filter)로 데이터를 추출해 보았습니다. 이슈 완료 수, 스프린트 완료율, 컴포넌트별 작업량 등 여러 수치가 모였지만, 수집한 숫자만으로는 조직의 작업 속도를 한눈에 파악하기 어려웠습니다. 작업이 어디서 얼마나 걸리는지도 보이지 않았습니다. Jira는 업무를 관리하는 도구일 뿐 소프트웨어 딜리버리 흐름 전체를 측정하는 도구는 아니기 때문입니다.&lt;/p&gt;
+        
+        &lt;p&gt;결국 특정 컴포넌트 기준의 분류, 팀 고유의 이슈 타입 정의, 팀 내 업무 흐름을 세밀하게 들여다볼 수 있는 맞춤형 도구가 필요했습니다. 기존 DevOps board를 대체하려는 것이 아니라, 팀의 상황에 맞추어 데이터를 직접 구성해 보고 싶었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;문제는 제가 이를 직접 구현할 기술적 역량이 부족하다는 점이었습니다. 개발자에게 부탁하기에는 작업 규모가 작았고, 백로그에 등록하더라도 언제 진행될지 기약할 수 없었습니다. 그래서 AI의 도움을 받아 직접 만들어 보기로 했습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;1html&quot;&gt;1단계: HTML 파일 하나로 가설 검증&lt;/h2&gt;
+        
+        &lt;p&gt;처음에는 배포, 서버, 인증 과정을 모두 생략하고 HTML 파일 하나로 가볍게 시작했습니다. 브라우저에서 Jira 변경 기록(changelog) CSV 파일을 파싱해 바로 시각화하는 구조였습니다.&lt;/p&gt;
+        
+        &lt;p&gt;AI에게 전달한 첫 프롬프트에는 현재 상황과 맥락을 최대한 자세히 담았습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;Jira 이슈별 changelog CSV에는 &apos;Issue Key&apos;, &apos;Status&apos;, &apos;Created&apos; 칼럼이 있어.
+        
+        각 이슈가 &apos;In Progress&apos;로 처음 전환된 시각과 &apos;Done&apos;으로 전환된 시각의 차이를 일(day) 단위로 계산하고 싶어. 팀별, 이슈 타입별로 집계해서 주차별 트렌드를 보여주는 웹 대시보드를 만들고 싶은데,
+        
+        구조는 이해하지만 직접 구현은 못 해.
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이 프롬프트에는 데이터 형식, 원하는 결과물, 그리고 저의 기술적 한계가 모두 들어가 있습니다.&lt;/p&gt;
+        
+        &lt;p&gt;AI는 곧바로 코드를 작성하는 대신 발생할 수 있는 예외 상황(edge case)을 먼저 짚어 주었습니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;이슈가 In Progress → Backlog → In Progress로 다시 이동했다가 Done이 되는 경우, 리드타임 기산점을 첫 번째 In Progress로 할지 마지막으로 할지 정의가 필요해요. Done 이후 재오픈 케이스는요?
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;이 질문을 받기 전까지는 저 역시 이러한 예외 상황을 생각하지 못했습니다. 실제로 확인해 보니 데이터에 해당 사례가 적지 않게 포함되어 있었습니다. 결국 AI와 대화하는 과정 자체가 요구사항 정의 세션이 된 셈입니다.&lt;/p&gt;
+        
+        &lt;p&gt;물론 초기에는 버그도 있었습니다. Jira CSV의 타임스탬프가 UTC 기준이라 KST로 변환해 날짜를 계산해야 했고, 내보내기 설정에 따라 이슈 타입 필드명이 달라지는 문제도 있었습니다. 이럴 때는 문제를 말로 설명하기보다 실제 CSV 헤더와 샘플 데이터 일부를 AI에게 그대로 보여주는 편이 훨씬 효과적이었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이렇게 해서 대시보드 화면에 리드타임 수치가 나타났습니다. 하지만 그 숫자를 보면서 새로운 의문이 생겼습니다. &lt;strong&gt;이 수치가 좋은 편인지 나쁜 편인지는 어떻게 알 수 있을까요?&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;2dora&quot;&gt;2단계: DORA 지표를 통한 기준 마련&lt;/h2&gt;
+        
+        &lt;p&gt;리드타임을 측정하는 것과 그 수치의 의미를 파악하는 것은 별개의 문제였습니다. 그래서 소프트웨어 딜리버리 성과를 측정하는 프레임워크인 DORA 지표를 참고했습니다. DORA 지표는 수많은 팀과 프로젝트의 데이터를 분석해 도출한 네 가지 핵심 지표로 구성됩니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;배포 빈도&lt;/li&gt;
+        &lt;li&gt;변경 리드타임&lt;/li&gt;
+        &lt;li&gt;변경 실패율&lt;/li&gt;
+        &lt;li&gt;서비스 복구 시간&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;여러 연구를 통해 이 네 가지 지표가 팀의 딜리버리 역량을 가장 잘 설명한다는 사실이 검증되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;제가 측정한 Jira 리드타임은 이 중 &apos;변경 리드타임&apos;에 해당했습니다. 작업 시작부터 실제 배포까지 걸리는 시간입니다. 나머지 지표를 확인하려면 추가 데이터가 필요했습니다. 배포 빈도는 배포 이벤트 로그에서, 변경 실패율과 복구 시간은 PR(Pull Request) 및 이슈 데이터에서 얻을 수 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;결국 Jira 데이터만으로는 전체 딜리버리 흐름의 절반만 볼 수 있었습니다. 나머지 절반을 채우려면 사내 GitHub 데이터를 연동해야 했습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;3ai&quot;&gt;3단계: AI를 활용한 서버 구축과 가이드 문서&lt;/h2&gt;
+        
+        &lt;p&gt;GitHub API를 주기적으로 호출하고 이를 Jira 데이터와 결합하려면 단순한 브라우저용 HTML 환경으로는 부족했습니다. 별도의 서버가 필요해진 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;사실 이 시점에서 진행을 포기할까 고민도 했습니다. Dockerfile을 한 번도 작성해 본 적 없는 비개발자가 컨테이너 기반 배포를 직접 해낼 수 있을지 확신이 서지 않았기 때문입니다.&lt;/p&gt;
+        
+        &lt;p&gt;일단 사내 공통 컨테이너 플랫폼인 &apos;N3R&apos;의 가이드 문서부터 찾아보았습니다. 하지만 낯선 용어가 많아 문서 첫 페이지부터 막막했습니다. 그래서 접근 방식을 바꿨습니다. 가이드 문서를 혼자 끙끙대며 읽는 대신, 그 내용을 AI에게 전달하고 함께 해석해 나가기 시작한 것입니다.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;이 가이드에 이렇게 나와 있는데, 파이썬 FastAPI 앱에 적용하면 Dockerfile을 어떻게 써야 해? [가이드 해당 섹션 붙여넣기]
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;&lt;strong&gt;가이드 문서에는 사내 환경과 표준 규칙이 담겨 있습니다. AI는 그 내용을 제 상황에 맞게 구체화해 주었습니다.&lt;/strong&gt; 둘 중 어느 한쪽만으로는 해결이 어려웠지만, 가이드 문서와 AI를 교차로 활용함으로써 무사히 서버를 띄울 수 있었습니다.&lt;/p&gt;
+        
+        &lt;h2 id=&quot;4&quot;&gt;4단계: 스케줄러 설정과 데이터 누락 문제 해결&lt;/h2&gt;
+        
+        &lt;p&gt;서버를 구축했다고 해서 데이터가 저절로 모이는 것은 아닙니다. Jira와 GitHub API를 주기적으로 호출해 줄 스케줄러가 필요했습니다. 다행히 사내에는 이미 Self-Hosted Runner 환경과 관련 설정 가이드 문서가 마련되어 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;돌이켜보면 9일 중 가장 많은 시간을 이 구간에서 소요했습니다. Runner 환경 변수 설정, 인증 토큰 발급, API 페이지네이션(pagination) 처리 등 예상치 못한 문제가 꼬리를 물고 나타났기 때문입니다.&lt;/p&gt;
+        
+        &lt;p&gt;그중에서도 가장 애를 먹었던 부분은 API 페이지네이션이었습니다. 조회할 이슈가 1,000개를 넘어가면 API 응답이 중간에 잘리는데, 초기에 AI가 작성한 코드에는 이 예외 처리가 누락되어 있었습니다. 오류 메시지조차 없이 데이터만 조용히 누락되고 있었고, 나중에 직접 숫자를 대조하며 검증하다가 우연히 발견했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 과정을 거치며 제가 AI에게 질문하는 방식도 달라졌습니다. 초반에는 &quot;이거 어떻게 해요?&quot;에 가까웠다면, 나중에는 가이드 내용, 현재 설정 파일, 오류 메시지를 함께 붙여 &quot;이 값을 내 상황에 어떻게 적용하면 돼?&quot;라고 물었습니다. &lt;strong&gt;상황과 맥락을 자세히 전달할수록 AI의 답변은 훨씬 정확해졌습니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;5&quot;&gt;5단계: 사내 스토리지 연동과 사람의 역할&lt;/h2&gt;
+        
+        &lt;p&gt;수집한 데이터를 저장하고 필요할 때 화면에 제공하려면 스토리지가 필요했습니다. 사내에서 제공하는 Redis 기반 스토리지인 nBase-ARC를 활용하기로 하고 관련 가이드 문서를 참고했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;AI는 보편적인 Redis 사용법은 훌륭하게 알려 주었습니다. 하지만 사내의 특수한 네트워크 정책, 고유한 TTL 설정 방식, 접근 권한 신청 프로세스 같은 내부 정보는 알지 못했습니다. 이런 부분에서는 사내 가이드 문서와 사내 AI 기반 문의 채널 ASK가 도움이 되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;strong&gt;널리 공개된 기술 스택을 다룰 때 AI는 탁월한 조력자입니다. 하지만 사내 특화 환경, 내부 정책, 조직 고유의 관행은 AI가 파악할 수 없는 영역입니다. 이 영역은 결국 사람이, 문서가, 동료가 채워야 합니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;완성된 대시보드의 효과&lt;/h2&gt;
+        
+        &lt;p&gt;이제 Jira와 GitHub 데이터는 매일 자동으로 수집됩니다. 대시보드에 접속하면 조직과 프로젝트의 전반적인 딜리버리 흐름을 한눈에 확인하고 다음과 같은 것들을 쉽게 파악할 수 있습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;리드타임이 유독 길어지는 구간&lt;/li&gt;
+        &lt;li&gt;특정 이슈 타입에서 반복되는 병목 현상&lt;/li&gt;
+        &lt;li&gt;스프린트 후반부에 배포 이벤트가 몰리는 패턴&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;&apos;요즘 왠지 개발 속도가 느려진 것 같다&apos;는 막연한 느낌을 이제는 데이터를 근거로 설명할 수 있게 되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;물론 이 대시보드가 완벽한 측정 도구는 아닙니다. DORA 지표를 온전히 구현한 것도 아닙니다. 하지만 측정 도구가 아예 없었을 때와 비교하면 확실한 차이가 있습니다. &lt;strong&gt;가장 큰 변화는 조직 회고 시간의 논의 수준이 달라졌다는 점입니다. 막연한 감이 아니라 실제 데이터를 보면서 이야기하게 되었습니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;프로젝트를 진행하며 배운 점&lt;/h2&gt;
+        
+        &lt;h3 id=&quot;ai&quot;&gt;기획의 재발견: AI는 마법사가 아니라 정밀한 조각가다&lt;/h3&gt;
+        
+        &lt;p&gt;AI는 사용자가 원하는 바를 구현하는 데 탁월한 능력을 보여줍니다. 하지만 그 전제는 사용자 스스로 &apos;무엇을 원하는지&apos;를 명확히 알고 있어야 한다는 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;작업을 하면서 특히 효과적이라고 느낀 소통 방식은 다음 세 가지였습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;실제 데이터를 예시로 보여주기&lt;/li&gt;
+        &lt;li&gt;발생 가능한 예외 상황을 미리 정의하기&lt;/li&gt;
+        &lt;li&gt;기대한 결과와 실제 결과의 차이를 명확히 짚어 주기&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;이 세 가지 요건이 충족될 때 AI는 가장 정확한 결과물을 내놓았습니다. 결국 &lt;strong&gt;기획이란 필요한 기능을 나열하는 작업이 아니라, AI가 올바르게 이해하고 작업할 수 있도록 꼼꼼한 설계도를 그리는 과정이었습니다. 얼마나 명확하고 구체적으로 지시하느냐가 최종 결과물의 품질을 결정&lt;/strong&gt;했습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;ai&quot;&gt;인프라의 벽: 가이드와 AI, 둘 다 필요했다&lt;/h3&gt;
+        
+        &lt;p&gt;서버를 구축하는 과정에서는 사내 가이드 문서와 AI를 함께 활용해야 했습니다. 가이드 문서는 사내 환경을 정확히 설명해 주었지만 제 프로젝트 상황에 딱 맞는 답을 주지는 못했습니다. 반대로 AI는 기술적 원리를 잘 설명해 주었지만 사내 환경의 특수성은 알지 못했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;따라서 이 둘을 교차해서 쓰는 것이 가장 효율적이었습니다. 가이드 문서의 내용을 AI에게 알려 주고 그 의미를 함께 해석하는 방식입니다. 가이드 문서가 &apos;무엇을&apos; 해야 하는지 알려주면, AI가 &apos;어떻게&apos; 해야 하는지 구체화했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;&lt;strong&gt;새로운 아이디어의 실현은 도구의 발전에서 비롯되지만, 그것이 지속 가능하게 유지하는 힘은 안정적인 인프라에서 나옵니다. 그리고 비개발자조차 그 인프라에 접근해 활용할 수 있도록 길을 열어 주는 것은 결국 잘 작성된 가이드 문서입니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h3 id=&quot;ai&quot;&gt;토큰의 무게: AI는 공짜가 아니다&lt;/h3&gt;
+        
+        &lt;p&gt;AI를 활용하면서 토큰(비용)이 유독 많이 소모되는 구간이 있었습니다. 대체로 다음과 같은 상황이었습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;AI가 매번 코드 전체를 새로 읽게 했던 초반&lt;/li&gt;
+        &lt;li&gt;대화 맥락을 정리하지 않고 질문을 무분별하게 이어 갔던 중반&lt;/li&gt;
+        &lt;li&gt;분석 탭에서 AI API를 3번 순차 호출하던 구조&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;해법은 &apos;역할 분리&apos;였습니다. 데이터 파싱이나 집계 같은 단순 계산은 JavaScript 코드가 직접 처리하도록 하고, AI에게는 최종적으로 요약된 수치만 전달해 의미 해석을 맡기는 구조로 바꿨습니다. 그러자 토큰 사용량이 눈에 띄게 줄었고 응답 속도도 훨씬 빨라졌습니다.&lt;/p&gt;
+        
+        &lt;p&gt;어떤 기능을 구현하기 전에는 &quot;&lt;strong&gt;이 작업을 반드시 AI가 처리해야 하는가?&lt;/strong&gt;&quot;를 먼저 자문해 볼 필요가 있습니다. 명확한 규칙으로 처리할 수 있는 작업은 코드로 해결하고, AI는 문맥 판단이나 해석이 필요한 영역에만 제한적으로 활용하는 편이 효율적입니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;ai&quot;&gt;AI의 한계: 오류가 없다고 올바른 것은 아니다&lt;/h3&gt;
+        
+        &lt;p&gt;가장 많은 시간을 낭비하게 만든 것은 역설적이게도 AI가 확신에 차서 작성해 준 코드였습니다. 앞서 언급한 API 페이지네이션 코드는 겉보기에는 아무런 오류 없이 매끄럽게 동작했습니다. 하지만 이슈가 1,000개를 넘어가는 순간부터 데이터가 시스템 내부에서 조용히 누락되고 있었습니다. 출력된 수치를 꼼꼼히 검증해 보지 않았다면 끝까지 몰랐을 문제였습니다.&lt;/p&gt;
+        
+        &lt;p&gt;따라서 &lt;strong&gt;AI가 만들어 준 코드는 오류 없이 실행되는지 확인하는 선에서 그쳐서는 안 됩니다. 도출된 결과가 실제로 정확한지 정합성을 검증하는 단계가 반드시 필요합니다.&lt;/strong&gt; 샘플 데이터로 직접 계산한 값과 AI의 결과물을 대조해 보는 과정은 번거롭지만 생략할 수 없습니다.&lt;/p&gt;
+        
+        &lt;h3 id=&quot;&quot;&gt;생태계의 제언: &apos;데이터 민주주의&apos;를 위한 조건&lt;/h3&gt;
+        
+        &lt;p&gt;비개발자인 제가 이 프로젝트를 무사히 마칠 수 있었던 것은 AI의 능력 덕분만은 아니었습니다. 든든한 사내 가이드 문서가 뒷받침되었기에 가능한 일이었습니다. 가이드 문서가 없었다면 아무리 훌륭한 AI라도 사내 환경에 맞는 결과물을 만들어내기 어려웠을 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;회사에는 방대한 데이터와 훌륭한 인프라가 있습니다. 하지만 권한은 열려 있어도 이를 실제로 활용할 수 있는 사람은 극소수인, 이른바 &apos;접근은 가능하지만 접근할 수 있는 사람은 없는&apos; 상태에 머무는 경우가 많습니다.&lt;/p&gt;
+        
+        &lt;p&gt;API 사용 가이드를 조금 더 체계적으로 다듬고, 자주 쓰이는 템플릿 코드를 사내에 공유하고, 보안 가이드라인을 명확히 제시해 주는 것만으로도 수많은 사내 맞춤형 도구가 새롭게 만들어질 수 있습니다. &lt;strong&gt;비개발자가 AI와 협업해 가치 있는 무언가를 만들어 내는 진정한 전제 조건은 결국 &apos;친절하고 정확한 가이드 문서&apos;입니다. AI는 사용자가 그 가이드를 조금 더 쉽게 소화하고 자기 상황에 적용할 수 있도록 돕는 훌륭한 조력자일 뿐입니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
+        
+        &lt;p&gt;불과 9일 전의 저는 스스로 서버를 구축할 수 있을 거라고는 생각도 못 했습니다. 그런데 결국 Dockerfile을 작성하고, 컨테이너를 빌드해 배포하고, API를 주기적으로 호출하는 스케줄러를 구성했으며, Redis에 데이터를 읽고 쓰는 경험까지 했습니다. 코드는 대부분 AI가 작성해 주었지만, &apos;무엇을 만들 것인지&apos;, &apos;어떤 구조로 설계할 것인지&apos;, &apos;최종 결과물이 올바른지&apos;를 판단하는 몫은 온전히 제게 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;대시보드의 숫자를 보며 종종 생각합니다. &apos;우리 조직과 프로젝트는 잘 나아가고 있나?&apos; 예전에는 막연했던 그 질문에, 이제는 데이터를 근거로 조금은 명확한 답을 할 수 있게 되었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;동료에게서 &quot;이거 어떻게 만드셨어요?&quot;라는 질문을 받을 때마다 저는 이렇게 답하곤 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;&quot;AI한테 말로 시켰어요. 그런데 뭘 시킬지는 제가 알아야 했어요.&quot;&lt;/p&gt;
+        
+        &lt;p&gt;이 글을 통해 전하고 싶은 메시지는 단 하나입니다. &lt;strong&gt;AI를 잘 활용하는 조직은 성능 좋은 AI 도구를 선별하는 데 그치지 않고, AI가 역량을 제대로 발휘할 수 있는 밑바탕 환경을 먼저 탄탄하게 갖춘 조직입니다.&lt;/strong&gt;&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;데이터를 같은 기준으로 관리하려는 조직적 합의&lt;/li&gt;
+        &lt;li&gt;누구나 안전하게 접근하여 실험할 수 있는 열린 인프라&lt;/li&gt;
+        &lt;li&gt;비개발자도 천천히 따라갈 수 있도록 작성된 가이드 문서&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;이 세 가지가 바로 AI 시대에 필요한 인프라입니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>네이버 검색의 대규모 메트릭 저장소, VictoriaMetrics 운영기</title>
       <link>https://d2.naver.com/helloworld/6475419</link>
       <guid>https://d2.naver.com/helloworld/6475419</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;h2 id=&quot;125555victoriametrics&quot;&gt;12.5억 개의 시계열과 555조 개의 데이터포인트를 다루는 VictoriaMetrics 아키텍처와 무중단 장비 전환&lt;/h2&gt;
         
@@ -291,7 +472,7 @@
       <title>NAVER SECURITY SEMINAR 참가 신청을 시작합니다!</title>
       <link>https://d2.naver.com/news/6236639</link>
       <guid>https://d2.naver.com/news/6236639</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=&quot;/content/images/2026/04/3472611488368805128--1-.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
         
@@ -397,7 +578,7 @@
       <title>[사전 안내] 첫 번째 &apos;NAVER SECURITY SEMINAR&apos;가 열립니다.</title>
       <link>https://d2.naver.com/news/2009415</link>
       <guid>https://d2.naver.com/news/2009415</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=&quot;/content/images/2026/04/3472611488368805128--1-.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
         
@@ -441,7 +622,7 @@
       <title>FE News 26년 4월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/6428522</link>
       <guid>https://d2.naver.com/news/6428522</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -486,7 +667,7 @@
       <title>C++ 객체 수명과 암묵적 객체 생성</title>
       <link>https://d2.naver.com/helloworld/7997284</link>
       <guid>https://d2.naver.com/helloworld/7997284</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;a href=&quot;https://d2.naver.com/helloworld/1155434&quot;&gt;이전 글&lt;/a&gt;에서는 엄격한 앨리어싱 규칙의 관점에서 &lt;code&gt;reinterpret_cast&lt;/code&gt;를 안전하게 사용하는 방법을 알아보았습니다. 이번 글에서는 한 걸음 더 나아가, 디스크나 네트워크에서 읽어 온 바이트 표현을 특정 타입으로 해석할 때 &lt;code&gt;reinterpret_cast&lt;/code&gt;를 사용하는 패턴을 C++의 엄격한 표준에 비추어 살펴보겠습니다.&lt;/p&gt;
         
@@ -786,7 +967,7 @@
       <title>C++ std::bit_cast와 reinterpret_cast — 언제 어떤 것을 써야 하는가</title>
       <link>https://d2.naver.com/helloworld/1155434</link>
       <guid>https://d2.naver.com/helloworld/1155434</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;저희 팀은 네이버의 고성능 검색 엔진 기술을 계승한 분산 데이터베이스인 Dot을 개발하고 있습니다. 스토리지 계층을 직접 다루다 보니 디스크에서 읽어 온 바이트 패턴을 &lt;code&gt;uint64_t&lt;/code&gt;, &lt;code&gt;float&lt;/code&gt;, 혹은 사용자 정의 구조체로 해석하는 일이 일상이고, 코드 리뷰에서 &lt;code&gt;reinterpret_cast&lt;/code&gt;를 마주치는 일도 잦습니다. 볼 때마다 느끼는 불안함, 즉 &apos;이것은 되도록 쓰지 말라고 배웠는데 괜찮을까?&apos; 하는 감정은 C++ 개발자라면 공감하실 것입니다.&lt;/p&gt;
         
@@ -980,7 +1161,7 @@
       <title>FE News 26년 3월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/0407747</link>
       <guid>https://d2.naver.com/news/0407747</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -1027,7 +1208,7 @@
       <title>FE News 26년 2월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/2922082</link>
       <guid>https://d2.naver.com/news/2922082</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -1074,7 +1255,7 @@
       <title>스마트스토어센터 Oracle에서 MySQL로의 무중단 전환기</title>
       <link>https://d2.naver.com/helloworld/6512234</link>
       <guid>https://d2.naver.com/helloworld/6512234</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;스마트스토어 플랫폼 내 여러 파트가 공동으로 사용하던 Oracle DBMS는 비즈니스 성장에 따라 리소스 경합이 심화되면서 서비스 성능 불안정을 초래했습니다. 기존 Oracle 인프라의 확장은 막대한 라이선스 비용 증가로 이어지기 때문에, 스마트스토어 회원 파트는 운영 비효율성과 비용 압박을 해소하고자 오픈소스인 MySQL로 DBMS 마이그레이션을 결정했습니다.&lt;/p&gt;
         
@@ -1706,7 +1887,7 @@
       <title>네이버 통합검색 AIB 도입과 웹 성능 변화 분석</title>
       <link>https://d2.naver.com/helloworld/4241703</link>
       <guid>https://d2.naver.com/helloworld/4241703</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;AIB(AI Briefing)는 네이버 통합검색에서 AI 기반 요약·브리핑 경험을 제공하는 기능입니다. 2025년 3월부터 단계적으로 도입되었으며, 초기에는 정적인 요약 형태 중심이었고 2025년 7월 채팅 UI 기반의 애니메이션 인터페이스가 추가되면서 상호작용 요소가 확장되었습니다.&lt;/p&gt;
         
@@ -1844,7 +2025,7 @@
       <title>FE News 26년 1월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/5798505</link>
       <guid>https://d2.naver.com/news/5798505</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -1891,7 +2072,7 @@
       <title>비용, 성능, 안정성을 목표로 한 지능형 로그 파이프라인 도입</title>
       <link>https://d2.naver.com/helloworld/0004394</link>
       <guid>https://d2.naver.com/helloworld/0004394</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Logiss는 AIDA(Advanced Interface for Data &amp;amp; AI)라는 네이버 사내 통합 데이터 플랫폼의 일부로, 로그 수집과 실시간 검색을 통해 문제를 추적하고 데이터를 분석하도록 지원합니다. 또한 Cuve와 CQuery라는 대용량 데이터 저장소 및 분석 설루션과 데이터를 연동합니다.&lt;/p&gt;
         
@@ -2561,7 +2742,7 @@
       <title>[인턴십] 2026 NAVER AI CHALLENGE를 소개합니다.</title>
       <link>https://d2.naver.com/news/7477295</link>
       <guid>https://d2.naver.com/news/7477295</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=&quot;/content/images/2025/12/-----------2025-12-10------5-46-58.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
         
@@ -2590,7 +2771,7 @@
       <title>디자인시스템이 AI를 만났을 때: FE 개발 패러다임의 변화</title>
       <link>https://d2.naver.com/helloworld/3442203</link>
       <guid>https://d2.naver.com/helloworld/3442203</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2642,7 +2823,7 @@
       <title>LLM이지만 PDF는 읽고 싶어: 복잡한 PDF를 LLM이 이해하는 방법</title>
       <link>https://d2.naver.com/helloworld/9036125</link>
       <guid>https://d2.naver.com/helloworld/9036125</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2709,7 +2890,7 @@
       <title>VLOps:Event-driven MLOps &amp; Omni-Evaluator</title>
       <link>https://d2.naver.com/helloworld/0931890</link>
       <guid>https://d2.naver.com/helloworld/0931890</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -2761,7 +2942,7 @@
       <title>FE News 25년 12월 소식을 전해드립니다!</title>
       <link>https://d2.naver.com/news/3740852</link>
       <guid>https://d2.naver.com/news/3740852</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -2808,7 +2989,7 @@
       <title>사용자의 목소리를 AI로 재현하다: LLM기반 Multi Agent UX플랫폼 개발기</title>
       <link>https://d2.naver.com/helloworld/2678553</link>
       <guid>https://d2.naver.com/helloworld/2678553</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; 
         해당 발표는 &lt;a href=&quot;https://dan.naver.com/25/sessions/699&quot;&gt;팀네이버 컨퍼런스 DAN25 홈페이지&lt;/a&gt;에서도 살펴보실 수 있습니다.&lt;/p&gt;
@@ -2873,7 +3054,7 @@
       <title>웹툰 창작 생태계 보호를 위한 연구</title>
       <link>https://d2.naver.com/helloworld/4571155</link>
       <guid>https://d2.naver.com/helloworld/4571155</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
+      <pubDate>Wed, 29 Apr 2026 16:27:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 웹툰은 웹툰, 웹소설 등 다양한 창작물을 독자에게 제공하는 플랫폼을 구축하고, 이를 통해 창작자가 전 세계 독자와 만나 소통하며 안정적인 수익을 바탕으로 창작 활동에 온전히 집중할 수 있는 환경을 만들기 위해 노력하고 있습니다. 특히 하나의 스토리를 다양한 IP(intellectual property)로 확장해 글로벌 시장의 규모를 지속적으로 키우고 있으며, 창작자와 독자, 플랫폼이 상생하며 지속 가능한 가치를 창출하는 디지털 창작 생태계를 만들어 나가는 데 주력하고 있습니다.&lt;/p&gt;
         
@@ -3121,57 +3302,6 @@
         &lt;/ul&gt;
         
         &lt;p&gt;이러한 방향성을 통해 네이버 웹툰은 창작자의 권리를 효과적으로 보호하고, 더욱 건전한 창작 생태계를 구축하는 데 기여할 것으로 기대합니다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Iceberg Low-Latency Queries with Materialized Views  (feat. 실시간 거래 리포트)</title>
-      <link>https://d2.naver.com/helloworld/9290684</link>
-      <guid>https://d2.naver.com/helloworld/9290684</guid>
-      <pubDate>Tue, 28 Apr 2026 16:50:13 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2025(10월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
-        
-        &lt;div style=&quot;position: relative; max-width: 100%; padding-bottom: 56.25%; height: 0;&quot;&gt;
-        
-        &lt;iframe width=&quot;800&quot; height=&quot;450&quot; src=&quot;https://tv.naver.com/embed/89476860?autoPlay=true&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot; style=&quot;position: absolute; position: absolute; top: 0; left: 0; width: 100%; height: 100%;&quot;&gt;&lt;/iframe&gt;  
-        &lt;/div&gt;  
-        
-        &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;발표 내용&lt;/h4&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;본 영상에서는 “실시간 거래 리포트를 어떻게 하면 사용자가 원하는 다양한 조건으로 빠르게 조회할 수 있을까?” 라는 질문에서 출발한 기술적 여정을 다룹니다.&lt;/li&gt;
-        &lt;li&gt;단순히 데이터를 쌓고 조회하는 단계를 넘어, 거래 데이터의 최신성과 응답 속도, 그리고 확장성을 동시에 확보하기 위한 여러 시도를 공유합니다.&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;발표 대상&lt;/h4&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;데이터 플랫폼 엔지니어 / 데이터 아키텍트 – 대용량 실시간 데이터 처리 및 저지연 설계에 관심 있는 분&lt;/li&gt;
-        &lt;li&gt;분석 플랫폼 운영자 / BI 개발자 – 다차원 필터 조회 속도 및 Freshness 향상 전략을 찾고 있는 분&lt;/li&gt;
-        &lt;li&gt;Spark, Iceberg, StarRocks 활용자 – 실제 조합 운영 사례를 통해 운영 팁을 얻고자 하는 분&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h4 id=&quot;&quot;&gt;목차&lt;/h4&gt;
-        
-        &lt;ol&gt;
-        &lt;li&gt;소개 (Introduction)  &lt;/li&gt;
-        &lt;li&gt;문제 정의 (Problem Definition)  &lt;/li&gt;
-        &lt;li&gt;도전 과제 (Challenges)  &lt;/li&gt;
-        &lt;li&gt;리서치 여정 (Research Journey)  &lt;/li&gt;
-        &lt;li&gt;아키텍처 개요 (Architecture Overview)  &lt;/li&gt;
-        &lt;li&gt;구성 요소 (Components)  &lt;/li&gt;
-        &lt;li&gt;결과 및 성능 (Results &amp;amp; Performance)&lt;/li&gt;
-        &lt;/ol&gt;
-        
-        &lt;blockquote&gt;
-        &lt;h5 id=&quot;naverengineeringdaybr&quot;&gt;&lt;strong&gt;◎ NAVER ENGINEERING DAY란?&lt;/strong&gt;&lt;br/&gt;&lt;/h5&gt;
-        
-        &lt;p&gt;NAVER에서는 사내 개발 경험과 기술 트렌드를 교류를 할 수 있는 프로그램이 많이 있습니다. 그중 매회 평균 70개 이상의 발표가 이루어지는 NAVER ENGINEERING DAY를 빼놓을 수 없는데요. &lt;br /&gt;
-        2016년부터 시작된 ENGINEERING DAY는 실무에서의 기술 개발 경험과 새로운 기술과 플랫폼 도입 시 유용하게 활용될 수 있는 팁 등을 공유하며 서로 배우고 성장하는 네이버의 대표적인 사내 개발자 행사입니다. &lt;br /&gt;
-        올해 진행된 NAVER ENGINEERING DAY의 일부 세션을 공개합니다.&lt;/p&gt;
-        &lt;/blockquote&gt;
       </content:encoded>
     </item>
   </channel>
