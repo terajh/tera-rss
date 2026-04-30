@@ -4,12 +4,112 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Wed, 29 Apr 2026 16:47:37 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 30 Apr 2026 16:40:14 GMT</lastBuildDate>
+    <item>
+      <title>Animated video backgrounds via a Web Component and ColorThief</title>
+      <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
+      <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
+        &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
+        &lt;p&gt;The idea would be - take any basic video element and wrap it like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;video-bgshadow&amp;gt;
+        &amp;lt;video controls width=&amp;quot;250&amp;quot;&amp;gt;
+        &amp;lt;source src=&amp;quot;videos/flower.mp4&amp;quot; type=&amp;quot;video/mp4&amp;quot;&amp;gt;
+        &amp;lt;/video&amp;gt;
+        &amp;lt;/video-bgshadow&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The web component would then handle:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Loading the ColorThief library&lt;/li&gt;
+        &lt;li&gt;Waiting for the video to be played&lt;/li&gt;
+        &lt;li&gt;Running the &lt;code&gt;observe&lt;/code&gt; method and updating the CSS&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;All in all, this wasn&apos;t too difficult. I don&apos;t think my shadow is as good as the demo (and I&apos;m totally open to people submitting a PR!), but it came out ok.&lt;/p&gt;
+        &lt;p&gt;I&apos;ll link to the demo below, but here&apos;s a simple example in a CodePen:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;&amp;amp;lt;video-bgshadow&amp;amp;gt;&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;yyVLXQY&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019dd938-b4d6-7494-a3f7-a6a3a1b801aa&quot;&gt;
+        &amp;lt;video-bgshadow&amp;gt;&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Alright, so here&apos;s the code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;class VideoBGShadowComponent extends HTMLElement {
+        
+        constructor() {
+        super();
+        }
+        
+        async connectedCallback() {
+        this.videoEl = this.querySelector(&apos;video&apos;);
+        if(!this.videoEl) {
+        console.warn(&apos;No &amp;lt;video&amp;gt; element found.&apos;);
+        return;
+        }
+        
+        // wrap the video in a new div
+        this.wrapper = document.createElement(&apos;div&apos;);
+        this.videoEl.parentNode.insertBefore(this.wrapper, this.videoEl);
+        this.wrapper.appendChild(this.videoEl);
+        this.wrapper.style.display = &apos;inline-block&apos;;
+        this.videoEl.style.verticalAlign = &apos;bottom&apos;;
+        if(!window.ColorThief) await this.loadCF();
+        this.videoEl.addEventListener(&apos;play&apos;, this.startShadow.bind(this));
+        this.videoEl.addEventListener(&apos;ended&apos;, this.endShadow.bind(this));
+        this.videoEl.addEventListener(&apos;pause&apos;, this.endShadow.bind(this));
+        
+        
+        }
+        
+        // Sets window.ColorThiefLoading (Promise) to deduplicate concurrent script injection across multiple instances.
+        async loadCF() {
+        if (!window.ColorThiefLoading) {
+        window.ColorThiefLoading = new Promise((resolve) =&amp;gt; {
+        const script = document.createElement(&apos;script&apos;);
+        script.type = &apos;text/javascript&apos;;
+        script.src = &apos;https://unpkg.com/colorthief@3/dist/umd/color-thief.global.js&apos;;
+        document.head.appendChild(script);
+        script.onload = resolve;
+        });
+        }
+        return window.ColorThiefLoading;
+        }
+        
+        startShadow(e) {
+        console.log(&apos;video play&apos;);
+        let thatWrapper = this.wrapper;
+        this.controller = ColorThief.observe(e.target, {
+        throttle: 200,
+        colorCount: 5,
+        onChange(palette) {
+        const [dominant] = palette;
+        thatWrapper.style.setProperty(&apos;--glow-color&apos;, dominant.css());
+        thatWrapper.style.boxShadow = &apos;15px 15px 20px 8px var(--glow-color)&apos;;
+        },
+        })
+        }
+        
+        endShadow() {
+        console.log(&apos;video play end&apos;);
+        this.controller.stop();
+        }
+        
+        }
+        
+        if(!customElements.get(&apos;video-bgshadow&apos;)) customElements.define(&apos;video-bgshadow&apos;, VideoBGShadowComponent);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I don&apos;t think there&apos;s anything necessarily interesting in here, although I struggled quite a bit with &lt;code&gt;loadCF&lt;/code&gt;. I didn&apos;t want to add the ColorThief library N times to the page. Checking for &lt;code&gt;window.ColorThief&lt;/code&gt; only works if for some reason a video wrapped with the component is added to the page &lt;em&gt;after&lt;/em&gt; the library loads. I used Claude to help me with this bit and while it &amp;quot;litters&amp;quot; the window object with a value, I think that is a fair trade off to ensure only one library is loaded. (Technically this could be further updated to first see if ColorThief exists in general as it&apos;s possible the website uses it for something else.)&lt;/p&gt;
+        &lt;p&gt;You can see a demo with a couple of examples here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/video-bgshadow/&quot;&gt;https://cfjedimaster.github.io/webdemos/video-bgshadow/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;And if you think this is a good start but could be &lt;em&gt;so&lt;/em&gt; much better, I agree, help me out over at the repo: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ansleycreative?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Matthew Ansley&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/two-people-standing-on-concrete-floor-6AQxBtaIYOk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (4/26/26)</title>
       <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
       <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
         &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
@@ -45,7 +145,7 @@
       <title>Another Game: My Little Mortal Combat</title>
       <link>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</link>
       <guid>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Hello awesome readers! I&apos;m happy to announce my latest web game, &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/my_little_mortal_combat/&quot;&gt;My Little Mortal Combat&lt;/a&gt;, a mashup of two epic franchises, My Little Pony and Mortal Kombat. This began as an idea, just the name, that I recorded in Microsoft To Do in September of 2019. Yes, almost seven years ago. It sat there, at the bottom of my &apos;idea&apos; list, until about a month ago when in the shower (not joking), it popped up in my head along with the basic mechanics of how the game would play.&lt;/p&gt;
         &lt;p&gt;Right now the game is just missing one feature (I&apos;d rather not talk about until I figure out how I&apos;m going to do it) but definitely needs some balancing work. I enjoy playing games without knowing the details of how things work, so if&apos;s that you too, head over to the game now and good luck!&lt;/p&gt;
@@ -84,7 +184,7 @@
       <title>Building a Simple Markdown PWA App</title>
       <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
       <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
         &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
@@ -189,7 +289,7 @@
       <title>Summarizing Docs with Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
         &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
@@ -384,7 +484,7 @@
       <title>Testing OCR with Chrome Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
         &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
@@ -658,7 +758,7 @@
       <title>Links For You (4/5/26)</title>
       <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
       <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
         about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
@@ -684,7 +784,7 @@
       <title>You&apos;ve gained a new achievement</title>
       <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
       <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
         &lt;p&gt;
@@ -797,7 +897,7 @@
       <title>Checking if a Movie has a Post or Mid Credit Scene</title>
       <link>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</link>
       <guid>https://www.raymondcamden.com/2026/03/28/checking-if-a-movie-has-a-post-or-mid-credit-scene</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Tell me if you done this before - you&apos;re sitting in a movie theater after it&apos;s ended and want to know if you should stay for a mid, or post-credit scene (also called a stinger). You open your phone, google, and end up a web page that has five gigs of ads or so and then thirty to forty paragraphs of text talking about the movie before they finally get around to actually answering the question. Yeah, I hate that too. I always tell myself, next time I&apos;ll google ahead of time so I&apos;ll know before going in, but I never do. If this bugs you, I built a web app that literally only tells you if the movie has these stingers - and nothing more. No context, no description of the movie you literally just saw, just a simple yes or no. If you don&apos;t care how it was built, just go here: &lt;a href=&quot;https://canhaspostcredit.raymondcamden.com/&quot;&gt;https://canhaspostcredit.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
         &lt;h2 id=&quot;how-it&apos;s-built&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-it&apos;s-built&quot;&gt;How It&apos;s Built&lt;/a&gt;&lt;/h2&gt;
@@ -886,7 +986,7 @@
       <title>Two bots walk into a bar...</title>
       <link>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</link>
       <guid>https://www.raymondcamden.com/2026/03/25/two-bots-walk-into-a-bar</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
+      <pubDate>Thu, 30 Apr 2026 16:22:31 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My regular readers know I like to have fun with my demos. I&apos;ll illustrate some API, framework, technique, with perhaps a somewhat silly example as a way of introducing you to something I&apos;ve learned recently that I thought was cool. My hope is that you see me demonstrating something useful in (perhaps) an less than useful demo that helps you apply it to a real world need. Today&apos;s post is not that. Rather, this is a completely silly, useless example and if you have any common sense, you&apos;ll stop reading now.&lt;/p&gt;
         &lt;p&gt;Still here? Good. Many, many years ago a man named Joseph Weizenbaum designed a natural language conversation program named &lt;a href=&quot;https://en.wikipedia.org/wiki/ELIZA&quot;&gt;ELIZA&lt;/a&gt;. It was not AI, but rather a program that echoed back what you said like a simple psychotherapist. I first saw it as an Applesoft BASIC program, but of course, there&apos;s a JavasScript port: &lt;a href=&quot;https://www.masswerk.at/elizabot/&quot;&gt;https://www.masswerk.at/elizabot/&lt;/a&gt;&lt;/p&gt;
@@ -945,292 +1045,6 @@
         &lt;/p&gt;
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@enchantedtools?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Enchanted Tools&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/two-robots-one-yellow-and-one-orange-stand-side-by-side-x6Qm6mJh6zo?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Implementing OAuth in Astro</title>
-      <link>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</link>
-      <guid>https://www.raymondcamden.com/2026/03/23/implementing-oauth-in-astro</guid>
-      <pubDate>Wed, 29 Apr 2026 16:32:26 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;As I continue to dig into &lt;a href=&quot;https://astro.build&quot;&gt;Astro&lt;/a&gt;, one of the areas I wanted to explore was security and authentication. The Astro docs have an entire section on &lt;a href=&quot;https://docs.astro.build/en/guides/authentication/&quot;&gt;authentication&lt;/a&gt; in which they mention multiple different third party projects you can use with Astro, but I wanted to take a stab at building something myself. Once again I figured this would be a useful way to get some experience with parts of Astro I had not used yet, specifically sessions and middleware.&lt;/p&gt;
-        &lt;h2 id=&quot;we-all-know-what-oauth-is...-right%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#we-all-know-what-oauth-is...-right%3F&quot;&gt;We all know what OAuth is... right?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I can remember being &lt;em&gt;incredibly&lt;/em&gt; confused by OAuth in the past. Honestly I felt like I was the only one who didn&apos;t get it. So I forced myself to build a few demos in that area to help it click and I realized it wasn&apos;t terribly difficult to implement at all. My first explorations in this area were back in 2010, almost two decades ago, so it&apos;s definitely not anything new, but on the off chance that one of my readers needs an overview, I figure it can&apos;t hurt to share.&lt;/p&gt;
-        &lt;p&gt;OAuth basically boils down to the idea of using a trusted third party to authenticate a user. &amp;quot;Typical&amp;quot; authentication systems required you to set up a users table in a database, carefully store credentials, and build a login process. OAuth is like saying screw that, if Google says a person is so and so, I trust Google.&lt;/p&gt;
-        &lt;p&gt;With OAuth, you work with a third party (Google, Facebook, or many other services) to hand off the authentication process. You get information about the user (like their email address) and can use that as an identifier when storing data on your site.&lt;/p&gt;
-        &lt;p&gt;OAuth also lets you perform actions based on a user. While you can use OAuth just to identify someone, you can also use it to do things like access their Google calendar, work with Facebook contacts, and so forth. Users see this when they authenticate with the third party as a warning (that they&apos;ll probably ignore) that says, &amp;quot;Once you login, the site will be able to do X, Y, and Z with your data.&amp;quot;&lt;/p&gt;
-        &lt;h2 id=&quot;typical-oauth-flow&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#typical-oauth-flow&quot;&gt;Typical OAuth Flow&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;In most cases, you set up OAuth like so. First, on the third party site, you create an application that represents your site. So if you are building RaymondCamden.com as the go to place for - well whatever - your app will usually have the same name and a description that matches. This is also where you specify the permissions your app needs. It may just need the minimum - a profile that identifiers the user. But if you are building an integration that needs read or write access to data, you&apos;ll specify it there.&lt;/p&gt;
-        &lt;p&gt;As part of the process, you also define a &amp;quot;call back url&amp;quot;, which is where the user is redirected to after authenticating with the third party. This will be your app, and usually you have two - one for development and one for production. Some OAuth providers don&apos;t allow this and you end up creating two apps for your environments.&lt;/p&gt;
-        &lt;p&gt;In your code, you then create a link to the third party. Their docs will tell you how to do this and you - of course - let the user know what&apos;s about to happen:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;a href=&amp;quot;long ass url on Google&amp;quot;&amp;gt;Login with Google&amp;lt;/a&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;When the user clicks this, they end up at the third part, login, get presented with the &amp;quot;The site will be able to do X with your stuff&amp;quot; prompt, and when confirmed, they return to the call back URL. When they do, a code will be in the URL. You take that code and send it &lt;em&gt;back&lt;/em&gt; to the third party to get an access token. This access token lets you do stuff - stuff being whatever permissions you wanted. The token is short lived so it&apos;s not useful forever, but will work fine for a typical session.&lt;/p&gt;
-        &lt;h2 id=&quot;my-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#my-demo&quot;&gt;My Demo&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;My Astro application makes use of Google as a third party login and will ask for Calendar read permissions. My app has a grand total of three pages:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;A home page with a link to login with Google&lt;/li&gt;
-        &lt;li&gt;A callback page the user doesn&apos;t actually &amp;quot;see&amp;quot;, but handles the post-auth stuff&lt;/li&gt;
-        &lt;li&gt;An events page that works with the data the app has access to once the user logs in&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;To make this work, I&apos;ll use:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://docs.astro.build/en/guides/sessions/&quot;&gt;Sessions&lt;/a&gt; to persist the access token.&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://docs.astro.build/en/guides/middleware/&quot;&gt;Middleware&lt;/a&gt; to route you based on your current status.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Ok, let&apos;s get started. I&apos;m not going to show you the Google Cloud Console and such as the UI there is - obviously - unique to Google. But I can say I created an app and got a client id and client secret. I put these, and my callback url, all in a &lt;code&gt;.env&lt;/code&gt; file:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;CLIENT_ID=my_client_id_brings_all_the_boys_to_the_yard
-        CLIENT_SECRET=damn_right_its_better_than_yours
-        REDIRECT_URL=http://localhost:4321/callback
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Yes, I named the the callback value &lt;code&gt;REDIRECT_URL&lt;/code&gt;, but I&apos;m ok with that. ;)&lt;/p&gt;
-        &lt;h2 id=&quot;enabling-sessions&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#enabling-sessions&quot;&gt;Enabling Sessions&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Since I knew I would be using sessions through, I started off enabling sessions. I did this by using the Node adapter as I wasn&apos;t planning on actually deploying this live. And literally, that&apos;s all I did. When you add that, your &lt;code&gt;astro.config.mjs&lt;/code&gt; is updating accordingly, but I also added &lt;code&gt;output:&apos;server&apos;&lt;/code&gt; such that every route was dynamic:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// @ts-check
-        import { defineConfig } from &apos;astro/config&apos;;
-        
-        import node from &apos;@astrojs/node&apos;;
-        
-        // https://astro.build/config
-        export default defineConfig({
-        output:&apos;server&apos;,
-        adapter: node({
-        mode: &apos;standalone&apos;
-        })
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2 id=&quot;the-home-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-home-page&quot;&gt;The Home Page&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A real-world application will usually have a mix of pages that require login and those that do not. My simple app only has (visibly anyway) the home page with login and the page that uses your data. Therefore my homepage is literally just a login link:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;---
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        
-        const CLIENT_ID = process.env.CLIENT_ID;
-        const REDIRECT_URL = process.env.REDIRECT_URL;
-        
-        const getAuthURL = () =&amp;gt; {
-        let params = new URLSearchParams();
-        params.set(&apos;client_id&apos;, CLIENT_ID);
-        params.set(&apos;redirect_uri&apos;, REDIRECT_URL);
-        params.set(&apos;response_type&apos;,&apos;code&apos;);
-        params.set(&apos;scope&apos;,&apos;https://www.googleapis.com/auth/calendar.readonly&apos;);
-        let url = &apos;https://accounts.google.com/o/oauth2/v2/auth?&apos; + params.toString();
-        return url;
-        }
-        
-        // treat it like a flash var, get it and nuke it
-        let error = await Astro.session?.get(&apos;error&apos;);
-        if(error) Astro.session.set(&apos;error&apos;, null);
-        console.log(&apos;error&apos;,error);
-        ---
-        
-        &amp;lt;BaseLayout&amp;gt;
-        
-        &amp;lt;h1&amp;gt;Login&amp;lt;/h1&amp;gt;
-        
-        { error &amp;amp;&amp;amp; 
-        &amp;lt;p&amp;gt;This error was returned: { error }&amp;lt;/p&amp;gt;
-        }
-        &amp;lt;p&amp;gt;
-        Link to login &amp;lt;a href={ getAuthURL() }&amp;gt;here&amp;lt;/a&amp;gt;.
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The most complex part here is &lt;code&gt;getAuthURL&lt;/code&gt;, which will almost always look like what you see here - a URL that includes the client id from the third party provider, the callback url (yes, you supply this on the third party site &lt;em&gt;and&lt;/em&gt; in the URL), and permissions. Almost always your code will follow this format but I&apos;ve seen &lt;code&gt;redirect_url&lt;/code&gt; and &lt;code&gt;redirect_uri&lt;/code&gt; pretty interchangeably.&lt;/p&gt;
-        &lt;p&gt;One little trick here I do is look in my session for an &lt;code&gt;error&lt;/code&gt; value. If it exists, I grab it, and remove it. This is a &apos;flash&apos; var, basically a value set on one page and used once in another. Some platforms/frameworks have built-in support for this but doing it by hand isn&apos;t too difficult - I simply delete it if exists.&lt;/p&gt;
-        &lt;p&gt;In the HTML, I render that error if it exists and then the login link. I&apos;d share a screenshot but it&apos;s literally just a link. :)&lt;/p&gt;
-        &lt;p&gt;I will share a screenshot of what you see when clicking:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/oa1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Auth consent form&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;This is a fairly standard UI. Each provider will have their own look and feel, but most users should be pretty familiar with it.&lt;/p&gt;
-        &lt;h2 id=&quot;the-callback-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-callback-page&quot;&gt;The Callback Page&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;After logging in, the provider (Google in this case) redirects the user back. This next page doesn&apos;t have any output as it just handles the result:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;---
-        const CLIENT_ID = process.env.CLIENT_ID;
-        const CLIENT_SECRET = process.env.CLIENT_SECRET;
-        const REDIRECT_URL = process.env.REDIRECT_URL;
-        
-        const code = Astro.url.searchParams.get(&apos;code&apos;) || &apos;&apos;;
-        const error = Astro.url.searchParams.get(&apos;error&apos;) || &apos;&apos;;
-        
-        if(error !== &apos;&apos;) {
-        console.error(&apos;Error!!&apos;, error);
-        Astro.session?.set(&apos;error&apos;,error);
-        return Astro.redirect(&apos;/&apos;);
-        }
-        
-        // get our access token
-        const params = new URLSearchParams();
-        params.append(&apos;client_id&apos;, CLIENT_ID);
-        params.append(&apos;client_secret&apos;, CLIENT_SECRET);
-        params.append(&apos;grant_type&apos;, &apos;authorization_code&apos;);
-        params.append(&apos;redirect_uri&apos;, REDIRECT_URL);
-        params.append(&apos;code&apos;, code);
-        
-        const atReq = await fetch(&apos;https://oauth2.googleapis.com/token&apos;, {
-        method: &apos;POST&apos;,
-        headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;
-        }, 
-        body: params
-        });
-        
-        const at = await atReq.json();
-        console.log(&apos;at&apos;, at);
-        
-        if(at.error) {
-        Astro.session?.set(&apos;error&apos;,at.error);
-        return Astro.redirect(&apos;/&apos;);
-        }
-        
-        Astro.session?.set(&apos;access_token&apos;, at.access_token, { ttl: at.expires_in });
-        
-        return Astro.redirect(&apos;/events&apos;);
-        ---
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;From the top, I first look in the URL for either the code or error. If there was an error, I set the value in the session and redirect back to the first page, which as you (hopefully) remember, will pick it up, delete it, and render it.&lt;/p&gt;
-        &lt;p&gt;If there wasn&apos;t an error, I then exchange the code for an access token. As I mentioned, the access token is short lived, and what&apos;s cool is that Astro sessions have a way to handle that - you can see it in the &lt;code&gt;ttl&lt;/code&gt; object when I set the value. I&apos;m going to touch on that in a bit.&lt;/p&gt;
-        &lt;h2 id=&quot;the-events-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-events-page&quot;&gt;The Events Page&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;After logging in, I render the events page. Now technically, you can skip this entire section as it&apos;s less OAuth and more Google API usage, but I&apos;ll show it for completeness. My &amp;quot;demo&amp;quot; looks at your events for the month, filters out all day events, and reports on how many hours you spend in meetings. I used Gemini AI to write those functions for me.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;---
-        import BaseLayout from &apos;../layouts/BaseLayout.astro&apos;;
-        
-        let token = await Astro.session?.get(&apos;access_token&apos;);
-        
-        /**
-        * Fetches Google Calendar events for the current month.
-        * @param {string} accessToken - A valid OAuth2 access token.
-        */
-        async function getCalendarEventsForCurrentMonth(accessToken) {
-        const now = new Date();
-        
-        // Calculate start of current month
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        
-        // Calculate start of next month
-        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-        
-        const calendarId = &apos;primary&apos;; // Use &apos;primary&apos; for the user&apos;s main calendar
-        const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`);
-        
-        // Set query parameters
-        url.searchParams.append(&apos;timeMin&apos;, startOfMonth);
-        url.searchParams.append(&apos;timeMax&apos;, startOfNextMonth);
-        url.searchParams.append(&apos;singleEvents&apos;, &apos;true&apos;); // Expands recurring events into instances
-        url.searchParams.append(&apos;orderBy&apos;, &apos;startTime&apos;);
-        
-        try {
-        const response = await fetch(url, {
-        method: &apos;GET&apos;,
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${accessToken}`,
-        &apos;Accept&apos;: &apos;application/json&apos;
-        }
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-        throw new Error(`Google API Error: ${data.error.message}`);
-        }
-        
-        return data.items; // This is the array of event objects
-        } catch (error) {
-        console.error(&apos;Failed to fetch events:&apos;, error);
-        }
-        }
-        
-        /**
-        * Calculates the total duration of timed Google Calendar events, skipping all-day events.
-        * @param {Array} events - The &apos;items&apos; array from the Google Calendar API response.
-        * @returns {number} - Total duration in hours.
-        */
-        function calculateTimedHours(events) {
-        if (!events || events.length === 0) return 0;
-        
-        const totalMilliseconds = events.reduce((total, event) =&amp;gt; {
-        // Skip all-day events (they have &apos;date&apos; but no &apos;dateTime&apos;)
-        if (!event.start.dateTime || !event.end.dateTime) {
-        return total;
-        }
-        
-        const start = new Date(event.start.dateTime);
-        const end = new Date(event.end.dateTime);
-        
-        const duration = end.getTime() - start.getTime();
-        
-        return total + (duration &amp;gt; 0 ? duration : 0);
-        }, 0);
-        
-        const hours = totalMilliseconds / (1000 * 60 * 60);
-        
-        // Round to one decimal place and ensure it returns as a number
-        return Math.round(hours * 10) / 10;
-        }
-        
-        const events = await getCalendarEventsForCurrentMonth(token);
-        const totalHours = calculateTimedHours(events);
-        
-        ---
-        
-        &amp;lt;BaseLayout pageTitle=&amp;quot;Events&amp;quot;&amp;gt;
-        
-        &amp;lt;h2&amp;gt;Events&amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        You have { events.length } events this month.
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        Ignoring all day events, you are spending { totalHours} hours in meetings.
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/BaseLayout&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In case your curious, this is my report, but note this does &lt;em&gt;not&lt;/em&gt; include my work calendar nor my wife&apos;s calendar that I share. The real number is probably 10X.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/03/oa2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Events page output&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;h2 id=&quot;the-middlware&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-middlware&quot;&gt;The Middlware&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The very last bit was the middleware. It has two jobs:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;If the user is not logged in, and they are trying to access &lt;code&gt;/events&lt;/code&gt;, redirect them home.&lt;/li&gt;
-        &lt;li&gt;If the user is logged in and they are &lt;em&gt;not&lt;/em&gt; accessing &lt;code&gt;/events&lt;/code&gt;, push them there.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;This particular logic will, of course, vary on your site and what you allow to be seen while not logged in and vice versa. Astro&apos;s &lt;a href=&quot;https://docs.astro.build/en/guides/middleware/&quot;&gt;middleware&lt;/a&gt; support is really simple. I added &lt;code&gt;src/middleware.js&lt;/code&gt; and used this code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;/*
-        If they have an access token and are NOT on /events, go there
-        If they don&apos;t have one and are ON /events, go to /
-        */
-        
-        export async function onRequest (context, next) {
-        
-        let token = await context.session.get(&apos;access_token&apos;);
-        console.log(&apos;path&apos;, context.url.pathname);
-        
-        if(token) {
-        
-        // are they trying to load / or /callback?
-        if(context.url.pathname === &apos;/&apos; || context.url.pathname === &apos;/callback&apos;) {
-        console.log(&apos;redirecting cuz logged in and not events&apos;);
-        return context.redirect(&apos;/events&apos;);
-        }
-        
-        } else if(context.url.pathname === &apos;/events&apos;) {
-        console.log(&apos;redirecting cuz not logged in and events req&apos;);
-        return context.redirect(&apos;/&apos;);
-        }
-        
-        return next();
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And that&apos;s it!&lt;/p&gt;
-        &lt;h2 id=&quot;conclusion&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, I need to riff a bit on some details that may or may not interest you, so before I do that - here&apos;s a link to the full code: &lt;a href=&quot;https://github.com/cfjedimaster/astro-tests/tree/main/oauthtest1&quot;&gt;https://github.com/cfjedimaster/astro-tests/tree/main/oauthtest1&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Alright, there was one thing in this demo that kinda confused me a bit. In my mind, a &apos;session&apos; is usually cookie-based such that a cookie identifies the user and the server associates that with data. I wrote my initial code on Saturday and when I tested on Sunday, my session still persisted, but the access token I had no longer worked. That was easy to fix - I added &lt;code&gt;ttl&lt;/code&gt;, but from what I can tell, when using Astro sessions and the Node adapter specifically, the cookie set on your browser is a Session cookie, which persists as long as the tab is open. The same applies to SessionStorage as well.&lt;/p&gt;
-        &lt;p&gt;None of this is &apos;wrong&apos; of course, it just wasn&apos;t what I was expecting, and I&apos;m curious if the other adapters, like the Netlify and Cloudflare ones, may act differently. I need to test this. If it&apos;s consistent, I could see then always using &lt;code&gt;ttl&lt;/code&gt; when setting session values. The other question I have is - given a value with a &lt;code&gt;ttl&lt;/code&gt;, does it &lt;em&gt;always&lt;/em&gt; expire at that time, or does it auto renew on every hit. If so, and I wasn&apos;t using OAuth, I&apos;d probably have logic to refresh the value one very hit so your session persists as you use the site. Yay - more Astro code to play with!&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@andyjh07?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Andy Holmes&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/galaxy-digital-wallpaper-rCbdp8VCYhQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
