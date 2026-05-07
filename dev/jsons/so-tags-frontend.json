@@ -7,6 +7,32 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "VueJS3 DOM event not forwarded to child component",
+    "partialText": "<p>I am migrating a Vue2 app to Vue3.</p>\n<p>I am running the <strong>compatibility build</strong> (vue 3.1.0 with @vue/compat: 3.1.0).</p>\n<p>I have custom buttons components like this:</p>\n<pre><code>&lt;template&gt;\n  &lt;button class=&quot;EditButton&quot;&gt;\n    &lt;SvgIcon name=&quot;edit&quot; /&gt;\n    &lt;span&gt;Edit&lt;/span&gt;\n  &lt;/button&gt;\n&lt;/template&gt;\n\n&lt;style scoped&gt;\n/* Some style */\n&lt;/style&gt;\n</code></pre>\n<p>My app currently calls this button like</p>\n<pre><code>&lt;EditButton\n  id=&quot;edit-button&quot;\n  :disabled=&quot;!aCondition&quot;\n  @click.native=&quot;editPost(post)&quot;\n/&gt;\n</code></pre>\n<p>Doing this works fine. <code>.native</code> event modifier being deprecated in Vue 3, I removed it (see <a href=\"https://v3-migration.vuejs.org/breaking-changes/v-on-native-modifier-removed.html\" rel=\"nofollow noreferrer\">vue3 v-on-native-modifier documentation</a>). According to the documentation, <code>v-on</code> listeners that are not part declared as a component event should be added as DOM event on thefirst  root element (<code>button</code> in my case).</p>\n<p>However that does not work. Removing <code>.native</code>  removes the <code>onClick</code> listener in the <code>$attrs</code> of the component and here is what I get on the devTools window:\n<a href=\"https://i.sstatic.net/8MgZlFkT.png\" rel=\"nofollow noreferrer\"><img src=\"https://i.sstatic.net/8MgZlFkT.png\" alt=\"vuejs DevTools\" /></a></p>\n<p>Here is my vite configuration, should it be useful</p>\n<pre><code>export default defineConfig({\n  resolve: {\n    alias: {\n      &quot;@&quot;: fileURLToPath(new URL(&quot;./src&quot;, import.meta.url)),\n      vue: '@vue/compat'\n    },\n  },\n  plugins: [\n    vue({\n      template: {\n        compilerOptions: {\n          compatConfig: {\n            MODE: 2\n          }\n        }\n      }\n    }),\n    createSvgIconsPlugin({\n      iconDirs: [fileURLToPath(new URL(&quot;./src/assets/icons&quot;, import.meta.url))],\n      symbolId: &quot;icon-[name]&quot;,\n    }),\n  ]});\n</code></pre>\n<p>My question is simple, how to handle click event in vueJS 3, what am I doing wrong?</p>",
+    "date": "2026-05-07T13:04:41.000Z",
+    "url": "https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "How to split locale messages into multiple files with @nuxtjs/i18n",
+    "partialText": "<p>I'm using <code>@nuxtjs/i18n</code> v10.2.1 with Nuxt 4. My <code>i18n/i18n.config.ts</code> has grown large because it contains ~250 country name translations for both German and English. I want to extract the countries into a separate file to keep <code>i18n.config.ts</code> manageable.</p>\n<p><strong>Current setup:</strong></p>\n<pre><code>// i18n/i18n.config.ts\nexport default defineI18nConfig(() =&gt; ({\n  messages: {\n    de: {\n      countries: { AF: 'Afghanistan', AL: 'Albanien', /* ~250 more */ },\n      about: 'Über uns',\n      // ...\n    },\n    en: {\n      countries: { AF: 'Afghanistan', AL: 'Albania', /* ~250 more */ },\n      about: 'About',\n      // ...\n    },\n  },\n}))\n</code></pre>\n<p><strong>What I tried:</strong></p>\n<p>I extracted the countries into <code>i18n/i18n.countries.js</code>:</p>\n<pre><code>export default {\n  de: { AF: 'Afghanistan', /* ... */ },\n  en: { AF: 'Afghanistan', /* ... */ },\n}\n</code></pre>\n<p>And tried to import it:</p>\n<pre><code>// i18n/i18n.config.ts\nimport countries from './i18n.countries.js'\n\nexport default defineI18nConfig(() =&gt; ({\n  messages: {\n    de: { countries: countries.de, about: 'Über uns' },\n    en: { countries: countries.en, about: 'About' },\n  },\n}))\n</code></pre>\n<p>This fails with:</p>\n<pre><code>Cannot find module '/i18n/i18n.countries.js' imported from\n/path/to/project/.nuxt/dev/index.mjs\n</code></pre>\n<p>The path is wrong — it resolves to an absolute path from filesystem root (<code>/i18n/...</code>) instead of the project root, because <code>defineI18nConfig</code> files are virtualized by nuxt-i18n and relative imports don't resolve correctly.</p>\n<p>I also tried moving to file-based locale files (<code>langDir</code> + <code>file</code> per locale in <code>nuxt.config.ts</code>) and importing from within those files — same resolution error regardless of where I put the countries file or what import path I use.</p>\n<p><strong>Question:</strong></p>\n<p>What is the correct way to split a large <code>messages</code> object in <code>@nuxtjs/i18n</code> v10 across multiple files? Specifically, how can I keep country translations in a dedicated file and reference them from either <code>i18n.config.ts</code> or locale files without hitting the virtual module path resolution issue?</p>\n<p><strong>nuxt.config.ts i18n section:</strong></p>\n<pre><code>i18n: {\n  strategy: 'prefix_except_default',\n  defaultLocale: 'en',\n  locales: [\n    { name: 'Deutsch', code: 'de', language: 'de-CH' },\n    { name: 'English', code: 'en', language: 'en-US' },\n  ],\n},\n</code></pre>",
+    "date": "2026-05-07T12:35:27.000Z",
+    "url": "https://stackoverflow.com/questions/79937570/how-to-split-locale-messages-into-multiple-files-with-nuxtjs-i18n"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "How to implement JWT refresh tokens in Nuxt 4? [closed]",
     "partialText": "<p>I can't figure out how to implement a refresh token system. My backend is built with Django (DRF) using JWT authentication. The API correctly returns both an access and a refresh token, but I don't know how to handle the automatic refresh on the Nuxt side. Could anyone shed some light on the best logic to adopt?</p>",
     "date": "2026-04-29T22:39:39.000Z",
@@ -362,31 +388,5 @@
     "partialText": "<p>I know that you can put multiple parameters in one object, and that's what I'm trying to do - I tried to implement it, but apparently I'm missing the basics, because the second parameter is always undefined.</p>\n<p>Can you tell me how to fix the problem and what I'm missing in this situation?</p>\n<p>in <code>&lt;script&gt;</code> of component:</p>\n<pre><code>methods: {\n   ...mapActions({\n      deleteComment: 'comment/deleteComment'\n   }),\n   removeComment() {\n      const comment = this.comment\n      const article = this.article\n      const payload = {\n         article: article,\n         comment: comment\n      }\n      this.deleteComment(payload)\n   }\n}\n</code></pre>\n<p>in Vuex module:</p>\n<pre><code>//action\nasync deleteComment({\n   state,\n   commit\n}, payload) {\n   try {\n      console.log('payload')\n      const aid = payload.acticle.id\n      const cid = payload.comment.id\n      const response = await axios.delete(`http://localhost:5000/article/${aid}/comment/${cid}`)\n   } catch (e) {\n      alert('Error', e)\n   }\n}\n</code></pre>\n<p>When I try to <code>console.log(payload)</code> it shows normal parameter</p>\n<p><img src=\"https://i.sstatic.net/26jpaf2M.png\" alt=\"image of console.log\" /></p>\n<p>Am I take value of params in right way?</p>\n<p>I seem to understand what the problem is, but changing the parameter transmission and trying to follow tips from the Internet and examples from the documentation, I don't understand simple things. I will be glad of any help.</p>",
     "date": "2026-01-22T00:42:44.000Z",
     "url": "https://stackoverflow.com/questions/79873324/how-to-transfer-multiple-parameters-in-vuex-action"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "How to conditionally render delete button without layout gap?",
-    "partialText": "<p>I’m building a Vue 3 form with dynamic rows (label + email/phone) inside a flex container. I want to show a trash/delete button only for rows that can be removed.</p>\n<p>My current approach uses invisible (Tailwind = visibility: hidden) for the last row, but that leaves a blank space in the flex layout. The content is hidden but the element still occupies width, which causes a “gap” until the fields are filled.</p>\n<p>When the delete button should not be visible, there should be no whitespace/gap at all.</p>\n<p>Here is a simplified version:</p>\n<pre><code>&lt;InputGroup\n  v-for=&quot;(item, index) in systemSettingsStore.getLabeledContactEmails()&quot;\n  :key=&quot;index&quot;\n  label=&quot;Add email&quot;\n  direction=&quot;row&quot;\n&gt;\n  &lt;div class=&quot;flex flex-col sm:flex-row gap-4 w-full&quot;&gt;\n    &lt;InputText\n      placeholder=&quot;Label&quot;\n      class=&quot;w-full sm:w-[90px] grow-0&quot;\n      :value=&quot;item.label&quot;\n      @input=&quot;(value) =&gt; update('CONTACT_EMAILS', index, 'label', value)&quot;\n    /&gt;\n\n    &lt;InputText\n      placeholder=&quot;Email&quot;\n      class=&quot;flex-1&quot;\n      :value=&quot;item.email&quot;\n      @input=&quot;(value) =&gt; update('CONTACT_EMAILS', index, 'email', value)&quot;\n    /&gt;\n\n    &lt;div\n      v-if=&quot;\n        systemSettingsStore.getLabeledContactEmails().length &gt; 1 &amp;&amp;\n        item.label?.trim() &amp;&amp;\n        item.email?.trim()\n      &quot;\n    &gt;\n      &lt;Button\n        :class=&quot;{\n          invisible: index === systemSettingsStore.getLabeledContactEmails().length - 1\n        }&quot;\n        square\n        icon=&quot;trash&quot;\n        class=&quot;sm:w-auto&quot;\n        @click=&quot;remove('CONTACT_EMAILS', index)&quot;\n      /&gt;\n    &lt;/div&gt;\n  &lt;/div&gt;\n&lt;/InputGroup&gt;\n</code></pre>\n<p>What is the best way in Vue to hide/remove this button <em>without</em> leaving whitespace in a flex layout?</p>",
-    "date": "2026-01-21T17:46:36.000Z",
-    "url": "https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Nuxt 3 setting base url for route path cause to a permenant redirect 301",
-    "partialText": "<p>I have a Nuxt 3 project where my base url is /travel and the page for that path is in pages/travel/index.vue\nAlso I have another index.vue file in pages folder like this pages/index.vue</p>\n<p>In <strong>nuxt.config.ts file</strong>,\nI added this to set the base url</p>\n<pre><code>app:{\n    baseURL:'/travel'\n  }\n</code></pre>\n<p>Due to certain conditions (This is a multi tenancy project) I can’t move <strong>pages/travel/index.vue</strong> content to the <strong>pages/index.vue</strong> and remove the baseURL.</p>\n<p>Now the problem is if a user visits <strong>http://localhost:3000/travel</strong> I can see <strong>301 redirect</strong> and then resolve the page in <strong>http://localhost:3000/travel/</strong> path.\nThis cause the SEO issues.</p>\n<p>Then I added</p>\n<pre><code>app:{\n    baseURL:'/travel',\n    router: {\n    options: {\n      strict: true\n    }\n  }\n</code></pre>\n<p>And this didn’t worked. Then I created a middleware server/middleware/noBaseSlash.ts and tried this</p>\n<pre><code>import { defineEventHandler, send } from 'h3'\n\nexport default defineEventHandler((event) =&gt; {\n  const url = event.node.req.url || ''\n\n  if (url === '/') {\n    // rewrite to /travel/\n    event.node.req.url = '/travel/'\n  }\n})\n</code></pre>\n<p>Both didn’t worked still I can see the re-direct. How to fix this with minimum effort?</p>",
-    "date": "2026-01-21T06:49:28.000Z",
-    "url": "https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301"
   }
 ]

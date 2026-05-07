@@ -4,7 +4,126 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Wed, 06 May 2026 16:48:24 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 07 May 2026 17:07:59 GMT</lastBuildDate>
+    <item>
+      <title>VueJS3 DOM event not forwarded to child component</title>
+      <link>https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component</link>
+      <guid>https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component</guid>
+      <pubDate>Thu, 07 May 2026 13:04:41 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am migrating a Vue2 app to Vue3.&lt;/p&gt;
+        &lt;p&gt;I am running the &lt;strong&gt;compatibility build&lt;/strong&gt; (vue 3.1.0 with @vue/compat: 3.1.0).&lt;/p&gt;
+        &lt;p&gt;I have custom buttons components like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;button class=&amp;quot;EditButton&amp;quot;&amp;gt;
+        &amp;lt;SvgIcon name=&amp;quot;edit&amp;quot; /&amp;gt;
+        &amp;lt;span&amp;gt;Edit&amp;lt;/span&amp;gt;
+        &amp;lt;/button&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        /* Some style */
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My app currently calls this button like&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;EditButton
+        id=&amp;quot;edit-button&amp;quot;
+        :disabled=&amp;quot;!aCondition&amp;quot;
+        @click.native=&amp;quot;editPost(post)&amp;quot;
+        /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Doing this works fine. &lt;code&gt;.native&lt;/code&gt; event modifier being deprecated in Vue 3, I removed it (see &lt;a href=&quot;https://v3-migration.vuejs.org/breaking-changes/v-on-native-modifier-removed.html&quot; rel=&quot;nofollow noreferrer&quot;&gt;vue3 v-on-native-modifier documentation&lt;/a&gt;). According to the documentation, &lt;code&gt;v-on&lt;/code&gt; listeners that are not part declared as a component event should be added as DOM event on thefirst  root element (&lt;code&gt;button&lt;/code&gt; in my case).&lt;/p&gt;
+        &lt;p&gt;However that does not work. Removing &lt;code&gt;.native&lt;/code&gt;  removes the &lt;code&gt;onClick&lt;/code&gt; listener in the &lt;code&gt;$attrs&lt;/code&gt; of the component and here is what I get on the devTools window:
+        &lt;a href=&quot;https://i.sstatic.net/8MgZlFkT.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/8MgZlFkT.png&quot; alt=&quot;vuejs DevTools&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Here is my vite configuration, should it be useful&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export default defineConfig({
+        resolve: {
+        alias: {
+        &amp;quot;@&amp;quot;: fileURLToPath(new URL(&amp;quot;./src&amp;quot;, import.meta.url)),
+        vue: &apos;@vue/compat&apos;
+        },
+        },
+        plugins: [
+        vue({
+        template: {
+        compilerOptions: {
+        compatConfig: {
+        MODE: 2
+        }
+        }
+        }
+        }),
+        createSvgIconsPlugin({
+        iconDirs: [fileURLToPath(new URL(&amp;quot;./src/assets/icons&amp;quot;, import.meta.url))],
+        symbolId: &amp;quot;icon-[name]&amp;quot;,
+        }),
+        ]});
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My question is simple, how to handle click event in vueJS 3, what am I doing wrong?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to split locale messages into multiple files with @nuxtjs/i18n</title>
+      <link>https://stackoverflow.com/questions/79937570/how-to-split-locale-messages-into-multiple-files-with-nuxtjs-i18n</link>
+      <guid>https://stackoverflow.com/questions/79937570/how-to-split-locale-messages-into-multiple-files-with-nuxtjs-i18n</guid>
+      <pubDate>Thu, 07 May 2026 12:35:27 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m using &lt;code&gt;@nuxtjs/i18n&lt;/code&gt; v10.2.1 with Nuxt 4. My &lt;code&gt;i18n/i18n.config.ts&lt;/code&gt; has grown large because it contains ~250 country name translations for both German and English. I want to extract the countries into a separate file to keep &lt;code&gt;i18n.config.ts&lt;/code&gt; manageable.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Current setup:&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// i18n/i18n.config.ts
+        export default defineI18nConfig(() =&amp;gt; ({
+        messages: {
+        de: {
+        countries: { AF: &apos;Afghanistan&apos;, AL: &apos;Albanien&apos;, /* ~250 more */ },
+        about: &apos;Über uns&apos;,
+        // ...
+        },
+        en: {
+        countries: { AF: &apos;Afghanistan&apos;, AL: &apos;Albania&apos;, /* ~250 more */ },
+        about: &apos;About&apos;,
+        // ...
+        },
+        },
+        }))
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;What I tried:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;I extracted the countries into &lt;code&gt;i18n/i18n.countries.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export default {
+        de: { AF: &apos;Afghanistan&apos;, /* ... */ },
+        en: { AF: &apos;Afghanistan&apos;, /* ... */ },
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And tried to import it:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// i18n/i18n.config.ts
+        import countries from &apos;./i18n.countries.js&apos;
+        
+        export default defineI18nConfig(() =&amp;gt; ({
+        messages: {
+        de: { countries: countries.de, about: &apos;Über uns&apos; },
+        en: { countries: countries.en, about: &apos;About&apos; },
+        },
+        }))
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This fails with:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Cannot find module &apos;/i18n/i18n.countries.js&apos; imported from
+        /path/to/project/.nuxt/dev/index.mjs
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The path is wrong — it resolves to an absolute path from filesystem root (&lt;code&gt;/i18n/...&lt;/code&gt;) instead of the project root, because &lt;code&gt;defineI18nConfig&lt;/code&gt; files are virtualized by nuxt-i18n and relative imports don&apos;t resolve correctly.&lt;/p&gt;
+        &lt;p&gt;I also tried moving to file-based locale files (&lt;code&gt;langDir&lt;/code&gt; + &lt;code&gt;file&lt;/code&gt; per locale in &lt;code&gt;nuxt.config.ts&lt;/code&gt;) and importing from within those files — same resolution error regardless of where I put the countries file or what import path I use.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Question:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;What is the correct way to split a large &lt;code&gt;messages&lt;/code&gt; object in &lt;code&gt;@nuxtjs/i18n&lt;/code&gt; v10 across multiple files? Specifically, how can I keep country translations in a dedicated file and reference them from either &lt;code&gt;i18n.config.ts&lt;/code&gt; or locale files without hitting the virtual module path resolution issue?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;nuxt.config.ts i18n section:&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;i18n: {
+        strategy: &apos;prefix_except_default&apos;,
+        defaultLocale: &apos;en&apos;,
+        locales: [
+        { name: &apos;Deutsch&apos;, code: &apos;de&apos;, language: &apos;de-CH&apos; },
+        { name: &apos;English&apos;, code: &apos;en&apos;, language: &apos;en-US&apos; },
+        ],
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to implement JWT refresh tokens in Nuxt 4? [closed]</title>
       <link>https://stackoverflow.com/questions/79933933/how-to-implement-jwt-refresh-tokens-in-nuxt-4</link>
@@ -1342,101 +1461,6 @@
         &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/26jpaf2M.png&quot; alt=&quot;image of console.log&quot; /&gt;&lt;/p&gt;
         &lt;p&gt;Am I take value of params in right way?&lt;/p&gt;
         &lt;p&gt;I seem to understand what the problem is, but changing the parameter transmission and trying to follow tips from the Internet and examples from the documentation, I don&apos;t understand simple things. I will be glad of any help.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to conditionally render delete button without layout gap?</title>
-      <link>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</link>
-      <guid>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</guid>
-      <pubDate>Wed, 21 Jan 2026 17:46:36 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m building a Vue 3 form with dynamic rows (label + email/phone) inside a flex container. I want to show a trash/delete button only for rows that can be removed.&lt;/p&gt;
-        &lt;p&gt;My current approach uses invisible (Tailwind = visibility: hidden) for the last row, but that leaves a blank space in the flex layout. The content is hidden but the element still occupies width, which causes a “gap” until the fields are filled.&lt;/p&gt;
-        &lt;p&gt;When the delete button should not be visible, there should be no whitespace/gap at all.&lt;/p&gt;
-        &lt;p&gt;Here is a simplified version:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;InputGroup
-        v-for=&amp;quot;(item, index) in systemSettingsStore.getLabeledContactEmails()&amp;quot;
-        :key=&amp;quot;index&amp;quot;
-        label=&amp;quot;Add email&amp;quot;
-        direction=&amp;quot;row&amp;quot;
-        &amp;gt;
-        &amp;lt;div class=&amp;quot;flex flex-col sm:flex-row gap-4 w-full&amp;quot;&amp;gt;
-        &amp;lt;InputText
-        placeholder=&amp;quot;Label&amp;quot;
-        class=&amp;quot;w-full sm:w-[90px] grow-0&amp;quot;
-        :value=&amp;quot;item.label&amp;quot;
-        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;label&apos;, value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;InputText
-        placeholder=&amp;quot;Email&amp;quot;
-        class=&amp;quot;flex-1&amp;quot;
-        :value=&amp;quot;item.email&amp;quot;
-        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;email&apos;, value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;div
-        v-if=&amp;quot;
-        systemSettingsStore.getLabeledContactEmails().length &amp;gt; 1 &amp;amp;&amp;amp;
-        item.label?.trim() &amp;amp;&amp;amp;
-        item.email?.trim()
-        &amp;quot;
-        &amp;gt;
-        &amp;lt;Button
-        :class=&amp;quot;{
-        invisible: index === systemSettingsStore.getLabeledContactEmails().length - 1
-        }&amp;quot;
-        square
-        icon=&amp;quot;trash&amp;quot;
-        class=&amp;quot;sm:w-auto&amp;quot;
-        @click=&amp;quot;remove(&apos;CONTACT_EMAILS&apos;, index)&amp;quot;
-        /&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/InputGroup&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What is the best way in Vue to hide/remove this button &lt;em&gt;without&lt;/em&gt; leaving whitespace in a flex layout?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Nuxt 3 setting base url for route path cause to a permenant redirect 301</title>
-      <link>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</link>
-      <guid>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</guid>
-      <pubDate>Wed, 21 Jan 2026 06:49:28 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I have a Nuxt 3 project where my base url is /travel and the page for that path is in pages/travel/index.vue
-        Also I have another index.vue file in pages folder like this pages/index.vue&lt;/p&gt;
-        &lt;p&gt;In &lt;strong&gt;nuxt.config.ts file&lt;/strong&gt;,
-        I added this to set the base url&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;app:{
-        baseURL:&apos;/travel&apos;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Due to certain conditions (This is a multi tenancy project) I can’t move &lt;strong&gt;pages/travel/index.vue&lt;/strong&gt; content to the &lt;strong&gt;pages/index.vue&lt;/strong&gt; and remove the baseURL.&lt;/p&gt;
-        &lt;p&gt;Now the problem is if a user visits &lt;strong&gt;http://localhost:3000/travel&lt;/strong&gt; I can see &lt;strong&gt;301 redirect&lt;/strong&gt; and then resolve the page in &lt;strong&gt;http://localhost:3000/travel/&lt;/strong&gt; path.
-        This cause the SEO issues.&lt;/p&gt;
-        &lt;p&gt;Then I added&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;app:{
-        baseURL:&apos;/travel&apos;,
-        router: {
-        options: {
-        strict: true
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And this didn’t worked. Then I created a middleware server/middleware/noBaseSlash.ts and tried this&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { defineEventHandler, send } from &apos;h3&apos;
-        
-        export default defineEventHandler((event) =&amp;gt; {
-        const url = event.node.req.url || &apos;&apos;
-        
-        if (url === &apos;/&apos;) {
-        // rewrite to /travel/
-        event.node.req.url = &apos;/travel/&apos;
-        }
-        })
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Both didn’t worked still I can see the re-direct. How to fix this with minimum effort?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
