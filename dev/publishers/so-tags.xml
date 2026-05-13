@@ -4,7 +4,145 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Tue, 12 May 2026 17:50:08 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2026 17:37:14 GMT</lastBuildDate>
+    <item>
+      <title>How can I make a Hero section fill the remaining viewport height below a header in Nuxt 4 without breaking when the page grows?</title>
+      <link>https://stackoverflow.com/questions/79940624/how-can-i-make-a-hero-section-fill-the-remaining-viewport-height-below-a-header</link>
+      <guid>https://stackoverflow.com/questions/79940624/how-can-i-make-a-hero-section-fill-the-remaining-viewport-height-below-a-header</guid>
+      <pubDate>Wed, 13 May 2026 15:16:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am currently building a website using Nuxt 4 + Tailwind CSS and I am having a problem with viewport units (&lt;code&gt;dvh&lt;/code&gt;, &lt;code&gt;vh&lt;/code&gt;) and percentage heights (&lt;code&gt;h-full&lt;/code&gt;) inside a Nuxt layout.&lt;/p&gt;
+        &lt;p&gt;My layout structure is basically:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;A global &lt;code&gt;default.vue&lt;/code&gt; layout&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;A &lt;code&gt;Header&lt;/code&gt; and a &lt;code&gt;main&lt;/code&gt; inside it&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Multiple sections rendered inside &lt;code&gt;index&lt;/code&gt; the page (&lt;code&gt;Hero&lt;/code&gt;, &lt;code&gt;OurTechnologies&lt;/code&gt;, etc.), where it uses the default layout&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The layout currently looks like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;min-h-dvh grid grid-rows-[auto_1fr]&amp;quot;&amp;gt;
+        &amp;lt;LayoutHeader /&amp;gt;
+        
+        &amp;lt;main&amp;gt;
+        &amp;lt;slot /&amp;gt;
+        &amp;lt;/main&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;index.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;
+        &amp;lt;template&amp;gt;
+        &amp;lt;LayoutSectionsHomeHero /&amp;gt; 
+        &amp;lt;LayoutSectionsSeparator /&amp;gt; 
+        &amp;lt;LayoutSectionsHomeOurTechnologies /&amp;gt; 
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;HeroSection.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;section
+        class=&amp;quot;homeHero__main-section h-full flex flex-col items-center justify-center&amp;quot; &amp;gt;
+        &amp;lt;h1 class=&amp;quot;homeHero__main-title title__default text-center&amp;quot;&amp;gt;
+        Welcome to
+        &amp;lt;br /&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;gradient__text bg-linear-green-1&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;mt-5 inline-block&amp;quot;&amp;gt;AutoAI&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;hidden sm:inline&amp;quot;&amp;gt; - &amp;lt;/span&amp;gt;
+        
+        &amp;lt;br class=&amp;quot;sm:hidden&amp;quot; /&amp;gt;
+        
+        &amp;lt;span&amp;gt;Pandemics&amp;lt;/span&amp;gt;
+        &amp;lt;/span&amp;gt;
+        &amp;lt;/h1&amp;gt;
+        
+        &amp;lt;p class=&amp;quot;homeHero__welcome-paragraph text__default mt-5 text-center&amp;quot;&amp;gt;
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+        velit esse cillum dolore eu fugiat nulla pariatur.
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;homeHero__buttons-container mt-10 flex w-full flex-col gap-5&amp;quot;&amp;gt;
+        &amp;lt;UiButtonsPrimary class=&amp;quot;font-header-text&amp;quot;&amp;gt;
+        Explore our technologies
+        &amp;lt;/UiButtonsPrimary&amp;gt;
+        
+        &amp;lt;UiButtonsSecondary class=&amp;quot;font-header-text&amp;quot;&amp;gt;
+        About us
+        &amp;lt;/UiButtonsSecondary&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And finally, the &lt;code&gt;OurTechnologiesSection.vue&lt;/code&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;section class=&amp;quot;homeOurTechnologies__main-section flex flex-col items-center&amp;quot;&amp;gt;
+        &amp;lt;UiCardsTool
+        v-for=&amp;quot;item in tools&amp;quot;
+        :toolName=&amp;quot;item.toolName&amp;quot;
+        :toolDescription=&amp;quot;item.toolDescription&amp;quot;
+        :toolLink=&amp;quot;item.toolLink&amp;quot;
+        &amp;gt;&amp;lt;/UiCardsTool&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        const tools = [
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        ];
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The problem is:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;If the page only contains the Hero section, everything works perfectly. Check the image below&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/65W2OApB.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Layout without OurTechnologies Section working perfectly&lt;/a&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;The Hero fills the remaining viewport space below the header exactly as expected.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;But as soon as I add another section below it (&lt;code&gt;OurTechnologies&lt;/code&gt;), the Hero suddenly becomes much taller than the viewport, like the image below:&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/26KpTgcM.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Layout broken with OurTechnologies Section&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Because of this:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;justify-center&lt;/code&gt; starts centering based on the entire page height instead of only the visible screen.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;The Hero content gets pushed down vertically.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;The selected element in DevTools becomes much taller than the viewport.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;What I want is a hero section that always fills exactly the visible viewport area remaining below the header(like you can see in the first image above) using best practices for responsive layout.&lt;/p&gt;
+        &lt;p&gt;Oh, and I also tried:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;h-full&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;min-h-full&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;h-dvh&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;min-h-dvh&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;CSS &lt;code&gt;calc()&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Changing Grid/Flex configurations&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In the hero section, but the behavior still breaks once the page grows vertically.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;*Just a small note: Feel free to give me feedback about Vue, HTML, CSS, and best practices. I’m currently starting my journey in front-end development, and I want to learn as much as I can about this huge area, and sorry for my english :)&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>VueJS3 DOM event not forwarded to child component</title>
       <link>https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component</link>
@@ -1478,47 +1616,6 @@
         &amp;lt;/InputGroup&amp;gt;
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;What is the best way in Vue to hide/remove this button &lt;em&gt;without&lt;/em&gt; leaving whitespace in a flex layout?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Nuxt 3 setting base url for route path cause to a permenant redirect 301</title>
-      <link>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</link>
-      <guid>https://stackoverflow.com/questions/79872578/nuxt-3-setting-base-url-for-route-path-cause-to-a-permenant-redirect-301</guid>
-      <pubDate>Wed, 21 Jan 2026 06:49:28 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I have a Nuxt 3 project where my base url is /travel and the page for that path is in pages/travel/index.vue
-        Also I have another index.vue file in pages folder like this pages/index.vue&lt;/p&gt;
-        &lt;p&gt;In &lt;strong&gt;nuxt.config.ts file&lt;/strong&gt;,
-        I added this to set the base url&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;app:{
-        baseURL:&apos;/travel&apos;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Due to certain conditions (This is a multi tenancy project) I can’t move &lt;strong&gt;pages/travel/index.vue&lt;/strong&gt; content to the &lt;strong&gt;pages/index.vue&lt;/strong&gt; and remove the baseURL.&lt;/p&gt;
-        &lt;p&gt;Now the problem is if a user visits &lt;strong&gt;http://localhost:3000/travel&lt;/strong&gt; I can see &lt;strong&gt;301 redirect&lt;/strong&gt; and then resolve the page in &lt;strong&gt;http://localhost:3000/travel/&lt;/strong&gt; path.
-        This cause the SEO issues.&lt;/p&gt;
-        &lt;p&gt;Then I added&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;app:{
-        baseURL:&apos;/travel&apos;,
-        router: {
-        options: {
-        strict: true
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And this didn’t worked. Then I created a middleware server/middleware/noBaseSlash.ts and tried this&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { defineEventHandler, send } from &apos;h3&apos;
-        
-        export default defineEventHandler((event) =&amp;gt; {
-        const url = event.node.req.url || &apos;&apos;
-        
-        if (url === &apos;/&apos;) {
-        // rewrite to /travel/
-        event.node.req.url = &apos;/travel/&apos;
-        }
-        })
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Both didn’t worked still I can see the re-direct. How to fix this with minimum effort?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

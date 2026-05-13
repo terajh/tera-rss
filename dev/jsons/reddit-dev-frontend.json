@@ -7,10 +7,88 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Laid off. Looking for new opportunities.",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hi everyone,<br/> Inspira UI and Akaza UI creator here.</p> <p>I have been recently laid off from my current job due to scale down of team.</p> <p>I&#39;m actively looking for opportunities and would be able to join immediately.</p> <p>My Profile: <a href=\"https://rahulv.dev\">https://rahulv.dev</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/AlternativePie7409\"> /u/AlternativePie7409 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tc43gv/laid_off_looking_for_new_opportunities/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tc43gv/laid_off_looking_for_new_opportunities/\">[comments]</a></span>",
+    "date": "2026-05-13T16:04:54.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tc43gv/laid_off_looking_for_new_opportunities/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Mass Supply Chain Attack Hits TanStack, Mistral AI npm and PyPI Packages",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tbwnii/mass_supply_chain_attack_hits_tanstack_mistral_ai/\"> <img src=\"https://external-preview.redd.it/tPtdBI9-z6AbHaCO0wNpmPen37FY52rEIosodzME6Kw.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=3d51795cd09e6073d3853d9b7105172708b0dfd5\" alt=\"Mass Supply Chain Attack Hits TanStack, Mistral AI npm and PyPI Packages\" title=\"Mass Supply Chain Attack Hits TanStack, Mistral AI npm and PyPI Packages\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Dry_Raspberry4514\"> /u/Dry_Raspberry4514 </a> <br/> <span><a href=\"https://safedep.io/mass-npm-supply-chain-attack-tanstack-mistral/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbwnii/mass_supply_chain_attack_hits_tanstack_mistral_ai/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-05-13T11:20:50.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tbwnii/mass_supply_chain_attack_hits_tanstack_mistral_ai/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Open-sourced my Vue 3 + TipTap email editor SDK — JSON in, MJML output, mounts in any framework",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone,</p> <p>I open-sourced Templatical last week — a drop-in drag-and-drop email editor SDK that you can embed into any app. After a few years of using Beefree, Unlayer, and others, seeing how they paywall even basic features behind $400-5,000/mo plans, I built an OSS alternative.</p> <h2>Tech stack</h2> <ul> <li><p><strong>Vue 3 + TipTap</strong> for the canvas. TipTap&#39;s schema-based extension model + Vue 3&#39;s Composition API made the rich-text-editing parts really easy.</p></li> <li><p><strong>vue-draggable-plus</strong> for the drag-and-drop block reordering. Initially used vue-draggable but noticed doesn&#39;t support ESM, switched to vue-draggable-plus.</p></li> <li><p><strong>@vueuse/core</strong> — composables like <code>useLocalStorage</code>, <code>useIntervalFn</code>, <code>usePreferredReducedMotion</code> are used in the editor and in the playground.</p></li> <li><p><strong>Shadow DOM-first mount.</strong> The editor renders inside an open Shadow Root by default — host page styles can&#39;t leak in, the editor&#39;s Tailwind/Vue/TipTap styles can&#39;t leak out. Opt out with <code>shadowDom: false</code> if you specifically want light-DOM mounting.</p></li> </ul> <h2>Architecture</h2> <ul> <li><p><strong>JSON in, MJML out.</strong> Templates are typed JSON trees. The renderer (a separate package) converts JSON→ MJML; you compile MJML to email-safe HTML server-side with the standard mjml package. No paid render API, no vendor lock-in.</p></li> <li><p><strong>Public API is a vanilla <code>init({ container })</code> function.</strong> The canvas is Vue internally, but consumers don&#39;t care — call init() from React&#39;s useEffect, Svelte&#39;s onMount, Angular&#39;s ngAfterViewInit, or a plain script tag.</p></li> <li><p><strong>9-package monorepo</strong>: types, core, core/cloud (subpath), media-library, editor, renderer, quality (a11y linter, more to come), three importers (BeeFree, Unlayer, HTML).</p></li> </ul> <h2>Custom blocks (the part I&#39;m proudest of)</h2> <p>Define a custom block as a schema — typed fields (text, image, color, number, select, boolean, repeatable) plus a Liquid-based template that emits HTML using those values. The editor auto-renders a form from the schema so marketers fill in fields; the renderer wraps the output in <code>&lt;mj-text&gt;</code> for cross-client safety. Optional <code>dataSource.onFetch</code> lets the block hit your API at render time and retrieve data directly to embed. This is the feature gated behind Beefree&#39;s $3,000/mo tier.</p> <h2>Other power features</h2> <p>All of these are paywalled in Beefree/Unlayer/similar; all open source here:</p> <ul> <li><p><strong>Merge tags with pluggable syntax</strong> — handlebars, Liquid, or JS literal templates. Auto-renders human-readable labels in the canvas so marketers don&#39;t see raw <code>{{firstName}}</code></p></li> <li><p><strong>Display conditions</strong> — show/hide blocks based on recipient attributes, with live editor preview.</p></li> <li><p><strong>Full theming via 27 OKLch design tokens</strong> — colors, radii, shadows driven by a design system. Override any of them for hard-enforced brand consistency.</p></li> <li><p><strong>Template + block defaults</strong> — baseline visual config for new templates so marketers stay on-brand without thinking.</p></li> <li><p><strong>Accessibility linter</strong>. Catches missing alt text, low contrast, vague link text in the editor as you work.</p></li> </ul> <h2>License</h2> <p>FSL-1.1-MIT. Auto-converts to plain MIT after 2 years. You can embed it commercially, modify it, redistribute it. The only thing the license forbids is reselling Templatical itself as a competing hosted email-editor SaaS.</p> <p>Why FSL and not pure MIT: I&#39;m a solo dev working on a managed Cloud tier (AI rewrite, MCP server with live updates, real-time collab, comments, snapshots, saved modules, hosted media gallery) for features that genuinely need a backend. Pure MIT means a well-funded competitor could lift the code and host it as a competing managed service tomorrow, undercutting my ability to keep building it. FSL gives me a 2-year head start on each release before it auto-converts to MIT — enough runway to keep the project sustainable without locking anyone out long-term. Anything that&#39;s already in the open-source SDK stays in the open-source SDK, free forever.</p> <h2>Links</h2> <ul> <li><p>Home: <a href=\"https://templatical.com\">https://templatical.com</a></p></li> <li><p>Playground: <a href=\"https://play.templatical.com\">https://play.templatical.com</a></p></li> <li><p>Repo: <a href=\"https://github.com/templatical/sdk\">https://github.com/templatical/sdk</a></p></li> <li><p>Docs: <a href=\"https://docs.templatical.com\">https://docs.templatical.com</a></p></li> </ul> <p>If you want deeper Q&amp;A — license, architecture, MJML choice - there was good discussion on the Show HN thread last week: <a href=\"https://news.ycombinator.com/item?id=48038019\">https://news.ycombinator.com/item?id=48038019</a></p> <p>Happy to answer any questions.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/orkhanahmadov\"> /u/orkhanahmadov </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbfqx0/opensourced_my_vue_3_tiptap_email_editor_sdk_json/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbfqx0/opensourced_my_vue_3_tiptap_email_editor_sdk_json/\">[comments]</a></span>",
+    "date": "2026-05-12T21:42:57.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tbfqx0/opensourced_my_vue_3_tiptap_email_editor_sdk_json/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "VueJS and Vite get an overview of a new project with SHIFT ALT D",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tbsd6c/vuejs_and_vite_get_an_overview_of_a_new_project/\"> <img src=\"https://external-preview.redd.it/6OpA7tIkIQBOo0p5b5hTB0_9qwbMegpfbgC0bjlvV6A.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=a9393b22ad5c766a73891a7987fc2e2c815ecf0b\" alt=\"VueJS and Vite get an overview of a new project with SHIFT ALT D\" title=\"VueJS and Vite get an overview of a new project with SHIFT ALT D\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Efficient-Public-551\"> /u/Efficient-Public-551 </a> <br/> <span><a href=\"https://youtu.be/us3msSjf6zg\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbsd6c/vuejs_and_vite_get_an_overview_of_a_new_project/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-05-13T07:24:29.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tbsd6c/vuejs_and_vite_get_an_overview_of_a_new_project/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "developers, which icon library are you using in your projects?",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tappxv/developers_which_icon_library_are_you_using_in/\"> <img src=\"https://preview.redd.it/j91ex4rfmm0h1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=a376e2dd30527fa43fecf971b4dc43a2be6954ea\" alt=\"developers, which icon library are you using in your projects?\" title=\"developers, which icon library are you using in your projects?\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TrT_nine\"> /u/TrT_nine </a> <br/> <span><a href=\"https://i.redd.it/j91ex4rfmm0h1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tappxv/developers_which_icon_library_are_you_using_in/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-05-12T03:33:38.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1tappxv/developers_which_icon_library_are_you_using_in/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Tackling a legacy Vue 2.7 \"spaghetti\" codebase with Claude Code — any tips to sharpen my bug-fixing workflow?",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone,</p> <p>I recently picked up a legacy Vue 2.7 project that’s... well, a mess. Total spaghetti code, outdated patterns, and no immediate plans for a Vue 3 migration (though it&#39;s on the roadmap).</p> <p>My current focus is high-velocity bug fixing and shipping small features. I’m already using <strong>Claude Code + Superpower</strong> to help parse the madness, but I want to sharpen my actual dev workflow for this specific stack.</p> <p>For those who’ve survived &#39;maintenance mode&#39; on messy Vue 2 apps, what <strong>skills</strong> for Claude or tools saved your sanity?</p> <p>I’m currently looking into:</p> <ul> <li>Extracting logic into Composables (since 2.7 supports it).</li> <li>Better JSDoc/TS integration for better IDE intellisense.</li> <li>Setting up Vitest for localized bug reproduction.</li> </ul> <p>Any other &#39;battle-tested&#39; advice for dealing with side-effect-heavy Vue 2 codebases? Cheers!&quot;</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/fyrik21\"> /u/fyrik21 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbteo5/tackling_a_legacy_vue_27_spaghetti_codebase_with/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbteo5/tackling_a_legacy_vue_27_spaghetti_codebase_with/\">[comments]</a></span>",
+    "date": "2026-05-13T08:24:48.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tbteo5/tackling_a_legacy_vue_27_spaghetti_codebase_with/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Built a Vue 3 + TypeScript admin dashboard - would love your feedback",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone,</p> <p>I built a modern admin dashboard template using Vue 3, TypeScript, Element Plus and ECharts.</p> <p>Features:</p> <p>✅ 6 pages (Login, Dashboard with charts, Data Table with CRUD, Form with live preview, Charts showcase, User Profile)</p> <p>✅ Dark &amp; Light theme</p> <p>✅ Fully responsive</p> <p>✅ Reusable ECharts wrapper components</p> <p>✅ Clean architecture with Pinia + Vue Router + Axios</p> <p>If you&#39;re building SaaS dashboards or admin panels, this could save you weeks of boilerplate work.</p> <p>Demo / More info: <a href=\"https://ko-fi.com/s/ebacb9964c\">https://ko-fi.com/s/ebacb9964c</a></p> <p>Would really appreciate any feedback on the design or features!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TemperatureSquare526\"> /u/TemperatureSquare526 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbueg2/built_a_vue_3_typescript_admin_dashboard_would/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tbueg2/built_a_vue_3_typescript_admin_dashboard_would/\">[comments]</a></span>",
+    "date": "2026-05-13T09:21:43.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tbueg2/built_a_vue_3_typescript_admin_dashboard_would/"
   },
   {
     "publisherId": "reddit-dev",
@@ -245,83 +323,5 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Edit: solved it . using a store.. so on app.vue increment a variable held in store,<br/> watched for it in the component and fetched Fresh data from API. </p> <p>I am using composition (script setup) vue 3.<br/> i have found this method:</p> <pre><code>router.go() </code></pre> <p>which does work, but it triggers a full page refresh..</p> <p>In my App.Vue I have a header section. Here i display a link called remove.</p> <p>In my actual component where i have a list.. Users are able to batch select them, once they do, remove button in App vue becomes visible.. when they click it i send that to api..</p> <p>when i now do a page refresh, i can see items being removed. but of course this is undesirable. so what are my options?</p> <p>from searching i have tried adding a key to the user list div, and increasing it everytime remove button is clicked to force component refresh but that doesnt work</p> <p>i guess when users click on remove, i can trigger an event and the component can filter out the items..</p> <p>is there a better way?</p> <ol> <li>the list is coming from api and i store that in a const.</li> <li>when i click the remove button, component doesnt know anything thats happened, and i thought instead of sending an event etc i can do a component refresh</li> </ol> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/shez19833\"> /u/shez19833 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t58ut4/refresh_component_without_full_page_reload/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t58ut4/refresh_component_without_full_page_reload/\">[comments]</a></span>",
     "date": "2026-05-06T10:27:28.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1t58ut4/refresh_component_without_full_page_reload/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Testing Vue components in the browser",
-    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/bogdanelcs\"> /u/bogdanelcs </a> <br/> <span><a href=\"https://jvns.ca/blog/2026/05/02/testing-vue-components-in-the-browser/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t56ufm/testing_vue_components_in_the_browser/\">[comments]</a></span>",
-    "date": "2026-05-06T08:30:15.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t56ufm/testing_vue_components_in_the_browser/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "NUXT: environmental variables for production",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>What is the recommended implementation for environmental variables in production for NUXT. The server is a linux and I added the environmental variables via &#39;export&#39;, but - surprisingly - my built nuxt server is using the variables that were in the .env file for some reason? Probable due to the fact that file is used during build and the variables were in the nuxt.config.ts file.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TheMadnessofMadara\"> /u/TheMadnessofMadara </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t4u4sa/nuxt_environmental_variables_for_production/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t4u4sa/nuxt_environmental_variables_for_production/\">[comments]</a></span>",
-    "date": "2026-05-05T22:10:25.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t4u4sa/nuxt_environmental_variables_for_production/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Vue/Render.com 404 error help",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1t3g3p5/vuerendercom_404_error_help/\"> <img src=\"https://preview.redd.it/gem9v6sk44zg1.png?width=140&amp;height=75&amp;auto=webp&amp;s=ba32241ccbc60827eb788f0dfbcc6d8f24d772fb\" alt=\"Vue/Render.com 404 error help\" title=\"Vue/Render.com 404 error help\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>So I have the web history setup and working correctly. Locally I can refresh the page and all is well. Have the render rule setup and it should be working according to docs and everything else I can find. When deployed if I refresh I get not found with a 404 in console. Any Ideas or things you can think of I am missing? I have back buttons in the site that work and bring you back and forth to pages no idea what I am missing. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Druber13\"> /u/Druber13 </a> <br/> <span><a href=\"https://www.reddit.com/gallery/1t3g3p5\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t3g3p5/vuerendercom_404_error_help/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-05-04T12:21:52.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t3g3p5/vuerendercom_404_error_help/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Is there anyone working on Loading UI port for Vue",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1t2x3cp/is_there_anyone_working_on_loading_ui_port_for_vue/\"> <img src=\"https://external-preview.redd.it/6Y0GTmjO3UojK3FOiUv-V2bid1dHALyOwMaoFbWpLuo.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=d8064ed3bbabdf2ad26e9538d0f63c247a662590\" alt=\"Is there anyone working on Loading UI port for Vue\" title=\"Is there anyone working on Loading UI port for Vue\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/am-i-coder\"> /u/am-i-coder </a> <br/> <span><a href=\"https://loading-ui.com/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t2x3cp/is_there_anyone_working_on_loading_ui_port_for_vue/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-05-03T20:47:45.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t2x3cp/is_there_anyone_working_on_loading_ui_port_for_vue/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "How to Write UI Components That Stay Flexible",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1t1rpno/how_to_write_ui_components_that_stay_flexible/\"> <img src=\"https://external-preview.redd.it/oEc7bU8TOdnzt5F6UzOLhtnayA7kkHf9oFcxI1mS9fo.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=5196a8e09a519dba41254c0a7f00726e98e3586f\" alt=\"How to Write UI Components That Stay Flexible\" title=\"How to Write UI Components That Stay Flexible\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/therealalex5363\"> /u/therealalex5363 </a> <br/> <span><a href=\"https://alexop.dev/posts/compound-components-in-vue-shadcn/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t1rpno/how_to_write_ui_components_that_stay_flexible/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-05-02T14:40:11.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t1rpno/how_to_write_ui_components_that_stay_flexible/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "I built a voucher management system for government offices and institutions using Laravel 12, Vue 3, and Inertia.js — here's what I made",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;m a BS Information Technology student in the Philippines and I noticed that most government offices and institutions still process vouchers manually — paper forms, physical routing between departments, no tracking, no visibility.</p> <p>So I spent months building VMMS — a complete voucher management and monitoring system that digitizes the entire process.</p> <p><strong>What it does:</strong></p> <ul> <li>Multi-department workflow routing with real-time pipeline tracking</li> <li>Three separate role panels (Admin, Staff, Client)</li> <li>Automated email notifications at every stage</li> <li>Staff performance leaderboard and analytics</li> <li>Complete audit trails and system logs</li> <li>PDF and Excel exports</li> </ul> <p><strong>Tech stack:</strong> Laravel 12, Vue 3, Inertia.js, Tailwind CSS, Vuetify 3, MySQL</p> <p><strong>Live demo:</strong> <a href=\"https://vmms-app-production.up.railway.app/login\">https://vmms-app-production.up.railway.app/login</a></p> <p>Demo credentials:</p> <ul> <li>Admin: [<a href=\"mailto:admin@vmms.demo\">admin@vmms.demo</a>](mailto:<a href=\"mailto:admin@vmms.demo\">admin@vmms.demo</a>) | Password: Admin@Demo123!</li> <li>Staff: [<a href=\"mailto:staff.infra@vmms.demo\">staff.infra@vmms.demo</a>](mailto:<a href=\"mailto:staff.infra@vmms.demo\">staff.infra@vmms.demo</a>) | [<a href=\"mailto:staff.budget@vmms.demo\">staff.budget@vmms.demo</a>](mailto:<a href=\"mailto:staff.budget@vmms.demo\">staff.budget@vmms.demo</a>) | [<a href=\"mailto:staff.procurement@vmms.demo\">staff.procurement@vmms.demo</a>](mailto:<a href=\"mailto:staff.procurement@vmms.demo\">staff.procurement@vmms.demo</a>) | [<a href=\"mailto:staff.supply@vmms.demo\">staff.supply@vmms.demo</a>](mailto:<a href=\"mailto:staff.supply@vmms.demo\">staff.supply@vmms.demo</a>) | [<a href=\"mailto:staff.executive@vmms.demo\">staff.executive@vmms.demo</a>](mailto:<a href=\"mailto:staff.executive@vmms.demo\">staff.executive@vmms.demo</a>) | Password: Staff@Demo123!</li> <li>Client: [<a href=\"mailto:client@vmms.demo\">client@vmms.demo</a>](mailto:<a href=\"mailto:client@vmms.demo\">client@vmms.demo</a>) | Password: Client@Demo123!</li> </ul> <p>Happy to answer any questions about the build!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/ChrisL0713\"> /u/ChrisL0713 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t1fzwk/i_built_a_voucher_management_system_for/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1t1fzwk/i_built_a_voucher_management_system_for/\">[comments]</a></span>",
-    "date": "2026-05-02T04:39:08.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1t1fzwk/i_built_a_voucher_management_system_for/"
   }
 ]
