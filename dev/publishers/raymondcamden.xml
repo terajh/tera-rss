@@ -4,12 +4,141 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 14 May 2026 17:19:16 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 17:09:39 GMT</lastBuildDate>
+    <item>
+      <title>Send me a message in a panel...</title>
+      <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
+      <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
+        &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
+        &lt;a href=&quot;https://youtube.com/watch?v=oRyVxxi6ew8&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
+        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
+        &lt;/a&gt;
+        &lt;/lite-youtube&gt;
+        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
+        &lt;p&gt;
+        &lt;p&gt;I was thinking about how else I could play with the API and decided to do something a bit risky - build a tool that lets you (yes, you!) send me a message right to my device. How did I do it? Let me describe the process from the bottom up.&lt;/p&gt;
+        &lt;h2 id=&quot;the-python-server&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-python-server&quot;&gt;The Python Server&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;At the lowest level is a Python server running on my machine. Yes, this isn&apos;t persistent and not stable, but who cares. The server handles accepting a string to display and rendering it on the Pixoo:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+        from urllib.parse import urlparse, parse_qs
+        from pixoo_ng import Pixoo, Channel
+        from pixoo_ng.config import PixooConfig
+        import time
+        
+        def split_string(text: str, max_chars: int) -&amp;gt; list[str]:
+        &amp;quot;&amp;quot;&amp;quot;Split a string into chunks of up to max_chars characters, without breaking words.&amp;quot;&amp;quot;&amp;quot;
+        words = text.split()
+        chunks = []
+        current = &amp;quot;&amp;quot;
+        
+        for word in words:
+        if not current:
+        current = word
+        elif len(current) + 1 + len(word) &amp;lt;= max_chars:
+        current += &amp;quot; &amp;quot; + word
+        else:
+        chunks.append(current)
+        current = word
+        
+        if current:
+        chunks.append(current)
+        
+        return chunks
+        
+        class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+        if self.path == &apos;/favicon.ico&apos;:
+        self.send_response(404)
+        self.end_headers()
+        return
+        
+        query = parse_qs(urlparse(self.path).query)
+        input_text = (query.get(&apos;input&apos;, [&apos;&apos;])[0]).strip()
+        
+        if not input_text:
+        self.send_response(400)
+        self.end_headers()
+        self.wfile.write(b&amp;quot;Missing &apos;input&apos; query parameter&amp;quot;)
+        return
+        
+        pix = Pixoo(PixooConfig(address=&apos;192.168.0.191&apos;))
+        
+        startY = 5
+        strings = split_string(input_text, 15)
+        
+        for line in strings[:8]:
+        print(line, startY)
+        pix.draw_text(line, (2, startY), (0, 255, 0))
+        startY += 5
+        
+        pix.push()
+        
+        self.send_response(204)
+        self.end_headers()
+        self.wfile.flush()
+        
+        # Show it for 10 seconds...
+        time.sleep(10)
+        
+        # Then go back to my regular face
+        pix.set_channel(Channel.FACES)
+        pix.set_face(0)
+        
+        def log_message(self, format, *args):
+        print(f&amp;quot;{self.address_string()} - {format % args}&amp;quot;)
+        
+        
+        if __name__ == &amp;quot;__main__&amp;quot;:
+        server = ThreadingHTTPServer((&amp;quot;&amp;quot;, 8099), Handler)
+        print(&amp;quot;Listening on port 8099&amp;quot;)
+        server.serve_forever()
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The important bits is how it handles dynamic strings. When you send text to the Pixoo, you have to handle ensuring it actually fits, so to do that, I used a function, &lt;code&gt;split_string&lt;/code&gt;, which wraps text on words into an array. I then take that array (up to 7 lines) and send each line progressively lower on the panel.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/pix2.png&quot; loading=&quot;lazy&quot; alt=&quot;Pixoo device&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;To make this little server &amp;quot;live&amp;quot;, I simply used ngrok to expose it.&lt;/p&gt;
+        &lt;h2 id=&quot;calling-the-server&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#calling-the-server&quot;&gt;Calling the Server&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;To call the server, I set up an API route on &lt;a href=&quot;val.town&quot;&gt;https://val.town&lt;/a&gt; that does the minimal work of proxying a front end call:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        const body = await req.json();
+        
+        //trim message to 80
+        let msg = body.message.substring(0, 80);
+        let API = Deno.env.get(&amp;quot;API&amp;quot;);
+        console.log(`Sending ${msg}`);
+        await fetch(API + `?input=${msg}`);
+        
+        return Response.json({ ok: true });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The ngrok URL is an environment variable and as I don&apos;t care about the response, I return a basic boolean value back.&lt;/p&gt;
+        &lt;h2 id=&quot;the-front-end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-front-end&quot;&gt;The Front End&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;And lastly, I used Claude to build a simple front end. It&apos;s just a form with a field and button:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/pix3.png&quot; loading=&quot;lazy&quot; alt=&quot;Pixoo device&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The JavaScript literally just takes the field and sends it to the server code above, but if you want to see the complete project, you can check it out on val.town: &lt;a href=&quot;https://www.val.town/x/raymondcamden/send-me-a-message&quot;&gt;https://www.val.town/x/raymondcamden/send-me-a-message&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Want to try it? I&apos;ll share the URL, but first...&lt;/p&gt;
+        &lt;h2 id=&quot;privilege&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#privilege&quot;&gt;Privilege&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I feel safe sharing this demo as my device is in my office, a room my kids don&apos;t go into, and I can shut it down in seconds. Heck, I&apos;ll probably forget it&apos;s running and next time I boot this machine, it won&apos;t run anyway. So yeah, no big deal.&lt;/p&gt;
+        &lt;p&gt;But also - I&apos;m a guy. Probably the worst thing I&apos;ll get is someone calling me foul names.&lt;/p&gt;
+        &lt;p&gt;I can&apos;t imagine there is any world where a woman would feel safe with this kind of connection to random people on the internet.&lt;/p&gt;
+        &lt;h2 id=&quot;try-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#try-it&quot;&gt;Try It&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ready to try it? I make no guarantees it will work, but then again, you&apos;ll never know. ;) Hit the form here: &lt;a href=&quot;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&quot;&gt;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@jayneharr33?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Jayne Harris&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-message-in-a-bottle-sitting-on-the-beach-EDTXcRCCVGk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -353,7 +482,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -422,7 +551,7 @@
       <title>Animated video backgrounds via a Web Component and ColorThief</title>
       <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
       <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
         &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
@@ -522,7 +651,7 @@
       <title>Links For You (4/26/26)</title>
       <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
       <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
         &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
@@ -558,7 +687,7 @@
       <title>Another Game: My Little Mortal Combat</title>
       <link>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</link>
       <guid>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Hello awesome readers! I&apos;m happy to announce my latest web game, &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/my_little_mortal_combat/&quot;&gt;My Little Mortal Combat&lt;/a&gt;, a mashup of two epic franchises, My Little Pony and Mortal Kombat. This began as an idea, just the name, that I recorded in Microsoft To Do in September of 2019. Yes, almost seven years ago. It sat there, at the bottom of my &apos;idea&apos; list, until about a month ago when in the shower (not joking), it popped up in my head along with the basic mechanics of how the game would play.&lt;/p&gt;
         &lt;p&gt;Right now the game is just missing one feature (I&apos;d rather not talk about until I figure out how I&apos;m going to do it) but definitely needs some balancing work. I enjoy playing games without knowing the details of how things work, so if&apos;s that you too, head over to the game now and good luck!&lt;/p&gt;
@@ -597,7 +726,7 @@
       <title>Building a Simple Markdown PWA App</title>
       <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
       <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
         &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
@@ -702,7 +831,7 @@
       <title>Summarizing Docs with Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
         &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
@@ -897,7 +1026,7 @@
       <title>Testing OCR with Chrome Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
         &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
@@ -1171,7 +1300,7 @@
       <title>Links For You (4/5/26)</title>
       <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
       <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:55:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
         about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
@@ -1191,119 +1320,6 @@
         &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
         &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
         &lt;p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>You&apos;ve gained a new achievement</title>
-      <link>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</link>
-      <guid>https://www.raymondcamden.com/2026/04/01/youve-gained-a-new-achievement</guid>
-      <pubDate>Thu, 14 May 2026 17:04:04 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;For the past month or so I&apos;ve been obsessed with a book series that&apos;s apparently been popular and I just didn&apos;t realize - Dungeon Crawler Carl. Without giving too much away, it&apos;s basically about a person, and his glorious cat, who get caught up in a real world RPG. I&apos;m currently on book 3 (of 8) and am enjoying every page of it. It&apos;s &lt;em&gt;incredibly&lt;/em&gt; funny and cool at the same time. If you haven&apos;t checked it out yet, I highly recommend picking up the first book and giving it a shot. I don&apos;t think you&apos;ll regret it.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/iamyelling.jpg&quot; loading=&quot;lazy&quot; alt=&quot;A cat by a keyboard saying I AM YELLING, CARL&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;As I mentioned, the book series involves a man (and his cat, the cat is crucial) experiencing a real-world RPG and like a RPG, it&apos;s got achievements as the character progress through the dungeon. For those of you aren&apos;t gamers, most games now will give you an achievement for performing some task. These achievements give you nothing but bragging rights and a slight feeling of accomplishment, but some folks get really excited about them.&lt;/p&gt;
-        &lt;p&gt;In the books, the main characters will also get achievements and typically the achievement is &lt;em&gt;incredibly&lt;/em&gt; snarky and sarcastic. As an example:&lt;/p&gt;
-        &lt;div class=&quot;callout&quot;&gt;
-        &lt;strong&gt;New achievement! Why aren’t you wearing pants?&lt;/strong&gt;&lt;br&gt;
-        You entered the dungeon wearing no pants. Dude. Seriously?
-        &lt;p&gt;&lt;strong&gt;Reward&lt;/strong&gt;: You&apos;ve received a Gold Apparel Box!&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;And another:&lt;/p&gt;
-        &lt;div class=&quot;callout&quot;&gt;
-        &lt;strong&gt;New achievement! You’ve entered a guildhall!&lt;/strong&gt;&lt;br&gt;
-        Congratulations. You know how to open doors.
-        &lt;p&gt;&lt;strong&gt;Reward&lt;/strong&gt;: That sense of fulfillment you feel? That’s reward enough.&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p&gt;These almost always make me LOL and I thought - what if I could make a simple web tool to generate these on the fly? I did so, using Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; feature, which as of today is still behind a flag, so if you want to play with this, you&apos;ll need to follow the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;instructions&lt;/a&gt; on which flags to enable in your browser. If you&apos;ve done that, and don&apos;t care about &lt;em&gt;how&lt;/em&gt; this tool was built, you can head over to the demo now: &lt;a href=&quot;https://dcc.raymondcamden.com/&quot;&gt;https://dcc.raymondcamden.com/&lt;/a&gt;&lt;/p&gt;
-        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The code behind this was a rather simple usage of the Chrome &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Here&apos;s the code that initializes the session:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;session = await LanguageModel.create({
-        initialPrompts:[
-        { 
-        role: &apos;system&apos;, 
-        content: 
-        `Generate an achievement announcement in the style of 
-        the Dungeon Crawler Carl series. You will be given a 
-        prompt to base the achievement on, which will be an 
-        ordinary, mundane task. The achievement you generate
-        should have the snarky, over the top prose associated 
-        with the book.
-        
-        do not comment about carl at all, or have any other output 
-        except the achievement title, text, and rewards` 
-        }
-        ],		
-        monitor(m) {
-        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
-        console.log(`Downloaded ${e.loaded * 100}%`);
-        if(e.loaded === 0 || e.loaded === 1) {
-        $status.innerHTML = &apos;&apos;;
-        return;
-        }
-        $status.innerHTML = `Downloading AI model, currently at ${Math.floor(e.loaded * 100)}%`;
-        });
-        }		
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Make note of the system instruction which is what guides the model when generating content. Your input is basically a &amp;quot;mundane&amp;quot; thing you&apos;ve done, like wash dishes or take out the trash. When you&apos;ve entered that and hit submit, I then simply get the achievement:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let achievement = JSON.parse(await session.prompt(input, {  
-        responseConstraint: schema,
-        }));
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Notice the &lt;code&gt;responseConstraint&lt;/code&gt; value? This is how I get precise results back, in my case an achievement title, the text, and a list of rewards. This is defined earlier in my code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let schema = {
-        &amp;quot;type&amp;quot;: &amp;quot;object&amp;quot;,
-        &amp;quot;properties&amp;quot;: {
-        &amp;quot;title&amp;quot;: {
-        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
-        },
-        &amp;quot;achievementText&amp;quot;: {
-        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
-        },
-        &amp;quot;rewards&amp;quot;: {
-        &amp;quot;type&amp;quot;:&amp;quot;array&amp;quot;,
-        &amp;quot;items&amp;quot;:{
-        &amp;quot;type&amp;quot;:&amp;quot;string&amp;quot;
-        }
-        },
-        },
-        &amp;quot;additionalProperties&amp;quot;: false
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And that&apos;s pretty much it. The rest of the code is straight up DOM manipulation.&lt;/p&gt;
-        &lt;h2 id=&quot;the-design&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-design&quot;&gt;The Design&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As for the look and feel of the app, I made use of Cursor and one simple prompt:&lt;/p&gt;
-        &lt;blockquote&gt;
-        im going to be building a tool that uses Chrome AI to generate random achievements in the style of Dungeon Crawler Carl. i need your help with a design. i dont need you to do any of the javascript, just create my scaffold for me. its one web page and the title should be, &quot;DCC Achievement Generator&quot;. There is a prompt, &quot;What mundane thing did you get done?&quot;, a form field for the task, and then it will render out the achievment. 
-        &lt;p&gt;Achievements have a title, a body of text, and a list of rewards (bulleted list). Create a nice design for the achievement as well (just make something up for now)&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I&apos;m just now noticing the typo and thankfully Cursor didn&apos;t complain. I let it output my HTML and CSS and then simply copied that over to CodePen so I could start working on the actual implementation. I think the only work I needed to do was add some IDs to the HTML in order for my JavaScript to connect to what it needed to update. The design Cursor created was just fine:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/dcc2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;A screenshot of the app&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;In case you can&apos;t read that, my input was: &lt;code&gt;i wrote a blog post&lt;/code&gt; and the achievement I received was:&lt;/p&gt;
-        &lt;div class=&quot;callout&quot;&gt;
-        &lt;strong&gt;The Scroll of Slightly Above Average Prose&lt;/strong&gt;&lt;br&gt;
-        By the gods...you *authored* a blog post? A digital missive of words, painstakingly crafted (or, let&apos;s be honest, hastily assembled) and disseminated across the ethereal web? A feat of remarkable… mediocrity? Fear not, adventurer! While not slaying a dragon or retrieving a legendary artifact, you have demonstrated a modicum of linguistic dexterity. A tiny flicker of creativity in the vast darkness of internet noise. Consider yourself mildly commended. It&apos;s not much, but it&apos;s… something.
-        &lt;br&gt;&lt;br&gt;
-        &lt;strong&gt;Rewards&lt;/strong&gt;:&lt;br&gt;
-        &lt;ul&gt;
-        &lt;li&gt;A digital badge of… acknowledgment.&lt;/li&gt;
-        &lt;li&gt;The fleeting satisfaction of knowing you’ve added to the collective human output.&lt;/li&gt;
-        &lt;li&gt;A slightly less judgmental stare from your cat.&lt;/li&gt;
-        &lt;li&gt;Potentially, an increase in internet karma. (Results may vary.)&lt;/li&gt;
-        &lt;/div&gt;
-        &lt;h2 id=&quot;results-may-vary&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#results-may-vary&quot;&gt;Results May Vary&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;If you&apos;ve got the flags enabled and try it out, please share your results, and let me know what you think. Feel free to fork the pen and modify to your heart&apos;s content. Also... Mongo is appalled!&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;DCC Generator&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;js&quot; data-slug-hash=&quot;qEaxdmg&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019d3084-ca56-7b39-bb6b-5a67093a283e&quot;&gt;
-        DCC Generator&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@giorgiotrovato?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Giorgio Trovato&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/yellow-and-white-trophy-_XTY6lD8jgM?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

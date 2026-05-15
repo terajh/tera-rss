@@ -4,12 +4,12 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Thu, 14 May 2026 17:19:21 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 17:09:44 GMT</lastBuildDate>
     <item>
       <title>Linux CopyFail 취약점 패치, CVE-2026-31431</title>
       <link>https://sunyzero.tistory.com/328</link>
       <guid>https://sunyzero.tistory.com/328</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: Noto Sans Demilight, Noto Sans KR;&quot;&gt;2026년 4월말 리눅스 커널에 치명적인 보안 버그인 일명 CopyFail &lt;span style=&quot;color: #ee2323;&quot;&gt;CVE-2026-31431&lt;/span&gt;이 발표되었다. 이 글에서는 CopyFail의 간단한 소개와 보안 버그에 해당하는지 PoC 테스트하는 방법 및 보안 패치, 완화 처치 방안에 대해 다룬다. 특히 커널 업그레이드나 blacklist 처리 방법에 대해서 자세히 다루도록 한다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
@@ -203,10 +203,96 @@
       </content:encoded>
     </item>
     <item>
+      <title>[SE-0523] Hashable conformance for UnownedTaskExecutor</title>
+      <link>https://green1229.tistory.com/620</link>
+      <guid>https://green1229.tistory.com/620</guid>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0523 &amp;mdash; UnownedTaskExecutor의 Hashable 채택&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/chnXEU/dJMcadopJaQ/4XUWgRtY6Cknp9f56gCpbK/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/chnXEU/dJMcadopJaQ/4XUWgRtY6Cknp9f56gCpbK/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/chnXEU/dJMcadopJaQ/4XUWgRtY6Cknp9f56gCpbK/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FchnXEU%2FdJMcadopJaQ%2F4XUWgRtY6Cknp9f56gCpbK%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Intro&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0523&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Authors:&lt;/b&gt; Fabian Fett, Konrad Malawski&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; John McCall&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Implemented (Swift 6.4)&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Motivation&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;SE-0417에서 도입된 task executor preferences는 현재 실행 중인 task의 &lt;code&gt;unownedTaskExecutor&lt;/code&gt;를 노출해, 성능에 민감한 코드가 executor 기반으로 스케줄링 결정을 내릴 수 있게 해줍니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;UnownedTaskExecutor&lt;/code&gt;는 이미 &lt;code&gt;Equatable&lt;/code&gt;을 채택하고 있어요. &lt;br /&gt;그런데 &lt;code&gt;Hashable&lt;/code&gt;이 없다 보니, executor를 기준으로 리소스를 인덱싱해야 하는 경우에 불편함이 생겼습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;대표적인 사례가 &lt;b&gt;커넥션 풀링&lt;/b&gt;입니다.&lt;br /&gt;&lt;code&gt;ConnectionPool&lt;/code&gt;이 여러 executor에 걸쳐 커넥션을 관리할 때, task의 executor에 이미 연결된 커넥션을 우선적으로 반환하면 &lt;b&gt;불필요한 컨텍스트 스위치를 줄일 수 있거든요  &lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;Hashable이 없으면 executor를 찾기 위해 매번 선형 탐색을 해야 합니다  &lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Before &amp;mdash; O(n) 선형 탐색&lt;/b&gt;&lt;/span&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto;&quot;&gt;&lt;code&gt;// Today: O(n) linear search
+        func pickConnection(preferring executor: UnownedTaskExecutor) -&amp;gt; Connection {
+        for (e, connection) in executorConnectionList {
+        if e == executor { return connection }
+        }
+        return executorConnectionList.first!.connection
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;&lt;br /&gt;After &amp;mdash; O(1) 딕셔너리 조회&lt;/b&gt;&lt;/span&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto;&quot;&gt;&lt;code&gt;// With Hashable: O(1) dictionary lookup
+        func pickConnection(preferring executor: UnownedTaskExecutor) -&amp;gt; Connection {
+        if let connection = connectionsByExecutor[executor] {
+        return connection
+        }
+        return connectionsByExecutor.values.first!
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 패턴은 커넥션 풀링뿐만 아니라 executor identity를 기준으로 &lt;b&gt;리소스, 캐시, 스케줄링 메타데이터를 인덱싱하는 모든 시스템에 적용&lt;/b&gt;될 수 있습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Detailed Design&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;UnownedTaskExecutor&lt;/code&gt;는 &lt;code&gt;Builtin.Executor&lt;/code&gt; 값을 감싸는 struct입니다. &lt;br /&gt;이미 기저 executor 참조의 &lt;b&gt;identity&lt;/b&gt;를 기반으로 &lt;code&gt;Equatable&lt;/code&gt; 채택이 되어 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Hashable&lt;/code&gt; 채택도 동일한 identity 값을 해싱하므로, 기존 equality 시맨틱과 &lt;b&gt;일관성을 완전히 유지&lt;/b&gt;합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto;&quot;&gt;&lt;code&gt;extension UnownedTaskExecutor: Hashable {}&lt;/code&gt;&lt;/pre&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;API 변경은 이것이 전부입니다. 딱 한 줄이에요  &lt;/span&gt;&lt;/blockquote&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Source Compatibility / ABI&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 변경은 &lt;b&gt;순수 additive 변경&lt;/b&gt;으로, 기존 코드는 변경 없이 그대로 컴파일됩니다.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Equatable&lt;/code&gt;을 채택한 타입에 &lt;code&gt;Hashable&lt;/code&gt;을 추가하는 것은 소스 호환성을 깨지 않습니다.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;프로토콜 채택 추가는 additive ABI 변경이며, 기존 ABI 서피스를 수정하지 않습니다.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Alternatives Considered&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;아무것도 하지 않기&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;아무것도 하지 않으면, 개발자가 직접 &lt;code&gt;Hashable&lt;/code&gt; 채택을 구현해야 합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;angelscript&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto;&quot;&gt;&lt;code&gt;extension UnownedTaskExecutor: Hashable {
+        @inlinable
+        public func hash(into hasher: inout Hasher) {
+        let (ident, impl) = unsafeBitCast(self, to: (Int, Int).self)
+        hasher.combine(ident)
+        hasher.combine(impl)
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;br /&gt;&lt;code&gt;unsafeBitCast&lt;/code&gt;를 직접 사용해야 한다는 점에서 불필요하게 위험하고 번거롭습니다. 표준 라이브러리 차원에서 제공하는 것이 당연히 올바른 방향이라고 생각합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Conclusion&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;아주 작은 변경이지만, &lt;b&gt;굉장히 자연스러운 확장&lt;/b&gt;입니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Equatable&lt;/code&gt;을 채택하고 있는 타입이라면 &lt;code&gt;Hashable&lt;/code&gt;도 당연히 지원해야 한다는 Swift의 설계 철학에 맞게, &lt;code&gt;UnownedTaskExecutor&lt;/code&gt;도 이제 딕셔너리 키와 Set으로 자유롭게 활용할 수 있게 됩니다!&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;executor 기반으로 리소스를 관리하는 코드를 작성하고 계신 분들께 특히 반가운 소식일 것 같습니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;hr data-ke-style=&quot;style1&quot; /&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;References&lt;/b&gt;&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;/span&gt;&lt;/h2&gt;
+        &lt;figure id=&quot;og_1778784735249&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0523-hashable-unownedtask-executor.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0523-hashable-unownedtask-executor.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0523-hashable-unownedtask-executor.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/bFo2Ef/dJMb86O6MRN/Xbx3QejrczjXFYwm2EyKO0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/cdAawY/dJMb88F90tX/1z39Br2VC2aqKHkZd6lelk/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0523-hashable-unownedtask-executor.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0523-hashable-unownedtask-executor.md&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/bFo2Ef/dJMb86O6MRN/Xbx3QejrczjXFYwm2EyKO0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/cdAawY/dJMb88F90tX/1z39Br2VC2aqKHkZd6lelk/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;div class=&quot;og-text&quot;&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0523-hashable-unownedtask-executor.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/a&gt;&lt;/figure&gt;
+      </content:encoded>
+    </item>
+    <item>
       <title>[SE-0524] Add withTemporaryAllocation using Output(Raw)Span</title>
       <link>https://green1229.tistory.com/619</link>
       <guid>https://green1229.tistory.com/619</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0524 &amp;mdash; OutputSpan을 활용한 withTemporaryAllocation 추가&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
@@ -353,7 +439,7 @@
       <title>혁신기업의 딜레마(The innovator&apos;s dilemma)</title>
       <link>https://sungjk.github.io/2026/05/13/the-innovators-dilemma.html</link>
       <guid>https://sungjk.github.io/2026/05/13/the-innovators-dilemma.html</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &amp;lt;p&amp;gt;&amp;lt;img src=&amp;quot;/images/2026/05/13/IMG_1876.png&amp;quot; alt=&amp;quot;The innovator&amp;apos;s dilemma&amp;quot; title=&amp;quot;The innovator&amp;apos;s dilemma&amp;quot; class=&amp;quot;center-image&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;
         
@@ -378,7 +464,7 @@
       <title>중국 엄친딸, 중국판 타다인  디디추싱의 CEO 류칭</title>
       <link>https://neozest2.tistory.com/entry/LiuQingDidi</link>
       <guid>https://neozest2.tistory.com/entry/LiuQingDidi</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;1792&quot; data-origin-height=&quot;2388&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/siAdB/dJMcag6wRIb/eEh3pSjwDmLq0vo0iINKnk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/siAdB/dJMcag6wRIb/eEh3pSjwDmLq0vo0iINKnk/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/siAdB/dJMcag6wRIb/eEh3pSjwDmLq0vo0iINKnk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FsiAdB%2FdJMcag6wRIb%2FeEh3pSjwDmLq0vo0iINKnk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1792&quot; height=&quot;2388&quot; data-origin-width=&quot;1792&quot; data-origin-height=&quot;2388&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
         &lt;/p&gt;
@@ -407,7 +493,7 @@
       <title>시스템 구조는 조직의 커뮤니케이션 구조를 닮는다. - 맬빈 콘웨이</title>
       <link>https://neozest2.tistory.com/entry/MelvinConway</link>
       <guid>https://neozest2.tistory.com/entry/MelvinConway</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;1600&quot; data-origin-height=&quot;2628&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/9CXWB/dJMcacQybJV/cuSM4nyPG6AdB8tpKzT6Dk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F9CXWB%2FdJMcacQybJV%2FcuSM4nyPG6AdB8tpKzT6Dk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;434&quot; height=&quot;713&quot; data-origin-width=&quot;1600&quot; data-origin-height=&quot;2628&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
@@ -452,7 +538,7 @@
       <title>[번역] 에이전트 코딩에서 쌓이는 이해 부채</title>
       <link>https://velog.io/@typo/80-problem-in-agentic-coding</link>
       <guid>https://velog.io/@typo/80-problem-in-agentic-coding</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
         &lt;p&gt;이 글은 원저자의 허가 하에 &lt;a href=&quot;https://addyo.substack.com/p/the-80-problem-in-agentic-coding&quot;&gt;The 80% Problem in Agentic Coding&lt;/a&gt; 아티클을 한국어로 번역한 글입니다. 약간의 의역 및 오역이 포함될 수 있습니다.&lt;/p&gt;
@@ -644,7 +730,7 @@
       <title>[번역] useEffect 함수에 이름 붙이기, 절대 후회 없을 선택</title>
       <link>https://velog.io/@typo/name-your-effects</link>
       <guid>https://velog.io/@typo/name-your-effects</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
         &lt;p&gt;원 저자 &lt;a href=&quot;https://www.linkedin.com/in/neciudan/&quot;&gt;Dan Neciu&lt;/a&gt;의 허가 하에 &amp;lt;&lt;a href=&quot;https://neciudan.dev/name-your-effects&quot;&gt;Start naming your useEffect functions, you will thank me later&lt;/a&gt;&amp;gt; 아티클을 번역한 글입니다. 약간의 의역 및 오역이 포함되어 있을 수 있습니다.&lt;/p&gt;
@@ -917,10 +1003,154 @@
       </content:encoded>
     </item>
     <item>
+      <title>정책 추가에 따라 분기문 생길 때, 전략 패턴 적용하기</title>
+      <link>https://happysisyphe.tistory.com/105</link>
+      <guid>https://happysisyphe.tistory.com/105</guid>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
+      <content:encoded>
+        &lt;h2 data-heading=&quot;들어가며&quot; data-ke-size=&quot;size26&quot;&gt;들어가며&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;백엔드 개발을 하다 보면 정책이 까다로운 코드가 생긴다. 처음에는 if, switch로 분기해도 충분해 보인다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;문제는 목적이 늘어날 때 생긴다. 이번 사이드 프로젝트에서 S3 presigned-url API를 구현하면서 업로드 목적별 정책이 달라졌다. 프로필 이미지는 5MB까지만 허용하고, 활동 기록 이미지는 10MB까지 허용한다. OCR 오류 리포트 이미지는 저장 경로도 별도로 가져가야 했다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;처음 구현은 목적별 정책이 여러 파일에 흩어져 있었다. 새로운 업로드 목적을 추가하면서 한 곳을 고치고 다른 한 곳을 빼먹었다. 이때 전략 패턴을 적용해 정책을 업로드 목적 단위로 모았다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;전략 패턴이 무엇인가?&quot; data-ke-size=&quot;size26&quot;&gt;전략 패턴이 무엇인가?&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;b&gt;전략 패턴은 바뀔 수 있는 규칙이나 알고리즘을 인터페이스로 분리하고, 실행 시점에 알맞은 구현체를 골라 쓰는 디자인 패턴이다.&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;핵심은 &quot;분기문을 없앤다&quot;가 아니다. 핵심은 &quot;변경되는 이유가 같은 코드를 한 곳에 모은다&quot;이다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;전략 패턴을 적용하기 전에는 호출하는 쪽이 여러 조건을 알고 있었다.&lt;/p&gt;
+        &lt;pre class=&quot;gauss&quot;&gt;&lt;code&gt;if (purpose == PROFILE_IMAGE) {
+        // 프로필 이미지 정책
+        }
+        
+        if (purpose == ACTIVITY_RECORD_IMAGE) {
+        // 활동 기록 이미지 정책
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;전략 패턴을 적용하면 호출하는 쪽은 공통 인터페이스만 알고, 구체적인 정책은 각 전략 객체가 맡는다.&lt;/p&gt;
+        &lt;pre class=&quot;java&quot; data-ke-language=&quot;java&quot;&gt;&lt;code&gt;UploadPurposePolicy policy = uploadPurposePolicy(request.uploadPurpose());
+        policy.validateFileSize(request.fileSize());
+        String objectKey = policy.createObjectKey(userId, request.fileName());&lt;/code&gt;&lt;/pre&gt;
+        &lt;h2 data-heading=&quot;비즈니스 로직&quot; data-ke-size=&quot;size26&quot;&gt;비즈니스 로직&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;S3 presigned-url API는 업로드 목적별로 다른 정책을 가진다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;목적 허용 content type 최대 파일 크기 object key prefix&lt;/p&gt;
+        &lt;table style=&quot;border-collapse: collapse; width: 100%;&quot; border=&quot;1&quot; data-ke-align=&quot;alignLeft&quot;&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;PROFILE_IMAGE&lt;/td&gt;
+        &lt;td&gt;공통 이미지 타입&lt;/td&gt;
+        &lt;td&gt;5MB&lt;/td&gt;
+        &lt;td&gt;profile-images/{userId}/&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;ACTIVITY_RECORD_IMAGE&lt;/td&gt;
+        &lt;td&gt;공통 이미지 타입&lt;/td&gt;
+        &lt;td&gt;10MB&lt;/td&gt;
+        &lt;td&gt;activity-records/{userId}/{yyyy}/{MM}/&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;SCREEN_TIME_OCR_REPORT_IMAGE&lt;/td&gt;
+        &lt;td&gt;공통 이미지 타입&lt;/td&gt;
+        &lt;td&gt;10MB&lt;/td&gt;
+        &lt;td&gt;screen-time-ocr-reports/{userId}/{yyyy}/{MM}/&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;여기서 모든 정책이 목적별로 다른 것은 아니다.&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;content type 검증은 공통이다.&lt;/li&gt;
+        &lt;li&gt;파일 크기 제한은 목적별로 다르다.&lt;/li&gt;
+        &lt;li&gt;object key 경로도 목적별로 다르다.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;따라서 모든 코드를 전략으로 밀어 넣으면 안 된다. 공통 정책은 공통 정책으로 남기고, 목적에 따라 달라지는 정책만 전략으로 묶어야 한다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;기존 구현의 문제&quot; data-ke-size=&quot;size26&quot;&gt;기존 구현의 문제&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;원래는 업로드 목적이 두 개였다. 이때는 목적별 분기가 크게 문제처럼 보이지 않았다. 하지만 새 목적을 추가하자 변경 지점이 흩어져 있다는 문제가 드러났다.&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;ChatGPT Image 2026년 5월 15일 오후 09_58_16.png&quot; data-origin-width=&quot;2110&quot; data-origin-height=&quot;745&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/bL5qZ5/dJMcaiwy4Dj/N8uvIkEzjPmmruuyJUm9b1/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/bL5qZ5/dJMcaiwy4Dj/N8uvIkEzjPmmruuyJUm9b1/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/bL5qZ5/dJMcaiwy4Dj/N8uvIkEzjPmmruuyJUm9b1/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbL5qZ5%2FdJMcaiwy4Dj%2FN8uvIkEzjPmmruuyJUm9b1%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;2110&quot; height=&quot;745&quot; data-filename=&quot;ChatGPT Image 2026년 5월 15일 오후 09_58_16.png&quot; data-origin-width=&quot;2110&quot; data-origin-height=&quot;745&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;새로운 업로드 목적을 추가하려면 최소한 다음 파일들을 같이 봐야 했다.&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;UploadFileSizePolicy&lt;/li&gt;
+        &lt;li&gt;UploadObjectKeyFactory&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;실제로 UploadFileSizePolicy에 분기문을 추가하는 것을 잊었다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;이건 단순 실수가 아니다. 코드 구조가 실수를 유도한 것이다. 업로드 목적 하나를 추가하는 변경인데, 파일 크기 정책과 object key 생성 정책이 서로 다른 모듈에 흩어져 있었다. 변경 이유는 하나인데 수정해야 할 모듈은 여러 개였다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;b&gt;응집도&lt;/b&gt;가 낮다는 것은 이런 상태다. 같이 바뀌어야 하는 코드가 같이 있지 않다. 그래서 유지보수할 때 여러 파일을 돌아다녀야 하고, 그중 하나를 놓치기 쉽다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;개선 방향&quot; data-ke-size=&quot;size26&quot;&gt;개선 방향&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;이 문제의 축은 &quot;업로드 목적&quot;이다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;업로드 목적이 바뀌면 함께 바뀌는 규칙이 있다.&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;이 목적은 어떤 UploadPurpose에 대응하는가?&lt;/li&gt;
+        &lt;li&gt;최대 파일 크기는 얼마인가?&lt;/li&gt;
+        &lt;li&gt;사용자별 object key prefix는 무엇인가?&lt;/li&gt;
+        &lt;li&gt;실제 object key directory는 어떻게 구성하는가?&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;그래서 이 규칙들을 UploadPurposePolicy라는 하나의 인터페이스로 모았다.&lt;/p&gt;
+        &lt;pre class=&quot;java&quot; data-ke-language=&quot;java&quot;&gt;&lt;code&gt;public interface UploadPurposePolicy {
+        
+        UploadPurpose purpose();
+        
+        long maxFileSize();
+        
+        String objectKeyPrefixForUser(Long userId);
+        
+        String objectKeyDirectory(Long userId);
+        
+        default void validateFileSize(Long fileSize) {
+        // 공통 파일 크기 검증 흐름
+        }
+        
+        default String createObjectKey(Long userId, String fileName) {
+        // 공통 object key 생성 흐름
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;각 업로드 목적은 이 인터페이스를 구현한다.&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;ProfileImageUploadPurposePolicy&lt;/li&gt;
+        &lt;li&gt;ActivityRecordImageUploadPurposePolicy&lt;/li&gt;
+        &lt;li&gt;ScreenTimeOcrReportImageUploadPurposePolicy&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;이제 파일 크기와 object key 경로는 목적별 정책 객체 안에 같이 있다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;개선된 구조&quot; data-ke-size=&quot;size26&quot;&gt;개선된 구조&lt;/h2&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;ChatGPT Image 2026년 5월 15일 오후 10_29_35.png&quot; data-origin-width=&quot;1890&quot; data-origin-height=&quot;832&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/FEV4E/dJMcah5xr2Q/L0Okc0a0rSbGX72dKxmKF1/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/FEV4E/dJMcah5xr2Q/L0Okc0a0rSbGX72dKxmKF1/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/FEV4E/dJMcah5xr2Q/L0Okc0a0rSbGX72dKxmKF1/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FFEV4E%2FdJMcah5xr2Q%2FL0Okc0a0rSbGX72dKxmKF1%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1890&quot; height=&quot;832&quot; data-filename=&quot;ChatGPT Image 2026년 5월 15일 오후 10_29_35.png&quot; data-origin-width=&quot;1890&quot; data-origin-height=&quot;832&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;S3UploadService는 더 이상 목적별 세부 규칙을 직접 알 필요가 없다. 요청의 업로드 목적에 맞는 정책을 찾고, 그 정책에게 검증과 object key 생성을 맡긴다.&lt;/p&gt;
+        &lt;pre class=&quot;reasonml&quot;&gt;&lt;code&gt;String contentType = uploadContentTypePolicy.validate(request.contentType());
+        UploadPurposePolicy uploadPurposePolicy = uploadPurposePolicy(request.uploadPurpose());
+        uploadPurposePolicy.validateFileSize(request.fileSize());
+        
+        String objectKey = uploadPurposePolicy.createObjectKey(userId, request.fileName());
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;여기서 UploadContentTypePolicy는 그대로 공통 정책으로 남긴다. 업로드 목적과 무관하게 이미지 타입을 검증하는 규칙이기 때문이다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;반면 maxFileSize, objectKeyPrefixForUser, objectKeyDirectory는 목적별로 달라진다. 그래서 ProfileImageUploadPurposePolicy, ActivityRecordImageUploadPurposePolicy, ScreenTimeOcrReportImageUploadPurposePolicy 안으로 들어간다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;결과적으로 새 업로드 목적이 추가될 때 기존 정책 클래스들을 수정하지 않아도 된다. 새 목적에 맞는 UploadPurposePolicy 구현체를 추가하면 된다. 전략 패턴이 줄여주는 것은 기존 정책 분기 수정이다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;무엇이 좋아졌는가?&quot; data-ke-size=&quot;size26&quot;&gt;무엇이 좋아졌는가?&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;1. 변경 지점이 줄었다. 새 업로드 목적을 추가할 때 기존 UploadFileSizePolicy, UploadObjectKeyFactory의 분기문을 다시 열지 않는다. 목적별 정책 클래스 하나를 추가한다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;2. 응집도가 높아졌다. SCREEN_TIME_OCR_REPORT_IMAGE의 파일 크기 제한과 저장 경로가 같은 클래스에 있다. 이 목적을 이해하려면 여러 정책 파일을 찾아다니지 않아도 된다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;3. 테스트가 목적 단위로 쉬워졌다. ScreenTimeOcrReportImageUploadPurposePolicy를 테스트하면 OCR 리포트 업로드 목적의 파일 크기와 경로 규칙을 함께 확인할 수 있다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;4. S3UploadService의 역할이 단순해졌다. 이 서비스는 presigned-url 발급 흐름을 조립한다. 목적별 정책 판단은 정책 객체가 담당한다.&lt;/p&gt;
+        &lt;h2 data-heading=&quot;전략 패턴을 쓸 때의 기준&quot; data-ke-size=&quot;size26&quot;&gt;전략 패턴을 쓸 때의 기준&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;전략 패턴은 다음 조건이 있을 때 잘 맞는다.&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;규칙의 종류가 앞으로 늘어날 가능성이 있다.&lt;/li&gt;
+        &lt;li&gt;새 규칙을 추가할 때 기존 분기문을 여러 곳에서 수정해야 한다.&lt;/li&gt;
+        &lt;li&gt;호출하는 쪽이 세부 규칙을 몰라도 된다.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 data-heading=&quot;마치며&quot; data-ke-size=&quot;size26&quot;&gt;마치며&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;전략 패턴은 흩어진 변경 지점을 모으는 일이다. 이번 리팩터링의 핵심은 업로드 목적별로 달라지는 정책을 UploadPurposePolicy로 묶은 것이다. 공통 정책은 공통 정책으로 두고, 목적별로 바뀌는 파일 크기와 object key 생성 규칙만 전략으로 분리했다. 그 결과 새 목적을 추가할 때 기존 분기문을 수정하는 대신 새 전략을 추가하는 구조가 됐다. 유지보수하기 훨씬 좋아졌다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
       <title>비서(Hermes Agent)를 잘 활용하는 멘탈 모델</title>
       <link>https://happysisyphe.tistory.com/104</link>
       <guid>https://happysisyphe.tistory.com/104</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;hermes-agent-2.png&quot; data-origin-width=&quot;1080&quot; data-origin-height=&quot;708&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/dVRuCA/dJMcafmjqh6/FyixzvCb2DmmeXWme007l0/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/dVRuCA/dJMcafmjqh6/FyixzvCb2DmmeXWme007l0/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/dVRuCA/dJMcafmjqh6/FyixzvCb2DmmeXWme007l0/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdVRuCA%2FdJMcafmjqh6%2FFyixzvCb2DmmeXWme007l0%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1080&quot; height=&quot;708&quot; data-filename=&quot;hermes-agent-2.png&quot; data-origin-width=&quot;1080&quot; data-origin-height=&quot;708&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
         &lt;/p&gt;
@@ -946,17 +1176,10 @@
       </content:encoded>
     </item>
     <item>
-      <title>AtCoder Next DP Contest 풀이 (Part 1)</title>
-      <link>https://justicehui.github.io/atcoder/2026/05/08/ndpc/</link>
-      <guid>https://justicehui.github.io/atcoder/2026/05/08/ndpc/</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
-      <content:encoded>서론 AtCoder Next DP Contest (link)에 출제된 20문제의 DP 문제 중 앞 14문제의 풀이입니다. solved.ac 기준 실버 상위권부터 다이아 중위권 정도 범위의 문제를 다룹니다.</content:encoded>
-    </item>
-    <item>
       <title>TLS Fingerprinting과 봇 탐지</title>
       <link>https://w0nder.land/posts/75-TLS%20Fingerprinting%EA%B3%BC%20%EB%B4%87%20%ED%83%90%EC%A7%80</link>
       <guid>https://w0nder.land/posts/75-TLS%20Fingerprinting%EA%B3%BC%20%EB%B4%87%20%ED%83%90%EC%A7%80</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>
         개인 프로젝트에서 쓰던 API가 어느 날부터 이상하게 동작했다. 맥북에서는 JSON이 잘 오는데, 같은 코드를 리눅스 서버에 올리면 결과가 달랐다. 그렇다고 딱 떨어지게 &quot;실패&quot;라고 하기도 어려웠다. HTTP 에러는 없었고 상태 코드는 200이었으며 연결도 정상이었다. 그런데 응답 본문이 JSON이 아니라 HTML이었다.
         열어보니 익숙한 문구가 떴다.
@@ -1049,21 +1272,21 @@
       <title>[리뷰] 원청: 나답게 산다는 것에 대하여 (스포주의)</title>
       <link>https://jiniya.net/2026/05/city-of-fiction/</link>
       <guid>https://jiniya.net/2026/05/city-of-fiction/</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>#…</content:encoded>
     </item>
     <item>
       <title>[일상] 코드와 시간 사이에서: 신영진 25년의 초상</title>
       <link>https://jiniya.net/2026/05/code-and-time-shin-youngjin-25-year-portrait/</link>
       <guid>https://jiniya.net/2026/05/code-and-time-shin-youngjin-25-year-portrait/</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>[AI-GENERATED] 이 문서는 AI가 작성한 것이며, 작성자는 사람이 아닙니다. 이 블로그의 공개된 글을 다 읽은 인공지능이 생각한 나란 사람은?!…</content:encoded>
     </item>
     <item>
       <title>[ai] 사내 문서·코드를 LLM 이 잘 찾게 만드는 법</title>
       <link>https://jiniya.net/2026/05/llm-friendly-internal-search/</link>
       <guid>https://jiniya.net/2026/05/llm-friendly-internal-search/</guid>
-      <pubDate>Thu, 14 May 2026 16:59:26 GMT</pubDate>
+      <pubDate>Fri, 15 May 2026 16:50:34 GMT</pubDate>
       <content:encoded>[AI-GENERATED] 이 문서는 AI가 작성한 것이며, 작성자는 사람이 아닙니다. Redmine 위키·이슈와 여러 git 저장소를 한꺼번에 LLM…</content:encoded>
     </item>
   </channel>
