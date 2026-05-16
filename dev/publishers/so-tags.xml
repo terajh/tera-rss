@@ -4,7 +4,537 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Fri, 15 May 2026 17:09:47 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 16 May 2026 16:31:52 GMT</lastBuildDate>
+    <item>
+      <title>Vue usersvue form practise</title>
+      <link>https://stackoverflow.com/questions/79942171/vue-usersvue-form-practise</link>
+      <guid>https://stackoverflow.com/questions/79942171/vue-usersvue-form-practise</guid>
+      <pubDate>Sat, 16 May 2026 13:42:06 GMT</pubDate>
+      <content:encoded>
+        &lt;h4&gt;Title:&lt;/h4&gt;
+        &lt;p&gt;Vue 3 fetch works for first request but fails/omits credentials on subsequent API call in onMounted&lt;/p&gt;
+        &lt;h4&gt;Body:&lt;/h4&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I am developing a user management dashboard in &lt;strong&gt;Vue 3&lt;/strong&gt; using &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt;. In the &lt;code&gt;onMounted&lt;/code&gt; hook, I am performing two sequential fetch requests to an Express.js backend. The first request validates the session, and the second one fetches the list of users to display them in a &lt;code&gt;v-for&lt;/code&gt; loop.&lt;/p&gt;
+        &lt;p&gt;I noticed that while my authentication check passes successfully, the second request (&lt;code&gt;/api/users&lt;/code&gt;) behaves differently, and I want to make sure I am handling cross-origin requests and asynchronous flow correctly within this component.&lt;/p&gt;
+        &lt;p&gt;Here is my &lt;code&gt;Users.vue&lt;/code&gt; component code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
+        &amp;lt;h1&amp;gt;Felhasználók&amp;lt;/h1&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;UserDisplay/&amp;gt;
+        
+        &amp;lt;ul v-for=&amp;quot;user in users&amp;quot; :key=&amp;quot;user.id&amp;quot;&amp;gt;
+        &amp;lt;li&amp;gt;{{ user.user_name }} ({{user.type}}) &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        import { onMounted, ref } from &apos;vue&apos;;
+        import router from &apos;@/router&apos;;
+        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;;
+        
+        
+        const users = ref([])
+        async function logout() {
+        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
+        credentials: &apos;include&apos;,
+        method:&apos;POST&apos;
+        })
+        return router.push(&apos;/&apos;)
+        }
+        
+        onMounted(async() =&amp;gt;{
+        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials: &apos;include&apos;,
+        })
+        
+        if(!res.ok){
+        router.push(&apos;/&apos;)
+        }
+        
+        res = await fetch(&amp;quot;http://localhost:3000/api/users&amp;quot;)
+        const data = await res.json()
+        
+        users.value = data.users
+        })
+        
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;My questions:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;I forgot to include &lt;code&gt;credentials: &apos;include&apos;&lt;/code&gt; in the second &lt;code&gt;fetch(&amp;quot;http://localhost:3000/api/users&amp;quot;)&lt;/code&gt; call. Will this cause the Express backend to reject the request if the routes are protected, or will it just omit the session cookie?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Similar to my other views, calling &lt;code&gt;router.push(&apos;/&apos;)&lt;/code&gt; inside the &lt;code&gt;if (!res.ok)&lt;/code&gt; block does not stop the rest of the function from executing. What is the cleanest way to prevent the &lt;code&gt;/api/users&lt;/code&gt; fetch from firing at all if the initial session check fails?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Thank you for your help and insights!&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue tasksvue Form practise</title>
+      <link>https://stackoverflow.com/questions/79942169/vue-tasksvue-form-practise</link>
+      <guid>https://stackoverflow.com/questions/79942169/vue-tasksvue-form-practise</guid>
+      <pubDate>Sat, 16 May 2026 13:40:52 GMT</pubDate>
+      <content:encoded>
+        &lt;h4&gt;Title:&lt;/h4&gt;
+        &lt;p&gt;Vue 3 component fetching multiple resources sequentially in onMounted vs Promise.all&lt;/p&gt;
+        &lt;h4&gt;Body:&lt;/h4&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I have created a tasks management view component in &lt;strong&gt;Vue 3&lt;/strong&gt; (Composition API, &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt;). It handles multiple responsibilities: displaying a shared &lt;code&gt;UserDisplay&lt;/code&gt; child component, handling user logout via a &lt;code&gt;POST&lt;/code&gt; request, guarding the route by checking &lt;code&gt;/api/me&lt;/code&gt;, and finally fetching a list of tasks.&lt;/p&gt;
+        &lt;p&gt;Currently, I am awaiting the authentication check first, and if it passes, I fetch the tasks sequentially right after. I want to optimize this workflow and make sure my template structure follows standard Vue 3 practices.&lt;/p&gt;
+        &lt;p&gt;Here is my current &lt;code&gt;Tasks.vue&lt;/code&gt; file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
+        &amp;lt;h1&amp;gt;Feladatok&amp;lt;/h1&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;UserDisplay/&amp;gt;
+        &amp;lt;ul v-for=&amp;quot;task in tasks&amp;quot; :key=&amp;quot;task.id&amp;quot;&amp;gt;
+        &amp;lt;li&amp;gt;{{ task.task }} ({{task.user_name}}) &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        
+        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;
+        import router from &apos;@/router&apos;
+        import {onMounted, ref} from &apos;vue&apos;
+        
+        const tasks = ref([])
+        
+        async function logout() {
+        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
+        credentials: &apos;include&apos;,
+        method:&apos;POST&apos;
+        })
+        return router.push(&apos;/&apos;)
+        }
+        
+        onMounted(async() =&amp;gt;{
+        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
+        
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials: &apos;include&apos;,
+        })
+        
+        if(!res.ok){
+        router.push(&apos;/&apos;)
+        }
+        
+        res = await fetch(&amp;quot;http://localhost:3000/api/tasks&amp;quot;,{
+        credentials:&apos;include&apos;,
+        })
+        const data = await res.json()
+        
+        tasks.value = data
+        })
+        
+        
+        
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;My questions:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Since Vue 3 supports multiple root fragments, is it safe to have &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;UserDisplay/&amp;gt;&lt;/code&gt;, and &lt;code&gt;&amp;lt;ul&amp;gt;&lt;/code&gt; as sibling elements at the root level, or should I wrap them all in a single container &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; for consistency?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Inside &lt;code&gt;onMounted&lt;/code&gt;, if the first check fails, I call &lt;code&gt;router.push(&apos;/&apos;)&lt;/code&gt;. However, the code execution continues and fires the &lt;code&gt;/api/tasks&lt;/code&gt; fetch immediately after. How can I properly halt the execution block right after the router redirection?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any architectural advice would be highly appreciated!&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue loginvue Form practise</title>
+      <link>https://stackoverflow.com/questions/79942167/vue-loginvue-form-practise</link>
+      <guid>https://stackoverflow.com/questions/79942167/vue-loginvue-form-practise</guid>
+      <pubDate>Sat, 16 May 2026 13:39:41 GMT</pubDate>
+      <content:encoded>
+        &lt;h4&gt;Title:&lt;/h4&gt;
+        &lt;p&gt;Vue 3 handle form submit double alert on fetch error handling&lt;/p&gt;
+        &lt;h4&gt;Body:&lt;/h4&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I am building a login form in &lt;strong&gt;Vue 3&lt;/strong&gt; using the &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt; syntax. The component sends a POST request to an Express.js backend with &lt;code&gt;credentials: &apos;include&apos;&lt;/code&gt; to handle the authentication session. It also has an &lt;code&gt;onMounted&lt;/code&gt; lifecycle hook to automatically redirect already authenticated users to the &lt;code&gt;/users&lt;/code&gt; page.&lt;/p&gt;
+        &lt;p&gt;I have run into two small issues:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;In my error handling block inside &lt;code&gt;handleform&lt;/code&gt;, I accidentally nested the &lt;code&gt;alert()&lt;/code&gt; functions, which causes unexpected behavior when the backend returns a non-200 response.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;What is the recommended way to handle a successful login redirect? Right now, after &lt;code&gt;fetch&lt;/code&gt; succeeds, it doesn&apos;t push the user to the next page inside &lt;code&gt;handleform&lt;/code&gt; (only the &lt;code&gt;onMounted&lt;/code&gt; handles redirection if the page is reloaded).&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Here is my full &lt;code&gt;loginvue.vue&lt;/code&gt; component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;h1&amp;gt;Bejelentkezés&amp;lt;/h1&amp;gt;
+        &amp;lt;form @submit.prevent=&amp;quot;handleform&amp;quot;&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;user_name&amp;quot; id=&amp;quot;user_name&amp;quot; v-model=&amp;quot;user_name&amp;quot;/&amp;gt; &amp;lt;br&amp;gt;
+        &amp;lt;input type=&amp;quot;password&amp;quot; name=&amp;quot;password&amp;quot; id=&amp;quot;password&amp;quot; v-model=&amp;quot;password&amp;quot;/&amp;gt; &amp;lt;br&amp;gt;
+        
+        &amp;lt;button&amp;gt;Bejelentkezés&amp;lt;/button&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        import router from &apos;@/router&apos;;
+        import {onMounted, ref} from &apos;vue&apos;;
+        
+        const user_name = ref(&amp;quot;&amp;quot;);
+        const password = ref(&amp;quot;&amp;quot;);
+        
+        async function handleform() {
+        const res = await fetch(&amp;quot;http://localhost:3000/api/auth/login&amp;quot;, {
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials:&apos;include&apos;,
+        method: &apos;POST&apos;,
+        body: JSON.stringify({
+        user_name: user_name.value,
+        password: password.value,
+        }),
+        })
+        if(!res.ok){
+        return alert(
+        alert((await res.json()).error), 
+        )}
+        }
+        
+        onMounted(async() =&amp;gt;{
+        const res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials: &apos;include&apos;,
+        })
+        
+        if(res.ok){
+        router.push(&apos;/users&apos;)
+        }
+        })
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;How can I clean up the fetch error handling and add a proper redirect immediately after a successful login response? Thanks!&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue Userdisplay Form</title>
+      <link>https://stackoverflow.com/questions/79942166/vue-userdisplay-form</link>
+      <guid>https://stackoverflow.com/questions/79942166/vue-userdisplay-form</guid>
+      <pubDate>Sat, 16 May 2026 13:38:13 GMT</pubDate>
+      <content:encoded>
+        &lt;h4&gt;Title:&lt;/h4&gt;
+        &lt;p&gt;Vue 3 Composition API fetch returns undefined for nested session object properties&lt;/p&gt;
+        &lt;h4&gt;Body:&lt;/h4&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I am working on a Vue 3 component using the &lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt; syntax. The goal of this component is to fetch the currently logged-in user&apos;s profile from an Express.js backend (&lt;code&gt;/api/me&lt;/code&gt;) using &lt;code&gt;fetch&lt;/code&gt; with &lt;code&gt;credentials: &apos;include&apos;&lt;/code&gt; to pass the session cookie.&lt;/p&gt;
+        &lt;p&gt;While the network request completes successfully, I am having trouble correctly extracting and displaying the user&apos;s role/type, and I want to make sure my asynchronous &lt;code&gt;onMounted&lt;/code&gt; lifecycle hook handles the data correctly.&lt;/p&gt;
+        &lt;p&gt;Here is my &lt;code&gt;UserDisplay.vue&lt;/code&gt; component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;p&amp;gt;Belépve mint:  {{ user_name }}&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Felhasználó típusa: {{ user_type }}&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        import { onMounted, ref } from &apos;vue&apos;;
+        
+        const user_name = ref(&apos;&apos;)
+        const user_type = ref(&apos;&apos;)
+        
+        onMounted(async ()=&amp;gt;{
+        const res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;,{
+        credentials: &apos;include&apos;,
+        })
+        const data = await res.json()
+        
+        user_name.value = data.session.user_name
+        user_type.value = data.type
+        })
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;My questions:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;In my backend, the &lt;code&gt;/api/me&lt;/code&gt; endpoint sends back &lt;code&gt;{ session: req.session }&lt;/code&gt;. However, the user type is determined by an external function. Should I modify the backend response, or is there a cleaner way to map the fetched reactive properties in Vue?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;What is the best practice for handling a loading state in Vue 3 while the &lt;code&gt;async onMounted&lt;/code&gt; fetch is still running, to prevent the UI from flashing empty values?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any advice on improving this component would be appreciated!&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue Form Practise</title>
+      <link>https://stackoverflow.com/questions/79942165/vue-form-practise</link>
+      <guid>https://stackoverflow.com/questions/79942165/vue-form-practise</guid>
+      <pubDate>Sat, 16 May 2026 13:36:41 GMT</pubDate>
+      <content:encoded>
+        &lt;h4&gt;Title:&lt;/h4&gt;
+        &lt;p&gt;How to implement route guarding in Vue Router 4 with an Express.js session backend?&lt;/p&gt;
+        &lt;h4&gt;Body:&lt;/h4&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I have set up a basic frontend router using &lt;strong&gt;Vue 3&lt;/strong&gt; and &lt;strong&gt;Vue Router 4&lt;/strong&gt; for a practice application. It connects to an Express.js backend that handles authentication via &lt;code&gt;iron-session&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Currently, the routes are publicly accessible, but I want to restrict access so that unauthenticated users are redirected to the &lt;code&gt;/&lt;/code&gt; (Login) page, and regular users cannot access the &lt;code&gt;/users&lt;/code&gt; (admin) page.&lt;/p&gt;
+        &lt;p&gt;Here is my current &lt;code&gt;router.js&lt;/code&gt; configuration:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createRouter, createWebHistory } from &apos;vue-router&apos;
+        
+        const router = createRouter({
+        history: createWebHistory(import.meta.env.BASE_URL),
+        routes: [
+        {
+        path: &apos;/&apos;,
+        name: &apos;Login&apos;,
+        component: () =&amp;gt; import(&amp;quot;../views/loginvue.vue&amp;quot;),
+        },
+        {
+        path: &apos;/users&apos;,
+        name: &apos;User&apos;,
+        component: () =&amp;gt; import(&amp;quot;../views/Uservue.vue&amp;quot;),
+        },
+        {
+        path: &apos;/tasks&apos;,
+        name: &apos;Tasks&apos;,
+        component: () =&amp;gt; import(&amp;quot;../views/Tasksvue.vue&amp;quot;),
+        },
+        ],
+        })
+        
+        export default router
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;My questions:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;How should I implement a global navigation guard (&lt;code&gt;router.beforeEach&lt;/code&gt;) to check the user&apos;s authentication status against my &lt;code&gt;/api/me&lt;/code&gt; backend endpoint before entering a route?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;What is the best way to attach meta fields (like &lt;code&gt;requiresAuth: true&lt;/code&gt; or &lt;code&gt;role: &apos;admin&apos;&lt;/code&gt;) to these routes to handle permissions cleanly?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any help or code examples would be greatly appreciated!&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue-Express.js Form</title>
+      <link>https://stackoverflow.com/questions/79942163/vue-express-js-form</link>
+      <guid>https://stackoverflow.com/questions/79942163/vue-express-js-form</guid>
+      <pubDate>Sat, 16 May 2026 13:28:43 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am practicing building a basic backend API using &lt;strong&gt;Express.js&lt;/strong&gt;, &lt;strong&gt;MariaDB&lt;/strong&gt;, and &lt;strong&gt;iron-session&lt;/strong&gt; for authentication. The application includes user login, session handling, role-based access control (admin vs. user), and fetching data via inner joins.&lt;/p&gt;
+        &lt;p&gt;While the code currently works for basic practice, I want to make sure I am following best practices regarding database connection management (releasing connections in &lt;code&gt;try/catch/finally&lt;/code&gt;), session middleware usage, and overall code structure.&lt;/p&gt;
+        &lt;p&gt;There is also a syntax typo at &lt;code&gt;/api/me&lt;/code&gt; (a random string &lt;code&gt;sadasdadsadsadsdasasdasddsa&lt;/code&gt; got left in during coding), which I am planning to clean up, but I am looking for feedback on the database and session architecture.&lt;/p&gt;
+        &lt;p&gt;Here is my complete server setup:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const bodyParser = require(&amp;quot;body-parser&amp;quot;);
+        const express = require(&amp;quot;express&amp;quot;);
+        const cors = require(&amp;quot;cors&amp;quot;);
+        const mariadb = require(&amp;quot;mariadb&amp;quot;);
+        const ironsession = require(&amp;quot;iron-session&amp;quot;);
+        const bcrypt = require(&amp;quot;bcrypt&amp;quot;);
+        
+        const db = mariadb.createPool({
+        host:&amp;quot;localhost&amp;quot;,
+        port: 3306,
+        user: &amp;quot;root&amp;quot;,
+        password: &amp;quot;tanulo11&amp;quot;,
+        database: &amp;quot;vue_session&amp;quot;,
+        connectionLimit: 5,
+        });
+        
+        const app = express();
+        
+        app.use(express.json());
+        app.use(bodyParser.json());
+        app.use(cors({
+        credentials: true,
+        origin: &amp;quot;http://localhost:5173&amp;quot;,
+        }),
+        );
+        
+        app.use(async(req, res, next) =&amp;gt; {
+        const session = await ironsession.getIronSession(req,res,{
+        cookieName: &amp;quot;Session&amp;quot;,
+        password: &amp;quot;k9#mP2vL!aR7zB*yX4cN8qJ0tU1wE3sV&amp;quot;,
+        cookieOptions: {
+        httpOnly: true,
+        secure: false,
+        sameSite:&amp;quot;lax&amp;quot;,
+        },
+        });
+        req.session = session;
+        
+        next();
+        });
+        
+        app.post(&amp;quot;/api/auth/login&amp;quot;, async(req,res) =&amp;gt; {
+        const{user_name,password} = await req.body;
+        try{
+        let conn = await db.getConnection();
+        const result = await conn.query(
+        &amp;quot;SELECT * FROM users WHERE user_name = ?&amp;quot;,
+        [user_name],
+        );
+        
+        
+        await conn.release();
+        
+        if (result.length &amp;lt; 1){
+        return res.status(404).json({
+        error:&amp;quot;Nincs ilyen felhasználó&amp;quot;,
+        });
+        }
+        
+        const user = result[0];
+        
+        if(
+        await bcrypt.compare(password, user.password_hash)
+        ){
+        const session = req.session;
+        
+        session.user_id = user.id;
+        session.user_name = user.user_name;
+        
+        await session.save();
+        
+        return res.status(200).json({
+        session,
+        });
+        }else{
+        return res.status(401).json({
+        error: &amp;quot;Hibás jelszó&amp;quot;,
+        });
+        }
+        }catch(e){
+        console.log(e);
+        return res.status(500).json({
+        error: e.message,
+        });
+        }
+        });
+        
+        app.post(&amp;quot;/api/auth/logout&amp;quot;, async (req,res) =&amp;gt; {
+        await req.session.destroy();
+        
+        return res.status(200).json({
+        message: &amp;quot;Sikeres kijelentkezés&amp;quot;,
+        });
+        });
+        
+        app.get(&amp;quot;/api/me&amp;quot;, async (req,res) =&amp;gt; {
+        const session = req.session;
+        
+        if(!session.user_id){
+        return res.status(401).json({
+        error: &amp;quot;Nem vagy bejelentkezve&amp;quot;,
+        });
+        }
+        
+        const type = await getUserType(session.user_id);
+        
+        res.status(200).json({session});
+        });
+        
+        app.get(&amp;quot;/api/users&amp;quot;, async (req,res) =&amp;gt; {
+        try{
+        const conn = await db.getConnection();
+        
+        const results = await conn.query(&amp;quot;SELECT id, user_name, type FROM users;&amp;quot;);
+        
+        
+        await conn.release();
+        res.json({
+        users:results.map((user) =&amp;gt; {
+        user.type = user.type ? &amp;quot;admin&amp;quot; : &amp;quot;user&amp;quot;;
+        
+        return user;
+        }),
+        });
+        }catch(e){
+        console.log(e);
+        return res.status(500).json({
+        error: e.message,
+        });
+        }
+        });
+        
+        async function getUserType(user_id) {
+        try{
+        const conn = await db.getConnection();
+        
+        const results = await conn.query(&amp;quot;SELECT type FROM users WHERE id = ?;&amp;quot;,
+        [user_id],
+        );
+        
+        
+        await conn.release();
+        return results [0].type ? &amp;quot;admin&amp;quot;: &amp;quot;user&amp;quot;;
+        }catch(e){
+        console.log(e);
+        }
+        }
+        
+        app.get(&amp;quot;/api/tasks&amp;quot;, async (req,res) =&amp;gt;{
+        const session= req.session;
+        
+        if(!session.user_id){
+        return res.status(401).json({
+        error: &amp;quot;Nem vagy bejelentkezve&amp;quot;,
+        });
+        }
+        const type = await getUserType(session.user_id);
+        try{
+        let tasks;
+        const conn = await db.getConnection();
+        
+        if(type == &amp;quot;admin&amp;quot;){
+        tasks = await conn.query(&amp;quot;SELECT tasks.id, users.user_name, task FROM tasks INNER JOIN users ON tasks.user_id = users.id;&amp;quot;,     
+        );
+        }
+        if(type == &amp;quot;user&amp;quot;){
+        tasks = await conn.query(&amp;quot;SELECT tasks.id, users.user_name, task FROM tasks INNER JOIN users ON tasks.user_id = users.id WHERE users.id = ?;&amp;quot;,
+        [session.user_id],
+        );
+        }
+        
+        
+        await conn.release();
+        
+        res.status(200).json(tasks);
+        }catch(e){
+        console.log(e);
+        
+        return res.status(500).json({
+        error: e.message,
+        });
+        }
+        
+        });
+        app.listen(3000, () =&amp;gt; {
+        console.log(&amp;quot;http://localhost:3000/&amp;quot;);
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;My specific questions:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Is using &lt;code&gt;conn.release()&lt;/code&gt; inside the &lt;code&gt;try&lt;/code&gt; block safe enough, or should I refactor it into a &lt;code&gt;finally&lt;/code&gt; block to prevent connection leaks on errors?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Is &lt;code&gt;iron-session&lt;/code&gt; being used efficiently here as a global middleware for every single route?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Are there any visible security risks regarding the way I handle user sessions and role checks?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any advice on improving this practice project would be highly appreciated!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How can I make a Hero section fill the remaining viewport height below a header in Nuxt 4 without breaking when the page grows?</title>
       <link>https://stackoverflow.com/questions/79940624/how-can-i-make-a-hero-section-fill-the-remaining-viewport-height-below-a-header</link>
@@ -1310,312 +1840,6 @@
         &lt;p&gt;&lt;strong&gt;Example of what I&apos;m seeing:&lt;/strong&gt;
         When an axios request fails with a 400/500 status, a red bar appears at the top showing something like:&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/3GmQvROl.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/3GmQvROl.png&quot; alt=&quot;red bar screenshot&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Chart.js with date-fns adapter throws &quot;This method is not implemented: Check that a complete date adapter is provided&quot; when using time scale</title>
-      <link>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</link>
-      <guid>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</guid>
-      <pubDate>Wed, 04 Feb 2026 14:37:08 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;m trying to create a time-series line chart using Chart.js (v4.4.0) in a Vue 3 component with the date-fns adapter. The chart works fine with a linear x-axis, but when I set the x-axis to type: &apos;time&apos;, I get the error:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;This method is not implemented: Check that a complete date adapter is provided.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;What I&apos;ve done so far:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Installed the required packages: chart.js, chartjs-adapter-date-fns, and date-fns (all v3+)&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Imported and registered the adapter as per the documentation&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Tried registering the adapter both globally and at the scale level&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Verified my date data is in proper Date objects&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;canvas ref=&amp;quot;chartRef&amp;quot;&amp;gt;&amp;lt;/canvas&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script&amp;gt;
-        import { Chart, registerables } from &apos;chart.js&apos;;
-        import { de } from &apos;date-fns/locale&apos;;
-        import &apos;chartjs-adapter-date-fns&apos;;
-        
-        Chart.register(...registerables);
-        
-        export default {
-        mounted() {
-        this.createChart();
-        },
-        methods: {
-        createChart() {
-        const ctx = this.$refs.chartRef;
-        
-        // Sample time-series data
-        const xAxisLabels = [&apos;2024-01-01&apos;, &apos;2024-01-02&apos;, &apos;2024-01-03&apos;];
-        const yAxisData = [0.5, 0.7, 0.6];
-        
-        new Chart(ctx, {
-        type: &apos;line&apos;,
-        data: {
-        datasets: [{
-        label: &apos;NDVI&apos;,
-        data: xAxisLabels.map((date, i) =&amp;gt; ({
-        x: new Date(date),
-        y: yAxisData[i]
-        }))
-        }]
-        },
-        options: {
-        scales: {
-        x: {
-        type: &apos;time&apos;, // ← ERROR OCCURS WHEN THIS IS SET
-        adapters: {
-        date: { locale: de }
-        }
-        }
-        }
-        }
-        });
-        }
-        }
-        };
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;code&gt;package.json&lt;/code&gt; dependencies:&lt;/p&gt;
-        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
-        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.4.0&amp;quot;,
-        &amp;quot;chartjs-adapter-date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
-        &amp;quot;date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.2.29&amp;quot;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The error stack trace:&lt;/p&gt;
-        &lt;pre class=&quot;lang-none prettyprint-override&quot;&gt;&lt;code&gt;Error: This method is not implemented: Check that a complete date adapter is provided.
-        at _adapters._date.override (chart.js:12457:1)
-        at Object.parse (chart.js:12516:1)
-        at TimeScale._parseValue (chart.js:13367:1)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;) when using vue-papa-parse with Vue 3 + Vite</title>
-      <link>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</link>
-      <guid>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</guid>
-      <pubDate>Sun, 01 Feb 2026 19:06:34 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m facing the following error when trying to install &lt;strong&gt;vue-papa-parse&lt;/strong&gt; in a Vue 3 project created with &lt;strong&gt;Vite&lt;/strong&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This occurs when registering the plugin in &lt;code&gt;main.js&lt;/code&gt;, following the usage shown in the documentation.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;main.js&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { createApp } from &apos;vue&apos;
-        import App from &apos;./App.vue&apos;
-        import VuePapaParse from &apos;vue-papa-parse&apos;
-        
-        const app = createApp(App)
-        
-        app.use(VuePapaParse)
-        app.mount(&apos;#app&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;Environment&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Vue 3&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Vite&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Why can&apos;t I import Dagre into my Vite app? [closed]</title>
-      <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
-      <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
-      <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Our team is migrating a Vue CLI app to Vite. We had some Dagre code that worked with no problems in the Vue CLI app, but is throwing this error with Vite, stopping the entire app from loading:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Uncaught Error: Dynamic require of &amp;quot;@dagrejs/graphlib&amp;quot; is not supported&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;// Adapted from https://vueflow.dev/examples/layout/simple.html
-        import dagre from &apos;@dagrejs/dagre&apos;;
-        import { Position, useVueFlow } from &apos;@vue-flow/core&apos;;
-        import { ref } from &apos;vue&apos;;
-        
-        export function useLayout() {
-        const graph = ref(new dagre.graphlib.Graph());
-        
-        function layout(nodes, edges, direction) {
-        const dagreGraph = new dagre.graphlib.Graph();
-        
-        // ...
-        
-        dagre.layout(dagreGraph);
-        
-        // ...
-        
-        return nodes;
-        }
-        
-        return { graph, layout };
-        }
-        
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;vite.config.js:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { fileURLToPath, URL } from &apos;node:url&apos;;
-        
-        import { defineConfig } from &apos;vite&apos;;
-        import vue from &apos;@vitejs/plugin-vue&apos;;
-        
-        // https://vitejs.dev/config/
-        export default defineConfig({
-        plugins: [vue()],
-        resolve: {
-        alias: {
-        &apos;@&apos;: fileURLToPath(new URL(&apos;./src&apos;, import.meta.url)),
-        },
-        },
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;package.json:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{
-        &amp;quot;scripts&amp;quot;: {
-        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
-        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
-        },
-        &amp;quot;dependencies&amp;quot;: {
-        &amp;quot;@dagrejs/dagre&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
-        &amp;quot;@tinymce/tinymce-vue&amp;quot;: &amp;quot;^5.1.0&amp;quot;,
-        &amp;quot;@vue-flow/background&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/controls&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;@vue-flow/core&amp;quot;: &amp;quot;^1.22.3&amp;quot;,
-        &amp;quot;@vue-flow/minimap&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/node-toolbar&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.3.4&amp;quot;,
-        },
-        &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;vite&amp;quot;: &amp;quot;^4.4.6&amp;quot;,
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Prevent swipe back on iOS</title>
-      <link>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</link>
-      <guid>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</guid>
-      <pubDate>Thu, 22 Jan 2026 19:29:29 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am building a Capacitor app using Vue and Ionic.&lt;/p&gt;
-        &lt;p&gt;On iOS, I want to disable the default edge swipe back gesture on some screens.&lt;/p&gt;
-        &lt;p&gt;I have seen a similar question where the solution was to override the gesture, but that question is about four years old. I am wondering if there is now a more native or official way to do this, for example through an Ionic prop, a router setting, or a Capacitor API, without having to add a custom gesture.&lt;/p&gt;
-        &lt;p&gt;Thanks&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; alt=&quot;image&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to transfer multiple parameters in Vuex action [closed]</title>
-      <link>https://stackoverflow.com/questions/79873324/how-to-transfer-multiple-parameters-in-vuex-action</link>
-      <guid>https://stackoverflow.com/questions/79873324/how-to-transfer-multiple-parameters-in-vuex-action</guid>
-      <pubDate>Thu, 22 Jan 2026 00:42:44 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I know that you can put multiple parameters in one object, and that&apos;s what I&apos;m trying to do - I tried to implement it, but apparently I&apos;m missing the basics, because the second parameter is always undefined.&lt;/p&gt;
-        &lt;p&gt;Can you tell me how to fix the problem and what I&apos;m missing in this situation?&lt;/p&gt;
-        &lt;p&gt;in &lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; of component:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;methods: {
-        ...mapActions({
-        deleteComment: &apos;comment/deleteComment&apos;
-        }),
-        removeComment() {
-        const comment = this.comment
-        const article = this.article
-        const payload = {
-        article: article,
-        comment: comment
-        }
-        this.deleteComment(payload)
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;in Vuex module:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;//action
-        async deleteComment({
-        state,
-        commit
-        }, payload) {
-        try {
-        console.log(&apos;payload&apos;)
-        const aid = payload.acticle.id
-        const cid = payload.comment.id
-        const response = await axios.delete(`http://localhost:5000/article/${aid}/comment/${cid}`)
-        } catch (e) {
-        alert(&apos;Error&apos;, e)
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;When I try to &lt;code&gt;console.log(payload)&lt;/code&gt; it shows normal parameter&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/26jpaf2M.png&quot; alt=&quot;image of console.log&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Am I take value of params in right way?&lt;/p&gt;
-        &lt;p&gt;I seem to understand what the problem is, but changing the parameter transmission and trying to follow tips from the Internet and examples from the documentation, I don&apos;t understand simple things. I will be glad of any help.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>How to conditionally render delete button without layout gap?</title>
-      <link>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</link>
-      <guid>https://stackoverflow.com/questions/79873099/how-to-conditionally-render-delete-button-without-layout-gap</guid>
-      <pubDate>Wed, 21 Jan 2026 17:46:36 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m building a Vue 3 form with dynamic rows (label + email/phone) inside a flex container. I want to show a trash/delete button only for rows that can be removed.&lt;/p&gt;
-        &lt;p&gt;My current approach uses invisible (Tailwind = visibility: hidden) for the last row, but that leaves a blank space in the flex layout. The content is hidden but the element still occupies width, which causes a “gap” until the fields are filled.&lt;/p&gt;
-        &lt;p&gt;When the delete button should not be visible, there should be no whitespace/gap at all.&lt;/p&gt;
-        &lt;p&gt;Here is a simplified version:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;InputGroup
-        v-for=&amp;quot;(item, index) in systemSettingsStore.getLabeledContactEmails()&amp;quot;
-        :key=&amp;quot;index&amp;quot;
-        label=&amp;quot;Add email&amp;quot;
-        direction=&amp;quot;row&amp;quot;
-        &amp;gt;
-        &amp;lt;div class=&amp;quot;flex flex-col sm:flex-row gap-4 w-full&amp;quot;&amp;gt;
-        &amp;lt;InputText
-        placeholder=&amp;quot;Label&amp;quot;
-        class=&amp;quot;w-full sm:w-[90px] grow-0&amp;quot;
-        :value=&amp;quot;item.label&amp;quot;
-        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;label&apos;, value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;InputText
-        placeholder=&amp;quot;Email&amp;quot;
-        class=&amp;quot;flex-1&amp;quot;
-        :value=&amp;quot;item.email&amp;quot;
-        @input=&amp;quot;(value) =&amp;gt; update(&apos;CONTACT_EMAILS&apos;, index, &apos;email&apos;, value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;div
-        v-if=&amp;quot;
-        systemSettingsStore.getLabeledContactEmails().length &amp;gt; 1 &amp;amp;&amp;amp;
-        item.label?.trim() &amp;amp;&amp;amp;
-        item.email?.trim()
-        &amp;quot;
-        &amp;gt;
-        &amp;lt;Button
-        :class=&amp;quot;{
-        invisible: index === systemSettingsStore.getLabeledContactEmails().length - 1
-        }&amp;quot;
-        square
-        icon=&amp;quot;trash&amp;quot;
-        class=&amp;quot;sm:w-auto&amp;quot;
-        @click=&amp;quot;remove(&apos;CONTACT_EMAILS&apos;, index)&amp;quot;
-        /&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/InputGroup&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What is the best way in Vue to hide/remove this button &lt;em&gt;without&lt;/em&gt; leaving whitespace in a flex layout?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
