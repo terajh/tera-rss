@@ -4,12 +4,81 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sat, 16 May 2026 16:31:46 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 17 May 2026 16:19:21 GMT</lastBuildDate>
+    <item>
+      <title>Is it hotter or colder this year?</title>
+      <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
+      <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
+        &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Lets you enter a free form address and then use &lt;a href=&quot;https://www.geocod.io/&quot;&gt;Geocoding&lt;/a&gt; to convert it to a proper longitude and latitude. This is a super simple geocoding API with a generous free tier. Do note though it&apos;s North America only.&lt;/li&gt;
+        &lt;li&gt;Uses the &lt;a href=&quot;https://pirateweather.net/en/latest/&quot;&gt;Pirate Weather&lt;/a&gt; API to get historical weather information. Date wise, I&apos;m using this week, and then the same days over the previous four days.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As I mentioned, I worked with Claude on this and let it design the layout and write the code initially. I was kinda impressed by one part - the &lt;code&gt;mapWithConcurrency&lt;/code&gt; function that lets you pass an array of async function with a desired max number to run at once. It handles doing the batching and returning the final result. That makes the calls for the weather data a bit more gentle on the provider.&lt;/p&gt;
+        &lt;p&gt;However - I noticed it was taking a &lt;em&gt;long&lt;/em&gt; time to finish. In theory, I&apos;m doing 7 times 5 (this week plus four previous years) of calls which is 35 which doesn&apos;t &lt;em&gt;seem&lt;/em&gt; like a lot, but I did some digging. Claude had used an endpoint that was a bit old. Doing some more research I switched to the proper endpoint... which didn&apos;t support CORS.&lt;/p&gt;
+        &lt;p&gt;Oh no!&lt;/p&gt;
+        &lt;p&gt;Oh - actually - I just moved to this to &lt;a href=&quot;https://val.town&quot;&gt;val.town&lt;/a&gt; and built a quick server side proxy. It takes in the same arguments that&apos;s send to my client side code (lat, lng, and a timestamp), and passes it to the historical Pirate Weather endpoint. So here&apos;s the frontend code - again - this is being driven by a concurrency function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function fetchDayTemperatures(lat, lng, unixSeconds) {
+        let req = await fetch(PIRATE_WEATHER_API_BASE, {
+        method: &amp;quot;POST&amp;quot;,
+        body: JSON.stringify({
+        lat,
+        lng,
+        unixSeconds,
+        }),
+        });
+        return await req.json();
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And here&apos;s the backend code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        const body = await req.json();
+        const key = Deno.env.get(&amp;quot;PIRATE&amp;quot;);
+        
+        const url = new URL(
+        `https://timemachine.pirateweather.net/forecast/${key}/${body.lat},${body.lng},${body.unixSeconds}`,
+        );
+        url.searchParams.set(&amp;quot;units&amp;quot;, &amp;quot;us&amp;quot;);
+        url.searchParams.set(&amp;quot;exclude&amp;quot;, &amp;quot;minutely,hourly,alerts,flags&amp;quot;);
+        
+        const response = await fetch(url);
+        const payload = await response.json();
+        
+        if (!response.ok) {
+        throw new Error(payload.error || &amp;quot;Weather lookup failed.&amp;quot;);
+        }
+        
+        const day = payload.daily?.data?.[0];
+        if (!day) {
+        throw new Error(&amp;quot;Weather data did not include a daily summary.&amp;quot;);
+        }
+        
+        return Response.json({
+        timezone: payload.timezone,
+        high: day.temperatureMax,
+        low: day.temperatureMin,
+        });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I barely modified this from the original client side code - only switching to an environment variable for the API (their API is free, but I might as well) and returning a proper &lt;code&gt;Response&lt;/code&gt; object.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a screenshot of it in action:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/weather.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;You can try this yourself here: &lt;a href=&quot;https://weathercomparison.val.run/&quot;&gt;https://weathercomparison.val.run/&lt;/a&gt;. If you want to see the code, and possibly fork the val, you can do so here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/weather-comparison&quot;&gt;https://www.val.town/x/raymondcamden/weather-comparison&lt;/a&gt;&lt;/p&gt;
+        &lt;h2 id=&quot;so%2C-was-it-cooler%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#so%2C-was-it-cooler%3F&quot;&gt;So, was it cooler?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;No. I was wrong. Last year was cooler than this year, but the three years before that were all higher, with 2022 being pure hell. I remember that year seeing the city working on a road that had literally buckled because of heat.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@peteralbanese?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Peter Albanese&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/black-and-white-cat-on-glass-window-K9_Igf8ZpC0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -138,7 +207,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -482,7 +551,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -551,7 +620,7 @@
       <title>Animated video backgrounds via a Web Component and ColorThief</title>
       <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
       <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
         &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
@@ -651,7 +720,7 @@
       <title>Links For You (4/26/26)</title>
       <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
       <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
         &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
@@ -687,7 +756,7 @@
       <title>Another Game: My Little Mortal Combat</title>
       <link>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</link>
       <guid>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Hello awesome readers! I&apos;m happy to announce my latest web game, &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/my_little_mortal_combat/&quot;&gt;My Little Mortal Combat&lt;/a&gt;, a mashup of two epic franchises, My Little Pony and Mortal Kombat. This began as an idea, just the name, that I recorded in Microsoft To Do in September of 2019. Yes, almost seven years ago. It sat there, at the bottom of my &apos;idea&apos; list, until about a month ago when in the shower (not joking), it popped up in my head along with the basic mechanics of how the game would play.&lt;/p&gt;
         &lt;p&gt;Right now the game is just missing one feature (I&apos;d rather not talk about until I figure out how I&apos;m going to do it) but definitely needs some balancing work. I enjoy playing games without knowing the details of how things work, so if&apos;s that you too, head over to the game now and good luck!&lt;/p&gt;
@@ -726,7 +795,7 @@
       <title>Building a Simple Markdown PWA App</title>
       <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
       <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
         &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
@@ -831,7 +900,7 @@
       <title>Summarizing Docs with Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
         &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
@@ -1026,7 +1095,7 @@
       <title>Testing OCR with Chrome Built-in AI</title>
       <link>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</link>
       <guid>https://www.raymondcamden.com/2026/04/11/testing-ocr-with-chrome-built-in-ai</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
+      <pubDate>Sun, 17 May 2026 16:01:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Sorry for the lack of posting this month. I&apos;m on the way back home from speaking at CodeStock so I&apos;ve been on the road a bit, and work has been incredibly busy (which is good!) so my usual blog cadence has slipped a bit. Luckily I had a great question in my session on &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Chrome&apos;s Built-in AI&lt;/a&gt; which led to a bit of investigating last night. The question involved how well Chrome&apos;s AI could do OCR on an image. I had a demo in my presentation showing using AI to describe an image and another to generate a list of tags, but not one specifically for OCR. Here&apos;s what I found.&lt;/p&gt;
         &lt;p&gt;Oh, before I get into the code - remember that as of the time I&apos;m writing this, the Prompt API in Chrome is still behind a flag. Check the &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;docs&lt;/a&gt; for what you need to enable in order to run my tests yourself.&lt;/p&gt;
@@ -1294,32 +1363,6 @@
         &lt;p&gt;I did try a larger and higher resolution version (about 4x the size) and did not see a noticeable change in results. I don&apos;t think we will be using this API to OCR books anytime soon, but it did seem to do a reasonable job with signs and such. I&apos;d call that a fair bargain for something running on the device without needing a remote API.&lt;/p&gt;
         &lt;p&gt;As always, let me know what you think. Also, I should note that &lt;a href=&quot;https://huggingface.co/docs/transformers.js/en/index&quot;&gt;Transformers.js&lt;/a&gt; can also support this. I haven&apos;t tested it myself, but here&apos;s a &lt;a href=&quot;https://discuss.huggingface.co/t/texo-an-in-browser-latex-ocr-model-built-on-transformers-and-transformers-js/169634&quot;&gt;post from their community&lt;/a&gt; showing an example. You can run their demo here: &lt;a href=&quot;https://texocr.netlify.app/&quot;&gt;https://texocr.netlify.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@mosdesign?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;mos design&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-picture-of-a-cat-on-a-billboard-in-a-city-SDJLR8UH44U?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (4/5/26)</title>
-      <link>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</link>
-      <guid>https://www.raymondcamden.com/2026/04/05/links-for-you-4526</guid>
-      <pubDate>Sat, 16 May 2026 16:00:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Happy &amp;quot;Three Days Before My Birthday Day&amp;quot;! Oh - yeah, and happy Easter too, but I&apos;m personally a bit more excited
-        about turning 53 as I&apos;ve decided that&apos;s when I&apos;m going to grow up and act like a mature adult. Probably. Maybe. We&apos;ll see. Now, if you, my lovely and incredibly intelligent reader, are feeling generous and you&apos;ve gotten some good knowledge (or entertainment) from this blog, I&apos;ll use today&apos;s Links For You post to remind you of my &lt;a href=&quot;https://www.amazon.com/gp/registry/wishlist/2TCL1D08EZEYE/ref=cm_wl_rlist_go_v?&quot;&gt;Amazon Wishlist&lt;/a&gt;. Or even cheaper, leave me a comment below saying HBD - that&apos;s just as good. ;)&lt;/p&gt;
-        &lt;h2 id=&quot;everything-old-is-new-again...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#everything-old-is-new-again...&quot;&gt;Everything old is new again...&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;First up is a blog post on an old topic but one that&apos;s still pretty useful - bookmarklets. &lt;a href=&quot;https://css-tricks.com/a-complete-guide-to-bookmarklets/&quot;&gt;&amp;quot;A Complete Guide to Bookmarklets&amp;quot;&lt;/a&gt; (by &lt;a href=&quot;https://css-tricks.com/author/declanchidlow/&quot;&gt;Declan Childlow&lt;/a&gt;) introduces and explains bookmarklets and gives some good examples of how to use them. Be sure to check the comments to for more examples.&lt;/p&gt;
-        &lt;h2 id=&quot;contrast-color()---more-css-awesomness&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#contrast-color()---more-css-awesomness&quot;&gt;contrast-color() - more CSS Awesomness&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;ve said this (probably too often), but it&apos;s been incredibly gratifying to see how far CSS is advancing. As yet another example of this, you can read this excellent introduction to another new feature at: &lt;a href=&quot;https://una.im/contrast-color&quot;&gt;&amp;quot;Automated accessible text with contrast-color()&amp;quot;&lt;/a&gt;. This lets you pass a color and get either &lt;code&gt;black&lt;/code&gt; or &lt;code&gt;white&lt;/code&gt; as a value that can be used to contrast properly against the original. This is not yet available but will launch in Chrome 147 (as of today, 146 is the released version).&lt;/p&gt;
-        &lt;h2 id=&quot;can-your-game-be-programmed%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#can-your-game-be-programmed%3F&quot;&gt;Can your game be programmed?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I love this. I mean, I &lt;em&gt;really&lt;/em&gt; love this. So apparently there&apos;s a city-sim game (a genre I&apos;ve long liked myself) where you manage a beaver colony - &lt;a href=&quot;https://store.steampowered.com/app/1062090/Timberborn/&quot;&gt;Timberborn&lt;/a&gt;. As part of the game&apos;s most recent updates, they added the ability to perform automations via HTTP calls. This exposes an endpoint that can be called by external clients to perform actions in the game. So of course someone took this and did something completely ridiculous - &lt;a href=&quot;https://dev.to/thormeier/how-to-use-timberborn-yes-the-beaver-city-building-game-as-a-database-489c&quot;&gt;build a basic database&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, I&apos;ll leave you with another music video, and once again I&apos;ve got &lt;a href=&quot;https://remotesynthesis.com/&quot;&gt;Brian Rinaldi&lt;/a&gt; to thank. This is another new band for me, &amp;quot;Golden Cats&amp;quot; - enjoy!&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;i6zPKKyAfzM&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/i6zPKKyAfzM/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=i6zPKKyAfzM&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
       </content:encoded>
     </item>
   </channel>
