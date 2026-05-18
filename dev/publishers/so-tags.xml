@@ -4,7 +4,137 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sun, 17 May 2026 16:19:28 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 18 May 2026 17:49:22 GMT</lastBuildDate>
+    <item>
+      <title>Vue displaying users data expansion options</title>
+      <link>https://stackoverflow.com/questions/79942552/vue-displaying-users-data-expansion-options</link>
+      <guid>https://stackoverflow.com/questions/79942552/vue-displaying-users-data-expansion-options</guid>
+      <pubDate>Sun, 17 May 2026 16:30:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Here we are at the 4th .vue file.&lt;br /&gt;
+        In this usersvue.vue file, we are getting the informations from the userdisplay.vue file, which is somehow connected to each other as far as im concerned.&lt;br /&gt;
+        However, in this section, i cant understand like nothing especially how are the 2 files are connected.&lt;br /&gt;
+        You can see that in my first post question.&lt;br /&gt;
+        I recommend to read all my questions, because they are all connected to each other.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
+        &amp;lt;h1&amp;gt;Felhasználók&amp;lt;/h1&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;UserDisplay/&amp;gt;
+        
+        &amp;lt;ul v-for=&amp;quot;user in users&amp;quot; :key=&amp;quot;user.id&amp;quot;&amp;gt;
+        &amp;lt;li&amp;gt;{{ user.user_name }} ({{user.type}}) &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        import { onMounted, ref } from &apos;vue&apos;;
+        import router from &apos;@/router&apos;;
+        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;;
+        
+        
+        const users = ref([])
+        async function logout() {
+        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
+        credentials: &apos;include&apos;,
+        method:&apos;POST&apos;
+        })
+        return router.push(&apos;/&apos;)
+        }
+        
+        onMounted(async() =&amp;gt;{
+        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials: &apos;include&apos;,
+        })
+        
+        if(!res.ok){
+        router.push(&apos;/&apos;)
+        }
+        
+        res = await fetch(&amp;quot;http://localhost:3000/api/users&amp;quot;)
+        const data = await res.json()
+        
+        users.value = data.users
+        })
+        
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;here is the code, can anyone who read my previous questiuons answer me how they are connected to each other?&lt;br /&gt;
+        And last but not least, future options to expand the database and adding more datas to the database table. I will concider every advices.&lt;br /&gt;
+        &amp;quot;My 5th post will be the backend, and you will see how is our project goes&amp;quot;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue writing tasks from a database</title>
+      <link>https://stackoverflow.com/questions/79942546/vue-writing-tasks-from-a-database</link>
+      <guid>https://stackoverflow.com/questions/79942546/vue-writing-tasks-from-a-database</guid>
+      <pubDate>Sun, 17 May 2026 16:16:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Here is my third question about the vue project what we are doing  in school.&lt;br /&gt;
+        In this tasksvue.vue form, we are writing what tasks each user has. We are using a database with HeidiSQL/mariadb, you can see the datas in  top of the code.&lt;br /&gt;
+        Only i can understand is the logout @click function.&lt;br /&gt;
+        The onmounted  async function, and the most nervous part is in the unordered list.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
+        &amp;lt;h1&amp;gt;Feladatok&amp;lt;/h1&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;UserDisplay/&amp;gt;
+        &amp;lt;ul v-for=&amp;quot;task in tasks&amp;quot; :key=&amp;quot;task.id&amp;quot;&amp;gt;
+        &amp;lt;li&amp;gt;{{ task.task }} ({{task.user_name}}) &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        
+        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;
+        import router from &apos;@/router&apos;
+        import {onMounted, ref} from &apos;vue&apos;
+        
+        const tasks = ref([])
+        
+        async function logout() {
+        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
+        credentials: &apos;include&apos;,
+        method:&apos;POST&apos;
+        })
+        return router.push(&apos;/&apos;)
+        }
+        
+        onMounted(async() =&amp;gt;{
+        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
+        
+        headers:{
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
+        },
+        credentials: &apos;include&apos;,
+        })
+        
+        if(!res.ok){
+        router.push(&apos;/&apos;)
+        }
+        
+        res = await fetch(&amp;quot;http://localhost:3000/api/tasks&amp;quot;,{
+        credentials:&apos;include&apos;,
+        })
+        const data = await res.json()
+        
+        tasks.value = data
+        })
+        
+        
+        
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;What is v-for?&lt;br /&gt;
+        Why do we need this everytime when we are developing in this?&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Vue login handleform understanding problems</title>
       <link>https://stackoverflow.com/questions/79942535/vue-login-handleform-understanding-problems</link>
@@ -80,8 +210,7 @@
       <guid>https://stackoverflow.com/questions/79942524/vue-problems-displaying-users-type</guid>
       <pubDate>Sun, 17 May 2026 15:38:02 GMT</pubDate>
       <content:encoded>
-        &lt;p&gt;I’m a beginner, learning in a school and I understand the basics, but I’m unsure about what is happening in this vue file. This file displays the users type(e.g admin) and I&apos;m a little bit nervous. This file is part of a project, I will ask some questions in a different post, but lets stay in this for now.&lt;br /&gt;
-        I have recently posted questions, but i&apos;ve made it with ai(not the code, the body part) since my english is not perfect, however its time to shine.&lt;/p&gt;
+        &lt;p&gt;I’m a beginner, learning in a school and I understand the basics, but I’m unsure about what is happening in this vue file. This file displays the users type(e.g admin) and I&apos;m a little bit nervous. This file is part of a project, I will ask some questions in a different post, but lets stay in this for now.&lt;/p&gt;
         &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
         &amp;lt;div&amp;gt;
         &amp;lt;p&amp;gt;Belépve mint:  {{ user_name }}&amp;lt;/p&amp;gt;
@@ -1577,111 +1706,6 @@
         at TimeScale._parseValue (chart.js:13367:1)
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;) when using vue-papa-parse with Vue 3 + Vite</title>
-      <link>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</link>
-      <guid>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</guid>
-      <pubDate>Sun, 01 Feb 2026 19:06:34 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m facing the following error when trying to install &lt;strong&gt;vue-papa-parse&lt;/strong&gt; in a Vue 3 project created with &lt;strong&gt;Vite&lt;/strong&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This occurs when registering the plugin in &lt;code&gt;main.js&lt;/code&gt;, following the usage shown in the documentation.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;main.js&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { createApp } from &apos;vue&apos;
-        import App from &apos;./App.vue&apos;
-        import VuePapaParse from &apos;vue-papa-parse&apos;
-        
-        const app = createApp(App)
-        
-        app.use(VuePapaParse)
-        app.mount(&apos;#app&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;Environment&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Vue 3&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Vite&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Why can&apos;t I import Dagre into my Vite app? [closed]</title>
-      <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
-      <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
-      <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Our team is migrating a Vue CLI app to Vite. We had some Dagre code that worked with no problems in the Vue CLI app, but is throwing this error with Vite, stopping the entire app from loading:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Uncaught Error: Dynamic require of &amp;quot;@dagrejs/graphlib&amp;quot; is not supported&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;// Adapted from https://vueflow.dev/examples/layout/simple.html
-        import dagre from &apos;@dagrejs/dagre&apos;;
-        import { Position, useVueFlow } from &apos;@vue-flow/core&apos;;
-        import { ref } from &apos;vue&apos;;
-        
-        export function useLayout() {
-        const graph = ref(new dagre.graphlib.Graph());
-        
-        function layout(nodes, edges, direction) {
-        const dagreGraph = new dagre.graphlib.Graph();
-        
-        // ...
-        
-        dagre.layout(dagreGraph);
-        
-        // ...
-        
-        return nodes;
-        }
-        
-        return { graph, layout };
-        }
-        
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;vite.config.js:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { fileURLToPath, URL } from &apos;node:url&apos;;
-        
-        import { defineConfig } from &apos;vite&apos;;
-        import vue from &apos;@vitejs/plugin-vue&apos;;
-        
-        // https://vitejs.dev/config/
-        export default defineConfig({
-        plugins: [vue()],
-        resolve: {
-        alias: {
-        &apos;@&apos;: fileURLToPath(new URL(&apos;./src&apos;, import.meta.url)),
-        },
-        },
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;package.json:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{
-        &amp;quot;scripts&amp;quot;: {
-        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
-        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
-        },
-        &amp;quot;dependencies&amp;quot;: {
-        &amp;quot;@dagrejs/dagre&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
-        &amp;quot;@tinymce/tinymce-vue&amp;quot;: &amp;quot;^5.1.0&amp;quot;,
-        &amp;quot;@vue-flow/background&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/controls&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;@vue-flow/core&amp;quot;: &amp;quot;^1.22.3&amp;quot;,
-        &amp;quot;@vue-flow/minimap&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/node-toolbar&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.3.4&amp;quot;,
-        },
-        &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;vite&amp;quot;: &amp;quot;^4.4.6&amp;quot;,
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
   </channel>
