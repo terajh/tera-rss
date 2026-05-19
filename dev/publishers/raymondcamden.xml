@@ -4,12 +4,92 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 18 May 2026 17:49:15 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 19 May 2026 18:04:46 GMT</lastBuildDate>
+    <item>
+      <title>My First AI Skill for My Blog</title>
+      <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
+      <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
+        &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Helping with my titles&lt;/li&gt;
+        &lt;li&gt;Writing the description (which is part of the metadata for a post)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Honestly, I built those tools as proof of concept implementations and don&apos;t think I used them ever again. But lately it&apos;s been on my mind that I should think about those tools and see if there would possibly be an easier way to use GenAI to help me with my content. Specifically I&apos;m looking for two things:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Spelling and grammar. I&apos;ve got a Visual Studio Code extension for that but it&apos;s not perfect and I also just miss it sometimes.&lt;/li&gt;
+        &lt;li&gt;And here&apos;s the big one. Sometimes I&apos;ll write about a topic and simply forget to cover something. I&apos;d love to use my AI tool to try to find those missing aspects and let me know. Maybe I won&apos;t care. Maybe I &lt;em&gt;intentionally&lt;/em&gt; skipped something. That being said, I&apos;d still like to know.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;You&apos;ll notice that none of the above involves AI actually &lt;em&gt;writing&lt;/em&gt; for me. Outside of correcting spelling mistakes I made, I don&apos;t want to use my tool for that. But both of these could really help me catch things before I publish and just make the final result a little bit better.&lt;/p&gt;
+        &lt;h2 id=&quot;the-skill&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-skill&quot;&gt;The Skill&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;To build this, I made use of &lt;a href=&quot;https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview&quot;&gt;Claude Skills&lt;/a&gt;. Skills are persistent instructions that can be used across your entire environment or per project. They&apos;re written in simple Markdown and are stored in a particular folder depending on your use. I actually cheated a bit and used Claude itself to help me create the skill.&lt;/p&gt;
+        &lt;p&gt;I knew about skills, knew they needed to be in a particular folder, but rather than looking it up I simply asked Claude to help me create a skill based on the needs above. It did an admirable job but I took over and tweaked things a bit.&lt;/p&gt;
+        &lt;p&gt;The directory is in my repository now, at &lt;code&gt;.claude/skills/prepublish&lt;/code&gt;. Here&apos;s what it looks like now (I say &apos;now&apos; as I expect to be tweaking this over time - you can also check out the &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;repo&lt;/a&gt; to see the latest!):&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        name: prepublish
+        description: Review a new blog post before publishing. Finds the latest post by its dated path under `src/posts/`, then spell-checks and offers content suggestions — without touching tone.
+        ---
+        
+        # Prepublish blog post review
+        
+        Run this right before pushing a new post. Blog posts live in `src/posts/YYYY/MM/DD/` as `.md` files.
+        
+        ## Step 1 — Find the post
+        
+        Do NOT use git to figure out which post is newest. Use the dated path under `src/posts/` — sort highest year → month → day and pick the most recent `.md` file.
+        
+        A reliable command: `find src/posts -type f -name &apos;*.md&apos; | sort -r | head -5`. The first entry is the latest post; the rest are there in case there&apos;s a tie or the user wants to pick another.
+        
+        If multiple `.md` files share the newest date directory, ask the user which one. Otherwise, confirm in one line (&amp;quot;Reviewing `path/to/post.md` — sound right?&amp;quot;) before proceeding.
+        
+        ## Step 2 — Spell check
+        
+        Read the post and surface misspellings. Ignore code blocks, fenced code, inline `code`, URLs, and proper nouns the user clearly intended (product names, people, libraries).
+        
+        Present findings as a short list: `word → suggestion (line N)`. Don&apos;t auto-edit. Ask which corrections to apply, then apply them with Edit.
+        
+        ## Step 3 — Content review
+        
+        Read the post end-to-end and give feedback focused on substance, not tone:
+        
+        - **Things that sound stupid or unclear** — sentences that don&apos;t land, claims that need backing, awkward logic jumps.
+        - **Gaps worth filling** — missing context a reader would want, an example that would help, a link the user usually includes (docs, repo, related post).
+        - **Factual / technical accuracy** — flag anything that looks wrong or outdated. If the post references code, check it makes sense.
+        - **Loose ends** — TODO markers, &amp;quot;fill this in&amp;quot;, broken-looking links, placeholder text.
+        
+        **Do NOT** comment on tone, voice, snark level, casual phrasing, or stylistic choices. The user likes their voice; leave it alone.
+        
+        Present feedback as a numbered list grouped by category. Keep each item to one or two sentences. Don&apos;t rewrite paragraphs — point at the issue and let the user decide.
+        
+        ## Step 4 — Apply changes
+        
+        Ask which suggestions to act on. Apply only what&apos;s confirmed. Then stop — the user handles the actual publish/push.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2 id=&quot;an-example-in-action&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-example-in-action&quot;&gt;An Example in Action&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;To test, I&apos;m going to run this right now on this post, which means it may get a bit confused as the post isn&apos;t actually done, but let&apos;s just see what happens:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/claude1.png&quot; loading=&quot;lazy&quot; alt=&quot;Results&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Hopefully that image is readable, let me know if not. But it did a great job of finding multiple grammar issues. My VS Code extension doesn&apos;t handle that (obviously).&lt;/p&gt;
+        &lt;p&gt;I disagreed/didn&apos;t care about the awkward comment. I did care about linking to Claude Skills so I added a link. Gap 3 was incorrect. I do talk about how I &apos;cheated&apos; (to be clear, it isn&apos;t cheating) in the following paragraph. And of course, issue 5 is simply because I ran this before I was done. Item 8 is the same.&lt;/p&gt;
+        &lt;p&gt;You&apos;ll notice it also offered to correct those mistakes, but I did them myself and I imagine I&apos;ll do so usually.&lt;/p&gt;
+        &lt;p&gt;In the end, these are all things a good editor would handle, but this is my personal blog and unfortunately I don&apos;t have an editor on call. (And even so, I&apos;d want to do this kind of check beforehand anyway.)&lt;/p&gt;
+        &lt;h2 id=&quot;what-next%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-next%3F&quot;&gt;What next?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Looking at the skill I wrote, and recognizing my own weaknesses (grammar, forgetting to cover things I should), I may actually move this skill into my global directory so I can use it for my non-blog writing as well. Anybody want to chime in and share if they&apos;ve done something similar?&lt;/p&gt;
+        &lt;p&gt;p.s. I ran the skill one more time - here&apos;s the latest:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/claude1.png&quot; loading=&quot;lazy&quot; alt=&quot;Final Results&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ningdamao?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;宁 宁&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-peacefully-sits-on-a-stack-of-papers-xDDkC_odjbU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -43,7 +123,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -112,7 +192,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -241,7 +321,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -585,7 +665,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -654,7 +734,7 @@
       <title>Animated video backgrounds via a Web Component and ColorThief</title>
       <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
       <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
         &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
@@ -754,7 +834,7 @@
       <title>Links For You (4/26/26)</title>
       <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
       <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
         &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
@@ -790,7 +870,7 @@
       <title>Another Game: My Little Mortal Combat</title>
       <link>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</link>
       <guid>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Hello awesome readers! I&apos;m happy to announce my latest web game, &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/my_little_mortal_combat/&quot;&gt;My Little Mortal Combat&lt;/a&gt;, a mashup of two epic franchises, My Little Pony and Mortal Kombat. This began as an idea, just the name, that I recorded in Microsoft To Do in September of 2019. Yes, almost seven years ago. It sat there, at the bottom of my &apos;idea&apos; list, until about a month ago when in the shower (not joking), it popped up in my head along with the basic mechanics of how the game would play.&lt;/p&gt;
         &lt;p&gt;Right now the game is just missing one feature (I&apos;d rather not talk about until I figure out how I&apos;m going to do it) but definitely needs some balancing work. I enjoy playing games without knowing the details of how things work, so if&apos;s that you too, head over to the game now and good luck!&lt;/p&gt;
@@ -829,7 +909,7 @@
       <title>Building a Simple Markdown PWA App</title>
       <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
       <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
+      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
         &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
@@ -928,201 +1008,6 @@
         &lt;p&gt;I told it to remember my choice and that was literally it. So now I&apos;ve got a web-based app I can use locally, heck even offline, to render my Markdown files in a nice reading experience. (Well, nice to me anyway. ;) Oh, and the size is about 400k, of which most is one of the icons. Significantly smaller than the Electron app. (But to be fair, Electron was overkill for what I was doing.)&lt;/p&gt;
         &lt;p&gt;Once again, the link to the site is here, &lt;a href=&quot;https://mdviewerpwa.netlify.app/&quot;&gt;https://mdviewerpwa.netlify.app/&lt;/a&gt;, and you can find all the code here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@anniespratt?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Annie Spratt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/shelf-with-art-supplies-books-and-decorations-ModHj41WZhg?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Summarizing Docs with Built-in AI</title>
-      <link>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</link>
-      <guid>https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai</guid>
-      <pubDate>Mon, 18 May 2026 17:34:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Back in January of this year, I blogged about on-device summarization of PDFs: &lt;a href=&quot;https://www.raymondcamden.com/2026/01/28/summarizing-pdfs-with-on-device-ai&quot;&gt;Summarizing PDFs with On-Device AI
-        &lt;/a&gt;. In that post, I made use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summary API&lt;/a&gt; and &lt;a href=&quot;https://mozilla.github.io/pdf.js/&quot;&gt;PDF.js&lt;/a&gt; to create summaries of PDFs completely within the browser. I thought I&apos;d take a look at extending that demo into more document types, specifically Office. And even more specifically - Word, Excel, and PowerPoint. Here&apos;s what I came up with.&lt;/p&gt;
-        &lt;h2 id=&quot;officeparser-ftw&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#officeparser-ftw&quot;&gt;officeParser FTW&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;So here comes the fun part. Last weekend I had this demo completely done using a few different libraries. Then - earlier this week one of the developer newsletters I subscribe to shared &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;. This nifty library handles Office, PDF, even Open Office formats. It also includes the metadata for files which is handy as heck. I forked my initial demo and removed all the extra libraries, leaving only officeParser.&lt;/p&gt;
-        &lt;p&gt;The library can return incredibly detailed information about the structure of the your doc as well as a plain text view. What I found in my testing is that the plain text view didn&apos;t seem like it would work well in my demo. For example, an XLS file was kinda glommed all together. I reached out to the developer and he is planning on a &lt;code&gt;toMarkdown&lt;/code&gt; feature that will make this easier, but for now what I did was get the complex data and write my own custom code to &apos;shape&apos; it well for AI.&lt;/p&gt;
-        &lt;p&gt;Generally speaking the first part was stupid easy - and I got this from the docs:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Now let&apos;s dig into the code a bit.&lt;/p&gt;
-        &lt;h2 id=&quot;working-with-docs&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#working-with-docs&quot;&gt;Working with Docs&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;m going to skip over the DOM manipulation aspects as that&apos;s not terribly interesting. My code basically has a file input field and when you select a file, a process is fired off to:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;get the text, again, with formatting to hopefully make it better for AI&lt;/li&gt;
-        &lt;li&gt;pass it to the Summary API for... summarization. :)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Let&apos;s focus on the &amp;quot;get text&amp;quot; aspect. My file input handler has this logic:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;if(file.name.toLowerCase().endsWith(&apos;.doc&apos;) || file.name.toLowerCase().endsWith(&apos;.docx&apos;)) {
-        summary = await processDoc(file);
-        } else if(file.name.toLowerCase().endsWith(&apos;.pdf&apos;)) {
-        summary = await processPDF(file);
-        } else if(file.name.toLowerCase().endsWith(&apos;.ppt&apos;) || file.name.toLowerCase().endsWith(&apos;.pptx&apos;)) {
-        summary = await processPPT(file);
-        // i add a flag to powerpoint so my summary func knows it has to deal with the text
-        summary.powerpoint = true;
-        } else if(file.name.toLowerCase().endsWith(&apos;.xls&apos;) || file.name.toLowerCase().endsWith(&apos;.xlsx&apos;)) {
-        summary = await processXLS(file);
-        // i add a flag to powerpoint so my summary func knows it has to deal with the text
-        summary.excel = true;
-        } else {
-        // in theory we can&apos;t get here, so just a return is fine
-        return;
-        }
-        
-        doSummary(summary);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;My expectation is that the &lt;code&gt;summary&lt;/code&gt; will be an object with two fields: &lt;code&gt;text&lt;/code&gt; and &lt;code&gt;title&lt;/code&gt;. I also use a flag for PowerPoint and Excel to help direct the Summary API to more properly handle the text.&lt;/p&gt;
-        &lt;p&gt;Now let&apos;s break down these functions. Doc and PDF are the easiest:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processDoc(f) {
-        let arrayBuffer = await f.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        
-        return {
-        text: data.toText(), 
-        title:data.metadata?.title ?? &apos;No Title&apos;
-        }
-        
-        }
-        
-        async function processPDF(f) {
-        const arrayBuffer = await f.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        console.log(data, data.toText());
-        
-        return {
-        text: data.toText(), 
-        title:data.metadata?.title ?? &apos;No Title&apos;
-        }
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;For Excel, as I mentioned earlier I got the raw data and examined it, and then wrote some utility bits to turn my sheets into (roughly) CSV form:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processXLS(f) {
-        let arrayBuffer = await f.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        
-        const getCSV = s =&amp;gt; {
-        let result = &apos;&apos;;
-        let rows = s.children.filter(c =&amp;gt; c.type === &apos;row&apos;);
-        console.log(rows[0]);
-        rows.forEach(r =&amp;gt; {
-        let data = [];
-        let cells = r.children.filter(c =&amp;gt; c.type === &apos;cell&apos;);
-        cells.forEach(c =&amp;gt; data.push(c.text));
-        result += data.join(&apos;, &apos;) + &apos;\n&apos;;
-        
-        });
-        return result;
-        };
-        
-        let result = {
-        text:&apos;&apos;,
-        title:data.metadata?.title ?? &apos;No Title&apos;
-        }
-        
-        let sheets = data.content.filter(c =&amp;gt; c.type === &apos;sheet&apos;);
-        sheets.forEach(s =&amp;gt; {
-        result.text += getCSV(s);
-        result.text += &apos;\n\n&apos;;
-        });
-        
-        return result;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;PowerPoint was a bit more complex as I had to create a separation between slides, and get deeply nested text nodes. I ignored anything that wasn&apos;t text.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function processPPT(f) {
-        let arrayBuffer = await f.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        let result = {
-        text:&apos;&apos;,
-        title:data.metadata?.title ?? &apos;No Title&apos;
-        }
-        
-        const getText = c =&amp;gt; {
-        let result = &apos;&apos;;
-        
-        c.forEach(kid =&amp;gt; {
-        if(kid.text) {
-        result += kid.text;
-        if(kid.type === &apos;paragraph&apos;) result += &apos;\n&apos;;
-        else result += &apos; &apos;;
-        }
-        if(kid.children) {
-        kid.children.forEach(gk =&amp;gt; {
-        if(gk.text) {
-        result += gk.text;
-        if(gk.type === &apos;paragraph&apos;) result += &apos;\n&apos;;
-        else result += &apos; &apos;;
-        }
-        });
-        }
-        });
-        return result;
-        }
-        
-        let content = data.content.filter(c =&amp;gt; c.type === &apos;slide&apos;);
-        result.text = content.reduce((prev, cur) =&amp;gt; {
-        return prev += getText(cur.children) + &apos;\n-------------\n&apos;;
-        }, &apos;&apos;);
-        
-        return result;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;One thing special here is that sometimes items on the same line were two nodes, hence me only adding newlines after paragraphs.&lt;/p&gt;
-        &lt;h2 id=&quot;the-fancy-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-fancy-ai&quot;&gt;The Fancy AI&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The code to do summarization is something I&apos;ve shown before, the only thing I did unique here was try to warn the system about my PowerPoint and Excel data:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function doSummary(summaryOb) {
-        console.log(summaryOb);
-        $output.innerHTML = &amp;quot;&amp;lt;i&amp;gt;File text extracted, working on the summary.&amp;quot;;
-        let sharedContext = null;
-        
-        if(summaryOb.powerpoint) {
-        sharedContext = &apos;This is extracted text from a Powerpoint file. Slides are separated by ----&apos;;
-        } else if(summaryOb.excel) {
-        sharedContext = &apos;This is extracted text from a Excel file in CSV format.&apos;
-        }
-        
-        let summarizer = await window.Summarizer.create({
-        type:&apos;tldr&apos;,
-        length:&apos;long&apos;,
-        sharedContext, 
-        monitor(m) {
-        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
-        /*
-        why this? the download event _always_ runs at
-        least once, so this prevents the msg showing up
-        when its already done. I&apos;ve seen it report 0 and 1
-        in this case, so we skip both
-        */
-        if(e.loaded === 0 || e.loaded === 1) return;
-        $output.innerHTML = `Downloading the Summary model, currently at ${Math.floor(e.loaded * 100)}%`;
-        });
-        }
-        });
-        
-        
-        try {
-        let summary = await summarizer.summarize(summaryOb.text);
-        $output.innerHTML = `&amp;lt;h3&amp;gt;Summary for ${summaryOb.title}&amp;lt;/h3&amp;gt;${marked.parse(summary)}`;
-        } catch(e) {
-        if(e.name === &apos;QuotaExceededError&apos;) {
-        $output.innerHTML = &apos;Unfortunately this document was too large!&apos;;
-        } else {
-        $output.innerHTML = `Some other error was thrown: ${e}`;
-        }
-        console.log(e);
-        }
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;All in all, it worked well. It did feel like I filled the context window with Excel pretty quickly. My initial text file had 1000 rows and that threw a quota error. I had to get it down to 200 to properly parse.&lt;/p&gt;
-        &lt;p&gt;If you are on the latest Chrome, in theory, this will work for you, but as always, let me know!&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Chrome AI, Doc Summaries (V2)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;MYjxbrv&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height:600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/MYjxbrv&quot;&gt;
-        Chrome AI, Doc Summaries (V2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
