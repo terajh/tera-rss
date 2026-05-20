@@ -4,12 +4,121 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 19 May 2026 18:04:46 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 20 May 2026 18:13:52 GMT</lastBuildDate>
+    <item>
+      <title>Dang good Office parsing on the web with officeParser</title>
+      <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
+      <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
+        &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But the issue I ran into was taking that result and turning it into something meaningful for Chrome&apos;s model to analyze. PDFs supported a &lt;code&gt;toText()&lt;/code&gt; method but for other formats I had to do a bit of work to get a text value. For example, here&apos;s the code I used to turn an Excel file into CSV:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let arrayBuffer = await file.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        
+        const getCSV = s =&amp;gt; {
+        let result = &apos;&apos;;
+        let rows = s.children.filter(c =&amp;gt; c.type === &apos;row&apos;);
+        console.log(rows[0]);
+        rows.forEach(r =&amp;gt; {
+        let data = [];
+        let cells = r.children.filter(c =&amp;gt; c.type === &apos;cell&apos;);
+        cells.forEach(c =&amp;gt; data.push(c.text));
+        result += data.join(&apos;, &apos;) + &apos;\n&apos;;
+        
+        });
+        return result;
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Yeah that&apos;s not bad, but it did mean a bit of work for each of the different Office types.&lt;/p&gt;
+        &lt;p&gt;Well, the good news is Harsh Ankur (the author of this awesome library) released a &lt;a href=&quot;https://github.com/harshankur/officeParser/blob/master/CHANGELOG.md&quot;&gt;v7&lt;/a&gt; that added a &lt;code&gt;to&lt;/code&gt; method that supports converting files to CSV, Markdown, RTF, PDF, Text, and HTML. Even better, his HTML support isn&apos;t just &amp;quot;convert to Markdown then render the Markdown to html&amp;quot;, but proper support straight from the parsed doc to create a richer result.&lt;/p&gt;
+        &lt;p&gt;I went ahead and built a demo you can use to test right now (and this demo doesn&apos;t use any of the Chrome AI stuff). I created a simple HTML file with a file field and 4 tabs: Text, Markdown, HTML, CSV. You can select a PDF or Office file and it will render into each of the tabs (well, only Excel will use CSV). The HTML isn&apos;t interesting, but here&apos;s the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { OfficeParser } from &apos;https://esm.sh/officeparser&apos;;
+        
+        let $sourceFile;
+        let $textResult, $mdResult, $htmlResult, $csvResult;
+        
+        const supportedFiles = [&apos;pdf&apos;,&apos;xlsx&apos;,&apos;docx&apos;,&apos;pptx&apos;];
+        
+        document.addEventListener(&apos;DOMContentLoaded&apos;, init, false);
+        async function init() {
+        console.log(&apos;lets go&apos;);
+        $sourceFile = document.querySelector(&apos;#sourceFile&apos;);
+        $textResult = document.querySelector(&apos;#textResult&apos;);
+        $mdResult = document.querySelector(&apos;#mdResult&apos;);
+        $htmlResult = document.querySelector(&apos;#htmlResult&apos;);
+        $csvResult = document.querySelector(&apos;#csvResult&apos;);
+        
+        $sourceFile.addEventListener(&apos;change&apos;, filePreview, false);
+        }
+        
+        async function filePreview(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        let ext = file.name.split(&apos;.&apos;).pop();
+        if(!supportedFiles.includes(ext)) return;
+        let arrayBuffer = await file.arrayBuffer();
+        let data = await getAST(arrayBuffer, {});
+        
+        let text = await data.to(&apos;text&apos;);
+        $textResult.innerText = text.value;
+        
+        let md = await data.to(&apos;md&apos;);
+        $mdResult.innerText = md.value;
+        
+        let html = await data.to(&apos;html&apos;);
+        $htmlResult.contentDocument.open();
+        $htmlResult.contentDocument.write(html.value);
+        $htmlResult.contentDocument.close();
+        
+        if(ext === &apos;xlsx&apos;) {
+        $csvResult.innerText = (await data.to(&apos;csv&apos;)).value;
+        } else $csvResult.innerText = &apos;Only used for Excel files.&apos;;
+        }
+        
+        const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can play with this below:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;officeParser demo&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;NPbpNqp&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019e3d03-91b9-7e58-a88f-b730b7371377&quot;&gt;
+        officeParser demo&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;So - given that - I took a look at my previous &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/MYjxbrv&quot;&gt;demo&lt;/a&gt; and modified the code to make use of these new features. Here&apos;s the new code that gets the text version of a document and passes it to the AI model:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;document.querySelector(&apos;#upload&apos;).addEventListener(&apos;change&apos;, async (e) =&amp;gt; {
+        $output.innerHTML = &apos;&apos;;
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        let ast = await getAST(await file.arrayBuffer());
+        
+        let summary = {
+        title: ast.metadata?.title ?? &apos;No Title&apos;,
+        text: (await ast.to(&apos;md&apos;)).value
+        }
+        
+        doSummary(summary);
+        
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Compared to the previous version, this one is over a hundred lines shorter. As I said... ddddaaaaannnnnngggg. You can try out this version below, but note that it is Chrome only. (If folks ask, or heck, even if you don&apos;t ask, I may build a Transformer.js version.)&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Chrome AI, Doc Summaries (V3)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;PwbpLJQ&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/PwbpLJQ&quot;&gt;
+        Chrome AI, Doc Summaries (V3)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -89,7 +198,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -123,7 +232,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -192,7 +301,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -321,7 +430,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -665,7 +774,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -734,7 +843,7 @@
       <title>Animated video backgrounds via a Web Component and ColorThief</title>
       <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
       <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
         &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
@@ -834,7 +943,7 @@
       <title>Links For You (4/26/26)</title>
       <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
       <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
         &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
@@ -870,7 +979,7 @@
       <title>Another Game: My Little Mortal Combat</title>
       <link>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</link>
       <guid>https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
+      <pubDate>Wed, 20 May 2026 17:58:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Hello awesome readers! I&apos;m happy to announce my latest web game, &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/my_little_mortal_combat/&quot;&gt;My Little Mortal Combat&lt;/a&gt;, a mashup of two epic franchises, My Little Pony and Mortal Kombat. This began as an idea, just the name, that I recorded in Microsoft To Do in September of 2019. Yes, almost seven years ago. It sat there, at the bottom of my &apos;idea&apos; list, until about a month ago when in the shower (not joking), it popped up in my head along with the basic mechanics of how the game would play.&lt;/p&gt;
         &lt;p&gt;Right now the game is just missing one feature (I&apos;d rather not talk about until I figure out how I&apos;m going to do it) but definitely needs some balancing work. I enjoy playing games without knowing the details of how things work, so if&apos;s that you too, head over to the game now and good luck!&lt;/p&gt;
@@ -903,111 +1012,6 @@
         &lt;p&gt;As I said, I definitely think the numbers need tweaking probably, so let me know. You can check out all the code here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/my_little_mortal_combat&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/my_little_mortal_combat&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Don&apos;t forget, I&apos;ve got this game and my others listed over on my my &lt;a href=&quot;https://www.raymondcamden.com/stuff&quot;&gt;Stuff&lt;/a&gt; page. Enjoy!&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@farvardin?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Felis Amafeles&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/five-small-cartoon-ponies-sitting-in-a-row-MI-KCy_foeU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building a Simple Markdown PWA App</title>
-      <link>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</link>
-      <guid>https://www.raymondcamden.com/2026/04/20/building-a-simple-markdown-pwa-app</guid>
-      <pubDate>Tue, 19 May 2026 17:47:10 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;While I didn&apos;t share it on the blog, last week I tasked Claude with using Electron to build a Markdown viewer app. It was part test (how well can Claude work with Electron) and part real need - I work with Markdown files all the time but didn&apos;t have a simple &amp;quot;view focused&amp;quot; application for it. I was sure there open source or paid app options out there, but I wanted my own. Claude did a pretty good job (you can see the source &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewer&quot;&gt;here&lt;/a&gt;) but one thing stood out to me - the size of the bundled app.&lt;/p&gt;
-        &lt;p&gt;I created both a Mac and Windows distribution and both were around 90 megs. That&apos;s not huge of course, but still felt like a lot for what could - in theory - just be a web app. But there was one crucial feature I wasn&apos;t sure I could replicate - double clicking on a MD file to have it open my app. Turns out - you certainly &lt;em&gt;can&lt;/em&gt; do it that.&lt;/p&gt;
-        &lt;p&gt;If you don&apos;t care how I built it, you can go to the app right now and install it: &lt;a href=&quot;https://mdviewerpwa.netlify.app/&quot;&gt;https://mdviewerpwa.netlify.app/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Alright, let&apos;s break it down.&lt;/p&gt;
-        &lt;h2 id=&quot;the-ui&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-ui&quot;&gt;The UI&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;When I had Claude design the application for me, it went with an incredibly simple UI. I felt no reason to add to that so when I began the web app, I copied over the generated HTML/CSS from the Electron app into my new folder. Here&apos;s an example of how it looks with no file selected:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa1.png&quot; loading=&quot;lazy&quot; alt=&quot;App with nothing loaded&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;And here&apos;s how it looks after a Markdown file is opened:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa2.png&quot; loading=&quot;lazy&quot; alt=&quot;App with MD loaded&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Now let&apos;s look at the code a bit.&lt;/p&gt;
-        &lt;h2 id=&quot;markdown-support&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#markdown-support&quot;&gt;Markdown Support&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This normally would be the boring part. Just drop in &lt;a href=&quot;https://www.npmjs.com/package/marked&quot;&gt;marked&lt;/a&gt; and be done with it. But so many Markdown files I use have frontmatter I wanted to do something special for it. My fix was incredibly simple. If a file begins with three dashes and has another three dashes, replace them with backticks:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const renderMarkdown = content =&amp;gt; {
-        rawContent = content;
-        /*
-        Special tweak for frontmatter. If our content starts with &apos;---&apos; and 
-        contains &apos;---&apos; again, we assume it&apos;s frontmatter and wrap it in and
-        swap the --- to ```.
-        */
-        contentToRender = content.trim();
-        // also, making a copy so we can keep the View Source version working
-        if (contentToRender.startsWith(&apos;---&apos;)) {
-        console.log(&apos;detected frontmatter, applying special formatting&apos;);
-        const parts = content.split(&apos;---&apos;);
-        if (parts.length &amp;gt;= 3) {
-        const frontmatter = parts[1];
-        const rest = parts.slice(2).join(&apos;---&apos;);
-        contentToRender = `\`\`\`yaml${frontmatter}\`\`\`\n\n${rest}`;
-        console.log(contentToRender);
-        }
-        }
-        renderedEl.innerHTML = marked.parse(contentToRender);
-        sourceEl.textContent = content;
-        
-        emptyState.style.display = &apos;none&apos;;
-        renderedEl.style.display = &apos;block&apos;;
-        sourceEl.style.display = &apos;none&apos;;
-        toggleBtn.style.display = &apos;inline-block&apos;;
-        showingSource = false;
-        toggleBtn.textContent = &apos;View Source&apos;;
-        
-        document.title = `MD Viewer — ${fileNameEl.textContent}`;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Honestly most of that code is UI crap, but you can see the frontmatter support on top. I think it came out &lt;em&gt;perfect&lt;/em&gt; - it stands out and I think most folks will recognize it for what it represents, but in theory I could possibly add a small graphical label or something to the block.&lt;/p&gt;
-        &lt;p&gt;So again, there&apos;s UI handling code in here that&apos;s not that interesting, so let me turn to the real cool part. Yes, Virginia, a PWA can absolutely associate itself with files. I added a manifest.json and basic service worker. For bot of these I relied on Claude and it &lt;em&gt;mostly&lt;/em&gt; did a good job, I had to tweak a few things.&lt;/p&gt;
-        &lt;p&gt;After the basics worked, I did some Googling and came across this excellent MDN resource: &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Associate_files_with_your_PWA&quot;&gt;Associate files with your PWA&lt;/a&gt;. Adding file support took two steps.&lt;/p&gt;
-        &lt;p&gt;First, I added the following to my manifest:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;&amp;quot;file_handlers&amp;quot;: [
-        {
-        &amp;quot;action&amp;quot;: &amp;quot;/&amp;quot;, 
-        &amp;quot;accept&amp;quot;: {
-        &amp;quot;text/markdown&amp;quot;: [&amp;quot;.md&amp;quot;, &amp;quot;.markdown&amp;quot;]
-        }
-        }
-        ]
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The &lt;code&gt;action&lt;/code&gt; step there tells my app what URL to go to when being opened via a file. As my app has one page/view, I just used &lt;code&gt;/&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;The next step was to look for this in JavaScript. My application does this when starting up:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;if(&amp;quot;launchQueue&amp;quot; in window) {
-        console.log(&apos;Launch Queue API is supported, setting up consumer&apos;);
-        window.launchQueue.setConsumer(launchParams =&amp;gt; {
-        if (!launchParams.files.length) {
-        return;
-        }
-        const fileHandle = launchParams.files[0];
-        console.log(&apos;File launched:&apos;, fileHandle);
-        fileHandle.getFile().then(file =&amp;gt; {
-        const reader = new FileReader();
-        reader.onload = e =&amp;gt; {
-        const content = e.target.result;
-        fileNameEl.textContent = file.name;
-        renderMarkdown(content);
-        };
-        reader.readAsText(file);
-        }).catch(error =&amp;gt; {
-        console.error(&apos;Error reading file:&apos;, error);
-        });
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Basically, if I can use &lt;code&gt;launchQueue&lt;/code&gt;, it will consist of a list of files, each of which is a file handle. I&apos;ve used File objects in JavaScript before, but not file handles, but you can quickly go to a real file object using &lt;code&gt;getFile()&lt;/code&gt;. Once you have that, the regular &lt;code&gt;FileReader&lt;/code&gt; approach works to get the contents and render it.&lt;/p&gt;
-        &lt;p&gt;I deployed the app to Netlify, opened it in my browser, and clicked the install icon.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa3.png&quot; loading=&quot;lazy&quot; alt=&quot;Install dialog&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;After I confirmed I had the application, I right clicked on a MD file, used open with, navigated to my PWA, and selected it:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/04/pwa4.png&quot; loading=&quot;lazy&quot; alt=&quot;Open file prompt&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;I told it to remember my choice and that was literally it. So now I&apos;ve got a web-based app I can use locally, heck even offline, to render my Markdown files in a nice reading experience. (Well, nice to me anyway. ;) Oh, and the size is about 400k, of which most is one of the icons. Significantly smaller than the Electron app. (But to be fair, Electron was overkill for what I was doing.)&lt;/p&gt;
-        &lt;p&gt;Once again, the link to the site is here, &lt;a href=&quot;https://mdviewerpwa.netlify.app/&quot;&gt;https://mdviewerpwa.netlify.app/&lt;/a&gt;, and you can find all the code here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/mdviewerpwa&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@anniespratt?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Annie Spratt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/shelf-with-art-supplies-books-and-decorations-ModHj41WZhg?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
