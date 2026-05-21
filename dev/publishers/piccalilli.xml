@@ -4,7 +4,1200 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 20 May 2026 18:13:55 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 21 May 2026 17:52:36 GMT</lastBuildDate>
+    <item>
+      <title>Framework-agnostic design systems: a practical approach to web components</title>
+      <link>https://piccalil.li/blog/framework-agnostic-design-systems-part-1/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/framework-agnostic-design-systems-part-1/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 21 May 2026 10:55:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A quick note before we get into things: this is a practical guide that covers managing, building and packaging design system components. It’s impossible to go into thorough detail at every step of the way without this becoming a full course. Some basic knowledge is assumed:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A basic working knowledge of HTML and CSS&lt;/li&gt;
+        &lt;li&gt;A basic grasp of web components&lt;/li&gt;
+        &lt;li&gt;A working installation of Node.js and npm&lt;/li&gt;
+        &lt;li&gt;Ability to navigate a terminal well enough to install some packages&lt;/li&gt;
+        &lt;li&gt;Basic knowledge of config files and JSON&lt;/li&gt;
+        &lt;li&gt;Grasping the revolutionary notion that a &lt;code&gt;&amp;lt;button&amp;gt;&lt;/code&gt; is not a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Finally, this is a pretty long post. Treat every &lt;code&gt;h2&lt;/code&gt; as an invitation to go make a brew and touch some grass.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=AWM5ZNdWlqw&quot;&gt;Okayyyyylet’sgo&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2&gt;Framework-agnostic components&lt;/h2&gt;
+        &lt;p&gt;Of all the recent hypes/bubbles/whatever you want to call them in tech, the one that excited and confounded me in equal parts was the design systems boom. The overarching concept is clearly fantastic, and almost every team or project can benefit from some form of centralised home for design decisions to live. Like every other boom though, it spawned a lot of &lt;em&gt;weirdness&lt;/em&gt;. People converged on certain ways of seeing design in &apos;the age of design systems&apos;, &lt;a href=&quot;https://atomicdesign.bradfrost.com/chapter-2/&quot;&gt;Atomic Design&lt;/a&gt; slides appearing in every conference talk became a meme, and people made design tokens their entire personality.&lt;/p&gt;
+        &lt;p&gt;This isn&apos;t a post about all the weirdness, but we do need to ground this in something a bit more solid than &lt;em&gt;cool technology is cool&lt;/em&gt;. As such, one of my least favourite weirdnesses from Design System Weirdness 101 is quite niche, but simultaneously a source of genuine physical pain to me: &lt;em&gt;framework-specific component libraries&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;The idea that our design systems can, even should, be powered by components written in a specific framework is wild to me. Design systems are supposed to be, at least in part, about versatility, composability, and portability. Baking framework lock-in into the equation at day one is absolutely baffling.&lt;/p&gt;
+        &lt;p&gt;I understand that web standards lacked a little in the early days of design systems, and that web components and custom elements lagged behind all the fun things that reactive, stateful frameworks offer. Fortunately for us, that&apos;s no longer the case, and there are a number of fantastic tools built around creating and consuming standard web components.&lt;/p&gt;
+        &lt;p&gt;In fact, I’d go as far to say that as of the time of writing this post, web components are &lt;em&gt;the single best approach&lt;/em&gt; to building out a component library. They’re portable, they use web standards, and any framework that isn’t a complete clusterfuck (and many that are, looking at you, React) will support them either directly, or with very minimal config.&lt;/p&gt;
+        &lt;p&gt;Exposition aside, this post will be as practical an introduction as possible to building web components using web standards, modern CSS, and some nifty tooling that’ll help speed us along. It’ll also be quite opinionated, and lean heavily into the idea that we should ship our library alongside our documentation in a single repo. You don’t &lt;em&gt;have&lt;/em&gt; to do all the docs stuff if you don’t want to, but I’d heavily encourage you to give it a try. All the code is here for you, you might as well!&lt;/p&gt;
+        &lt;h2&gt;Principles&lt;/h2&gt;
+        &lt;p&gt;First, let&apos;s explore a few principles. If you vibe with these, then you can read on; if you don&apos;t, then you can close the tab, make a brew, and get on with your life.&lt;/p&gt;
+        &lt;h3&gt;Lowest viable level&lt;/h3&gt;
+        &lt;p&gt;While there are tonnes of tools out there that will transform your framework-specific (let&apos;s be honest, it&apos;s almost always React-specific) components into web components, I don&apos;t think that approach aligns with what we &lt;em&gt;say&lt;/em&gt; we want our component and pattern libraries to be in spirit.&lt;/p&gt;
+        &lt;p&gt;When we&apos;re building out components and designing component APIs, we&apos;re crafting some of the most atomic elements of a design system. In this scenario I think there&apos;s a clear, tangible benefit to working as closely to the delivery platform as possible. For web products, this means working directly with web standards.&lt;/p&gt;
+        &lt;p&gt;At the component level, I am far more bullish about removing abstraction layers and working closer to web standards. Rather than jumping straight into the framework du jour, I much prefer working with scaffolding tools and lightweight wrappers. This means you&apos;re always rooted in &apos;web standards mode&apos;, staying on the straight and narrow. Proud of you.&lt;/p&gt;
+        &lt;h3&gt;Dumbest viable components&lt;/h3&gt;
+        &lt;p&gt;Components should be as primitive as possible. Even the most seemingly complex component can be seen as a very basic finite state machine. I&apos;m yet to encounter a component that can&apos;t be expressed as such, and you do not need to default to a bloated framework for simple component-level variants and isolated state.&lt;/p&gt;
+        &lt;p&gt;I&apos;d go as far as saying that many reactive components are an anti-pattern. Reactivity usually means logic, and very often that brings us into the realms of &apos;business logic&apos; and shared state at the container or app level. Simple, component-level reactivity is often necessary – think a button that shows a loading spinner while something is processing and reverts back to it’s default state when it’s done — but adding tonnes of statefulness and reactivity within isolated component code always &lt;em&gt;feels&lt;/em&gt; like a red flag to me.&lt;/p&gt;
+        &lt;p&gt;In my experience, components are most useful when they’re told explicitly what state they need to reflect and what content they need to contain. They&apos;re purposefully limited and expressly declarative. Handling complex state and reactivity in your app, even if it means combining a few primitives into an app-specific pattern, is far more sane than trying to centralise a complex behemoth of a component that tries to handle too much.&lt;/p&gt;
+        &lt;h3&gt;As future-proof as possible&lt;/h3&gt;
+        &lt;p&gt;Opinionated frameworks eventually become legacy technologies. For all the &apos;rewriting Angular projects in React&apos; work that a non-select few of us lived on for a solid two years, we should know this by now. React itself is becoming (arguably &lt;a href=&quot;https://adactio.com/journal/20618&quot;&gt;already is&lt;/a&gt;) legacy technology, and &apos;rewriting our React app in Solid/Svelte&apos; is now a thing. I fully expect this to repeat ad-nauseum.&lt;/p&gt;
+        &lt;p&gt;Web standards – while admittedly slower-moving and backed by laborious, idiosyncratic release processes – will always be around. Web standards have stood the test of time, and consistently prove to be demonstrably more robust than your problematic favourite, over-engineered framework.&lt;/p&gt;
+        &lt;p&gt;Frameworks are also genuinely fantastic when used properly. Speaking from experience, trying to write stateful, reactive apps using vanilla HTML, CSS and JS is a hardening yet ultimately improvident task. Primitive components, however, are not complex, stateful, reactive web applications. They’re little chunks of atomic web code, and to build them with all the overheads and idiosyncrasies of a full-fledged framework is just asking for future obsolescence.&lt;/p&gt;
+        &lt;p&gt;By building &lt;em&gt;directly with web standards&lt;/em&gt;, we get a lower-level understanding of how our components work, we get innate future-proofing by eschewing the framework du jour, and we get an inherently more progressive, accessible (or, at least, easier-to-make-accessible) and web-native component library out the other end.&lt;/p&gt;
+        &lt;p&gt;By separating your atomic, design system components from your &lt;em&gt;application components &lt;/em&gt;you’re getting the best of both worlds: portable, primitive components at the system level; complex and reactive components and wrappers at the application level.&lt;/p&gt;
+        &lt;p&gt;This way, when you do need to rewrite your app in Solid/Svelte, you at least don’t have to rewrite your entire component library alongside it.&lt;/p&gt;
+        &lt;h3&gt;Decide in code&lt;/h3&gt;
+        &lt;p&gt;I will absolutely die on this hill. Design tools are &lt;em&gt;terrible&lt;/em&gt; places to be making &lt;em&gt;design system&lt;/em&gt; decisions. This is at least partly because of just how disconnected tools like Figma are from how design systems actually work, even down to frankly disastrous disparity between the vocabulary and concepts.&lt;/p&gt;
+        &lt;p&gt;As someone who is ostensibly more of a designer than a developer, I’ve made and worked on well over a dozen Figma &apos;design systems&apos;. As someone who also spends far more time in code than in design tools, I feel qualified to say that none of them were reflective of what a good, systemic foundation should be. This isn’t a dig at designers who don’t code, moreso just how difficult this part of our work is made by the &lt;em&gt;tools themselves&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Design tools are places to try different ideas quickly and to experiment with style and layout ideas. They are absolutely terrible places to codify systemic decisions, in part due to their very nature of exposing a very small, proprietary subset of the capabilities of our actual medium – the browser.&lt;/p&gt;
+        
+        So is the browser but I’m at risk of getting entrenched on that aforementioned hill.
+        
+        &lt;p&gt;Final, systemic design decisions should be made in the browser. Colour tokens can make use of modern colour spaces. Sizing and spacing tokens should be expressed in relative units where possible. Almost every token type can benefit from some kind of math as well, including logarithmic scales for typography, or programatic hue and lightness shifts for colours. Component APIs should also be built using robust well-typed definitions. Design tools can only ever offer a facsimile of these concepts.&lt;/p&gt;
+        &lt;p&gt;If you’re Figma-first, that’s totally fine, but it’s a woeful source of truth. Treat your design tool as a precise prototyping tool, not a final destination for design decisions.&lt;/p&gt;
+        &lt;h3&gt;Document as you build&lt;/h3&gt;
+        &lt;p&gt;Piggybacking on the last principle, if the best place to decide is in code, then the best time to document those decisions is during the build phase, when they&apos;re fresh in your head. Hashing out your props? Well look at that, you have a lovely set of type definitions for those props, might as well lash a little &lt;a href=&quot;https://jsdoc.app/&quot;&gt;JSDoc&lt;/a&gt; comment in there and get on with your life.&lt;/p&gt;
+        &lt;p&gt;I like to go a step further for this and spin up my component library directly in a docs framework like &lt;a href=&quot;https://vitepress.dev/&quot;&gt;VitePress&lt;/a&gt;, actively building the human-readable docs while building out the components themselves. Not only will this eventually become the &apos;official&apos; design system documentation, you also get to test just how portable your components are.&lt;/p&gt;
+        &lt;p&gt;This makes my brain happy, because the full coded representation of my design systems (which absolutely, always includes the actual documentation) lives in a single repo. The whole system can be deployed without juggling dependencies, and forces me to treat documentation as an essential step towards release.&lt;/p&gt;
+        &lt;h2&gt;Let&apos;s build (and document)&lt;/h2&gt;
+        &lt;p&gt;Okay, enough waffling, let&apos;s actually build something practical. We&apos;re going to put together the foundations for a centralised, framework-agnostic component library. We&apos;ll flesh out our docs as we build our components out, which will give us a really clean test bed for our components themselves. A truly virtuous cycle if there ever was one.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s what we&apos;ll have at the end of this post:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A foundation for our component library/documentation hybrid &apos;all-in-one&apos; design system&lt;/li&gt;
+        &lt;li&gt;A snazzy, well-documented button web component&lt;/li&gt;
+        &lt;li&gt;A deployable docs site that shows how wonderful our button component is&lt;/li&gt;
+        &lt;li&gt;A production-ready component library that can be published to your favourite package manager&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;We really only need to care about two tools for this: &lt;a href=&quot;https://elenajs.com/&quot;&gt;Elena&lt;/a&gt; for building and distributing our component library, and &lt;a href=&quot;https://vitepress.dev/&quot;&gt;VitePress&lt;/a&gt; for building our documentation.&lt;/p&gt;
+        &lt;h3&gt;Elena&lt;/h3&gt;
+        &lt;p&gt;The glue for this whole project is Elena. A fantastic library, from the indominatble &lt;a href=&quot;https://arielsalminen.com/&quot;&gt;Ariel Salminen&lt;/a&gt;, for building Progressive Web Components. I&apos;m not going to dive in to the philosophy around what &apos;progressive&apos; means in this regard, because it&apos;s already &lt;a href=&quot;https://arielsalminen.com/2026/progressive-web-components/&quot;&gt;exceptionally well documented&lt;/a&gt; by Ariel.&lt;/p&gt;
+        &lt;p&gt;Elena is a tiny library that does Just Enough Abstraction™ on top of standard web components. We get things like props (reflected as custom attributes), isolated reactivity, lifecycle methods, and even fancy things like mixins for composability. We won&apos;t be going &lt;em&gt;too&lt;/em&gt; deep into Elena, but follow along and, if you like the basics, I really encourage you to dive deep into everything it offers. It&apos;s fab.&lt;/p&gt;
+        &lt;p&gt;To quote the &lt;a href=&quot;https://elenajs.com/#why-should-i-use-elena&quot;&gt;Elena docs&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;[Elena] handles the cross-framework complexity (prop/attribute syncing, event delegation, framework compatibility) so you can focus on building components rather than plumbing.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That&apos;s precicely what I want from a tool like this: let me write the code, don’t abstract out web standards, handle all the weird shit that I don’t want to touch.&lt;/p&gt;
+        &lt;h3&gt;VitePress&lt;/h3&gt;
+        &lt;p&gt;I’m not going to spend too long on VitePress because, honestly, it’s just the most usable out-the-box solution for documentation that isn’t called Storybook. A few &lt;code&gt;npm install&lt;/code&gt;s and we’ve got a reliable, markdown-based documentation solution ready to go.&lt;/p&gt;
+        &lt;p&gt;We’ll do some nifty stuff with VitePress, JSDoc, and our Elena-generated custom elements manifest later on that will help speed up our docs process, but honestly, having &lt;em&gt;somewhere&lt;/em&gt; to document is far more important than &lt;em&gt;what&lt;/em&gt; we document in.&lt;/p&gt;
+        &lt;h3&gt;Project structure&lt;/h3&gt;
+        &lt;p&gt;This is where things might initially look a bit weird. While we need to build and distribute our components as a standalone library, we also need to actually see and test them. The simplest way to do this would be to hack together a static site and just dump all our components in a single page. That&apos;s &lt;em&gt;totally fine,&lt;/em&gt; and in fact something I would encourage if you&apos;re just messing around with Elena, but for reasons explained above, I think it makes a lot of sense to build &lt;em&gt;inside&lt;/em&gt; our documentation.&lt;/p&gt;
+        &lt;p&gt;We’ll essentially have a bit of a monorepo going on here, with Elena doing its thing at the component level, and the actual docs site being generated statically with VitePress.&lt;/p&gt;
+        &lt;h2&gt;Scaffolding the project&lt;/h2&gt;
+        &lt;p&gt;We have quite a few moving parts here, so instead of just lashing a wild chain of concatenated &lt;code&gt;npm install&lt;/code&gt;s your way, let&apos;s go through the setup step-by-step.&lt;/p&gt;
+        &lt;p&gt;First off, let&apos;s create our project folder:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;mkdir my-ds &amp;amp;&amp;amp; cd my-ds
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Replace &lt;code&gt;my-ds&lt;/code&gt; with whatever you want to name your project.&lt;/p&gt;
+        &lt;p&gt;Then init npm:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm init -y
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;npm init -y&lt;/code&gt;  command will generate a &lt;code&gt;package.json&lt;/code&gt; file in your project&apos;s root. This root folder won&apos;t really be doing anything directly, just gluing our components and docs together in a monorepo.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s get our &lt;code&gt;package.json&lt;/code&gt; in order:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &quot;name&quot;: &quot;my-ds&quot;,
+        &quot;private&quot;: true,
+        &quot;workspaces&quot;: [
+        &quot;packages/components&quot;
+        ],
+        &quot;scripts&quot;: {
+        &quot;build:lib&quot;: &quot;npm run build --workspace=packages/components&quot;,
+        &quot;watch:lib&quot;: &quot;npm run watch --workspace=packages/components&quot;,
+        &quot;docs:dev&quot;: &quot;vitepress dev docs&quot;,
+        &quot;docs:build&quot;: &quot;vitepress build docs&quot;,
+        &quot;dev&quot;: &quot;concurrently \&quot;npm run watch:lib\&quot; \&quot;npm run docs:dev\&quot;&quot;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There&apos;s some stuff going on here that won&apos;t really make much sense (or even work) until a little later. The &lt;code&gt;workspaces&lt;/code&gt; setting is what will let us treat our built component library as a package without having to actually publish it, and the &lt;code&gt;dev&lt;/code&gt; and various &lt;code&gt;watch&lt;/code&gt; and &lt;code&gt;build&lt;/code&gt; scripts will allow us to watch/build either the docs or our components (or both concurrently with the &lt;code&gt;dev&lt;/code&gt; command).&lt;/p&gt;
+        &lt;p&gt;On that note, let&apos;s install a few bits:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm install -D concurrently vitepress
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This will install &lt;code&gt;concurrently&lt;/code&gt;, which will allow us to run Elena&apos;s watch command and VitePress&apos;s dev command at the same time. We&apos;ll keep this running while we build. It&apos;ll also install VitePress and its default theme. Feel free to use a different theme if you want to get fancy.&lt;/p&gt;
+        &lt;h3&gt;Setting up VitePress&lt;/h3&gt;
+        &lt;p&gt;Let&apos;s get our docs set up. First we&apos;re going to create our docs folder:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;mkdir -p docs/.vitepress
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then create &lt;code&gt;docs/.vitepress/config.mjs&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;
+        import { defineConfig } from &quot;vitepress&quot;;
+        import { postcssIsolateStyles } from &quot;vitepress&quot;;
+        
+        export default defineConfig({
+        title: &quot;My DS&quot;,
+        description: &quot;Component library documentation&quot;,
+        vite: {
+        css: {
+        postcss: {
+        plugins: [postcssIsolateStyles({ includeFiles: [/vp-doc\.css/] })],
+        },
+        },
+        },
+        themeConfig: {
+        sidebar: [
+        {
+        text: &quot;Welcome&quot;,
+        items: [
+        { text: &quot;Introduction&quot;, link: &quot;/&quot; },
+        { text: &quot;Installation&quot;, link: &quot;/install&quot; },
+        ],
+        },
+        {
+        text: &quot;Principles&quot;,
+        items: [
+        { text: &quot;Design Principles&quot;, link: &quot;/design-principles&quot; },
+        { text: &quot;Accessibility Principles&quot;, link: &quot;/accessibility&quot; },
+        ],
+        },
+        {
+        text: &quot;Components&quot;,
+        items: [{ text: &quot;Button&quot;, link: &quot;/components/button&quot; }],
+        },
+        ],
+        },
+        });
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        Notice we’re using `.mjs` and not `.js` – this forces Node to treat this file as an ESM file. Which is required because we’re importing from `vitepress`. You don’t need to know what that means. Honestly, I’m not sure I know what it means. Just make sure you use `.mjs`. Okay thanks.
+        &lt;/div&gt;
+        &lt;p&gt;We’re using &lt;code&gt;postIsolateStyles&lt;/code&gt; here to scope VitePress&apos;s own &lt;code&gt;.vp-doc&lt;/code&gt; styles so they can&apos;t bleed into our component examples. Without it, VitePress&apos;s built-in styles &lt;em&gt;can&lt;/em&gt; override your component styles (including encapsulated unsets) due to how Vite injects stylesheets at runtime.&lt;/p&gt;
+        &lt;p&gt;Next, create a minimal &lt;code&gt;docs/index.md&lt;/code&gt; so VitePress has a home page:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        title: My DS | Lovely Web Components
+        description: My DS is a lovely component library using Progressive Web Components.
+        ---
+        # My DS
+        
+        Component library documentation.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now&apos;s a good time to check if everything is working:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm run docs:dev
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You should see a very basic VitePress local site! By default this will be served from &lt;a href=&quot;http://localhost:5173/&quot;&gt;&lt;code&gt;http://localhost:5173/&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+        &lt;h3&gt;Setting up Elena&lt;/h3&gt;
+        &lt;p&gt;Now for the MVP of our design system, let&apos;s get Elena installed. We&apos;re going to be using Elena to build our components and eventually distribute them as a package. This is where some of the project root&apos;s &lt;code&gt;package.json&lt;/code&gt; starts to make sense.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s start by creating our components folder and initialising npm for our components package:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;mkdir -p packages/components/src &amp;amp;&amp;amp; cd packages/components &amp;amp;&amp;amp; npm init -y
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Next, edit &lt;code&gt;packages/components/package.json&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &quot;name&quot;: &quot;@my-ds/components&quot;,
+        &quot;version&quot;: &quot;0.0.1&quot;,
+        &quot;private&quot;: true,
+        &quot;type&quot;: &quot;module&quot;,
+        &quot;main&quot;: &quot;./dist/bundle.js&quot;,
+        &quot;exports&quot;: {
+        &quot;.&quot;: &quot;./dist/bundle.js&quot;,
+        &quot;./dist/*&quot;: &quot;./dist/*&quot;
+        },
+        &quot;scripts&quot;: {
+        &quot;build&quot;: &quot;elena build&quot;,
+        &quot;watch&quot;: &quot;elena watch&quot;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then install Elena:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm install @elenajs/core &amp;amp;&amp;amp; npm install -D @elenajs/bundler @elenajs/cli
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This will install Elena and its bundler and CLI tool.&lt;/p&gt;
+        &lt;p&gt;We&apos;ll be using Elena&apos;s CLI tool to scaffold our components. This essentially walks us through creating a component, allowing us to run a command that generates the appropriate folder and scaffolds a js and css file for any component we want to create. More on that later!&lt;/p&gt;
+        &lt;p&gt;For now, we&apos;ll need to configure Elena. In many scenarios, you can skip this and just use the default settings. However, we&apos;re being silly geese and combining our docs and our components into one project, so we might have a few tweaks to make. Plus, I like my configs to be explicit instead of invisible.&lt;/p&gt;
+        &lt;p&gt;Create the Elena config at &lt;code&gt;packages/components/elena.config.mjs&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * @type {import(&quot;@elenajs/bundler&quot;).ElenaConfig}
+        */
+        export default {
+        input: &quot;src&quot;,
+        output: {
+        dir: &quot;dist&quot;,
+        format: &quot;esm&quot;,
+        sourcemap: true,
+        filename: &quot;bundle.js&quot;,
+        },
+        bundle: &quot;src/index.js&quot;,
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This tells Elena where to look for our components (&lt;code&gt;src&lt;/code&gt;), where to output any built components (&lt;code&gt;dist&lt;/code&gt;), and where to look for our library entry point (&lt;code&gt;src/index.js&lt;/code&gt;). Note that all of these locations are relative to the &lt;code&gt;packages/components&lt;/code&gt; directory, &lt;strong&gt;not&lt;/strong&gt; our project root. Our Elena stuff and component library is self-contained.&lt;/p&gt;
+        &lt;p&gt;This entry point is important if we want to import all our web components via the &lt;code&gt;bundle.js&lt;/code&gt; that Elena generates. Let&apos;s set an empty one up for now.&lt;/p&gt;
+        &lt;p&gt;Create &lt;code&gt;packages/components/src/index.js&lt;/code&gt;. For now it can just be empty, or use a comment placeholder:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Componment exports will live here!
+        // e.g. export { default as MyButton } from &quot;./my-button.js&quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As we build out components, we can add the appropriate &lt;code&gt;export&lt;/code&gt; to this file to ensure they&apos;re included in our production bundle.&lt;/p&gt;
+        &lt;p&gt;Confirm Elena is working, ensure you’re at your project root, and run:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm run build:lib
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;If you’re running this on a Mac with Apple Silicon you will very likely encounter an error.&lt;/strong&gt; In my experience this is due to an Elena dependency (&lt;code&gt;lightningcss&lt;/code&gt;) being a little fucky (sorry to get so technical). If you get a &lt;code&gt;&apos;MODULE_NOT_FOUND&apos;&lt;/code&gt; error when trying to build, run the following &lt;strong&gt;from your project root&lt;/strong&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;rm -rf node_modules packages/components/node_modules package-lock.json &amp;amp;&amp;amp; npm install
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That will nuke your node modules folder and reinstall, putting everything in the correct place. &lt;strong&gt;If you get this error once, you will likely have to run this every time you install a new dependency. I am sorry.&lt;/strong&gt; Package management is, as always, a Very Good Time.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;h2&gt;And breathe…&lt;/h2&gt;
+        &lt;p&gt;Let&apos;s take a step back, pop the kettle on, and see what we have. Your project should look like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;my-ds/
+        ├── package.json
+        ├── node_modules/
+        ├── docs/
+        │   ├── .vitepress/
+        │   │   └── config.mjs
+        │   └── README.md
+        └── packages/
+        └── components/
+        ├── package.json
+        ├── elena.config.mjs
+        └── dist/
+        └── …
+        └── src/
+        └── index.js
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Our root folder is basically just a container, so we don&apos;t have too much to worry about there.&lt;/p&gt;
+        &lt;p&gt;Our &lt;code&gt;docs&lt;/code&gt; folder is where all our VitePress stuff will live. This will eventually be our full-fledged design system documentation, and we&apos;ll use it to preview and document our components as we build.&lt;/p&gt;
+        &lt;p&gt;Our &lt;code&gt;packages/components&lt;/code&gt; folder is where we&apos;ll handle all our component stuff. The &lt;code&gt;packages/components/src&lt;/code&gt; folder will be where we build our components, and &lt;code&gt;index.js&lt;/code&gt; in that folder is our library entry point, where we&apos;ll simply &lt;code&gt;export&lt;/code&gt; any component we want to include in our bundle.&lt;/p&gt;
+        &lt;p&gt;Our &lt;code&gt;dist&lt;/code&gt; folder in &lt;code&gt;packages/components&lt;/code&gt; is where our built component library and custom elements manifest will be stored. We can then import from this into our VitePress project as if it was a packaged dependency.&lt;/p&gt;
+        &lt;p&gt;To get to that point though, we need some actual components to distribute.&lt;/p&gt;
+        &lt;h2&gt;Building our first component&lt;/h2&gt;
+        &lt;p&gt;Now that we’ve got everything set up, we can finally start building some components! For this post, we’re going to keep it simple and focus on nailing what might just be the most common component you’ll encounter: a lovely button.&lt;/p&gt;
+        &lt;p&gt;In an incredibly fortunate turn of events, your very own Piccalilli Web Master, &lt;a href=&quot;https://piccalil.li/author/andy-bell/&quot;&gt;Andy Bell&lt;/a&gt;, has already written a &lt;em&gt;fabulous&lt;/em&gt; article about &lt;a href=&quot;https://piccalil.li/blog/how-i-build-a-button-component/&quot;&gt;building button components&lt;/a&gt; in standard HTML and CSS. We’ll be referencing those principles here, with a few little tweaks to get the best out of our web component setup.&lt;/p&gt;
+        &lt;p&gt;Andy&apos;s article does a great job of explaining the &lt;em&gt;why&lt;/em&gt; behind a lot of the semantic and structural decisions when it comes to buttons themselves, so I won’t go into too much detail on that front. Andy walked so we could run. What a man.&lt;/p&gt;
+        &lt;h3&gt;Composite, primitive, and declarative components&lt;/h3&gt;
+        &lt;p&gt;Core to Elena&apos;s &apos;Progressive Web Component&apos; shtick is the conceptual delineation of components into three main categories: &lt;a href=&quot;https://elenajs.com/components/overview#_1-composite&quot;&gt;composite&lt;/a&gt;, &lt;a href=&quot;https://elenajs.com/components/overview#_2-primitive&quot;&gt;primitive&lt;/a&gt;, and &lt;a href=&quot;https://elenajs.com/components/overview#_3-declarative&quot;&gt;declarative&lt;/a&gt;. The Elena docs do a wonderful job of explaining the differences in detail, but it’s important to remember &lt;em&gt;these are all just still web components.&lt;/em&gt; We’re not being forced to adopt nonstandard concepts or methods, rather encouraged to &lt;em&gt;think&lt;/em&gt; about our components in these terms.&lt;/p&gt;
+        &lt;p&gt;I’ll let the Elena docs do the heavy lifting with these definitions, but the highlights:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Composite&lt;/strong&gt; components wrap and enhance their inner HTML. These are great for things like sliders, accordions, cards, and stacked layouts; where you’ll most commonly let HTML and CSS do the heavy lifting and enhance with scoped JS where needed. Composite components are also great for &lt;em&gt;patterns&lt;/em&gt;, where we might want to combine primitive components and HTML into reusable, &lt;em&gt;&apos;macro&apos;&lt;/em&gt; components with specific behaviours. Think things like dialogs, fieldsets and notification banners; where the structure and behaviour are fixed, but the content inside remains flexible and consumer-defined.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Primitive&lt;/strong&gt; components declare and render their own HTML and come with their own &lt;code&gt;render()&lt;/code&gt; function. These are likely the most common components we’ll be using in a design system; think things like buttons, inputs, loading indicators, badges, etc.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Declarative&lt;/strong&gt; components are a combination of both and can combine Light DOM and a declarative Shadow DOM. Unless we know we &lt;em&gt;really&lt;/em&gt; need encapsulation with a Shadow DOM, we can pretty much ignore it for component libraries. I haven’t dived &lt;em&gt;too&lt;/em&gt; deep into this, but my first thoughts are that declarative components would be great for fully encapsulated components like web-based content editors or syntax-highlighted code blocks/editors, where encapsulation and isolation are often critical.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;We’re building a primitive component this time ’round. Our button will declare and render its own HTML and we’ll style it with scoped CSS.&lt;/p&gt;
+        &lt;h3&gt;Scaffolding our component&lt;/h3&gt;
+        &lt;p&gt;We’ll use Elena&apos;s CLI helper to generate the folder and files we need for our component.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        We’re using the very tutorial-coded `my-` prefix for our button, but why have a prefix at all? This goes back to how custom elements require a `-` in their tag name to avoid conflicting with native HTML elements. If we did have complete control, and we created a `` component, we’d be conflicting with the actual HTML `` element, and we’d have a Very Bad Time. So we just _can’t_ do that, all our custom elements should be in `&amp;lt;{prefix}-{component}&amp;gt;` format.
+        &lt;pre&gt;&lt;code&gt;There’s no hard requirement for our _files_ to also be hyphenated, but personally I like the neatness of our file and folder names matching our actual element. So pick a prefix and stick with it. For my [Mindful Design](https://piccalil.li/mindful-design?utm_medium=author-promo) design system, I use the prefix `md-`; so all my custom elements are something like `&amp;lt;md-button&amp;gt;`, `&amp;lt;md-card&amp;gt;`, etc. [Web Awesome](https://webawesome.com/docs/components) uses `wa-`. You can use whatever your heart desires. Just be consistent.
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        &lt;p&gt;From your &lt;code&gt;packages/components&lt;/code&gt; folder run:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npx elena-create my-button
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You’ll then be prompted to select what features and language you want. For our button, we want to select:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Props&lt;/li&gt;
+        &lt;li&gt;CSS Variables&lt;/li&gt;
+        &lt;li&gt;CSS Encapsulation&lt;/li&gt;
+        &lt;li&gt;Code Comments&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Hit enter, then select &lt;code&gt;JavaScript&lt;/code&gt; as the language.&lt;/p&gt;
+        &lt;p&gt;Set your output directory to &lt;code&gt;src/&lt;/code&gt;. Elena defaults to &lt;code&gt;src/components/&lt;/code&gt;, but we don’t need that level of nesting.&lt;/p&gt;
+        &lt;p&gt;This will scaffold our files with a few example values and comments, so we’re not staring at empty files. Hit enter after selecting your features, language and directory, and Elena will generate a &lt;code&gt;my-button&lt;/code&gt; folder, with matching JS and CSS files. We’ll worry about styling later, right now we want to get our component API designed.&lt;/p&gt;
+        &lt;p&gt;Open up &lt;code&gt;packages/components/src/my-button/my-button.js&lt;/code&gt; and you’ll see the following:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Elena, html } from &quot;@elenajs/core&quot;;
+        
+        /**
+        * The description of the component goes here.
+        *
+        * @displayName MyButton
+        * @status alpha
+        *
+        * @cssprop [--my-button-text] - Overrides the default text color.
+        * @cssprop [--my-button-bg] - Overrides the default background color.
+        * @cssprop [--my-button-font] - Overrides the default font family.
+        */
+        export default class MyButton extends Elena(HTMLElement) {
+        static tagName = &quot;my-button&quot;;
+        static props = [&quot;variant&quot;];
+        
+        /**
+        * The style variant of the component.
+        * @property
+        * @type {&quot;default&quot; | &quot;primary&quot; | &quot;danger&quot;}
+        */
+        variant = &quot;default&quot;;
+        
+        /**
+        * Renders the html template.
+        * @internal
+        */
+        render() {
+        return html`
+        &amp;lt;div class=&quot;my-button&quot;&amp;gt;${this.text}&amp;lt;/div&amp;gt;
+        `;
+        }
+        }
+        MyButton.define();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There’s a lot going on here for some simple boilerplate, but we’ll tackle each section as we go!&lt;/p&gt;
+        &lt;h3&gt;Adding props&lt;/h3&gt;
+        &lt;p&gt;Component &lt;a href=&quot;https://elenajs.com/components/props&quot;&gt;props&lt;/a&gt; are what will allow us to control component styling and behaviour in a declarative manner. We can then use these props to create variants of our components. For our button, let’s keep it simple and use the following props:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;variant&lt;/code&gt;: the style variant of our button, e.g. &quot;primary&quot;, &quot;danger&quot;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;disabled&lt;/code&gt;: whether or not the button is disabled&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;href&lt;/code&gt;: where the button should link to, also determines whether the button renders as a link or a button&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;This is a small subset of the props that a production button will require, but it’s enough to get us moving right now. If you’re feeling fancy after this, you can come back and add a bunch more props – a &lt;code&gt;size&lt;/code&gt; or an &lt;code&gt;icon&lt;/code&gt; prop would be a great place to start!&lt;/p&gt;
+        &lt;p&gt;Let’s get those props into our button component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Elena, html } from &quot;@elenajs/core&quot;;
+        
+        /**
+        * The description of the component goes here.
+        *
+        * @displayName MyButton
+        * @status alpha
+        *
+        * @cssprop [--my-button-text] - Overrides the default text color.
+        * @cssprop [--my-button-bg] - Overrides the default background color.
+        * @cssprop [--my-button-font] - Overrides the default font family.
+        */
+        export default class MyButton extends Elena(HTMLElement) {
+        static tagName = &quot;my-button&quot;;
+        static props = [&quot;disabled&quot;, &quot;href&quot;, &quot;variant&quot;];
+        
+        
+        /**
+        * The style variant of the component.
+        * @property
+        * @type {&quot;default&quot; | &quot;primary&quot; | &quot;danger&quot;}
+        */
+        variant = &quot;default&quot;;
+        
+        /**
+        * Renders the html template.
+        * @internal
+        */
+        render() {
+        return html`
+        &amp;lt;div class=&quot;my-button&quot;&amp;gt;${this.text}&amp;lt;/div&amp;gt;
+        `;
+        }
+        }
+        MyButton.define();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;static props&lt;/code&gt; declaration lets us define our finite array of props our component will accept. By default, all these props will be reflected onto our rendered component as HTML attributes. You almost always want this to be the case, especially if you’re using non-custom attributes like &lt;code&gt;disabled&lt;/code&gt;, &lt;code&gt;download&lt;/code&gt;, etc.&lt;/p&gt;
+        &lt;p&gt;Directly under this array, you’ll find the scaffolded prop defaults, each with a nice little comment above it. Let’s follow Elena&apos;s lead and set some defaults for the props we added:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Elena, html } from &quot;@elenajs/core&quot;;
+        
+        /**
+        * The description of the component goes here.
+        *
+        * @displayName MyButton
+        * @status alpha
+        *
+        * @cssprop [--my-button-text] - Overrides the default text color.
+        * @cssprop [--my-button-bg] - Overrides the default background color.
+        * @cssprop [--my-button-font] - Overrides the default font family.
+        */
+        export default class MyButton extends Elena(HTMLElement) {
+        static tagName = &quot;my-button&quot;;
+        static props = [&quot;disabled&quot;, &quot;href&quot;, &quot;variant&quot;];
+        
+        /**
+        * Whether or not the button is in a disabled state
+        *
+        * @property
+        * @type {boolean}
+        */
+        disabled = false;
+        
+        /**
+        * Where the button should link to, will also force the component to render as a link.
+        *
+        * @property
+        * @type {string}
+        */
+        href = &quot;&quot;;
+        
+        /**
+        * The style variant of the component.
+        * @property
+        * @type {&quot;default&quot; | &quot;primary&quot; | &quot;danger&quot; | &quot;success&quot; }
+        */
+        variant = &quot;default&quot;;
+        
+        /**
+        * Renders the html template.
+        * @internal
+        */
+        render() {
+        return html`
+        &amp;lt;div class=&quot;my-button&quot;&amp;gt;${this.text}&amp;lt;/div&amp;gt;
+        `;
+        }
+        }
+        MyButton.define();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The comments above each definition are JSDoc comments. They might look a bit unfamiliar, but they let us document our components and props and can act as a source of truth for documenting our component APIs. It also gives us a bit of &apos;soft-typing&apos; without needed to use TypeScript. Most IDEs will highlight or warn you if you set a prop to a value/type that’s not hinted at in the JSDoc syntax.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;
+        /**
+        * The style variant of the component.
+        * @property
+        * @type {&quot;default&quot; | &quot;primary&quot; | &quot;danger&quot; | &quot;success&quot; }
+        */
+        variant = &quot;default&quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the above example, we’re defining our variant prop, giving it an default value of &quot;default&quot;, and softly-typing it using a &lt;code&gt;@type&lt;/code&gt; definition. In this case we’re only accepting one of the four listed values.&lt;/p&gt;
+        &lt;p&gt;It might seem a bit pointless at this stage, but stay on top of your JSDoc comments as you build your components. We’ll be using it later. While we’re at it, we might as well set a better description for our component.&lt;/p&gt;
+        &lt;p&gt;Change the the top comment in &lt;code&gt;packages/components/src/my-button/my-button.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * A standard button component used to trigger actions and events. Definitely not a `&amp;lt;div&amp;gt;`.
+        *
+        * @displayName Button
+        * @status alpha
+        */
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;We’ve also removed the &lt;code&gt;@cssprop&lt;/code&gt; definitions from this comment. These were generated because we selected &apos;CSS Variables&apos; when we created our component, and allow us to expose the custom properties used to style our components. If you’re working on a themeable or headless component library you might want to keep them in, otherwise, I prefer to skip defining these and avoid exposing them in my documentation.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s take a look at our &lt;code&gt;render()&lt;/code&gt; function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * Renders the html template.
+        * @internal
+        */
+        render() {
+        return html`
+        &amp;lt;div class=&quot;my-button&quot;&amp;gt;${this.text}&amp;lt;/div&amp;gt;
+        `;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Unless you have a severe case of React Brain, you might notice at least one of a couple of problems here: firstly, a &lt;code&gt;button&lt;/code&gt; is not a &lt;code&gt;div&lt;/code&gt;. Wild, right? Now, this isn’t Elena&apos;s fault, we’ve just scaffolded a basic component, and &lt;code&gt;div&lt;/code&gt; is by far the most common HTML element. It’s up to us to render the correct, semantic, accessible markup.&lt;/p&gt;
+        &lt;p&gt;Secondly, we’ve just added &lt;code&gt;href&lt;/code&gt; as a prop, which is an &lt;code&gt;a&lt;/code&gt; thing, not a &lt;code&gt;button&lt;/code&gt; thing. We need to conditionally render &lt;em&gt;either&lt;/em&gt; an &lt;code&gt;a&lt;/code&gt; &lt;em&gt;or&lt;/em&gt; a &lt;code&gt;button&lt;/code&gt; depending on whether &lt;code&gt;href&lt;/code&gt; is set.&lt;/p&gt;
+        &lt;h3&gt;Conditional rendering&lt;/h3&gt;
+        &lt;p&gt;The ‘should links ever be styled as buttons?’ debate is older than your stepdad&apos;s goatee and similarly still somehow persevering through the ages. I am too old and tired to care about that, and the reality is that CTA link-buttons are one of the most common things you’ll see on a website, rivaled only by cookie banners and poor accessibility in their omnipresence.&lt;/p&gt;
+        &lt;p&gt;So, you’re going to do it, whether we like it or not, and you might as well do it right.&lt;/p&gt;
+        &lt;p&gt;The cleanest approach to this is to abstract out our rendering by adding two new functions:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * Renders a button: &amp;lt;button&amp;gt;.
+        *
+        * @internal
+        */
+        renderButton(template) {
+        return html`
+        &amp;lt;button
+        class=&quot;my-button&quot;
+        ${this.disabled ? &quot;disabled&quot; : nothing}
+        &amp;gt;
+        ${template}
+        &amp;lt;/button&amp;gt;
+        `;
+        }
+        
+        /**
+        * Renders a link: &amp;lt;a href=&quot;#&quot;&amp;gt;.
+        *
+        * @internal
+        */
+        renderLink(template) {
+        return html`
+        &amp;lt;a
+        class=&quot;my-button&quot;
+        href=&quot;${this.href}&quot;
+        &amp;gt;
+        ${template}
+        &amp;lt;/a&amp;gt;
+        `;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then we can replace our component&apos;s &lt;code&gt;render()&lt;/code&gt; function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * Renders the html template, calls `renderLink()` or `renderButton()` depending on whether or not an `href` prop is present.
+        * @internal
+        */
+        render() {
+        const markup = html`
+        ${this.text ? html`&amp;lt;span&amp;gt;${this.text}&amp;lt;/span&amp;gt;` : nothing}
+        `;
+        return this.href ? this.renderLink(markup) : this.renderButton(markup);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Super simple: if a &lt;code&gt;href&lt;/code&gt; is present, it’s a link, if not, it’s a button. We don’t need to add any new props, just leverage the one we have already.&lt;/p&gt;
+        &lt;p&gt;We’re using &lt;code&gt;nothing&lt;/code&gt; in this function, and if you try to build/watch right now you’ll get an error. That’s because &lt;code&gt;nothing&lt;/code&gt; is an Elena helper for safely rendering, well, &lt;em&gt;nothing&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;Let’s import it at the top of our button. Edit the first line of &lt;code&gt;packages/components/src/my-button/my-button.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Elena, html, nothing } from &quot;@elenajs/core&quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now let’s build our component library to include our new button in our production &lt;code&gt;bundle.js&lt;/code&gt;. Edit &lt;code&gt;packages/components/src/index.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Componment exports will live here!
+        export { default as MyButton } from &quot;./my-button/my-button.js&quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then from the project root run:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm run build:lib
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;With any luck, the build will go off without a hitch, and we can finally get our button into our docs.&lt;/p&gt;
+        &lt;h3&gt;Previewing our button&lt;/h3&gt;
+        &lt;p&gt;At this point, we have everything we need to be able to render our button and actually see it on a page. It took a bit of setup to get here, but we made it!&lt;/p&gt;
+        &lt;p&gt;Because of how our project is set up, we’re now able to pull in our built components as if they were a standalone package. We just need to configure VitePress to import the bundle that Elena generates, and tell it to treat our imported components as web components (by default VitePress expects Vue components).&lt;/p&gt;
+        &lt;p&gt;Create &lt;code&gt;docs/.vitepress/theme/index.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import DefaultTheme from &quot;vitepress/theme&quot;;
+        import &quot;@my-ds/components/dist/bundle.css&quot;;
+        
+        export default {
+        extends: DefaultTheme,
+        async enhanceApp({ app }) {
+        if (typeof window !== &quot;undefined&quot;) {
+        await import(&quot;@my-ds/components&quot;);
+        }
+        },
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This tells our VitePress theme to import the bundle files that Elena generated. &lt;code&gt;@my-ds/components&lt;/code&gt; is loaded asynchronously as it’s client-side and VitePress uses server-side-rendering by default. &lt;code&gt;@my-ds/components/dist/bundle.css&lt;/code&gt; is imported directly at the top of our file because it’s just good old CSS.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        If you know you need SSR, there are a few ways to enable it with Elena. Depending on your framework/site generator of choice, you might need to do a few extra configuration steps. Consult the Elena docs for [SSR tips](https://elenajs.com/advanced/ssr) and the [framework integrations](https://elenajs.com/advanced/frameworks) page for more advanced integrations.
+        &lt;/div&gt;
+        &lt;p&gt;Next, update &lt;code&gt;docs/.vitepress/config.mjs&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { defineConfig } from &quot;vitepress&quot;;
+        import { postcssIsolateStyles } from &quot;vitepress&quot;;
+        
+        export default defineConfig({
+        title: &quot;My DS&quot;,
+        description: &quot;Component library documentation&quot;,
+        vite: {
+        css: {
+        postcss: {
+        plugins: [postcssIsolateStyles({ includeFiles: [/vp-doc\.css/] })],
+        },
+        },
+        },
+        vue: {
+        template: {
+        compilerOptions: {
+        isCustomElement: (tag) =&amp;gt; tag.includes(&quot;-&quot;),
+        },
+        },
+        },
+        themeConfig: {
+        sidebar: [
+        {
+        text: &quot;Welcome&quot;,
+        items: [
+        { text: &quot;Introduction&quot;, link: &quot;/&quot; },
+        { text: &quot;Installation&quot;, link: &quot;/install&quot; },
+        ],
+        },
+        {
+        text: &quot;Principles&quot;,
+        items: [
+        { text: &quot;Design Principles&quot;, link: &quot;/design-principles&quot; },
+        { text: &quot;Accessibility Principles&quot;, link: &quot;/accessibility&quot; },
+        ],
+        },
+        {
+        text: &quot;Components&quot;,
+        items: [{ text: &quot;Button&quot;, link: &quot;/components/button&quot; }],
+        },
+        ],
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is a little hacky, but it basically tells VitePress to consider any tag with a &lt;code&gt;-&lt;/code&gt; as a custom element instead of a Vue component. Given that custom elements require a &lt;code&gt;-&lt;/code&gt; to avoid clashing with native HTML elements, it’s good enough for our purposes.&lt;/p&gt;
+        &lt;p&gt;Let’s get our actual button docs together now. Create &lt;code&gt;docs/components/button.md&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;# Button
+        
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This should give us everything we need to preview our button! Start your dev process if you haven&apos;t already:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm run dev
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This will serve the VitePress docs in dev mode and run Elena&apos;s &lt;code&gt;watch&lt;/code&gt; script concurrently, giving us a pretty nifty live-reload experience. Navigate to &lt;a href=&quot;http://localhost:5173/components/button.html&quot;&gt;&lt;code&gt;http://localhost:5173/components/button.html&lt;/code&gt;&lt;/a&gt; and you should see your lovely button!&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        The `npm run dev` command will give you your docs dev server, and keep Elena watching for component changes in the background. You’ll get live reloads whenever you make changes, and you can now seamlessy make and test component and docs changes.
+        &lt;/div&gt;
+        &lt;p&gt;If you open your browser’s Inspector and look at your rendered button, you’ll see something like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;my-button&amp;gt;
+        &amp;lt;button class=&quot;my-button&quot;&amp;gt;
+        Click me
+        &amp;lt;/button&amp;gt;
+        &amp;lt;/my-button&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Our host &lt;code&gt;&amp;lt;my-button&amp;gt;&lt;/code&gt; element wraps the markup from its &lt;code&gt;render()&lt;/code&gt; function, and we have our first web component rendered out into the browser! I know, I know. It doesn&apos;t look great at all, but it&apos;s there! Let’s style it up.&lt;/p&gt;
+        &lt;h2&gt;Styling our button&lt;/h2&gt;
+        &lt;p&gt;If you&apos;ve got this far, you might have noticed a distinct lack of Design Token Discourse. That&apos;s not because they&apos;re unimportant, but because token management and distribution is an absolute beast of a topic, and this post is already shaping up to be very fucking long. We&apos;ll very likely explore token workflows in a follow-up post!&lt;/p&gt;
+        &lt;p&gt;For now, we&apos;re going to keep things simple and use Elena&apos;s scoped styles. This allows us to somewhat negate the cascade with our CSS, and ensure that styles don&apos;t leak out of our component-level styling.&lt;/p&gt;
+        &lt;p&gt;We&apos;ll also do something that I &lt;strong&gt;don&apos;t recommend&lt;/strong&gt; for production components, especially if you want to build themeable design systems that inherit sensible globals (spoiler: you do) and that&apos;s to reset our component before applying any styles. This essentially leaves us with a component that doesn&apos;t leak styles out (due to its styles being scoped) and prevents global styles from leaking in (due to our component-level reset).&lt;/p&gt;
+        &lt;h3&gt;Scoped styles&lt;/h3&gt;
+        &lt;p&gt;Open your &lt;code&gt;packages/components/src/my-button/my-button.css&lt;/code&gt; file and you&apos;ll see the following:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;@scope (my-button) {
+        
+        /* Unset makes sure styles don&apos;t leak in */
+        :scope,
+        *:where(:not(img, svg):not(svg *)),
+        *::before,
+        *::after {
+        all: unset;
+        display: revert;
+        }
+        
+        /* Targets the host element (my-button) */
+        :scope {
+        
+        /* Public CSS properties */
+        --my-button-font: sans-serif;
+        --my-button-text: white;
+        --my-button-bg: blue;
+        
+        /* Display mode for the host element */
+        display: inline-block;
+        }
+        .my-button {
+        font-family: var(--my-button-font);
+        color: var(--my-button-text);
+        background: var(--my-button-bg);
+        display: inline-block;
+        }
+        
+        /* Rest of your component styles */
+        :scope[variant=&quot;primary&quot;] {
+        --my-button-bg: red;
+        }
+        }
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;By default, Elena generates a &lt;code&gt;@scope&lt;/code&gt; at-rule for any created component. You don&apos;t &lt;em&gt;have&lt;/em&gt; to use scoped styles for your components. It&apos;s important to remember that it&apos;s &lt;strong&gt;all just CSS&lt;/strong&gt;. We&apos;re not doing anything wild or brittle like CSS-in-JS, we&apos;re just making use of a specific, standard CSS feature. You can just as easily write unscoped, namespaced CSS and get ostensibly the same results.&lt;/p&gt;
+        &lt;p&gt;In fact, if you need to support browsers that don&apos;t support &lt;code&gt;@scope&lt;/code&gt; then namespacing might be the approach you need to take. For this example (and for my own production work) I&apos;m fine with &lt;code&gt;@scope&lt;/code&gt; and find it a much cleaner approach to styling components.&lt;/p&gt;
+        &lt;p&gt;Because we selected &apos;CSS Encapsulation&apos; when we created our component, you’ll see Elena generated the following:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;  /* Unset makes sure styles don&apos;t leak in */
+        :scope,
+        *:where(:not(img, svg):not(svg *)),
+        *::before,
+        *::after {
+        all: unset;
+        display: revert;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This essentially means our component won’t inherit any styles from further up in the cascade. Depending on your approach to styling across your design system, this may or may not be what you want. For &lt;em&gt;this specific scenario&lt;/em&gt; it’s the simplest way to make sure we have full control over our individual components. For many real-world scenarios though, you should really &lt;em&gt;want&lt;/em&gt; some degree of inheritance or default styles in your components.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        Using `all: unset` and `display: revert` will strip any styling that is defined *before* these rules are encountered. It won’t prevent further unscoped styles in files or ` into your &lt;code&gt;my-button&lt;/code&gt; element will reflect that back in the DOM as &lt;code&gt;&amp;lt;my-button variant=&quot;primary&quot;&amp;gt;&lt;/code&gt;, meaning you can target specific variants using CSS attribute selectors – &lt;code&gt;:scope[variant=&quot;primary&quot;] {…}&lt;/code&gt;  in this case.&lt;p&gt;&lt;/p&gt;
+        &lt;h3&gt;Component-level custom properties&lt;/h3&gt;
+        &lt;p&gt;Combining scoped styles with component-level custom properties is my absolute favourite way of styling components. You can see these as the final, most-specific &apos;layer&apos; of contextual tokens, and I really recommend using the component&apos;s top-level &lt;code&gt;:scope&lt;/code&gt; to define custom properties for any value you set in your component styles.&lt;/p&gt;
+        &lt;p&gt;Do this right and every component remains themeable, with sensible fallbacks. Let&apos;s create the various custom properties we&apos;ll need for our button component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;  /* Targets the host element (my-button) */
+        :scope {
+        /* Default custom properties. Override for variants where needed. */
+        --my-button-font: var(--font-family-body, sans-serif);
+        --my-button-font-size: var(--size-step-0, 1rem);
+        --my-button-font-weight: var(--font-weight-button, 500);
+        --my-button-bg: var(--color-surface-default, white);
+        --my-button-bg-hover: var(--color-surface-default-hover, #fafafa);
+        --my-button-text: var(--color-text-loud, #121812);
+        --my-button-padding-x: var(--space-sm, 1em);
+        --my-button-padding-y: var(--space-xs, .6em);
+        --my-button-border-color: var(--color-border-quiet, #eaeaea);
+        --my-button-border-width: var(--border-width-main, 1px);
+        --my-button-border-style: var(--border-style-main, solid);
+        --my-button-radius: var(--radius-sm, 0.5em);
+        /* Display mode for the host element */
+        display: inline-block;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You&apos;ll see that each property is aliased to another custom property. In the real world, these custom properties will likely come from our design tokens, but unless you create them yourself &lt;em&gt;these custom properties will not exist right now&lt;/em&gt;. Fortunately, we&apos;re setting a fallback for each custom property, so even without our &apos;real&apos; tokens, we’ll still get nice buttons.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        If you wanted your components to be *somewhat headless*, you could skip the fallbacks entirely and you essentially have a themeable, unstyled component library. Reference them in your component’s JS file as JSDoc comments using `@cssprop` and you can even bake your themeable tokens into a custom elements manifest at build. We’re not building _yet another_ headless UI though, so we can be a bit more explicit in our styles and fallbacks.
+        &lt;/div&gt;
+        &lt;p&gt;All we need to do now is write the CSS for our actual element! Let&apos;s start by applying our custom properties to our default button state:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;  .my-button {
+        text-decoration: none;
+        font-family: var(--my-button-font);
+        font-size: var(--my-button-font-size);
+        font-weight: var(--my-button-font-weight);
+        color: var(--my-button-text);
+        background: var(--my-button-bg);
+        border-color: var(--my-button-border-color);
+        border-width: var(--my-button-border-width);
+        border-style: var(--my-button-border-style);
+        border-radius: var(--my-button-radius);
+        padding: var(--my-button-padding-y) var(--my-button-padding-x);
+        display: inline-flex;
+        cursor: pointer;
+        &amp;amp;:hover {
+        background: var(--my-button-bg-hover);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As you progress with styling your components, I&apos;d encourage you to abstract out pretty much &lt;em&gt;any&lt;/em&gt; hard-coded value you use. That is to say, if you want to give your button a border, don&apos;t just rawdog a &lt;code&gt;border-width: 2px&lt;/code&gt; and call it a day; instead, add a &lt;code&gt;--my-button-border-width&lt;/code&gt; up in the component&apos;s top level scope and override where needed in your variants.&lt;/p&gt;
+        &lt;p&gt;Here’s our updated &lt;code&gt;my-button.css&lt;/code&gt; file in full:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;@scope (my-button) {
+        /* Unset makes sure styles don&apos;t leak in */
+        :scope,
+        *:where(:not(img, svg):not(svg *)),
+        *::before,
+        *::after {
+        all: unset;
+        display: revert;
+        }
+        
+        /* Targets the host element (my-button) */
+        :scope {
+        /* Default custom properties. Override for variants where needed. */
+        --my-button-font: var(--font-family-body, sans-serif);
+        --my-button-font-size: var(--size-step-0, 1rem);
+        --my-button-font-weight: var(--font-weight-button, 500);
+        --my-button-bg: var(--color-surface-default, white);
+        --my-button-bg-hover: var(--color-surface-default-hover, #fafafa);
+        --my-button-text: var(--color-text-loud, #121812);
+        --my-button-padding-x: var(--space-sm, 1em);
+        --my-button-padding-y: var(--space-xs, .6em);
+        --my-button-border-color: var(--color-border-quiet, #eaeaea);
+        --my-button-border-width: var(--border-width-main, 1px);
+        --my-button-border-style: var(--border-style-main, solid);
+        --my-button-radius: var(--radius-sm, 0.5em);
+        /* Display mode for the host element */
+        display: inline-block;
+        }
+        .my-button {
+        text-decoration: none;
+        font-family: var(--my-button-font);
+        font-size: var(--my-button-font-size);
+        font-weight: var(--my-button-font-weight);
+        color: var(--my-button-text);
+        background: var(--my-button-bg);
+        border-color: var(--my-button-border-color);
+        border-width: var(--my-button-border-width);
+        border-style: var(--my-button-border-style);
+        border-radius: var(--my-button-radius);
+        padding: var(--my-button-padding-y) var(--my-button-padding-x);
+        display: inline-flex;
+        cursor: pointer;
+        &amp;amp;:hover {
+        background: var(--my-button-bg-hover);
+        }
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3&gt;Styling variants&lt;/h3&gt;
+        &lt;p&gt;So far we have a very nice default button, but we only have one variant of said button. Let&apos;s start by styling a few basic variants for now.&lt;/p&gt;
+        &lt;p&gt;Because of how Elena reflects props to the host element as attributes, our variants can be expressed using a combination of standard CSS attribute selectors. This is far more efficient and much cleaner than trying to wrangle a bunch of conditional classes, and makes for a super readable CSS file.&lt;/p&gt;
+        &lt;p&gt;You’ll notice that our &lt;code&gt;.my-button&lt;/code&gt; selector is powered almost exclusively by custom properties defined on our host element (&lt;code&gt;:scope&lt;/code&gt; in this case). Logically, this means we can simply use &lt;code&gt;:scope[some-lovely-prop]&lt;/code&gt;, and override any/all of the custom properties for any variant. Specificity babeyyy.&lt;/p&gt;
+        &lt;p&gt;Let’s add a couple of variant-specific selectors to our button&apos;s CSS:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* Overrides for primary variant */
+        :scope[variant=&quot;primary&quot;] {
+        --my-button-bg: var(--color-primary-bg, #3d33cf);
+        --my-button-bg-hover: var(--color-primary-bg-hover, #3730b5);
+        --my-button-text: var(--color-on-primary, #edf1ff);
+        --my-button-border-color: transparent;
+        }
+        /* Overrides for danger variant */
+        :scope[variant=&quot;danger&quot;] {
+        --my-button-bg: var(--color-danger-bg, #fee2e2);
+        --my-button-bg-hover: var(--color-danger-bg-hover, #fecaca);
+        --my-button-text: var(--color-on-danger, #b91c1c);
+        --my-button-border-color: transparent;
+        }
+        /* Overrides for success variant */
+        :scope[variant=&quot;success&quot;] {
+        --my-button-bg: var(--color-success-bg, #dcfce7);
+        --my-button-bg-hover: var(--color-success-bg-hover, #bbf7d0);
+        --my-button-text: var(--color-on-success, #064e3b);
+        --my-button-border-color: transparent;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It really is as simple as that. If we define a prop on our component, it’s reflected onto its host element by default (you can disable reflection when defining props) as an attribute, and we can target that prop (or a combination of props) to express a specific variant of our component.&lt;/p&gt;
+        &lt;p&gt;Let’s edit our &lt;code&gt;button.md&lt;/code&gt; to include examples of all our variants:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;# Button
+        
+        ::: raw
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        :::
+        
+        ```html
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        ```
+        
+        &amp;lt;style&amp;gt;
+        .component-example {
+        border: 1px solid #f6f6f6;
+        border-radius: 6px;
+        padding: 1.5rem;
+        display: flex;
+        gap: .5rem;
+        margin-top: 1.25rem;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Check your button page in the browser; hopefully you’ll agree that’s looking much better!&lt;/p&gt;
+        &lt;h2&gt;Where we’re at&lt;/h2&gt;
+        &lt;p&gt;So, four buttons in a spartan docs page mightn&apos;t &lt;em&gt;seem&lt;/em&gt; like much, especially considering the amount of work (and reading, on your part!) it’s taken to get here. But we’re very close to having some &lt;em&gt;really&lt;/em&gt; solid foundations for a pretty nifty design system. Here’s what we have:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A monorepo structure that combines a component library with documentation&lt;/li&gt;
+        &lt;li&gt;VitePress running smoothly, compiling from markdown files&lt;/li&gt;
+        &lt;li&gt;Elena doing the heavy lifting building and bundling our web components&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;From here, any time we want to add a component, we can scaffold it with &lt;code&gt;npx elena-create&lt;/code&gt;, build and bundle it, document it and, with a few more tweaks, publish our component library and deploy our documentation. All from one repository with a pretty straightforward workflow.&lt;/p&gt;
+        &lt;p&gt;Not only that, but this setup is completely framework-agnostic. We’re relying on Elena for scaffolding and quality of life stuff, but the bundled code is &lt;em&gt;just a bunch of web components&lt;/em&gt;. This is as portable a source of truth as you’re going to get. Once you’re ready for production, it’s as simple as publishing your library as a package, then importing and including it in whatever projects require it.&lt;/p&gt;
+        &lt;p&gt;Before you run off and prematurely publish your amazing design system unfinished button component, we should probably get it documented.&lt;/p&gt;
+        &lt;h2&gt;Documenting our button&lt;/h2&gt;
+        &lt;p&gt;We went to great pains earlier to get VitePress up and running, and I spent several paragraphs espousing the virtues of documenting as you build, so it’s only natural that we come back full circle to our docs.&lt;/p&gt;
+        &lt;p&gt;Right now we don’t really have documentation, we have a component test container in a page that looks suspiciously like bad documentation. To flesh this out, we need to document two facets of any component, how to implement it, and how to use it. They sound ostensibly identical, but they’re not.&lt;/p&gt;
+        &lt;h2&gt;Implementation documentation&lt;/h2&gt;
+        &lt;p&gt;Implementation documentation revolves around ensuring that the technical details of our component are as clear and demonstrable as possible. Essentially we’re asking whether someone can correctly implement this component in an interface: do they know what props it accepts? What values or types are appropriate for those props? What impact those props will have on the rendered output?&lt;/p&gt;
+        &lt;p&gt;The best place for this type of documentation is the code itself. This is why we’ve leaned so heavily on the JSDoc syntax as we’ve built our button, so much so that our component JS file is more comment than code. That’s a good thing.&lt;/p&gt;
+        &lt;p&gt;Documenting a prop at the point you’ve expressly decided you need it is the easiest way to ensure you stay disciplined with documentation. It’s much easier to let things slide when you can put it off till later. Here’s a bunch of lies I’ve told myself:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;I’ll just document that in Storybook later&lt;/li&gt;
+        &lt;li&gt;I’ll just update our docs before we ship this change&lt;/li&gt;
+        &lt;li&gt;I’ll be able to remember what &lt;code&gt;random-bullshit-prop&lt;/code&gt; means&lt;/li&gt;
+        &lt;li&gt;I’ll just watch one episode of Biker Mice From Mars&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;You might be a better person than me, but if I don’t do it right away, I will invariably forget or neglect to do it entirely.&lt;/p&gt;
+        &lt;p&gt;You already comment your code because you’re not a sadomasochist. You might as well comment your code in a way that’s conducive to automatic implementation documentation and save yourself the hassle and duplication.&lt;/p&gt;
+        &lt;h3&gt;Automating Implementation Documentation&lt;/h3&gt;
+        &lt;p&gt;One last bit of esoteric boilerplate to go! We’ve been fastidious with our JSDoc syntax (right? Right?!) so far, clearly documenting our component, right down to the individual props. That’s pretty much everything we need for Elena to generate a lovely custom element manifest at build time.&lt;/p&gt;
+        &lt;p&gt;Check it out yourself, open up &lt;code&gt;packages/components/dist/custom-elements.json&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;You’ll see a big old structured object pulled automatically from our component code and JSDoc comments. With a bit of VitePress diddling, we can make sure that we’re pulling in as much of this content as we need. Let’s start by pulling in a props table for our component. We’ll add a data loader to VitePress that pulls from our manifest, and a simple props table component for rendering that data out per-component.&lt;/p&gt;
+        &lt;p&gt;Create &lt;code&gt;docs/.vitepress/custom-elements.data.mjs&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { readFileSync } from &quot;fs&quot;;
+        import { resolve } from &quot;path&quot;;
+        
+        export default {
+        load() {
+        const manifest = JSON.parse(
+        readFileSync(
+        resolve(
+        __dirname,
+        &quot;../../packages/components/dist/custom-elements.json&quot;,
+        ),
+        &quot;utf-8&quot;,
+        ),
+        );
+        
+        return manifest;
+        },
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This will read the contents of our custom elements manifest and return it as loadable data for VitePress to access. Now we’ll create the component that can read this data and output a nice little props table.&lt;/p&gt;
+        &lt;p&gt;Create &lt;code&gt;docs/.vitepress/theme/components/PropsTable.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { data as manifest } from &apos;../../custom-elements.data.mjs&apos;
+        
+        const props = defineProps({
+        tag: {
+        type: String,
+        required: true,
+        },
+        })
+        
+        const component = manifest.modules
+        .flatMap((m) =&amp;gt; m.declarations ?? [])
+        .find((d) =&amp;gt; d.tagName === props.tag)
+        
+        const fields = component?.members.filter(
+        (m) =&amp;gt; m.kind === &apos;field&apos; &amp;amp;&amp;amp; !m.static &amp;amp;&amp;amp; m.description
+        ) ?? []
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Prop&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Type&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Default&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Description&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr v-for=&quot;field in fields&quot; :key=&quot;field.name&quot;&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;{{ field.name }}&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;{{ field.type?.text ?? &apos;—&apos; }}&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;code&amp;gt;{{ field.default ?? &apos;—&apos; }}&amp;lt;/code&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;{{ field.description }}&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Update &lt;code&gt;docs/.vitepress/theme/index.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import DefaultTheme from &quot;vitepress/theme&quot;;
+        import &quot;@my-ds/components/dist/bundle.css&quot;;
+        import PropsTable from &quot;./components/PropsTable.vue&quot;;
+        
+        export default {
+        extends: DefaultTheme,
+        enhanceApp({ app }) {
+        app.component(&quot;PropsTable&quot;, PropsTable);
+        },
+        async setup() {
+        if (typeof window !== &quot;undefined&quot;) {
+        await import(&quot;@my-ds/components&quot;);
+        }
+        },
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then use it in &lt;code&gt;docs/components/button.md&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;# Button
+        
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        ```html
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        ```
+        
+        ## Props
+        
+        &amp;lt;PropsTable tag=&quot;my-button&quot; /&amp;gt;
+        
+        &amp;lt;style&amp;gt;
+        .component-example {
+        border: 1px solid #f6f6f6;
+        border-radius: 6px;
+        padding: 1.5rem;
+        display: flex;
+        gap: .5rem;
+        margin-top: 1.25rem;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Let’s go a little further. The comment block at the top of our component JS file has a space for us to add a description, display name and status for our components. Again, this is good practice even if we weren’t using it to power our documentation, but Elena compiles this into our manifest, which means we have that data available to us from our loader, so we might as well use it!&lt;/p&gt;
+        &lt;p&gt;First, we’ll install &lt;code&gt;markdown-it&lt;/code&gt; so we can render Markdown in our Vue components:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;npm install -D markdown-it
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;We’ve just installed a new dependency, so again, &lt;strong&gt;if you’re on Apple Silicon, you will likely get an error next time you build&lt;/strong&gt;. Here are the commands to fix that:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;rm -rf node_modules packages/components/node_modules package-lock.json &amp;amp;&amp;amp; npm install
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Either way, create &lt;code&gt;docs/.vitepress/theme/components/ComponentHeader.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { data as manifest } from &quot;../../custom-elements.data.mjs&quot;;
+        import MarkdownIt from &quot;markdown-it&quot;;
+        
+        const md = new MarkdownIt();
+        
+        const props = defineProps({
+        tag: {
+        type: String,
+        required: true,
+        },
+        });
+        
+        const component = manifest.modules
+        .flatMap((m) =&amp;gt; m.declarations ?? [])
+        .find((d) =&amp;gt; d.tagName === props.tag);
+        
+        const description = md.render(component.description);
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;div style=&quot;display: flex; align-items: center; gap: 1rem&quot;&amp;gt;
+        &amp;lt;h1&amp;gt;{{ component.displayName }}&amp;lt;/h1&amp;gt;
+        &amp;lt;code&amp;gt;&amp;amp;lt;{{ component.tagName }}&amp;amp;gt;&amp;lt;/code&amp;gt;
+        &amp;lt;code&amp;gt;{{ component.status }}&amp;lt;/code&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div v-html=&quot;description&quot; /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then register it in &lt;code&gt;docs/.vitepress/theme/index.js&lt;/code&gt; alongside &lt;code&gt;PropsTable&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import ComponentHeader from &quot;./components/ComponentHeader.vue&quot;;
+        
+        // and in enhanceApp:
+        app.component(&quot;ComponentHeader&quot;, ComponentHeader);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then use it at the top of &lt;code&gt;docs/components/button.md&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;ComponentHeader tag=&quot;my-button&quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And there you have it, your component’s dsplay name, tag name, status, description (as Markdown!) and props should all now be getting pulled in to your button documentation.&lt;/p&gt;
+        &lt;p&gt;We’re not quite done though, you might have noticed that changing any of these values in the component code comments doesn’t update the page. Elena successfully builds and generates the custom element manifest, but VitePress doesn’t rebuild. Simple solution here, we just need to tell VitePress to watch our custom elements manifest for changes.&lt;/p&gt;
+        &lt;p&gt;Update &lt;code&gt;docs/.vitepress/config.mjs&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;
+        import { defineConfig } from &quot;vitepress&quot;;
+        import { postcssIsolateStyles } from &quot;vitepress&quot;;
+        
+        export default defineConfig({
+        title: &quot;My DS&quot;,
+        description: &quot;Component library documentation&quot;,
+        vite: {
+        css: {
+        postcss: {
+        plugins: [postcssIsolateStyles({ includeFiles: [/vp-doc\.css/] })],
+        },
+        },
+        server: {
+        watch: {
+        paths: [&quot;../packages/components/dist/custom-elements.json&quot;],
+        },
+        },
+        },
+        vue: {
+        template: {
+        compilerOptions: {
+        isCustomElement: (tag) =&amp;gt; tag.includes(&quot;-&quot;),
+        },
+        },
+        },
+        themeConfig: {
+        sidebar: [
+        {
+        text: &quot;Welcome&quot;,
+        items: [
+        { text: &quot;Introduction&quot;, link: &quot;/&quot; },
+        { text: &quot;Installation&quot;, link: &quot;/install&quot; },
+        ],
+        },
+        {
+        text: &quot;Principles&quot;,
+        items: [
+        { text: &quot;Design Principles&quot;, link: &quot;/design-principles&quot; },
+        { text: &quot;Accessibility Principles&quot;, link: &quot;/accessibility&quot; },
+        ],
+        },
+        {
+        text: &quot;Components&quot;,
+        items: [{ text: &quot;Button&quot;, link: &quot;/components/button&quot; }],
+        },
+        ],
+        },
+        });
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now, any time we update our component comments, Elena will generate a new bundle, including a new manifest, this will trigger our docs to rebuild, and we’ll see our changes pretty much instantly. From a workflow perspective, we document our code like normal humans, and we get a big chunk of our documentation for free.&lt;/p&gt;
+        &lt;h2&gt;Usage documentation&lt;/h2&gt;
+        &lt;p&gt;Usage documentation is where we get into the details about how/how not to actually use a specific component. Think of this more like guidelines and component-level principles. If technical documentation answers our &lt;em&gt;how&lt;/em&gt;, usage documentation answer our &lt;em&gt;where&lt;/em&gt;, &lt;em&gt;when&lt;/em&gt;, and &lt;em&gt;why&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;While it’s arguably the more important of the two, we won’t be going into usage documentation in this post. It’s long enough without another tea break diatribe. We’re not doing anything automatic or fancy with usage docs. Just write some silly Markdown in your silly Markdown files and be happy. Thanks.&lt;/p&gt;
+        &lt;p&gt;Here’s what a finished &lt;code&gt;docs/components/button.md&lt;/code&gt; file might look like when you combine your generated implementation documentation with your handcrafted, artisinal usage documentation:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;ComponentHeader tag=&quot;my-button&quot; /&amp;gt;
+        
+        ## Examples
+        
+        ::: raw
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        :::
+        
+        ```html
+        &amp;lt;my-button&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        ```
+        
+        ## Props
+        
+        &amp;lt;PropsTable tag=&quot;my-button&quot; /&amp;gt;
+        
+        ## Usage
+        
+        Use a button to trigger an action or event, such as submitting a form, opening a dialog, or confirming a decision. Use a button with an `href` to act as a CTA link.
+        
+        ### Variants
+        
+        Use `variant` to communicate the intent of the action.
+        
+        - **Default** — for secondary or low-priority actions
+        - **Primary** — for the single, primary action on a page or in a section; use sparingly
+        - **Danger** — for destructive or irreversible actions, such as deleting or removing
+        - **Success** — for confirming a positive outcome, such as saving or completing
+        
+        Avoid using multiple primary or danger buttons in close proximity. If everything is high priority, nothing is.
+        
+        ---
+        
+        #### Do:
+        Place primary buttons _after_ default buttons if you need to stack two buttons together:
+        
+        ::: raw
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button&amp;gt;Cancel&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Save Document&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        :::
+        
+        #### Don’t:
+        Stack primary, danger, or success buttons next to one another
+        
+        ::: raw
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button variant=&quot;primary&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;danger&quot;&amp;gt;Click me&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Do a Good Thing!&amp;lt;/my-button&amp;gt;
+        &amp;lt;my-button variant=&quot;success&quot;&amp;gt;Do Another Good Thing!&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        :::
+        
+        ---
+        
+        ### Links
+        
+        Pass an `href` to render the button as an anchor element. Use this when the action navigates the user to a new page or location rather than triggering an in-page action.
+        
+        ::: raw
+        &amp;lt;div class=&quot;component-example&quot;&amp;gt;
+        &amp;lt;my-button href=&quot;/get-started&quot;&amp;gt;Get started&amp;lt;/my-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        :::
+        
+        ```html
+        &amp;lt;my-button href=&quot;/get-started&quot;&amp;gt;Get started&amp;lt;/my-button&amp;gt;
+        ```
+        
+        Don&apos;t use a link-button for actions that don&apos;t result in navigation — use a standard button instead.
+        
+        ### Disabled state
+        
+        Use `disabled` to prevent interaction when an action is temporarily unavailable. Where possible, pair a disabled button with an explanation of why it&apos;s unavailable.
+        
+        ```html
+        &amp;lt;my-button disabled&amp;gt;Unavailable&amp;lt;/my-button&amp;gt;
+        ```
+        
+        Avoid using `disabled` as a default state — if an action is never available in a given context, don&apos;t show the button at all.
+        
+        ### Accessibility
+        
+        - Button text should clearly describe the action it triggers — avoid vague labels like &quot;Click here&quot; or &quot;Submit&quot;
+        - When using an icon alongside text, ensure the text is still present or an `aria-label` is provided
+        - Disabled buttons are not focusable by default; consider whether users need to know why the action is unavailable before removing it from the tab order
+        
+        &amp;lt;style&amp;gt;
+        .component-example {
+        border: 1px solid #f6f6f6;
+        border-radius: 6px;
+        padding: 1.5rem;
+        display: flex;
+        gap: .5rem;
+        margin-top: 1.25rem;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        Production components will likely need a robust test suite. Pushing broken code at the component level is _disastrous_ (don’t ask me how I know) and runs the risk of screwing over _multiple_ apps in one fell swoop. I can almost guarantee there’s a way to pull in examples and even full usage documentation from your tests alone. When you eventually get down to writing component tests, why not pick up a side quest and figure out how to populate your usage docs/examples from them?
+        &lt;/div&gt;
+        &lt;p&gt;That’s where we’ll leave things for now. We have the foundations for a future-proof, centralised, framework-agnostic design system &lt;em&gt;built with web standards&lt;/em&gt;. Our component library is publishable as a standalone package, our docs are are a static site that can be deployed anywhere, and our workflow is as seamless as it gets.&lt;/p&gt;
+        &lt;h1&gt;What’s next?&lt;/h1&gt;
+        &lt;p&gt;Allow me to break the fourth wall, insomuch as one can in a non-fiction post designed to offer active guidance: this shit got very long, very quickly. If you’ve made it all this way, thanks for sticking with it. Hopefully at this point you can see the potential behind not only this solution, but the actual mindset and approach that precipitates it.&lt;/p&gt;
+        &lt;p&gt;We’ve really only scratched the surface of what’s possible here. Like I hinted to throughout the post, the next technical challenge feels naturally like figuring out a token workflow. That’s where we’ll pick up again soon, with a follow-up post all about how to make this whole thing token-driven.&lt;/p&gt;
+        &lt;p&gt;That’s on me, though. In the meantime, here’s a few challenges to keep you sated:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Make your button component more robust by adding props for different sizes, icons, square/icon-only&lt;/li&gt;
+        &lt;li&gt;Ensure that your button meets minimum accessibility requirements and that all button roles are accounted for (&lt;code&gt;type=&quot;submit&quot;, type=&quot;reset&quot;&lt;/code&gt; etc.)&lt;/li&gt;
+        &lt;li&gt;Add a few more primitive components – maybe you already have a design system you can recreate components from.&lt;/li&gt;
+        &lt;li&gt;Explore creating composite components with slotted HTML&lt;/li&gt;
+        &lt;li&gt;Theme or customise your docs so they don’t look like shit (and remove that &lt;em&gt;extremely hacky&lt;/em&gt; &lt;code&gt;&amp;lt;style&amp;gt;&lt;/code&gt; tag from the Markdown files and put it somewhere sensible)&lt;/li&gt;
+        &lt;li&gt;Get &lt;em&gt;really&lt;/em&gt; fancy and try to set up autonatic &lt;code&gt;.md&lt;/code&gt; file generation when a component is &lt;em&gt;added&lt;/em&gt; to your custom elements manifest&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Stay tuned for the tokens stuff, and hit me up on &lt;a href=&quot;https://bsky.app/profile/scott.is&quot;&gt;Bluesky&lt;/a&gt; if you encounter any issues with the code or just want to shout at me/tell me you love me. Have fun!&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #182</title>
       <link>https://piccalil.li/the-index/182/?ref=main-rss-feed</link>
@@ -111,61 +1304,6 @@
         
         &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://codepen.io/beta?utm_medium=newsletter&amp;utm_source=piccalilli&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/codepen-newsletter.jpg&quot; alt=&quot;Build better with CodePen 2.0, now in beta&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;The CodePen you’ve loved for years has levelled up&lt;/strong&gt;, now with multiple files, deployments, lightning fast processing and previews — all with advanced privacy controls.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://codepen.io/beta?utm_medium=newsletter&amp;utm_source=piccalilli&quot;&gt;Check out CodePen 2.0&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Three stoic principles for better web accessibility</title>
-      <link>https://piccalil.li/blog/three-stoic-principles-for-better-web-accessibility/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/blog/three-stoic-principles-for-better-web-accessibility/?ref=main-rss-feed</guid>
-      <pubDate>Thu, 30 Apr 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;When I listened to Arthur Brooks&apos; podcast episode &lt;a href=&quot;https://www.arthurbrooks.com/podcast/four-practical-ways-to-live-like-a-stoic-with-ryan-holiday&quot;&gt;&lt;em&gt;Four Practical Ways to Live Like a Stoic with Ryan Holiday&lt;/em&gt;&lt;/a&gt;, I was surprised and excited to see how it applies to my work as an accessibility practitioner.&lt;/p&gt;
-        &lt;p&gt;Among other things, they talk about three principles, and in this article, I’m going to discuss how they can help you in your everyday life doing web accessibility work.&lt;/p&gt;
-        &lt;h2&gt;Manage yourself, not the outside world&lt;/h2&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;“Having the emotion, but not being ruled by it.”&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;You already seem to be living by this principle, otherwise you wouldn&apos;t be reading this. You can&apos;t influence how your colleagues deal with the issue of accessibility, but you have decided to be here.&lt;/p&gt;
-        &lt;p&gt;There are many things we have no control over: laws, recommendations, opinions, hierarchies, technologies used, brand colours, et cetera. This can be very upsetting and you might feel your voice is not heard. Don’t be discouraged and take it personally though, because even in this confined space &lt;em&gt;you&lt;/em&gt; still get to decide how to work with these restrictions.&lt;/p&gt;
-        &lt;p&gt;You might not be able to break free from the oppressive nature of the corporate world, but you &lt;em&gt;can&lt;/em&gt; still do your best by not taking it personally and keep moving towards the goal: improving the user experience, collaborating with your colleagues and protecting your employer from a lawsuit along the way.&lt;/p&gt;
-        &lt;p&gt;Does it upset you when a team lead tells you that only 1% of their users have a disability and frankly they don’t give a shit about accessibility? It &lt;em&gt;did&lt;/em&gt; upset me, but it didn’t stop me from “killing them with kindness”. I asked them politely where this made up number came from and if they’re aware that there are roughly &lt;a href=&quot;https://www.destatis.de/EN/Themes/Society-Environment/Health/Disabled-People/_node.html&quot;&gt;7.9 million people in Germany with an official disability&lt;/a&gt; instead.&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;h2&gt;Everything is an opportunity, including suffering&lt;/h2&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;“The obstacle is the way.”&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Let&apos;s take the dreaded &lt;a href=&quot;https://shouldiuseacarousel.com/&quot;&gt;carousel pattern&lt;/a&gt; as an example: there is a insistence on using it on the home page, preferably an external ready-made solution, because it has to be done quickly. It has been decided, the customer insists it &lt;em&gt;must&lt;/em&gt; be used and you have no influence on this decision.&lt;/p&gt;
-        &lt;p&gt;You &lt;em&gt;can&lt;/em&gt; influence by educating your colleagues about the implications. Welcome to the amusement park of pain, take a seat on the merry-go-round of the unreasonable!&lt;/p&gt;
-        &lt;p&gt;The carousel pattern is not only a questionable one and will most likely not have the desired effect that you intend, it’s also very complex to implement, especially if it &lt;em&gt;must&lt;/em&gt; be accessible. The ARIA Authoring Practices Guide explains the &lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/carousel/&quot;&gt;Carousel (Slide Show or Image Rotator) Pattern&lt;/a&gt; in detail, in case you want to give your developer colleagues a look behind the scenes and get their sweat glands working overtime.&lt;/p&gt;
-        &lt;p&gt;If the offer &lt;em&gt;must&lt;/em&gt; be accessible, time (and therefore money) must be invested in finding a suitable ready-made solution, adapting it or writing it yourself. Sonja Weckenmann from &lt;em&gt;tollwerk&lt;/em&gt; has written a very detailed, excellent article on creating &lt;a href=&quot;https://tollwerk.de/projekte/tipps-techniken-inklusiv-barrierefrei/barrierefreie-karussells&quot;&gt;accessible carousels&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;p&gt;The article is in German but your browser of choice should be able to translate it into your preferred language.&lt;/p&gt;
-        
-        &lt;p&gt;You could also try to convince your colleagues to integrate an MVP (minimum viable product) solution that offers simple horizontal scrolling. If you break this pattern down to its essence, that&apos;s exactly what it is: a container that you navigate horizontally to access the content.&lt;/p&gt;
-        &lt;p&gt;This solution can be implemented quickly and easily, and the horizontal scroll bar can even be implemented using CSS with the brand colours. Building on this &lt;a href=&quot;https://piccalil.li/blog/its-about-time-i-tried-to-explain-what-progressive-enhancement-actually-is/&quot;&gt;progressive enhancement&lt;/a&gt; approach, further complexity can be added later.&lt;/p&gt;
-        &lt;p&gt;What you can also do — which is &lt;em&gt;my&lt;/em&gt; preferred solution — is re-evaluate the use of the carousel, even if it has already been decided to use the pattern. At this point, everyone involved should be aware of the many disadvantages and few advantages and be able to form their own opinion. &lt;a href=&quot;https://piccalil.li/complete-css/lessons/4&quot;&gt;Simplifying design with feedback&lt;/a&gt; is a big part of producing excellent user interfaces.&lt;/p&gt;
-        &lt;p&gt;If the carousel &lt;em&gt;still&lt;/em&gt; has to be implemented as desired, you (and your colleagues) will suffer a lot, but you will also learn an incredible amount about accessibility during the implementation of an accessible carousel.&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;h2&gt;Choose virtue over comfort&lt;/h2&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;On those mornings you struggle with getting up, keep this thought in mind—I am awakening to the work of a human being. Why then am I annoyed that I am going to do what I’m made for, the very things for which I was put into this world? Or was I made for this, to snuggle under the covers and keep warm? It’s so pleasurable. Were you then made for pleasure? In short, to be coddled or to exert yourself?&lt;/p&gt;
-        &lt;p&gt;— Marcus Aurelius, Meditations, 5.1&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Simply put: Sometimes there are days when you wonder why you should get up and subject yourself to the stress of everyday life when you could just stay in bed. Take the previous example: Instead of fighting a losing battle and trying to talk your boss out of the carousel pattern with very good arguments, you could just do it and be done with it.&lt;/p&gt;
-        &lt;p&gt;As bleak as this situation may seem, it’s okay! If you have a little breathing room, why not document the process internally, for example? If the topic comes up again, you can show in detail what had to be done and how much work was involved. You can use hard facts to demonstrate the disadvantages and how much time went into it.&lt;/p&gt;
-        &lt;p&gt;Other ways to go the extra mile could include:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;You could publish a case study as part of your company blog (if there is one) and thus help others by showing that the company takes accessibility seriously.&lt;/li&gt;
-        &lt;li&gt;You can involve designers in creating images with accessibility annotations to make the process easier to understand for a non-technical audience.&lt;/li&gt;
-        &lt;li&gt;Writing good, easy-to-understand documentation is an important skill that not only increases your market value but can also greatly &lt;a href=&quot;https://piccalil.li/complete-css/lessons/3&quot;&gt;improve your communication skills&lt;/a&gt;.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;I had a colleague who was very interested in the topic but didn&apos;t have the capacity to deal with it. When he asked me to give him a glimpse behind the scenes and I showed him everything that goes into the work of an accessibility practitioner, he was very surprised. Moments like these also help to raise awareness within the team and sensitise people to the topic.&lt;/p&gt;
-        &lt;p&gt;Even if you only have the capacity to do one of these things, a little goes a long way. Attentive colleagues will take note and be grateful that you went the extra mile. And who knows, maybe it will even inspire them to follow your example because they realised how it makes their own work easier?&lt;/p&gt;
-        &lt;h2&gt;Wrapping up&lt;/h2&gt;
-        &lt;p&gt;If you search for them, you will find &lt;a href=&quot;https://duckduckgo.com/?q=stoic+principles&amp;amp;ia=web&quot;&gt;much more than just these three principles&lt;/a&gt;. Some may not be so easy to apply to work in the field of web accessibility, but others will.&lt;/p&gt;
-        &lt;p&gt;These three principles have helped me to take several steps back and look at my work from a bird&apos;s eye view.&lt;/p&gt;
-        &lt;p&gt;More often than I would like, I get too caught up in technical details and forget that I am working with many different people to ultimately enable as many people as possible to participate digitally.&lt;/p&gt;
-        &lt;p&gt;If you would like to dive deeper into this non-technical topic, I highly recommend &lt;a href=&quot;https://dpersing.com/book/&quot;&gt;The Accessibility Operations Guidebook&lt;/a&gt; by &lt;em&gt;Devon Persing&lt;/em&gt;. In it, she explains in detail how to make accessibility work more sustainable.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
