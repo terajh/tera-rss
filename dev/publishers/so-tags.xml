@@ -4,7 +4,7 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Fri, 22 May 2026 17:28:17 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 23 May 2026 16:22:35 GMT</lastBuildDate>
     <item>
       <title>How to enable live reload on localhost:8000 without a separate dev server</title>
       <link>https://stackoverflow.com/questions/79944247/how-to-enable-live-reload-on-localhost8000-without-a-separate-dev-server</link>
@@ -112,240 +112,6 @@
         });
         });
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue displaying users data expansion options</title>
-      <link>https://stackoverflow.com/questions/79942552/vue-displaying-users-data-expansion-options</link>
-      <guid>https://stackoverflow.com/questions/79942552/vue-displaying-users-data-expansion-options</guid>
-      <pubDate>Sun, 17 May 2026 16:30:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Here we are at the 4th .vue file.&lt;br /&gt;
-        In this usersvue.vue file, we are getting the informations from the userdisplay.vue file, which is somehow connected to each other as far as im concerned.&lt;br /&gt;
-        However, in this section, i cant understand like nothing especially how are the 2 files are connected.&lt;br /&gt;
-        You can see that in my first post question.&lt;br /&gt;
-        I recommend to read all my questions, because they are all connected to each other.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
-        &amp;lt;h1&amp;gt;Felhasználók&amp;lt;/h1&amp;gt;
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;UserDisplay/&amp;gt;
-        
-        &amp;lt;ul v-for=&amp;quot;user in users&amp;quot; :key=&amp;quot;user.id&amp;quot;&amp;gt;
-        &amp;lt;li&amp;gt;{{ user.user_name }} ({{user.type}}) &amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script setup&amp;gt;
-        import { onMounted, ref } from &apos;vue&apos;;
-        import router from &apos;@/router&apos;;
-        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;;
-        
-        
-        const users = ref([])
-        async function logout() {
-        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
-        credentials: &apos;include&apos;,
-        method:&apos;POST&apos;
-        })
-        return router.push(&apos;/&apos;)
-        }
-        
-        onMounted(async() =&amp;gt;{
-        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
-        headers:{
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
-        },
-        credentials: &apos;include&apos;,
-        })
-        
-        if(!res.ok){
-        router.push(&apos;/&apos;)
-        }
-        
-        res = await fetch(&amp;quot;http://localhost:3000/api/users&amp;quot;)
-        const data = await res.json()
-        
-        users.value = data.users
-        })
-        
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;here is the code, can anyone who read my previous questiuons answer me how they are connected to each other?&lt;br /&gt;
-        And last but not least, future options to expand the database and adding more datas to the database table. I will concider every advices.&lt;br /&gt;
-        &amp;quot;My 5th post will be the backend, and you will see how is our project goes&amp;quot;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue writing tasks from a database</title>
-      <link>https://stackoverflow.com/questions/79942546/vue-writing-tasks-from-a-database</link>
-      <guid>https://stackoverflow.com/questions/79942546/vue-writing-tasks-from-a-database</guid>
-      <pubDate>Sun, 17 May 2026 16:16:39 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Here is my third question about the vue project what we are doing  in school.&lt;br /&gt;
-        In this tasksvue.vue form, we are writing what tasks each user has. We are using a database with HeidiSQL/mariadb, you can see the datas in  top of the code.&lt;br /&gt;
-        Only i can understand is the logout @click function.&lt;br /&gt;
-        The onmounted  async function, and the most nervous part is in the unordered list.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;button @click=&amp;quot;logout&amp;quot;&amp;gt;Kijelentkezés&amp;lt;/button&amp;gt;
-        &amp;lt;h1&amp;gt;Feladatok&amp;lt;/h1&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;UserDisplay/&amp;gt;
-        &amp;lt;ul v-for=&amp;quot;task in tasks&amp;quot; :key=&amp;quot;task.id&amp;quot;&amp;gt;
-        &amp;lt;li&amp;gt;{{ task.task }} ({{task.user_name}}) &amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script setup&amp;gt;
-        
-        import UserDisplay from &apos;@/components/UserDisplay.vue&apos;
-        import router from &apos;@/router&apos;
-        import {onMounted, ref} from &apos;vue&apos;
-        
-        const tasks = ref([])
-        
-        async function logout() {
-        await fetch(&amp;quot;http://localhost:3000/api/auth/logout&amp;quot;,{
-        credentials: &apos;include&apos;,
-        method:&apos;POST&apos;
-        })
-        return router.push(&apos;/&apos;)
-        }
-        
-        onMounted(async() =&amp;gt;{
-        let res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
-        
-        headers:{
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
-        },
-        credentials: &apos;include&apos;,
-        })
-        
-        if(!res.ok){
-        router.push(&apos;/&apos;)
-        }
-        
-        res = await fetch(&amp;quot;http://localhost:3000/api/tasks&amp;quot;,{
-        credentials:&apos;include&apos;,
-        })
-        const data = await res.json()
-        
-        tasks.value = data
-        })
-        
-        
-        
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What is v-for?&lt;br /&gt;
-        Why do we need this everytime when we are developing in this?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue login handleform understanding problems</title>
-      <link>https://stackoverflow.com/questions/79942535/vue-login-handleform-understanding-problems</link>
-      <guid>https://stackoverflow.com/questions/79942535/vue-login-handleform-understanding-problems</guid>
-      <pubDate>Sun, 17 May 2026 15:55:59 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Here is my second question about vue frontend.&lt;br /&gt;
-        Recently, i have asked about displaying users type, but right now, lets discuss about loginning in.&lt;br /&gt;
-        In the handleform section i cant understand what is happening, my teachers answer is a &amp;quot;thanks for nothing&amp;quot; situation, so i would be delighted for explaining this, since this will be our last exam in this year.&lt;br /&gt;
-        This file called loginvue.vue, which allows the login, pretty self-explanatory, but in the script setup tag, i have problems.&lt;br /&gt;
-        Copying from the teacher is not a solution, watching videos are useless for me.&lt;/p&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;h1&amp;gt;Bejelentkezés&amp;lt;/h1&amp;gt;
-        &amp;lt;form @submit.prevent=&amp;quot;handleform&amp;quot;&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;user_name&amp;quot; id=&amp;quot;user_name&amp;quot; v-model=&amp;quot;user_name&amp;quot;/&amp;gt; &amp;lt;br&amp;gt;
-        &amp;lt;input type=&amp;quot;password&amp;quot; name=&amp;quot;password&amp;quot; id=&amp;quot;password&amp;quot; v-model=&amp;quot;password&amp;quot;/&amp;gt; &amp;lt;br&amp;gt;
-        
-        &amp;lt;button&amp;gt;Bejelentkezés&amp;lt;/button&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script setup&amp;gt;
-        import router from &apos;@/router&apos;;
-        import {onMounted, ref} from &apos;vue&apos;;
-        
-        const user_name = ref(&amp;quot;&amp;quot;);
-        const password = ref(&amp;quot;&amp;quot;);
-        
-        async function handleform() {
-        const res = await fetch(&amp;quot;http://localhost:3000/api/auth/login&amp;quot;, {
-        headers:{
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
-        },
-        credentials:&apos;include&apos;,
-        method: &apos;POST&apos;,
-        body: JSON.stringify({
-        user_name: user_name.value,
-        password: password.value,
-        }),
-        })
-        if(!res.ok){
-        return alert(
-        alert((await res.json()).error), 
-        )}
-        }
-        
-        onMounted(async() =&amp;gt;{
-        const res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;, {
-        headers:{
-        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;
-        },
-        credentials: &apos;include&apos;,
-        })
-        
-        if(res.ok){
-        router.push(&apos;/users&apos;)
-        }
-        })
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here is the code.&lt;br /&gt;
-        first of all, what is credentials and fetch?&lt;br /&gt;
-        What are they for?&lt;br /&gt;
-        Can somebody give me an advice of building this in a logical way?&lt;br /&gt;
-        Thank you&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue problems displaying users type</title>
-      <link>https://stackoverflow.com/questions/79942524/vue-problems-displaying-users-type</link>
-      <guid>https://stackoverflow.com/questions/79942524/vue-problems-displaying-users-type</guid>
-      <pubDate>Sun, 17 May 2026 15:38:02 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m a beginner, learning in a school and I understand the basics, but I’m unsure about what is happening in this vue file. This file displays the users type(e.g admin) and I&apos;m a little bit nervous. This file is part of a project, I will ask some questions in a different post, but lets stay in this for now.&lt;/p&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;p&amp;gt;Belépve mint:  {{ user_name }}&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Felhasználó típusa: {{ user_type }}&amp;lt;/p&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script setup&amp;gt;
-        import { onMounted, ref } from &apos;vue&apos;;
-        
-        const user_name = ref(&apos;&apos;)
-        const user_type = ref(&apos;&apos;)
-        
-        onMounted(async ()=&amp;gt;{
-        const res = await fetch(&amp;quot;http://localhost:3000/api/me&amp;quot;,{
-        credentials: &apos;include&apos;,
-        })
-        const data = await res.json()
-        
-        user_name.value = data.session.user_name
-        user_type.value = data.type
-        })
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Can anyone please give me some advice about to understand what is happening?&lt;br /&gt;
-        Or ,maybe some changes in the code to understand it more efficently.&lt;/p&gt;
       </content:encoded>
     </item>
     <item>
@@ -657,30 +423,6 @@
         &lt;p&gt;But of course, Astro components don’t run in the browser, so this doesn’t work (and yes, Button, Input, etc is not just div with styles and can&apos;t be replaced by simple css class).&lt;/p&gt;
         &lt;p&gt;So, now I doubt about this entire approach. Is it correct? What about best practices? How real projects combine astro and interactivity?&lt;/p&gt;
         &lt;p&gt;Thanks!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Why does IntelliJ IDEA mark `.router-link-active` as unused in Nuxt project but not in pure Vue project?</title>
-      <link>https://stackoverflow.com/questions/79927052/why-does-intellij-idea-mark-router-link-active-as-unused-in-nuxt-project-but</link>
-      <guid>https://stackoverflow.com/questions/79927052/why-does-intellij-idea-mark-router-link-active-as-unused-in-nuxt-project-but</guid>
-      <pubDate>Fri, 17 Apr 2026 04:21:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;m encountering a difference in IntelliJ IDEA&apos;s behavior between pure Vue and Nuxt projects regarding the CSS class &lt;code&gt;.router-link-active&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;In a &lt;strong&gt;pure Vue&lt;/strong&gt; project using &lt;code&gt;&amp;lt;RouterLink&amp;gt;&lt;/code&gt;, IDEA correctly recognizes &lt;code&gt;.router-link-active&lt;/code&gt; as a class that will be automatically applied to active links. There is no &amp;quot;Unused selector&amp;quot; warning.&lt;/p&gt;
-        &lt;p&gt;However, in my &lt;strong&gt;Nuxt&lt;/strong&gt; project, when I use &lt;code&gt;&amp;lt;NuxtLink&amp;gt;&lt;/code&gt;, IDEA marks the &lt;code&gt;.router-link-active&lt;/code&gt; selector in my &lt;code&gt;&amp;lt;style scoped&amp;gt;&lt;/code&gt; block as grey/unused (inspection: &amp;quot;Unused selector&amp;quot; / &lt;code&gt;CssUnusedSymbol&lt;/code&gt;), even though the style works perfectly at runtime.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Why does IDEA recognize the class from &lt;code&gt;&amp;lt;RouterLink&amp;gt;&lt;/code&gt; but not from &lt;code&gt;&amp;lt;NuxtLink&amp;gt;&lt;/code&gt;?&lt;/strong&gt; Is there a way to make IDEA understand that &lt;code&gt;&amp;lt;NuxtLink&amp;gt;&lt;/code&gt; outputs the same standard Vue Router classes without resorting to suppression comments?&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Code Example (Nuxt):&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;NuxtLink to=&amp;quot;/about&amp;quot; class=&amp;quot;nav-link&amp;quot;&amp;gt;About&amp;lt;/NuxtLink&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;style scoped&amp;gt;
-        /* IDEA marks .router-link-active as unused in Nuxt project */
-        .nav-link.router-link-active {
-        color: blue;
-        }
-        &amp;lt;/style&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
     <item>
@@ -1660,6 +1402,233 @@
         }
         },
         &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to disable the error overlay (red bar) in Nuxt 2 when receiving bad responses from backend?</title>
+      <link>https://stackoverflow.com/questions/79883813/how-to-disable-the-error-overlay-red-bar-in-nuxt-2-when-receiving-bad-response</link>
+      <guid>https://stackoverflow.com/questions/79883813/how-to-disable-the-error-overlay-red-bar-in-nuxt-2-when-receiving-bad-response</guid>
+      <pubDate>Thu, 05 Feb 2026 19:09:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m working with a Nuxt 2 application, and whenever I receive a 4XX or 5XX error response from my backend API, a red error &amp;quot;loading&amp;quot; overlay bar appears at the top of the application.&lt;/p&gt;
+        &lt;p&gt;I want to disable this error overlay because I&apos;m handling errors with custom toast notifications
+        2. I want to control error display through my own error handling system&lt;/p&gt;
+        &lt;p&gt;I&apos;ve searched the Nuxt 2 documentation but couldn&apos;t find a clear way to disable this error overlay. I&apos;m using:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Nuxt 2.18.1&lt;/li&gt;
+        &lt;li&gt;Vue 2.7.14&lt;/li&gt;
+        &lt;li&gt;@nuxtjs/axios for API calls&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Is there a configuration option in &lt;code&gt;nuxt.config.js&lt;/code&gt; to disable this error overlay? Or do I need to handle this differently?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Example of what I&apos;m seeing:&lt;/strong&gt;
+        When an axios request fails with a 400/500 status, a red bar appears at the top showing something like:&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/3GmQvROl.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/3GmQvROl.png&quot; alt=&quot;red bar screenshot&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Chart.js with date-fns adapter throws &quot;This method is not implemented: Check that a complete date adapter is provided&quot; when using time scale</title>
+      <link>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</link>
+      <guid>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</guid>
+      <pubDate>Wed, 04 Feb 2026 14:37:08 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m trying to create a time-series line chart using Chart.js (v4.4.0) in a Vue 3 component with the date-fns adapter. The chart works fine with a linear x-axis, but when I set the x-axis to type: &apos;time&apos;, I get the error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;This method is not implemented: Check that a complete date adapter is provided.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;What I&apos;ve done so far:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Installed the required packages: chart.js, chartjs-adapter-date-fns, and date-fns (all v3+)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Imported and registered the adapter as per the documentation&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Tried registering the adapter both globally and at the scale level&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Verified my date data is in proper Date objects&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;canvas ref=&amp;quot;chartRef&amp;quot;&amp;gt;&amp;lt;/canvas&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script&amp;gt;
+        import { Chart, registerables } from &apos;chart.js&apos;;
+        import { de } from &apos;date-fns/locale&apos;;
+        import &apos;chartjs-adapter-date-fns&apos;;
+        
+        Chart.register(...registerables);
+        
+        export default {
+        mounted() {
+        this.createChart();
+        },
+        methods: {
+        createChart() {
+        const ctx = this.$refs.chartRef;
+        
+        // Sample time-series data
+        const xAxisLabels = [&apos;2024-01-01&apos;, &apos;2024-01-02&apos;, &apos;2024-01-03&apos;];
+        const yAxisData = [0.5, 0.7, 0.6];
+        
+        new Chart(ctx, {
+        type: &apos;line&apos;,
+        data: {
+        datasets: [{
+        label: &apos;NDVI&apos;,
+        data: xAxisLabels.map((date, i) =&amp;gt; ({
+        x: new Date(date),
+        y: yAxisData[i]
+        }))
+        }]
+        },
+        options: {
+        scales: {
+        x: {
+        type: &apos;time&apos;, // ← ERROR OCCURS WHEN THIS IS SET
+        adapters: {
+        date: { locale: de }
+        }
+        }
+        }
+        }
+        });
+        }
+        }
+        };
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;code&gt;package.json&lt;/code&gt; dependencies:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.4.0&amp;quot;,
+        &amp;quot;chartjs-adapter-date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
+        &amp;quot;date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
+        &amp;quot;vue&amp;quot;: &amp;quot;^3.2.29&amp;quot;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The error stack trace:&lt;/p&gt;
+        &lt;pre class=&quot;lang-none prettyprint-override&quot;&gt;&lt;code&gt;Error: This method is not implemented: Check that a complete date adapter is provided.
+        at _adapters._date.override (chart.js:12457:1)
+        at Object.parse (chart.js:12516:1)
+        at TimeScale._parseValue (chart.js:13367:1)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;) when using vue-papa-parse with Vue 3 + Vite</title>
+      <link>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</link>
+      <guid>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</guid>
+      <pubDate>Sun, 01 Feb 2026 19:06:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m facing the following error when trying to install &lt;strong&gt;vue-papa-parse&lt;/strong&gt; in a Vue 3 project created with &lt;strong&gt;Vite&lt;/strong&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This occurs when registering the plugin in &lt;code&gt;main.js&lt;/code&gt;, following the usage shown in the documentation.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;main.js&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { createApp } from &apos;vue&apos;
+        import App from &apos;./App.vue&apos;
+        import VuePapaParse from &apos;vue-papa-parse&apos;
+        
+        const app = createApp(App)
+        
+        app.use(VuePapaParse)
+        app.mount(&apos;#app&apos;)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;Environment&lt;/strong&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Vue 3&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Vite&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Why can&apos;t I import Dagre into my Vite app? [closed]</title>
+      <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
+      <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
+      <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Our team is migrating a Vue CLI app to Vite. We had some Dagre code that worked with no problems in the Vue CLI app, but is throwing this error with Vite, stopping the entire app from loading:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Uncaught Error: Dynamic require of &amp;quot;@dagrejs/graphlib&amp;quot; is not supported&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Adapted from https://vueflow.dev/examples/layout/simple.html
+        import dagre from &apos;@dagrejs/dagre&apos;;
+        import { Position, useVueFlow } from &apos;@vue-flow/core&apos;;
+        import { ref } from &apos;vue&apos;;
+        
+        export function useLayout() {
+        const graph = ref(new dagre.graphlib.Graph());
+        
+        function layout(nodes, edges, direction) {
+        const dagreGraph = new dagre.graphlib.Graph();
+        
+        // ...
+        
+        dagre.layout(dagreGraph);
+        
+        // ...
+        
+        return nodes;
+        }
+        
+        return { graph, layout };
+        }
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;vite.config.js:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { fileURLToPath, URL } from &apos;node:url&apos;;
+        
+        import { defineConfig } from &apos;vite&apos;;
+        import vue from &apos;@vitejs/plugin-vue&apos;;
+        
+        // https://vitejs.dev/config/
+        export default defineConfig({
+        plugins: [vue()],
+        resolve: {
+        alias: {
+        &apos;@&apos;: fileURLToPath(new URL(&apos;./src&apos;, import.meta.url)),
+        },
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;package.json:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{
+        &amp;quot;scripts&amp;quot;: {
+        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
+        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
+        },
+        &amp;quot;dependencies&amp;quot;: {
+        &amp;quot;@dagrejs/dagre&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
+        &amp;quot;@tinymce/tinymce-vue&amp;quot;: &amp;quot;^5.1.0&amp;quot;,
+        &amp;quot;@vue-flow/background&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
+        &amp;quot;@vue-flow/controls&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
+        &amp;quot;@vue-flow/core&amp;quot;: &amp;quot;^1.22.3&amp;quot;,
+        &amp;quot;@vue-flow/minimap&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
+        &amp;quot;@vue-flow/node-toolbar&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
+        &amp;quot;vue&amp;quot;: &amp;quot;^3.3.4&amp;quot;,
+        },
+        &amp;quot;devDependencies&amp;quot;: {
+        &amp;quot;vite&amp;quot;: &amp;quot;^4.4.6&amp;quot;,
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Prevent swipe back on iOS</title>
+      <link>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</link>
+      <guid>https://stackoverflow.com/questions/79874084/prevent-swipe-back-on-ios</guid>
+      <pubDate>Thu, 22 Jan 2026 19:29:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am building a Capacitor app using Vue and Ionic.&lt;/p&gt;
+        &lt;p&gt;On iOS, I want to disable the default edge swipe back gesture on some screens.&lt;/p&gt;
+        &lt;p&gt;I have seen a similar question where the solution was to override the gesture, but that question is about four years old. I am wondering if there is now a more native or official way to do this, for example through an Ionic prop, a router setting, or a Capacitor API, without having to add a custom gesture.&lt;/p&gt;
+        &lt;p&gt;Thanks&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/rEmY91nkm.png&quot; alt=&quot;image&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
