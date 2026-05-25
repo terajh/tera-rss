@@ -7,6 +7,32 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Vuemorphic - an open source React to Vue 3 transpiler",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>My design workflow is kind of weird. I prototype everything in Claude Design (<a href=\"https://claude.ai/design\">https://claude.ai/design</a>) which spits out React. My actual app is Vue 3. For a while I was porting components by hand, which was fine until I had 30+ of them to move.</p> <p>So I built vuemorphic. It&#39;s a LangGraph pipeline that takes React JSX and produces idiomatic Vue 3 SFCs, one component at a time, in dependency order. The translation is done by an LLM but the work is in the scaffolding around it: topological sort so dependencies are ready before their consumers, a compile + vue-tsc verification step after every conversion, and a structured review queue for anything that doesn&#39;t pass.</p> <p>Here&#39;s a real before/after, a range slider:</p> <p>React: <code>jsx function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = &#39;&#39;, onChange }) { return ( &lt;TweakRow label={label} value={`${value}${unit}`}&gt; &lt;input type=&quot;range&quot; className=&quot;twk-slider&quot; min={min} max={max} step={step} value={value} onChange={(e) =&gt; onChange(Number(e.target.value))} /&gt; &lt;/TweakRow&gt; ); } </code></p> <p>Vue 3: ``<code>vue &lt;template&gt; &lt;TweakRow :label=&quot;label&quot; :value=&quot;</code>${value}${unit}`&quot;&gt; &lt;input type=&quot;range&quot; class=&quot;twk-slider&quot; :min=&quot;min&quot; :max=&quot;max&quot; :step=&quot;step&quot; :value=&quot;value&quot; u/change=&quot;(e) =&gt; emit(&#39;change&#39;, Number((e.target as HTMLInputElement).value))&quot; /&gt; &lt;/TweakRow&gt; &lt;/template&gt;</p> <p>&lt;script setup lang=&quot;ts&quot;&gt; import TweakRow from &#39;./TweakRow.vue&#39;</p> <p>interface TweakSliderProps { label: string value: number min?: number max?: number step?: number unit?: string }</p> <p>const props = withDefaults(defineProps&lt;TweakSliderProps&gt;(), { min: 0, max: 100, step: 1, unit: &#39;&#39; }) const emit = defineEmits&lt;{ change: [value: number] }&gt;() &lt;/script&gt; ```</p> <p>It maps <code>onChange</code> to a typed <code>defineEmits</code> + <code>emit(&#39;change&#39;, ...)</code> rather than just inlining a prop, which is what makes it actually idiomatic instead of mechanically translated.</p> <p>I&#39;ve run it on 3 projects, 119 components total. About 90% convert on the first pass. The failures are usually complex SVG-heavy layout components.</p> <p>Building this also forced me to document some Vue 3.5 footguns that produce silently wrong output. Destructuring from the <code>props</code> proxy still loses reactivity, even with 3.5&#39;s reactive <code>defineProps</code> destructuring — easy to mix up. Numeric CSS values without a &quot;px&quot; suffix are silently ignored. Chrome doesn&#39;t apply Vue&#39;s reactive bindings to SVG <code>&lt;defs&gt;</code> patterns (gradients, fills) before first paint. These are all in the prompt template now so the model avoids them, which helped the first-pass rate a lot.</p> <p>This is built on the same LangGraph harness as oxidant (<a href=\"https://github.com/ByteBard97/oxidant\">https://github.com/ByteBard97/oxidant</a>), a TypeScript/Python to Rust transpiler I made earlier. Same architecture, different language pair.</p> <p>The source going in is React from Claude Design so I&#39;m not claiming this works on arbitrary production codebases. It&#39;s built for my specific workflow, but if yours looks similar it might save you some time.</p> <p><a href=\"https://github.com/ByteBard97/vuemorphic\">https://github.com/ByteBard97/vuemorphic</a></p> <p>examples/ has a few before/after pairs if you want to see more conversions</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/NegativeMastodon5798\"> /u/NegativeMastodon5798 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tna011/vuemorphic_an_open_source_react_to_vue_3/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tna011/vuemorphic_an_open_source_react_to_vue_3/\">[comments]</a></span>",
+    "date": "2026-05-25T13:58:24.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tna011/vuemorphic_an_open_source_react_to_vue_3/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "New nuxt-stripe package",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tn5s0r/new_nuxtstripe_package/\"> <img src=\"https://external-preview.redd.it/ooeArTk_oVDdmNY8YOlhJDmtfO6sqnk8k-N3FZ3f-iU.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=ec15e908c6b0d89c4d14649efd451455b935f688\" alt=\"New nuxt-stripe package\" title=\"New nuxt-stripe package\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/IllLeg1679\"> /u/IllLeg1679 </a> <br/> <span><a href=\"/r/Nuxt/comments/1tn5ruu/new_nuxtstripe_package/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tn5s0r/new_nuxtstripe_package/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-05-25T11:01:23.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1tn5s0r/new_nuxtstripe_package/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "Create mobile app with vue lynx",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tl4z8m/create_mobile_app_with_vue_lynx/\"> <img src=\"https://external-preview.redd.it/c2twMXRhbXkzdDJoMXPJ864agRsu-oxNtpLBcWrVYEnrzXN2UG9G_NHw3zin.png?width=320&amp;crop=smart&amp;auto=webp&amp;s=7f32666a44319472c9a81ebc5637603e536ef22a\" alt=\"Create mobile app with vue lynx\" title=\"Create mobile app with vue lynx\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>👋 I had some free time recently and created a Vue + Lynx Android , iOS Starter Template just for fun.</p> <p>Packed with a few things to help skip the boring setup phase:</p> <p>⚡️ Tailwind CSS (Dark/Light mode) &amp; Pinia</p> <p>🧩 Pre-built UI (Dialogs, Action Sheets, Cards, etc.)</p> <p>📱 Native modules ready (Image Picker, LocalStorage, SafeArea)</p> <p>Repo <a href=\"https://github.com/bekaku/vue-lynx-tailwind-starter\">https://github.com/bekaku/vue-lynx-tailwind-starter</a></p> <p>Experience with lynx</p> <p>It&#39;s fast native performance and use familiar web tools like vue and CSS. The main challenge is adapting to non-browser environment and missing standard web APIs. The biggest pain point is the limited plugin ecosystem. If you need specific device features, you can&#39;t just npm install a library you have to manual write custom Native Modules from scratch for both Android and iOS yourself.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/bekaku\"> /u/bekaku </a> <br/> <span><a href=\"https://v.redd.it/mtcijaty3t2h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tl4z8m/create_mobile_app_with_vue_lynx/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-05-23T03:30:57.000Z",
@@ -50,19 +76,6 @@
     "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Active_Value_9615\"> /u/Active_Value_9615 </a> <br/> <span><a href=\"https://v.redd.it/iompnd7rax2h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tlmvmn/i_built_a_payasyougo_platform_to_kill_the/\">[comments]</a></span>",
     "date": "2026-05-23T17:37:38.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1tlmvmn/i_built_a_payasyougo_platform_to_kill_the/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "I built a full social entertainment platform with Nuxt 3 + Vue 3 — Movie Night brackets, social feed, CineClash voting & more",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey <a href=\"/r/vuejs\">r/vuejs</a> 👋</p> <p>Long-time lurker, first time sharing something I&#39;ve actually shipped. I built <strong>Leitpt</strong> — a social platform for movie &amp; TV lovers — entirely with Nuxt 3 + Vue 3 + Quasar, and wanted to share it here since this community indirectly taught me a lot.</p> <p><strong>The stack:</strong></p> <ul> <li><strong>Nuxt 3</strong> — SSR, auto-imports, <code>useSeoMeta</code>, file-based routing</li> <li><strong>Vue 3</strong> — Composition API throughout, <code>&lt;script setup&gt;</code> everywhere</li> <li><strong>Pinia</strong> — store per feature (feed, movienight, auth, eshare...)</li> <li><strong>Quasar</strong> — UI components + icons</li> <li><strong>vue-i18n</strong> — full EN/GR localization</li> <li><strong>Express + MongoDB</strong> — backend, deployed on Render</li> <li><strong>Netlify</strong> — frontend with CSP headers via <code>netlify.toml</code></li> </ul> <p><strong>Some Vue-specific things I built that might interest you:</strong></p> <p>🔄 <strong>Visibility-aware polling</strong> — pauses <code>setInterval</code> when the tab is hidden, resumes + immediately fetches on tab return. Huge for the Movie Night real-time updates</p> <p>⚡ <strong>Optimistic UI</strong> — votes, reactions, watched toggles all update instantly with rollback on error</p> <p>🎯 <strong>Module-level batch queue in a component</strong> — <code>EndorseButton.vue</code> was firing 2 requests per mounted instance (20 posts = 40 requests). Fixed it with a module-level debounced queue that collapses all mounts within 50ms into one batch API call</p> <p>📦 <strong>Cursor pagination</strong> — infinite scroll feed using MongoDB <code>_id &lt; cursor</code> pattern, IntersectionObserver sentinel at the bottom</p> <p>🧩 <strong>Composables for everything</strong> — <code>useListPoll</code>, <code>useNightPoll</code>, <code>useAuthGate</code>, <code>useTimeAgo</code>, <code>useTier</code>...</p> <p><strong>What the app actually does:</strong></p> <ul> <li>Social feed (post, react, repost, comment)</li> <li>Movie Night — invite friends, add films to a pool, vote, then a bracket decides what you watch</li> <li>Shared Collections with editor/viewer roles</li> <li>CineClash — community head-to-head movie votes</li> <li>Watchlist, history, E-Share, Greek Cinema archive, achievements/XP</li> </ul> <p>Happy to go deep on any of the technical decisions — there were some interesting problems to solve. Would love feedback from people who actually know Vue on what I could&#39;ve done better.</p> <p><strong>Link:</strong> <a href=\"https://leitpt.com/\">leitpt.com</a></p> <p><em>The Movie Night bracket feature is genuinely the thing I&#39;m most proud of — real-time multiplayer bracket that resolves &quot;what do we watch&quot; arguments democratically 😄</em></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/LycawnX\"> /u/LycawnX </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tlk857/i_built_a_full_social_entertainment_platform_with/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tlk857/i_built_a_full_social_entertainment_platform_with/\">[comments]</a></span>",
-    "date": "2026-05-23T15:55:42.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1tlk857/i_built_a_full_social_entertainment_platform_with/"
   },
   {
     "publisherId": "reddit-dev",
@@ -310,18 +323,5 @@
     "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Love_faith4\"> /u/Love_faith4 </a> <br/> <span><a href=\"/r/Vue/comments/1teo0mg/anyone_have_1or_2_vue_discount_codes/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1teo0x0/anyone_have_1or_2_vue_discount_codes/\">[comments]</a></span>",
     "date": "2026-05-16T08:44:18.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1teo0x0/anyone_have_1or_2_vue_discount_codes/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Berry admin dashboard built using Vuetify 4 & Vue 3",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tcrnmb/berry_admin_dashboard_built_using_vuetify_4_vue_3/\"> <img src=\"https://external-preview.redd.it/NmZrYWhkY2lhMjFoMWjcJJl815wBmu7ePM3agGZeiMVk4-szWmQPVB3hTMbQ.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=1d195d823badc68cd5352064ed5c84732db9846b\" alt=\"Berry admin dashboard built using Vuetify 4 &amp; Vue 3\" title=\"Berry admin dashboard built using Vuetify 4 &amp; Vue 3\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/riti_rathod\"> /u/riti_rathod </a> <br/> <span><a href=\"https://v.redd.it/fdg1dabia21h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tcrnmb/berry_admin_dashboard_built_using_vuetify_4_vue_3/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-05-14T08:14:41.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1tcrnmb/berry_admin_dashboard_built_using_vuetify_4_vue_3/"
   }
 ]
