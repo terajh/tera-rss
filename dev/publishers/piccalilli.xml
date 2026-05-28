@@ -4,7 +4,371 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 27 May 2026 18:24:52 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 28 May 2026 18:30:59 GMT</lastBuildDate>
+    <item>
+      <title>Navigating the age-old problem of checkmarks in UI with progressive enhancement</title>
+      <link>https://piccalil.li/blog/navigating-the-age-old-problem-of-checkmarks-in-ui-with-progressive-enhancement/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/navigating-the-age-old-problem-of-checkmarks-in-ui-with-progressive-enhancement/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 28 May 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;The &lt;code&gt;::checkmark&lt;/code&gt; pseudo-element was introduced in &lt;a href=&quot;https://drafts.csswg.org/css-forms-1/&quot;&gt;&lt;strong&gt;CSS Form Control Styling Module Level 1&lt;/strong&gt;&lt;/a&gt; and it’s a powerful CSS feature to say the least. I even wrote about it as an &lt;a href=&quot;https://css-tricks.com/almanac/pseudo-selectors/c/checkmark/&quot;&gt;almanac entry for CSS-Tricks in 2025&lt;/a&gt; to share what this pseudo-element can do.&lt;/p&gt;
+        &lt;p&gt;The CSS &lt;code&gt;::checkmark&lt;/code&gt; pseudo-element is used to style the checked state of input elements with checkers including the &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; dropdown, checkboxes, and radio buttons. There’s one problem: at the time of writing, &lt;code&gt;::checkmark&lt;/code&gt; lacks browser support on two major browsers: Safari &amp;amp; Firefox.&lt;/p&gt;
+        &lt;p&gt;That’s not all.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://drafts.csswg.org/css-forms-1/#checkmark&quot;&gt;According to the specification&lt;/a&gt;, &lt;code&gt;::checkmark&lt;/code&gt; is supposed to support styling of checkmarks present in checkboxes, radios, and option elements, but again, at the time of writing, it’s only supported for &lt;code&gt;&amp;lt;option&amp;gt;&lt;/code&gt; elements in the &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; dropdown.&lt;/p&gt;
+        &lt;p&gt;This means that &lt;code&gt;::checkmark&lt;/code&gt; , as simple, powerful, and useful as it is, is still very limited, and that’s a problem. So, do we rely on the traditional solutions we used to use in the past to style checkmarks? Are they better? In this article, we will be exploring how the problem of customised checkmarks was solved in the past and compare those solutions with the modern &lt;code&gt;::checkmark&lt;/code&gt; solution, providing recommendations as we go.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;How we’ve traditionally approached checkmarks in menus&lt;/h2&gt;
+        &lt;p&gt;To create and style a traditional checkmark similar to the ones you see in &lt;code&gt;&amp;lt;option&amp;gt;&lt;/code&gt; elements under &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; , first, we would create a custom dropdown to house the checkmark. To do that, we would have to consider a bunch of interactive states and rules. Your browser doesn’t provide these with non-semantic elements, so taking a few notes from &lt;a href=&quot;https://css-tricks.com/striking-a-balance-between-native-and-custom-select-elements/&quot;&gt;Sandrina’s article&lt;/a&gt;, we need to have:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A dropdown with the current selected option&lt;/li&gt;
+        &lt;li&gt;Box toggling ability to toggle the visibility of the options&lt;/li&gt;
+        &lt;li&gt;Clicking an option in the list updates the dropdown value. The dropdown text changes, and the list MUST be closed&lt;/li&gt;
+        &lt;li&gt;Clicking outside closes the list&lt;/li&gt;
+        &lt;li&gt;A customizable select dropdown icon to represent our picker&lt;/li&gt;
+        &lt;li&gt;A customizable select checkmark icon to represent our checkmark for any selected option&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Here’s how our HTML would likely look:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div id=&quot;cs&quot;&amp;gt;
+        &amp;lt;div id=&quot;cs-btn&quot;&amp;gt;
+        &amp;lt;span id=&quot;btn-lbl&quot;&amp;gt;::before&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;btn-arrow&quot;&amp;gt;▼&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        /* list menu */
+        &amp;lt;div class=&quot;cs-menu&quot;&amp;gt;
+        &amp;lt;div class=&quot;item&quot; data-sel data-v=&quot;:before&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::before&amp;lt;/span&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&quot;item&quot; data-v=&quot;::after&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::after&amp;lt;/span&amp;gt; 
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&quot;item&quot; data-v=&quot;::marker&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::marker&amp;lt;/span&amp;gt;  
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&quot;item&quot; data-v=&quot;::selection&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::selection&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;item&quot; data-v=&quot;::placeholder&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::placeholder&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And our main CSS for the dropdown would look something like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* position property sets the list dropdown menu to be centered and non-clickable, just below the button that reveals it*/
+        .cs-menu {
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 0.3rem;
+        z-index: 20;
+        box-shadow: 0 1.5rem 3rem oklch(0% 0 0 / 0.55);
+        opacity: 0;
+        transform: translateY(-0.4rem);
+        pointer-events: none;
+        transition: opacity 0.15s, transform 0.15s;
+        }
+        
+        /* this reveals the menu list when the dropdown menu button is clicked if data-open attribute is present. It is hidden otherwise */ 
+        #cs[data-open] .cs-menu {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+        }
+        
+        /* you can use flex here instead of grid. Just follow the pattern stated */
+        .item {
+        display: grid;
+        grid-template-columns: 1.2rem 1fr;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.4rem;
+        cursor: pointer;
+        transition: background 0.1s;
+        }
+        .item:hover {
+        background: var(--hover);
+        }
+        .item[data-sel] {
+        background: oklch(75% 0.18 55 / 0.08);
+        }
+        
+        .label {
+        font-size: 0.88rem;
+        color: var(--muted);
+        transition: color 0.12s;
+        }
+        .item[data-sel] .label {
+        color: var(--accent);
+        }
+        
+        /* checkmark over here 🙋‍♂️ */
+        .checkmark {
+        justify-self: end;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--accent);
+        visibility: hidden;
+        }
+        .item[data-sel] .checkmark {
+        visibility: visible;
+        }
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In essence, we’re using &lt;code&gt;position&lt;/code&gt; absolute to remove the element from the normal document flow and hide it from the user. revealing the menu only when the dropdown is clicked. Then, we’re using &lt;code&gt;grid&lt;/code&gt; to align and arrange the items in the dropdown menu.&lt;/p&gt;
+        &lt;p&gt;Finally, we style the checkmark to be hidden by default on all list items, and only the selected item should reveal the checkmark, indicating it has been chosen!&lt;/p&gt;
+        &lt;p&gt;Ah yes! That should be all, right?&lt;/p&gt;
+        &lt;p&gt;All this code should make sure the dropdown and checkmark work as intended, fulfilling the requirements stated above. Surely, it works without JavaScript (JS). But, enough sarcastic talk, let’s see the result…&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/GgNqgym&quot;&gt;The dilemma of custom select dropdown with checkmarks: no js, a problem&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Notice something not working? Yes, the dropdown is not working. Why? &lt;strong&gt;It’s because there’s no JS to provide the interactivity!&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;That’s a &lt;em&gt;big&lt;/em&gt; issue with solutions like this because JS is required for them to work, and &lt;a href=&quot;https://piccalil.li/blog/a-handful-of-reasons-javascript-wont-be-available/&quot;&gt;JS &lt;em&gt;will&lt;/em&gt; fail for your users&lt;/a&gt;. Warnings about best practice aside, let’s provide some interactivity to at least get this sample working.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const cs = document.getElementById(&quot;cs&quot;);
+        const btn = document.getElementById(&quot;cs-btn&quot;);
+        const lbl = document.getElementById(&quot;btn-lbl&quot;);
+        const items = document.querySelectorAll(&quot;.item&quot;);
+        
+        btn.addEventListener(&quot;click&quot;, () =&amp;gt; cs.toggleAttribute(&quot;data-open&quot;));
+        
+        items.forEach((item) =&amp;gt;
+        item.addEventListener(&quot;click&quot;, () =&amp;gt; {
+        items.forEach((x) =&amp;gt; x.removeAttribute(&quot;data-sel&quot;));
+        item.setAttribute(&quot;data-sel&quot;, &quot;&quot;);
+        lbl.textContent = item.dataset.v;
+        cs.removeAttribute(&quot;data-open&quot;);
+        })
+        );
+        
+        document.addEventListener(&quot;click&quot;, (e) =&amp;gt; {
+        if (!cs.contains(e.target)) cs.removeAttribute(&quot;data-open&quot;);
+        });
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/ogYjrZv&quot;&gt;Custom dropdown using grid/flex with position property&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;We are missing two important points. What about accessibility and users who want to navigate via keyboard?&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;We will have to modify the HTML with some &lt;code&gt;aria-haspopup&lt;/code&gt; , &lt;code&gt;aria-expanded&lt;/code&gt;, &lt;code&gt;aria-selected&lt;/code&gt;, &lt;code&gt;role&lt;/code&gt;, &lt;code&gt;tab-index&lt;/code&gt;, and &lt;code&gt;aria-label&lt;/code&gt; . That would sort out our HTML accessibility dilemma. The code would look a lot like this. Setting it up this way from the start, although tedious, would ensure checkmarks in our dropdowns work as intended for &lt;em&gt;all&lt;/em&gt; users:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;	&amp;lt;div id=&quot;cs&quot;&amp;gt;
+        &amp;lt;!-- Button to open/close dropdown --&amp;gt;
+        &amp;lt;button id=&quot;cs-btn&quot; aria-haspopup=&quot;listbox&quot; aria-expanded=&quot;false&quot;&amp;gt;
+        &amp;lt;span id=&quot;btn-lbl&quot;&amp;gt;::before&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;btn-arrow&quot;&amp;gt;▼&amp;lt;/span&amp;gt;
+        &amp;lt;/button&amp;gt;
+        
+        &amp;lt;!-- Menu itself --&amp;gt;
+        &amp;lt;div class=&quot;cs-menu&quot; 
+        id=&quot;cs-menu&quot; 
+        role=&quot;listbox&quot; 
+        aria-label=&quot;CSS pseudo-element&quot;
+        &amp;gt;
+        &amp;lt;div class=&quot;item&quot; 
+        role=&quot;option&quot; 
+        data-sel 
+        aria-selected=&quot;true&quot; 
+        data-v=&quot;:before&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::before&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;item&quot; 
+        role=&quot;option&quot; 
+        aria-selected=&quot;false&quot; 
+        data-v=&quot;::after&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::after&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;item&quot; 
+        role=&quot;option&quot; 
+        aria-selected=&quot;false&quot; 
+        data-v=&quot;::marker&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::marker&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;item&quot; 
+        role=&quot;option&quot; 
+        aria-selected=&quot;false&quot; 
+        data-v=&quot;::selection&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::selection&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&quot;item&quot; 
+        role=&quot;option&quot; 
+        aria-selected=&quot;false&quot; 
+        data-v=&quot;::placeholder&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;span class=&quot;checkmark&quot;&amp;gt;✓&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;label&quot;&amp;gt;::placeholder&amp;lt;/span&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then, for our JavaScript, that will be modified a bit from what you saw earlier. We would have to account for when the user uses the directional arrows &lt;code&gt;up&lt;/code&gt; and &lt;code&gt;down&lt;/code&gt;, and when they click &lt;code&gt;enter&lt;/code&gt; and &lt;code&gt;esc&lt;/code&gt; to navigate the dropdown and click on any option.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const cs = document.getElementById(&quot;cs&quot;);
+        const btn = document.getElementById(&quot;cs-btn&quot;);
+        const lbl = document.getElementById(&quot;btn-lbl&quot;);
+        const items = [...document.querySelectorAll(&quot;.item&quot;)];
+        
+        let selected = items.find((i) =&amp;gt; i.hasAttribute(&quot;data-sel&quot;));
+        
+        function open() {
+        cs.setAttribute(&quot;data-open&quot;, &quot;&quot;);
+        btn.setAttribute(&quot;aria-expanded&quot;, &quot;true&quot;);
+        (selected ?? items[0]).focus();
+        }
+        
+        function close() {
+        cs.removeAttribute(&quot;data-open&quot;);
+        btn.setAttribute(&quot;aria-expanded&quot;, &quot;false&quot;);
+        btn.focus();
+        }
+        
+        function select(item) {
+        selected?.removeAttribute(&quot;data-sel&quot;);
+        selected?.setAttribute(&quot;aria-selected&quot;, &quot;false&quot;);
+        item.setAttribute(&quot;data-sel&quot;, &quot;&quot;);
+        item.setAttribute(&quot;aria-selected&quot;, &quot;true&quot;);
+        selected = item;
+        lbl.textContent = item.dataset.v;
+        }
+        
+        btn.addEventListener(&quot;click&quot;, () =&amp;gt;
+        cs.hasAttribute(&quot;data-open&quot;) ? close() : open()
+        );
+        
+        btn.addEventListener(&quot;keydown&quot;, (e) =&amp;gt; {
+        if (e.key === &quot;ArrowDown&quot;) {
+        e.preventDefault();
+        open();
+        }
+        });
+        
+        /* accounting for keyboard up, down, enter and esc for the dropdown */
+        items.forEach((item) =&amp;gt; {
+        item.addEventListener(&quot;click&quot;, () =&amp;gt; {
+        select(item);
+        close();
+        });
+        item.addEventListener(&quot;keydown&quot;, (e) =&amp;gt; {
+        const i = items.indexOf(item);
+        if (e.key === &quot;ArrowDown&quot;) {
+        e.preventDefault();
+        items[(i + 1) % items.length].focus();
+        }
+        if (e.key === &quot;ArrowUp&quot;) {
+        e.preventDefault();
+        items[(i - 1 + items.length) % items.length].focus();
+        }
+        if (e.key === &quot;Enter&quot; || e.key === &quot; &quot;) {
+        e.preventDefault();
+        select(item);
+        close();
+        }
+        if (e.key === &quot;Escape&quot;) close();
+        });
+        });
+        
+        document.addEventListener(&quot;click&quot;, (e) =&amp;gt; {
+        if (!cs.contains(e.target)) close();
+        });
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That’s &lt;em&gt;a lot&lt;/em&gt; of JavaScript! And essentially, what I’m doing is accounting for when a user clicks the &lt;code&gt;down&lt;/code&gt; arrow button on their keyboard, which can be used to expand the dropdown and also browse downwards through the options. The up arrow key inside the dropdown can be used to navigate up, enter selects the item, and esc leaves the dropdown.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/NPbdVeY&quot;&gt;custom dropdown using grid/flex with position property
+        &lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Let’s also not forget the accessibility toggles that let the screen reader know that the dropdown has been expanded or that an item in the dropdown list has been selected.&lt;/p&gt;
+        &lt;p&gt;This approach is how many developers have tackled the problem at hand before and here two key reasons why it is not the best solution:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;When JS fails, the whole solution is &lt;strong&gt;dead.&lt;/strong&gt; Not even a glimmer of hope is here. No JavaScript means no interaction and the markup we added likely ends up creating even more problems for people using assistive technology&lt;/li&gt;
+        &lt;li&gt;Every single browser behavior has to be unnecessarily implemented from scratch. From option focusing, to accounting for what happens when the user clicks the button to expand and close the dropdown and also clicks outside of the dropdown to close it, has to be implemented&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;In essence, this solution is fragile and unreliable due to its over-reliance on JS. What’s more? Our checkmark styles are nonexistent if the dropdown cannot be revealed!&lt;/p&gt;
+        &lt;p&gt;So, how do we solve these issues? Luckily, there’s a far less “heavy code” intensive solution that allows us to do style checkmarks anyhow we like.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Modern day &lt;code&gt;::checkmark&lt;/code&gt; styling&lt;/h2&gt;
+        &lt;p&gt;The CSS &lt;code&gt;::checkmark&lt;/code&gt; is a pseudo-element that allows us to apply styles to HTML elements that support a checkmark. It really helps remove the hassle of writing a bunch of HTML, CSS, and JS in order to make things work as they’re supposed to. Let’s take a custom dropdown and a checkmark designed using &lt;code&gt;::checkmark&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Take for example, this &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt;dropdown:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;select id=&quot;ls&quot;&amp;gt;
+        &amp;lt;option value=&quot;css&quot;&amp;gt;CSS&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;js&quot;&amp;gt;JavaScript&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;html&quot;&amp;gt;HTML&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;ts&quot;&amp;gt;TypeScript&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;rust&quot;&amp;gt;Rust&amp;lt;/option&amp;gt;
+        &amp;lt;/select&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The HTML is pretty concise when compared to the previous solution, right? It’s amazing what happens when we use semantic elements. This way, the browser handles everything for us. Accessibility, keyboard navigation, and every standard behavior we expect from our dropdown, without any hassle. Just define a dropdown using &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; with its &lt;code&gt;&amp;lt;option&amp;gt;&lt;/code&gt;s and boom! We’re good to go.&lt;/p&gt;
+        &lt;p&gt;Checkmarks even come out of the box with this native browser solution!&lt;/p&gt;
+        &lt;p&gt;For our CSS, we would have something like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* required to make the checkmark stylable */ 
+        #ls {
+        appearance: base-select;
+        }
+        
+        #ls {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.6rem;
+        padding: 0.7rem 1rem;
+        }
+        
+        #ls option:checked {
+        color: var(--accent);
+        background: oklch(78% 0.22 145 / 0.1);
+        }
+        
+        /* checkmark style here 🙋‍♂️*/
+        ::checkmark {
+        content: &quot;🎨&quot;;
+        }
+        
+        /* a dot checkmark for options not checked */
+        #ls option:not(:checked)::checkmark {
+        visibility: visible;
+        content: &quot;·&quot;;
+        color: var(--muted);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;All you need to do is set &lt;code&gt;appearance&lt;/code&gt; to &lt;code&gt;base-select&lt;/code&gt; on the &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; dropdown and you’re set for styling your checkmarks using &lt;code&gt;::checkmark&lt;/code&gt; and changing the default check using &lt;code&gt;content&lt;/code&gt;!&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/Pwbzqqa&quot;&gt;::checkmark demo (no JS required!)&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;No JS required!&lt;/p&gt;
+        &lt;p&gt;A win for &lt;a href=&quot;https://piccalil.li/blog/its-about-time-i-tried-to-explain-what-progressive-enhancement-actually-is/&quot;&gt;progressive enhancement&lt;/a&gt; because it essentially accounts for all the major issues associated with creating a custom dropdown and having a custom checkmark style. This solution, even when JS fails, will still work out fine.&lt;/p&gt;
+        &lt;p&gt;This approach is clearly better than the previous approach, but there are a few issues with this that I think we should touch on.&lt;/p&gt;
+        &lt;h2&gt;The problem with &lt;code&gt;::checkmark&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;It’s amazing what this pseudo-element can do and what &lt;em&gt;it is intended to do&lt;/em&gt;. It’s also amazing the amount of code it saves. Not only do I need to write less code to achieve the same result (efficiency), but the browser also handles the default behavior I expect when I click outside the dropdown (the dropdown closes automatically).&lt;/p&gt;
+        &lt;p&gt;There are a few issues with &lt;code&gt;::checkmark&lt;/code&gt; that I want to address though.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;There’s limited browser support. At the time of writing, &lt;a href=&quot;https://caniuse.com/mdn-css_selectors_checkmark&quot;&gt;&lt;code&gt;::checkmark&lt;/code&gt; is only supported in 3 major browsers&lt;/a&gt; and not across the board. That would suck for a user having to experience a feature in one browser and be absent on the next.&lt;/li&gt;
+        &lt;li&gt;Lacking full feature support: According to the documentation, &lt;a href=&quot;https://drafts.csswg.org/css-forms-1/#checkmark&quot;&gt;&lt;code&gt;::checkmark&lt;/code&gt; is supposed to work for checkboxes, radios, and&lt;/a&gt; options. Guess what? In browsers that currently support this, &lt;strong&gt;only the options from &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; are supported.&lt;/strong&gt;  So even if I’m using this pseudo-element, I’m not getting its full feature!&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Both need to be looked into by browser vendors, in my opinion.&lt;/p&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;The modern day &lt;code&gt;::checkmark&lt;/code&gt; solution with native browser dropdown allows us to favor all users without having to implement our own accessibility, keyboard navigation, and dropdown behavior. Even when JavaScript fails, the solution still works! Because we&apos;re using a native &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; element, we get the correct announcements from assistive technology too.&lt;/p&gt;
+        &lt;p&gt;My only plea is that for our checkmarks to be styled correctly, major browser vendors may need to provide full support for this feature as soon as possible, so we can style our own custom checkmarks without having to rely on JS at all, ever again.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #183</title>
       <link>https://piccalil.li/the-index/183/?ref=main-rss-feed</link>
@@ -1279,32 +1643,6 @@
         &lt;p&gt;Use the code &lt;code&gt;NEXTLEVEL&lt;/code&gt; at checkout to get our courses for only &lt;strong&gt;£199.20&lt;/strong&gt;.&lt;/p&gt;
         &lt;p&gt;By taking our courses, you’re supporting independent publishing, rooted in doing right for workers in design, development and leadership.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://piccalil.li/courses?utm_source=the-index&amp;utm_campaign=next-level-2026&quot;&gt;Take your career to the next level&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Introducing the Mindful Design Toolkit with even more free lessons</title>
-      <link>https://piccalil.li/links/the-mindful-design-toolkit-free-lessons/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/links/the-mindful-design-toolkit-free-lessons/?ref=main-rss-feed</guid>
-      <pubDate>Wed, 06 May 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;a href=&quot;https://mindfuldesign.xyz/toolkit/intro/?utm_source=piccalilli-link&quot;&gt;The Mindful Design Toolkit&lt;/a&gt; is a collection of free, open source templates, workshops, and resources, built to empower your design journey. To coincide with the launch, we’ve also opened up over two hours of free lessons from the &lt;a href=&quot;https://piccalil.li/mindful-design/?utm_medium=author-promo&quot;&gt;Mindful Design course&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2&gt;The toolkit&lt;/h2&gt;
-        &lt;p&gt;For a long time, open source projects and packages have given developers a wealth of resources to learn, improve, or simply make our lives easier. While there are some &lt;a href=&quot;https://piccalil.li/blog/the-open-source-design-stack/&quot;&gt;fantastic open source design tools out there&lt;/a&gt;, when it comes to the actual artefacts and outputs of our day-to-day design work, we’re far less spoiled for choice as designers.&lt;/p&gt;
-        &lt;p&gt;The &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/intro/?utm_source=piccalilli-link&quot;&gt;Mindful Design Toolkit&lt;/a&gt; aims to make a tiny little dent in this problem, with an already-large-but-definitely-growing collection of resources aimed squarely at designers. You’ll find common, industry-standard artefacts like &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/user-personas/&quot;&gt;user personas&lt;/a&gt; and &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/ia/&quot;&gt;information architecture boards&lt;/a&gt;, forgotten classics like &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/style-explorations/&quot;&gt;style tiles&lt;/a&gt;, and transformative gems like &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/ooux/&quot;&gt;OOUX workshops&lt;/a&gt; and &lt;a href=&quot;https://mindfuldesign.xyz/toolkit/how-might-we/&quot;&gt;How Might We&lt;/a&gt; sessions.&lt;/p&gt;
-        &lt;p&gt;The toolkit is split into some of the most common phases of a design project, covering everything from kicking off with a simple brief, all the way through to final design prototypes and robust token systems. Most resources come with filled examples and blank templates so you can check out what the finished product might look like before grabbing a fresh, crisp copy to use in your own work.&lt;/p&gt;
-        &lt;h2&gt;Even more free lessons are now available&lt;/h2&gt;
-        &lt;p&gt;While the toolkit aims to open up and democratise the most impactful artefacts of a good design process, you’ll still need to learn how to make use of them. To coincide with this launch, we’ve made a few lessons from the &lt;a href=&quot;https://piccalil.li/mindful-design/?utm_medium=author-promo&quot;&gt;Mindful Design Course&lt;/a&gt; viewable for free. If you like what you see in the following freebies, you can grab the &lt;a href=&quot;https://piccalil.li/mindful-design/?utm_medium=author-promo&quot;&gt;full course&lt;/a&gt; at a discounted rate!&lt;/p&gt;
-        &lt;p&gt;Here’s the (further) lessons we’ve opened up:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://piccalil.li/mindful-design/lessons/25&quot;&gt;Predictive Mental Models&lt;/a&gt; (10:14 mins)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://piccalil.li/mindful-design/lessons/31&quot;&gt;The Design Process&lt;/a&gt; (6:52 mins)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://piccalil.li/mindful-design/lessons/44&quot;&gt;Problem &amp;amp; Empowerment Statements&lt;/a&gt; (20:10 mins)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://piccalil.li/mindful-design/lessons/59&quot;&gt;Playing With Type Scales&lt;/a&gt; (1 hr 10 mins)&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://piccalil.li/mindful-design/lessons/69&quot;&gt;Style Explorations&lt;/a&gt; (26:27 mins)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;As you can see, there’s at least a couple hours’ worth of learning, and that’s just a fraction of the full course.&lt;/p&gt;
-        &lt;p&gt;If you find the free lessons or the Mindful Design Toolkit useful, feel free to reach out to &lt;a href=&quot;https://bsky.app/profile/scott.is&quot;&gt;Scott on Bluesky&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://mindfuldesign.xyz/toolkit/intro/?utm_source=piccalilli-link&quot;&gt;Check it out!&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
