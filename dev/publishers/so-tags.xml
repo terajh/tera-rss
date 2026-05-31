@@ -4,7 +4,165 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sat, 30 May 2026 16:22:31 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 31 May 2026 16:46:29 GMT</lastBuildDate>
+    <item>
+      <title>How can I apply a &apos;for&apos; loop for my ASCII pattern for it to be in the X and Y direction when needed?</title>
+      <link>https://stackoverflow.com/questions/79949032/how-can-i-apply-a-for-loop-for-my-ascii-pattern-for-it-to-be-in-the-x-and-y-di</link>
+      <guid>https://stackoverflow.com/questions/79949032/how-can-i-apply-a-for-loop-for-my-ascii-pattern-for-it-to-be-in-the-x-and-y-di</guid>
+      <pubDate>Sat, 30 May 2026 20:17:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;After a really long time searching, I can&apos;t find the logic to apply to this code for it to loop without me needing to type out all of the pattern. It goes in a Y direction but I want it to be in a X direction too:&lt;/p&gt;
+        &lt;p&gt;My TypeScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { onMounted, computed } from &apos;vue&apos;;
+        import { useGithub } from &apos;../composables/useGithub&apos;;
+        
+        const { user: githubProfile, fetchUserProfile } = useGithub();
+        
+        onMounted(() =&amp;gt; {
+        fetchUserProfile();
+        });
+        
+        const motifs = computed(() =&amp;gt; {
+        const ASCIILigne1 = &amp;quot;|__|   __|__|   __|__|   &amp;quot;; 
+        const ASCIILigne2 = &amp;quot; __|__|   __|__|   __|__|&amp;quot;; 
+        const ASCIILigne3 = &amp;quot;|   __|__|   __|__|   __|&amp;quot;; 
+        
+        const totalLignes = 40;
+        const repetitionX = 6;
+        
+        let lignes: string[] = [];
+        
+        for (let i = 0; i &amp;lt; totalLignes; i++) {
+        let ligneDeBase = &amp;quot;&amp;quot;;
+        
+        if (i % 3 === 0) {
+        ligneDeBase = ASCIILigne1;
+        } else if (i % 3 === 1) {
+        ligneDeBase = ASCIILigne2;
+        } else {
+        ligneDeBase = ASCIILigne3;
+        }
+        
+        lignes.push(ligneDeBase.repeat(repetitionX));
+        }
+        
+        return lignes;
+        });
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My HTML with bootstrap:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;portfolio-wrapper position-relative overflow-hidden&amp;quot; style=&amp;quot;min-height: 100vh;&amp;quot;&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;brick-background position-absolute top-0 start-0 w-100 h-100 z-0 m-0 p-0 text-secondary pe-none user-select-none&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;
+        &amp;lt;div 
+        v-for=&amp;quot;(ligne, index) in motifs&amp;quot; 
+        :key=&amp;quot;index&amp;quot; 
+        class=&amp;quot;pattern-line&amp;quot;
+        &amp;gt;
+        {{ ligne }}
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;container py-5 position-relative z-1&amp;quot;&amp;gt;
+        &amp;lt;header class=&amp;quot;text-center mb-5 fade-in&amp;quot;&amp;gt;
+        &amp;lt;h1 class=&amp;quot;display-4 fw-bold gradient-text&amp;quot;&amp;gt;&amp;lt;/h1&amp;gt;
+        &amp;lt;div class=&amp;quot;underline mx-auto&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;/header&amp;gt;
+        
+        &amp;lt;div v-if=&amp;quot;githubProfile&amp;quot; class=&amp;quot;&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;profile-content&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;avatar-container&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;../assets/1776786464860.jpg&amp;quot; alt=&amp;quot;Avatar&amp;quot; class=&amp;quot;profile-avatar&amp;quot; /&amp;gt;
+        &amp;lt;div class=&amp;quot;status-badge&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;h2 class=&amp;quot;mt-3 fw-bold&amp;quot;&amp;gt;{{ &apos;Arthur Dubé&apos;}}&amp;lt;/h2&amp;gt;
+        &amp;lt;p class=&amp;quot;text-muted bio-text&amp;quot;&amp;gt;
+        {{ githubProfile.bio || &apos;Développeur Full Stack Junior, Un des créateurs de Air-Métique.&apos; }}
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;stats d-flex justify-content-center gap-4 mt-3&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;stat-item&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;d-block fw-bold&amp;quot;&amp;gt;{{ githubProfile.public_repos }}&amp;lt;/span&amp;gt;
+        &amp;lt;small&amp;gt;Projets&amp;lt;/small&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;stat-item&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;d-block fw-bold&amp;quot;&amp;gt;{{ githubProfile.followers }}&amp;lt;/span&amp;gt;
+        &amp;lt;small&amp;gt;Followers&amp;lt;/small&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;text-center mt-5&amp;quot;&amp;gt;
+        &amp;lt;h3 class=&amp;quot;mb-4 section-title&amp;quot;&amp;gt;Explorez mon univers&amp;lt;/h3&amp;gt;
+        &amp;lt;div class=&amp;quot;row justify-content-center g-4&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;col-md-5 col-sm-6&amp;quot;&amp;gt;
+        &amp;lt;router-link to=&amp;quot;/repos/all?view=featured&amp;quot; class=&amp;quot;category-card featured-btn&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;label&amp;quot;&amp;gt;Projets Vedettes&amp;lt;/span&amp;gt;
+        &amp;lt;small class=&amp;quot;text-muted-hover&amp;quot;&amp;gt;Mes réalisations majeures&amp;lt;/small&amp;gt;
+        &amp;lt;/router-link&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;col-md-5 col-sm-6&amp;quot;&amp;gt;
+        &amp;lt;router-link to=&amp;quot;/repos/all?view=repos&amp;quot; class=&amp;quot;category-card&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;label&amp;quot;&amp;gt;Dépôts GitHub&amp;lt;/span&amp;gt;
+        &amp;lt;small class=&amp;quot;text-muted-hover&amp;quot;&amp;gt;Explorations et code brut&amp;lt;/small&amp;gt;
+        &amp;lt;/router-link&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My CSS:&lt;/p&gt;
+        &lt;pre class=&quot;lang-css prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;style scoped&amp;gt;
+        .pattern-line {
+        font-family: monospace;
+        white-space: pre;   
+        line-height: 1;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I want the code to give this pattern in my background:&lt;/p&gt;
+        &lt;p&gt;&lt;div class=&quot;snippet&quot; data-lang=&quot;js&quot; data-hide=&quot;false&quot; data-console=&quot;true&quot; data-babel=&quot;false&quot; data-babel-preset-react=&quot;false&quot; data-babel-preset-ts=&quot;false&quot;&gt;
+        &lt;div class=&quot;snippet-code&quot;&gt;
+        &lt;pre class=&quot;snippet-code-css lang-css prettyprint-override&quot;&gt;&lt;code&gt;.pattern-line {
+        font-family: monospace;
+        white-space: pre;   
+        line-height: 1;
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;snippet-code-html lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;div class=&quot;pattern-line&quot;&amp;gt;
+        
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|  
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|  
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        &amp;lt;/div&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Thanks in advance for the response and comments!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Disable custom button in the fc-header-toolbar with &apos;disable&apos; in stead of CSS</title>
       <link>https://stackoverflow.com/questions/79948599/disable-custom-button-in-the-fc-header-toolbar-with-disable-in-stead-of-css</link>
@@ -1578,80 +1736,6 @@
         &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
         &lt;/li&gt;
         &lt;/ul&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Why can&apos;t I import Dagre into my Vite app? [closed]</title>
-      <link>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</link>
-      <guid>https://stackoverflow.com/questions/79876129/why-cant-i-import-dagre-into-my-vite-app</guid>
-      <pubDate>Mon, 26 Jan 2026 06:43:42 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Our team is migrating a Vue CLI app to Vite. We had some Dagre code that worked with no problems in the Vue CLI app, but is throwing this error with Vite, stopping the entire app from loading:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Uncaught Error: Dynamic require of &amp;quot;@dagrejs/graphlib&amp;quot; is not supported&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;// Adapted from https://vueflow.dev/examples/layout/simple.html
-        import dagre from &apos;@dagrejs/dagre&apos;;
-        import { Position, useVueFlow } from &apos;@vue-flow/core&apos;;
-        import { ref } from &apos;vue&apos;;
-        
-        export function useLayout() {
-        const graph = ref(new dagre.graphlib.Graph());
-        
-        function layout(nodes, edges, direction) {
-        const dagreGraph = new dagre.graphlib.Graph();
-        
-        // ...
-        
-        dagre.layout(dagreGraph);
-        
-        // ...
-        
-        return nodes;
-        }
-        
-        return { graph, layout };
-        }
-        
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;vite.config.js:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { fileURLToPath, URL } from &apos;node:url&apos;;
-        
-        import { defineConfig } from &apos;vite&apos;;
-        import vue from &apos;@vitejs/plugin-vue&apos;;
-        
-        // https://vitejs.dev/config/
-        export default defineConfig({
-        plugins: [vue()],
-        resolve: {
-        alias: {
-        &apos;@&apos;: fileURLToPath(new URL(&apos;./src&apos;, import.meta.url)),
-        },
-        },
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;package.json:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;{
-        &amp;quot;scripts&amp;quot;: {
-        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
-        &amp;quot;build&amp;quot;: &amp;quot;vite build&amp;quot;,
-        },
-        &amp;quot;dependencies&amp;quot;: {
-        &amp;quot;@dagrejs/dagre&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
-        &amp;quot;@tinymce/tinymce-vue&amp;quot;: &amp;quot;^5.1.0&amp;quot;,
-        &amp;quot;@vue-flow/background&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/controls&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;@vue-flow/core&amp;quot;: &amp;quot;^1.22.3&amp;quot;,
-        &amp;quot;@vue-flow/minimap&amp;quot;: &amp;quot;^1.2.0&amp;quot;,
-        &amp;quot;@vue-flow/node-toolbar&amp;quot;: &amp;quot;^1.1.0&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.3.4&amp;quot;,
-        },
-        &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;vite&amp;quot;: &amp;quot;^4.4.6&amp;quot;,
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
   </channel>
