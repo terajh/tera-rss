@@ -4,12 +4,135 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 31 May 2026 16:46:30 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 01 Jun 2026 20:15:12 GMT</lastBuildDate>
+    <item>
+      <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
+      <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
+      <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
+        &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop1c.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from RainDrop&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;When I discovered the site, I did some digging and discovered they had an API: &lt;a href=&quot;https://api.raindrop.farm/docs&quot;&gt;https://api.raindrop.farm/docs&lt;/a&gt;. This API gives you &lt;em&gt;incredibly&lt;/em&gt; detailed information about rainfall (and snow) and can even return historical data.&lt;/p&gt;
+        &lt;p&gt;Given an API key passed in an &lt;code&gt;Authorization&lt;/code&gt; header, this gets the current precipitation for my location:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://api.raindrop.farm/v1/precipitation/current?lat=30.216667&amp;amp;lon=-92.033333
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which returns (as of 11:34 AM, and I just heard thunder):&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;lat&amp;quot;: 30.216667,
+        &amp;quot;lon&amp;quot;: -92.033333,
+        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T16:30:00Z&amp;quot;,
+        &amp;quot;precipitationIntensity&amp;quot;: 0.0
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Ok - slight delay here - I just got out of a meeting, and the rain is here:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;lat&amp;quot;: 30.216667,
+        &amp;quot;lon&amp;quot;: -92.033333,
+        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T17:06:00Z&amp;quot;,
+        &amp;quot;precipitationIntensity&amp;quot;: 1.2999999523162842
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That value is in millimeters per hour so it looks like just a trickle, so nothing to worry about. Of course, what if it &lt;em&gt;was&lt;/em&gt; something to worry about? I thought - why not automate checking for this using my go to platform lately, &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so the app I had in mind was fairly simple:&lt;/p&gt;
+        &lt;p&gt;Every X minutes, use the RainDrop API to check the rain intensity and if it is over a certain threshold, send an alert my way.&lt;/p&gt;
+        &lt;p&gt;My RainDrop API access had pretty high usage limits (120 a minute) that were above what made sense to realistically check. On the other hand, my free tier level at Val Town capped me at one execution per fifteen minutes.&lt;/p&gt;
+        &lt;p&gt;To be honest, once every fifteen minutes seemed perfectly reasonable, but keep in mind that both RainDrop and Val Town would support much higher frequencies if necessary.&lt;/p&gt;
+        &lt;p&gt;Given the above, I created a new val and set the trigger to Cron, set to every 15 minutes:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop2.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from Val Town showing the Cron settings&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I then created an environment variable for my RainDrop key. With that in place, the entire &amp;quot;early warning flood system&amp;quot; (that&apos;s what I&apos;ll call it when doing interviews for my next job) is one file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
+        
+        /**
+        * Converts speed from millimeters per hour to inches per hour.
+        * @param {number} mmPerHour - Speed in millimeters per hour.
+        * @returns {number} Speed in inches per hour.
+        */
+        function mmPerHourToInchesPerHour(mmPerHour) {
+        return mmPerHour / 25.4;
+        }
+        
+        function dtFormat(timestamp) {
+        const date = new Date(timestamp);
+        
+        const options = {
+        weekday: &amp;quot;long&amp;quot;,
+        year: &amp;quot;numeric&amp;quot;,
+        month: &amp;quot;long&amp;quot;,
+        day: &amp;quot;numeric&amp;quot;,
+        hour: &amp;quot;2-digit&amp;quot;,
+        minute: &amp;quot;2-digit&amp;quot;,
+        timeZoneName: &amp;quot;short&amp;quot;,
+        };
+        
+        // Create the formatter (e.g., for US English)
+        const formatter = new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, options);
+        
+        return formatter.format(date);
+        }
+        
+        export default async function (interval: Interval) {
+        // Lafayette, LA
+        const lat = &amp;quot;30.216667&amp;quot;;
+        const lng = &amp;quot;-92.033333&amp;quot;;
+        
+        // The threshold value is inches of rain per hour - any value &amp;gt;= will trigger a warning
+        const threshold = 0.5;
+        
+        let key = Deno.env.get(&amp;quot;API_KEY&amp;quot;);
+        let precipReq = await fetch(
+        `https://api.raindrop.farm/v1/precipitation/current?lat=${lat}&amp;amp;lon=${lng}`,
+        {
+        headers: {
+        &amp;quot;Authorization&amp;quot;: key,
+        },
+        },
+        );
+        
+        let precip = await precipReq.json();
+        let rainInches = mmPerHourToInchesPerHour(precip.precipitationIntensity);
+        console.log(&amp;quot;rainInches&amp;quot;, rainInches);
+        console.log(precip);
+        
+        if (rainInches &amp;gt;= threshold) {
+        let html = `
+        &amp;lt;h2&amp;gt;Heavy Rain Alert&amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        As of ${
+        dtFormat(precip.timestamp)
+        }, we have detected ${rainInches.toFixed(2)} inches of rain per hour.
+        &amp;lt;/p&amp;gt;
+        `;
+        
+        await email({
+        subject: &amp;quot;Rain Alert&amp;quot;,
+        html,
+        });
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;On top of my script are two utility functions with the interesting one being the simple wrapper to convert RainDrop&apos;s values to inches.&lt;/p&gt;
+        &lt;p&gt;After that, I hit the API, check against a threshold (currently set to half an inch), and if it matches, I fire off an email. As a reminder, I&apos;m using Val Town&apos;s built in &amp;quot;mail the owner&amp;quot; feature. I could also use a proper email API to have more control over the delivery, but this works well for now.&lt;/p&gt;
+        &lt;p&gt;And of course, as soon as I built this there were no events, which is &lt;em&gt;good&lt;/em&gt; I suppose, but I did a quick tweak to force it to email and here&apos;s an example. Not terribly thrilling with 0 inches:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop3.png&quot; loading=&quot;lazy&quot; alt=&quot;Email example&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;If you want to play with this, you can fork the val here: https://www.val.town/x/raymondcamden/raindropAlert. And of course if you do, let me know!&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@r_shayesrehpour?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;reza shayestehpour&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/grayscale-photography-of-raindrops-Nw_D8v79PM4?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -19,7 +142,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -128,7 +251,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -208,7 +331,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -242,7 +365,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -311,7 +434,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -440,7 +563,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -784,7 +907,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -853,7 +976,7 @@
       <title>Animated video backgrounds via a Web Component and ColorThief</title>
       <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
       <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
+      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
         &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
@@ -947,42 +1070,6 @@
         &lt;p&gt;You can see a demo with a couple of examples here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/video-bgshadow/&quot;&gt;https://cfjedimaster.github.io/webdemos/video-bgshadow/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;And if you think this is a good start but could be &lt;em&gt;so&lt;/em&gt; much better, I agree, help me out over at the repo: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ansleycreative?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Matthew Ansley&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/two-people-standing-on-concrete-floor-6AQxBtaIYOk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (4/26/26)</title>
-      <link>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</link>
-      <guid>https://www.raymondcamden.com/2026/04/26/links-for-you-42626</guid>
-      <pubDate>Sun, 31 May 2026 16:09:20 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I was supposed to post this last week (I try to keep to a schedule of every two weeks), but I didn&apos;t get around to it because... nope, that&apos;s it. That&apos;s the reason. Because. And that&apos;s good enough, amiright!?!? The heat is slowly cranking up here in Louisiana and I&apos;m dreading the full on summer, but things do slow down a bit when the kids aren&apos;t in school and that&apos;s something I greatly appreciate. Before getting into this weeks links, I was reminded a few weeks back that my wife actually reads my posts so... hi baby, I love you.&lt;/p&gt;
-        &lt;h2 id=&quot;super-useful-web-components-ftw---%3Cform-saver%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#super-useful-web-components-ftw---%3Cform-saver%3E&quot;&gt;Super useful web components FTW - &amp;lt;form-saver&amp;gt;&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;First up is a really simple and really useful web component, &lt;a href=&quot;https://www.aaron-gustafson.com/notebook/never-lose-form-progress-again/&quot;&gt;form-saver&lt;/a&gt;. You can wrap any form with the component and instantly get client-side storage of form contents until the form is submitted. This works for all types of form fields except file fields of course. (I assume folks know this but you can&apos;t use JavaScript to set the value of a file field for security reasons.)&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a simple usage example from the docs:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form-saver&amp;gt;
-        &amp;lt;form action=&amp;quot;/contact&amp;quot; method=&amp;quot;post&amp;quot;&amp;gt;
-        &amp;lt;label&amp;gt;
-        Name
-        &amp;lt;input name=&amp;quot;name&amp;quot; autocomplete=&amp;quot;name&amp;quot; /&amp;gt;
-        &amp;lt;/label&amp;gt;
-        &amp;lt;label&amp;gt;
-        Email
-        &amp;lt;input name=&amp;quot;email&amp;quot; type=&amp;quot;email&amp;quot; autocomplete=&amp;quot;email&amp;quot; /&amp;gt;
-        &amp;lt;/label&amp;gt;
-        &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Send&amp;lt;/button&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &amp;lt;/form-saver&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Isn&apos;t that sweet? Thanks go to Aaron Gustafson.&lt;/p&gt;
-        &lt;p&gt;As a reminder (and I usually try to avoid linking to my own stuff in these posts, but it&apos;s definitely related), if you like this you may like my &lt;a href=&quot;https://www.npmjs.com/package/@raymondcamden/table-sorter&quot;&gt;table-sorter&lt;/a&gt; web component as well.&lt;/p&gt;
-        &lt;h2 id=&quot;share-the-python-love&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#share-the-python-love&quot;&gt;Share the Python Love&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Next up is a superb guide at &lt;a href=&quot;https://stephenlf.dev/blog/python-library-in-2026/&quot;&gt;packing Python code&lt;/a&gt; for distribution. I&apos;ve written a lot of Python code, but have only created a distribution once or twice, and this guide literally walks you from the first line of code to publication.&lt;/p&gt;
-        &lt;p&gt;Thanks to Stephen Funk for writing this up!&lt;/p&gt;
-        &lt;h2 id=&quot;the-last-quiet-thing&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-last-quiet-thing&quot;&gt;The Last Quiet Thing&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Finally, this essay, &lt;a href=&quot;https://www.terrygodier.com/the-last-quiet-thing&quot;&gt;&amp;quot;The Last Quiet Thing&amp;quot;&lt;/a&gt;, is a thought provoking deep look at how much of our lives are being stolen from devices that constantly, &lt;em&gt;endlessly&lt;/em&gt; need our attention. Not only is it incredibly well written, it&apos;s also really well designed as well.&lt;/p&gt;
-        &lt;p&gt;This was written by Terry Godier and thanks go to Salma Alam-Naylor for sharing it on her &lt;a href=&quot;https://buttondown.com/weirdwidewebhole/archive/&quot;&gt;newsletter&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I love building silly things on the web (see &lt;a href=&quot;https://www.raymondcamden.com/2026/04/25/another-game-my-little-mortal-combat&quot;&gt;yesterday&apos;s post&lt;/a&gt; as an example), and this little toy from Wes Bos is just that. &lt;a href=&quot;https://tab.wesbos.com/&quot;&gt;Tab Snitch&lt;/a&gt; does one thing - set a custom title for the web page - but does so with silly and quite embarrassing titles. Although I have to be honest - a few of the fake titles listed there are one&apos;s I&apos;ve probably legitimately had on my screen at some point in time. You can guess which.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
