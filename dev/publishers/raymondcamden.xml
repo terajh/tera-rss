@@ -4,12 +4,206 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 01 Jun 2026 20:15:12 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 19:29:24 GMT</lastBuildDate>
+    <item>
+      <title>AI versus a Grue</title>
+      <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
+      <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
+        &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before I could even begin trying to test AI&apos;s ability to play a 50 year old game (almost 50, Zork 1 launched in 1977), I first needed to find a JavaScript implementation. This turned out to be a bit tricky.&lt;/p&gt;
+        &lt;p&gt;I quickly found &lt;a href=&quot;https://github.com/curiousdannii/ifvms.js&quot;&gt;ifvms.js&lt;/a&gt;, an interactive fiction virtual machine library, but it was tailored to running at the command line. Also, there was little to no documentation on how to make use of the library. The repo mentions another repo, &lt;a href=&quot;https://github.com/curiousdannii/parchment&quot;&gt;parchment&lt;/a&gt; which lets you play games on the web, but I struggled to find documentation there as well, or documentation specific to my use case.&lt;/p&gt;
+        &lt;p&gt;To help, I went to Claude, and had it load &lt;code&gt;ifvms.js&lt;/code&gt; and create a &apos;stubbed&apos; version that I could use via calls like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// all of this loads Zork 1...
+        const res = await fetch(&apos;zork1.b64.txt&apos;);
+        const b64 = await res.text();
+        
+        const binary = atob(b64.trim());
+        const arrayBuffer = new ArrayBuffer(binary.length);
+        const view = new Uint8Array(arrayBuffer);
+        for (let i = 0; i &amp;lt; binary.length; i++) {
+        view[i] = binary.charCodeAt(i);
+        }
+        
+        engine = new ZorkEngine();
+        engine.load(arrayBuffer);
+        
+        // and then later:
+        let gameResponse = engine.getOutput(); // last thing the game did
+        
+        // send a command
+        let lastResponse = engine.send(command);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That source file above mentioned in the first line comes from an online source. Zork itself is open source (&lt;a href=&quot;https://github.com/historicalsource/zork1&quot;&gt;https://github.com/historicalsource/zork1&lt;/a&gt;), but I forget where I got my copy of the source. It&apos;s not a text file, I renamed it to that when initially attempting to build my demo on CodePen. I believe it was pure binary I converted to base64 and then renamed.&lt;/p&gt;
+        &lt;h2 id=&quot;building-the-game&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-the-game&quot;&gt;Building the Game&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So with Claude helping me build the version of &lt;code&gt;ifvms&lt;/code&gt; I could use interactively, I then had to whip up a quick UI and point Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;, which as of Chrome 148 is GA to everyone. (Well, everyone on Chrome.)&lt;/p&gt;
+        &lt;p&gt;My UI was just a giant text area where I&apos;d stream the output from the game and Chrome&apos;s inputs. All of that code is kinda basic, so I&apos;ll focus on the prompt aspect. Here&apos;s how I create my session:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;$session = await LanguageModel.create({
+        initialPrompts:[
+        { 
+        role: &apos;system&apos;, 
+        content: 
+        `
+        You are playing the classic text adventure game Zork. You will be given the current game output, and you will 
+        respond with a single command to play the game. You will not explain your command, just give the command. 
+        
+        Remember to keep your commands concise and to the point, as if you were playing the game yourself. Do not include 
+        any extra text or explanations.
+        
+        Zork is a text-based adventure game where you explore a mysterious underground world filled with treasures, puzzles, 
+        and dangers. Your goal is to navigate through the various locations, solve puzzles, and collect treasures 
+        while avoiding traps and monsters.
+        
+        Here are some examples of commands you might use in Zork:
+        - &amp;quot;go north&amp;quot;
+        - &amp;quot;take lamp&amp;quot;
+        - &amp;quot;open mailbox&amp;quot;
+        - &amp;quot;look around&amp;quot;
+        - &amp;quot;inventory&amp;quot;
+        
+        Do your best to play the game effectively and efficiently, making smart choices based on the current game output.
+        
+        Try not to keep returning to the same location repeatedly, as that can lead to getting stuck in loops. Instead, 
+        explore new areas and try different actions to progress through the game. Remember that you can travel in all directions.
+        `
+        }
+        ],		
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        console.log(`Downloaded ${e.loaded * 100}%`);
+        if(e.loaded === 0 || e.loaded === 1) {
+        $output.innerHTML = &apos;&apos;;
+        return;
+        }
+        $output.innerHTML = `Downloading AI model, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }		
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As you can see, a majority of this is the big prompt. I iterated over this multiple times to help guide Chrome to effectively solve the game. (Which to be clear, it never did.)&lt;/p&gt;
+        &lt;p&gt;Outside of that, the main loop of the game is this heartbeat function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function gameHeartBeat() {
+        
+        console.log(&apos;in hb&apos;);
+        let gameResponse = engine.getOutput();
+        if(!gameResponse) gameResponse = lastResponse;
+        
+        if(gameResponse) {
+        $gameoutput.value += gameResponse + &apos;\n&apos;;
+        $gameoutput.scrollTop = $gameoutput.scrollHeight;
+        
+        let command = await $session.prompt(gameResponse);
+        lastResponse = engine.send(command);
+        
+        $gameoutput.value += `&amp;gt; ${command}\n`;
+        $gameoutput.scrollTop = $gameoutput.scrollHeight;
+        
+        console.log(&apos;Resp&apos;,command);
+        setTimeout(gameHeartBeat, 1000 * 2);
+        }
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The variable &lt;code&gt;$gameoutput&lt;/code&gt; is just a DOM pointer to the &lt;code&gt;textarea&lt;/code&gt; used to render the game.&lt;/p&gt;
+        &lt;p&gt;Before going any further, I&apos;ll note a huge issue with my code and that&apos;s the lack of session management. Chrome absolutely provides you a way to monitor that usage and re-init the session when it is nearly filled. I didn&apos;t bother with that because I was being lazy when I built this.&lt;/p&gt;
+        &lt;p&gt;I&apos;d also argue that we could help Chrome&apos;s model quite a bit by keeping track of a list of rooms it has already visited to help it remember and not loop over the same place. My prompt tries to do that, but I could also help it out myself.&lt;/p&gt;
+        &lt;p&gt;All in all - this was a quick implementation and the results were... well what you would expect with a lightweight model and me just hacking quickly on it. ;)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a transcript from a test I just did.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;ZORK I: The Great Underground Empire
+        Infocom interactive fiction - a fantasy story
+        Copyright (c) 1981, 1982, 1983, 1984, 1985, 1986 Infocom, Inc. All rights reserved.
+        ZORK is a registered trademark of Infocom, Inc.
+        Release 119 / Serial number 880429
+        
+        West of House
+        You are standing in an open field west of a white house, with a boarded front door.
+        There is a small mailbox here.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 0
+        &amp;gt; examine mailbox
+        The small mailbox is closed.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 1
+        &amp;gt; open mailbox
+        Opening the small mailbox reveals a leaflet.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 2
+        &amp;gt; read leaflet
+        (Taken)
+        &amp;quot;WELCOME TO ZORK!
+        
+        ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!&amp;quot;
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 3
+        &amp;gt; look around
+        West of House
+        You are standing in an open field west of a white house, with a boarded front door.
+        There is a small mailbox here.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 4
+        &amp;gt; go north
+        North of House
+        You are facing the north side of a white house. There is no door here, and all the windows are boarded up. To the north a narrow path winds through the trees.
+        
+        &amp;gt;                                                                                 North of HouseScore: 0  Turns: 5
+        &amp;gt; go north
+        Forest Path
+        This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 6
+        &amp;gt; examine tree
+        There&apos;s nothing special about the tree.
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 7
+        &amp;gt; go north
+        Clearing
+        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
+        On the ground is a pile of leaves.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 8
+        &amp;gt; take leaves
+        In disturbing the pile of leaves, a grating is revealed.
+        Taken.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 9
+        &amp;gt; open grating
+        The grating is locked.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 10
+        &amp;gt; look around
+        Clearing
+        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
+        There is a grating securely fastened into the ground.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 11
+        &amp;gt; go south
+        Forest Path
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 12
+        &amp;gt; go north
+        Clearing
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 13
+        &amp;gt; examine leaves
+        There&apos;s nothing special about the pile of leaves.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 14
+        &amp;gt; go south
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In my tests, it never seems to get much further in the game than the outer area, but certainly tries hard, so I guess I&apos;ll give it a gold star for that.&lt;/p&gt;
+        &lt;p&gt;If you want to try this yourself, you can point Chrome at &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/chrome_zork/&quot;&gt;https://cfjedimaster.github.io/webdemos/chrome_zork/&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;If you want to peruse the code yourself, you can check it out here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Now that I&apos;ve got a bit more time on my hands (ahem), I may try hacking on this a bit more, but it was certainly fun to see it in action.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@sortino?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Joshua Sortino&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/photo-of-light-towards-inside-of-cave-rAqzj79GUmA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -132,7 +326,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -142,7 +336,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -251,7 +445,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -331,7 +525,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -365,7 +559,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -434,7 +628,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -563,7 +757,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -907,7 +1101,7 @@
       <title>Using Val Town and Gemini for Sports Ball Stuff</title>
       <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
       <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
+      <pubDate>Tue, 02 Jun 2026 18:49:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
         &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
@@ -970,106 +1164,6 @@
         &lt;p&gt;I&apos;ve embedded the Val below - let me know if you fork it!&lt;/p&gt;
         &lt;iframe width=&quot;100%&quot; height=&quot;400px&quot; src=&quot;https://www.val.town/embed/x/raymondcamden/nfl-roundup/main.ts&quot; title=&quot;Val Town&quot; frameborder=&quot;0&quot; allow=&quot;web-share&quot; allowfullscreen&gt;&lt;/iframe&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@aussiedave?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Dave Adamson&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/brown-and-black-wilson-football--nATH0CrkMU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Animated video backgrounds via a Web Component and ColorThief</title>
-      <link>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</link>
-      <guid>https://www.raymondcamden.com/2026/04/30/animated-video-backgrounds-via-a-web-component-and-colorthief</guid>
-      <pubDate>Mon, 01 Jun 2026 20:00:16 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Earlier this year, the epic &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/&quot;&gt;ColorThief&lt;/a&gt; library had a pretty significant update. I &lt;a href=&quot;https://www.raymondcamden.com/2026/03/04/dyanimically-adjusting-image-text-for-contrast&quot;&gt;blogged&lt;/a&gt; about a simple demo I built with it but I was fascinated by one particular demo on their site.&lt;/p&gt;
-        &lt;p&gt;The &amp;quot;observe&amp;quot; function in ColorThief lets you monitor a video source and grab the colors at a particular frame. Their &lt;a href=&quot;https://lokeshdhakar.com/projects/color-thief/#v3-observe&quot;&gt;demo&lt;/a&gt; uses this to create a lovely shadow background of the video. I believe some TVs have this feature as well, and honestly I&apos;d worry that would get annoying, but the ColorThief demo was pretty cool, so I thought I&apos;d try to build it with a web component.&lt;/p&gt;
-        &lt;p&gt;The idea would be - take any basic video element and wrap it like so:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;video-bgshadow&amp;gt;
-        &amp;lt;video controls width=&amp;quot;250&amp;quot;&amp;gt;
-        &amp;lt;source src=&amp;quot;videos/flower.mp4&amp;quot; type=&amp;quot;video/mp4&amp;quot;&amp;gt;
-        &amp;lt;/video&amp;gt;
-        &amp;lt;/video-bgshadow&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The web component would then handle:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Loading the ColorThief library&lt;/li&gt;
-        &lt;li&gt;Waiting for the video to be played&lt;/li&gt;
-        &lt;li&gt;Running the &lt;code&gt;observe&lt;/code&gt; method and updating the CSS&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;All in all, this wasn&apos;t too difficult. I don&apos;t think my shadow is as good as the demo (and I&apos;m totally open to people submitting a PR!), but it came out ok.&lt;/p&gt;
-        &lt;p&gt;I&apos;ll link to the demo below, but here&apos;s a simple example in a CodePen:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;&amp;amp;lt;video-bgshadow&amp;amp;gt;&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;yyVLXQY&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019dd938-b4d6-7494-a3f7-a6a3a1b801aa&quot;&gt;
-        &amp;lt;video-bgshadow&amp;gt;&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;Alright, so here&apos;s the code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;class VideoBGShadowComponent extends HTMLElement {
-        
-        constructor() {
-        super();
-        }
-        
-        async connectedCallback() {
-        this.videoEl = this.querySelector(&apos;video&apos;);
-        if(!this.videoEl) {
-        console.warn(&apos;No &amp;lt;video&amp;gt; element found.&apos;);
-        return;
-        }
-        
-        // wrap the video in a new div
-        this.wrapper = document.createElement(&apos;div&apos;);
-        this.videoEl.parentNode.insertBefore(this.wrapper, this.videoEl);
-        this.wrapper.appendChild(this.videoEl);
-        this.wrapper.style.display = &apos;inline-block&apos;;
-        this.videoEl.style.verticalAlign = &apos;bottom&apos;;
-        if(!window.ColorThief) await this.loadCF();
-        this.videoEl.addEventListener(&apos;play&apos;, this.startShadow.bind(this));
-        this.videoEl.addEventListener(&apos;ended&apos;, this.endShadow.bind(this));
-        this.videoEl.addEventListener(&apos;pause&apos;, this.endShadow.bind(this));
-        
-        
-        }
-        
-        // Sets window.ColorThiefLoading (Promise) to deduplicate concurrent script injection across multiple instances.
-        async loadCF() {
-        if (!window.ColorThiefLoading) {
-        window.ColorThiefLoading = new Promise((resolve) =&amp;gt; {
-        const script = document.createElement(&apos;script&apos;);
-        script.type = &apos;text/javascript&apos;;
-        script.src = &apos;https://unpkg.com/colorthief@3/dist/umd/color-thief.global.js&apos;;
-        document.head.appendChild(script);
-        script.onload = resolve;
-        });
-        }
-        return window.ColorThiefLoading;
-        }
-        
-        startShadow(e) {
-        console.log(&apos;video play&apos;);
-        let thatWrapper = this.wrapper;
-        this.controller = ColorThief.observe(e.target, {
-        throttle: 200,
-        colorCount: 5,
-        onChange(palette) {
-        const [dominant] = palette;
-        thatWrapper.style.setProperty(&apos;--glow-color&apos;, dominant.css());
-        thatWrapper.style.boxShadow = &apos;15px 15px 20px 8px var(--glow-color)&apos;;
-        },
-        })
-        }
-        
-        endShadow() {
-        console.log(&apos;video play end&apos;);
-        this.controller.stop();
-        }
-        
-        }
-        
-        if(!customElements.get(&apos;video-bgshadow&apos;)) customElements.define(&apos;video-bgshadow&apos;, VideoBGShadowComponent);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I don&apos;t think there&apos;s anything necessarily interesting in here, although I struggled quite a bit with &lt;code&gt;loadCF&lt;/code&gt;. I didn&apos;t want to add the ColorThief library N times to the page. Checking for &lt;code&gt;window.ColorThief&lt;/code&gt; only works if for some reason a video wrapped with the component is added to the page &lt;em&gt;after&lt;/em&gt; the library loads. I used Claude to help me with this bit and while it &amp;quot;litters&amp;quot; the window object with a value, I think that is a fair trade off to ensure only one library is loaded. (Technically this could be further updated to first see if ColorThief exists in general as it&apos;s possible the website uses it for something else.)&lt;/p&gt;
-        &lt;p&gt;You can see a demo with a couple of examples here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/video-bgshadow/&quot;&gt;https://cfjedimaster.github.io/webdemos/video-bgshadow/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;And if you think this is a good start but could be &lt;em&gt;so&lt;/em&gt; much better, I agree, help me out over at the repo: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/video-bgshadow&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ansleycreative?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Matthew Ansley&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/two-people-standing-on-concrete-floor-6AQxBtaIYOk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
