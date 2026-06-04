@@ -4,7 +4,118 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Wed, 03 Jun 2026 19:09:54 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 04 Jun 2026 18:13:07 GMT</lastBuildDate>
+    <item>
+      <title>vue-html2pdf: Line of text is split between pages when generating multi-page PDFs</title>
+      <link>https://stackoverflow.com/questions/79951435/vue-html2pdf-line-of-text-is-split-between-pages-when-generating-multi-page-pdf</link>
+      <guid>https://stackoverflow.com/questions/79951435/vue-html2pdf-line-of-text-is-split-between-pages-when-generating-multi-page-pdf</guid>
+      <pubDate>Thu, 04 Jun 2026 14:14:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m using &lt;strong&gt;vue-html2pdf v1.8.0&lt;/strong&gt; to generate PDF files in a Vue.js application.&lt;/p&gt;
+        &lt;p&gt;I&apos;m encountering a page-break issue when the generated PDF contains multiple pages.&lt;/p&gt;
+        &lt;h3&gt;Problem&lt;/h3&gt;
+        &lt;p&gt;The last line of text near the bottom of a page is being split horizontally across two pages.&lt;/p&gt;
+        &lt;p&gt;For example:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;The &lt;strong&gt;upper half&lt;/strong&gt; of the last text line is rendered at the bottom of page 1.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;The &lt;strong&gt;lower half&lt;/strong&gt; of the same text line is rendered at the top of page 2.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As a result, the text looks cut in half rather than being moved completely to the next page.&lt;/p&gt;
+        &lt;p&gt;This issue occurs consistently throughout the PDF whenever content reaches a page boundary.&lt;/p&gt;
+        &lt;h3&gt;vue-html2pdf configuration&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;wrapper__detail&amp;quot;&amp;gt;
+        &amp;lt;TableDetail
+        v-for=&amp;quot;item in interviews&amp;quot;
+        :interview=&amp;quot;item&amp;quot;
+        :key=&amp;quot;item.id&amp;quot;
+        /&amp;gt;
+        
+        &amp;lt;div style=&amp;quot;display: none&amp;quot;&amp;gt;
+        &amp;lt;vue-html2pdf
+        :show-layout=&amp;quot;false&amp;quot;
+        :float-layout=&amp;quot;false&amp;quot;
+        :enable-download=&amp;quot;true&amp;quot;
+        :preview-modal=&amp;quot;false&amp;quot;
+        :pdf-quality=&amp;quot;2&amp;quot;
+        :manual-pagination=&amp;quot;true&amp;quot;
+        pdf-format=&amp;quot;a4&amp;quot;
+        pdf-orientation=&amp;quot;portrait&amp;quot;
+        pdf-content-width=&amp;quot;800px&amp;quot;
+        :html-to-pdf-options=&amp;quot;{
+        margin: 9,
+        filename: `interview_${moment().format(&apos;yyyyMMDDHHmmss&apos;)}.pdf`,
+        html2canvas: {
+        scale: 1,
+        useCORS: true
+        }
+        }&amp;quot;
+        ref=&amp;quot;html2PdfRef&amp;quot;
+        &amp;gt;
+        &amp;lt;section slot=&amp;quot;pdf-content&amp;quot;&amp;gt;
+        &amp;lt;TableDetail
+        v-for=&amp;quot;(item, idx) in interviews&amp;quot;
+        :print=&amp;quot;true&amp;quot;
+        :canBreak=&amp;quot;idx &amp;lt; interviews.length - 1&amp;quot;
+        :key=&amp;quot;item.id&amp;quot;
+        :interview=&amp;quot;item&amp;quot;
+        /&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/vue-html2pdf&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Child component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;wrapper__table&amp;quot;&amp;gt;
+        &amp;lt;div
+        class=&amp;quot;datatable&amp;quot;
+        :class=&amp;quot;{
+        print: print,
+        &apos;html2pdf__page-break&apos;: print &amp;amp;&amp;amp; canBreak
+        }&amp;quot;
+        &amp;gt;
+        ...
+        
+        &amp;lt;div
+        class=&amp;quot;row&amp;quot;
+        v-if=&amp;quot;interview &amp;amp;&amp;amp; interview.inter_comments&amp;quot;
+        &amp;gt;
+        &amp;lt;div class=&amp;quot;col-1&amp;quot;&amp;gt;Comment&amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;col-2 break-line&amp;quot;&amp;gt;
+        {{ interview.comments }}
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Print CSS:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.print {
+        width: 720px;
+        
+        .col-2 {
+        width: 570px;
+        line-height: 23px;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;visually, the page break cuts through the middle of the line height, so the top half of the characters appears on page 1 and the bottom half appears on page 2.&lt;/p&gt;
+        &lt;h3&gt;Questions&lt;/h3&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Is this a known issue with &lt;code&gt;vue-html2pdf&lt;/code&gt;, &lt;code&gt;html2canvas&lt;/code&gt;, or &lt;code&gt;jsPDF&lt;/code&gt;?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Is there a way to prevent page breaks from occurring in the middle of a text line?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Are there any recommended CSS settings or library options to ensure that a full line is rendered on one page before breaking to the next?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any help would be appreciated. Thanks!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How can I apply a &apos;for&apos; loop for my ASCII pattern for it to be in the X and Y direction when needed?</title>
       <link>https://stackoverflow.com/questions/79949032/how-can-i-apply-a-for-loop-for-my-ascii-pattern-for-it-to-be-in-the-x-and-y-di</link>
@@ -1705,37 +1816,6 @@
         at TimeScale._parseValue (chart.js:13367:1)
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;) when using vue-papa-parse with Vue 3 + Vite</title>
-      <link>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</link>
-      <guid>https://stackoverflow.com/questions/79880656/typeerror-cannot-set-properties-of-undefined-setting-papa-when-using-vue-pa</guid>
-      <pubDate>Sun, 01 Feb 2026 19:06:34 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I’m facing the following error when trying to install &lt;strong&gt;vue-papa-parse&lt;/strong&gt; in a Vue 3 project created with &lt;strong&gt;Vite&lt;/strong&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;TypeError: Cannot set properties of undefined (setting &apos;Papa&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This occurs when registering the plugin in &lt;code&gt;main.js&lt;/code&gt;, following the usage shown in the documentation.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;main.js&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { createApp } from &apos;vue&apos;
-        import App from &apos;./App.vue&apos;
-        import VuePapaParse from &apos;vue-papa-parse&apos;
-        
-        const app = createApp(App)
-        
-        app.use(VuePapaParse)
-        app.mount(&apos;#app&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;Environment&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Vue 3&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Vite&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;vue-papa-parse&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
       </content:encoded>
     </item>
   </channel>
