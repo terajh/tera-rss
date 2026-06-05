@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "Vue wrapper for gantt/scheduling timeline library",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hiya, i&#39;ve spent the last few months working on a gantt/scheduling timeline library (tempis.dev) and i&#39;ve built a React wrapper but was trying to gauge interest in a drop-in vue wrapper too.</p> <p>It would be great to get some input, thanks</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Material-Gold7483\"> /u/Material-Gold7483 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1txftnt/vue_wrapper_for_ganttscheduling_timeline_library/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1txftnt/vue_wrapper_for_ganttscheduling_timeline_library/\">[comments]</a></span>",
+    "date": "2026-06-05T09:22:07.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1txftnt/vue_wrapper_for_ganttscheduling_timeline_library/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
     "title": "VoidZero is joining Cloudflare",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1twosp6/voidzero_is_joining_cloudflare/\"> <img src=\"https://external-preview.redd.it/Py749QX02Kyr8_Z5hsUSLyRcN8ySmxY9Vw8IX7jkj4w.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=3be085e0970d721f4e4d11100072b3f7b6695f91\" alt=\"VoidZero is joining Cloudflare\" title=\"VoidZero is joining Cloudflare\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/youlikepete\"> /u/youlikepete </a> <br/> <span><a href=\"https://blog.cloudflare.com/voidzero-joins-cloudflare/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1twosp6/voidzero_is_joining_cloudflare/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-06-04T14:09:41.000Z",
@@ -24,6 +37,19 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tws1x2/cerious_scroll_i_built_a_virtual_scroller_that/\"> <img src=\"https://preview.redd.it/km4hg9njha5h1.png?width=140&amp;height=81&amp;auto=webp&amp;s=165e917957305ff6da4efe0d2c847babb52f6a48\" alt=\"Cerious Scroll: I built a virtual scroller that actually measures your rows.\" title=\"Cerious Scroll: I built a virtual scroller that actually measures your rows.\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I&#39;ve spent way too many hours fighting virtual scrollers over the years, so I finally wrote my own. Sharing it here because the Vue wrapper just feels good to use and I want to see what you all think.</p> <p><strong>Cerious Scroll:</strong> The core is plain TypeScript with zero dependencies, and there&#39;s a Vue 3 wrapper (<a href=\"https://github.com/ceriousdevtech/vue-cerious-scroll\">ceriousdevtech/vue-cerious-scroll</a>) that&#39;s a thin layer on top of it. There are also React and Angular wrappers if anyone cares, but this post is about Vue.</p> <p>Why I made it: every virtual scroller I tried either wanted a fixed <code>itemSize</code>, or asked for an <code>estimateSize</code> and then quietly re-jiggered the layout once it found out the real heights. For uniform lists that&#39;s fine. For chat messages, log lines, code blocks, or anything with paragraphs that wrap differently, it gets annoying fast. Scrollbars jump, the position drifts, sometimes the page settles a few rows off from where you clicked.</p> <p>What this one does instead: it uses an index based positioning system with offset to position rows. This means it does not need to measure any rows that came before. It renders your rows into containers it owns, then reads offsetHeight after the row has actually committed. No estimation, no settle pass. With Vue, that means rows get committed using Vue&#39;s synchronous render() and your app&#39;s <code>appContext</code> comes along for the ride, so Pinia, i18n, globally registered components, all of that just works inside every row.</p> <p>Quick example:</p> <pre><code>&lt;script setup lang=&quot;ts&quot;&gt; import { CeriousScroll } from &#39;@ceriousdevtech/vue-cerious-scroll&#39;; const items = Array.from({ length: 1_000_000 }, (_, i) =&gt; ({ id: i, name: `Item ${i}`, })); &lt;/script&gt; &lt;template&gt; &lt;CeriousScroll :items=&quot;items&quot; :style=&quot;{ height: &#39;480px&#39; }&quot;&gt; &lt;template #item=&quot;{ item, index }&quot;&gt; &lt;div class=&quot;row&quot;&gt;{{ index }} {{ item.name }}&lt;/div&gt; &lt;/template&gt; &lt;/CeriousScroll&gt; &lt;/template&gt; </code></pre> <p>That&#39;s it for variable heights. No <code>itemSize</code>, no <code>estimateSize</code>. There&#39;s also a <code>useCeriousScroll</code> composable if you want imperative control, lazy <code>getItem(index)</code> if you&#39;re working with sparse data instead of an array, and the usual stuff (keyboard, touch, wheel, native scrollbar) is built into the core.</p> <p>Performance has been solid in my testing. Holds 60fps when I spin the wheel as hard as I can, and memory stays flat whether I&#39;m scrolling 100k rows or 100 million, because only the visible window is in the DOM.</p> <p>Install:</p> <pre><code>npm i @ceriousdevtech/vue-cerious-scroll </code></pre> <p>Vue demo (100k rows, fixed/variable toggle, jump-to-row, fps overlay): [<a href=\"https://ceriousdevtech.github.io/vue-cerious-scroll/%5D(vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html)\">https://ceriousdevtech.github.io/vue-cerious-scroll/](vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html)</a></p> <p>There&#39;s also a vanilla demo gallery with a data grid, chat, log viewer, finance ticker, and a side-by-side bake-off against Clusterize.js if you want to poke at the core: [<a href=\"https://ceriousdevtech.github.io/cerious-scroll/%5D(vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html)\">https://ceriousdevtech.github.io/cerious-scroll/](vscode-file://vscode-app/Applications/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/code/electron-browser/workbench/workbench.html)</a></p> <p>MIT, source on GitHub under <code>ceriousdevtech</code>.</p> <p>If you give it a try and hit something weird, please tell me. I&#39;m especially interested in row content that throws off measurement, and anything about the API that feels off for Vue specifically. Thanks for reading.</p> <p><a href=\"https://preview.redd.it/km4hg9njha5h1.png?width=1642&amp;format=png&amp;auto=webp&amp;s=c64f998b6639e3473024546d5962327d4b2d5110\">Cerious-Scroll</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Suitable_Language_37\"> /u/Suitable_Language_37 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tws1x2/cerious_scroll_i_built_a_virtual_scroller_that/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tws1x2/cerious_scroll_i_built_a_virtual_scroller_that/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-06-04T16:05:07.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1tws1x2/cerious_scroll_i_built_a_virtual_scroller_that/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/vuejs",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/vuejs.rss",
+    "title": "OpenAI completely ditched Vue in favor or React and Next",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1txdxdq/openai_completely_ditched_vue_in_favor_or_react/\"> <img src=\"https://external-preview.redd.it/Px1m-qRItiCjqLQ4T4YFzdctwbb21l70ueV8VBu_br0.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=d90cd23c0b3b290304eb194ae070188f20dce923\" alt=\"OpenAI completely ditched Vue in favor or React and Next\" title=\"OpenAI completely ditched Vue in favor or React and Next\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/hyejnathe\"> /u/hyejnathe </a> <br/> <span><a href=\"https://i.imgur.com/dbIsdMy.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1txdxdq/openai_completely_ditched_vue_in_favor_or_react/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-06-05T07:30:15.000Z",
+    "url": "https://www.reddit.com/r/vuejs/comments/1txdxdq/openai_completely_ditched_vue_in_favor_or_react/"
   },
   {
     "publisherId": "reddit-dev",
@@ -76,19 +102,6 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Has anyone used the VibeUI library yet in their projects? The 1.0 is out and I&#39;m working on a few different things with it. I&#39;m actually using it and vue in a Rust app which is pretty wild. </p> <p>Thought you&#39;d all be interested to check it out. <a href=\"https://github.com/velkymx/vibeui\">https://github.com/velkymx/vibeui</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Familiar-Ad-9844\"> /u/Familiar-Ad-9844 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1twd99s/new_component_library_for_vue_bs_53/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1twd99s/new_component_library_for_vue_bs_53/\">[comments]</a></span>",
     "date": "2026-06-04T04:36:50.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1twd99s/new_component_library_for_vue_bs_53/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Integrating WPS Office via iframe in a Vue app",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;m planning to embed WPS Office document editing into a Vue application using the iframe-based SDK and would like to hear from anyone who has done this before.</p> <p>A few questions:</p> <ul> <li>How easy is it to communicate between the Vue app and the WPS iframe?</li> <li>Does the JavaScript messaging API work well with Vue&#39;s reactivity system, or are extra workarounds needed?</li> <li>Are there any issues when mounting or unmounting the WPS iframe through Vue Router?</li> </ul> <p>If you&#39;ve successfully embedded WPS Office in a Vue application, I&#39;d appreciate hearing about your experience.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/archer02486\"> /u/archer02486 </a> <br/> <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tvkt7w/integrating_wps_office_via_iframe_in_a_vue_app/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tvkt7w/integrating_wps_office_via_iframe_in_a_vue_app/\">[comments]</a></span>",
-    "date": "2026-06-03T10:04:53.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1tvkt7w/integrating_wps_office_via_iframe_in_a_vue_app/"
   },
   {
     "publisherId": "reddit-dev",
@@ -310,18 +323,5 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tnior5/how_i_use_vue_and_ai_together_today/\"> <img src=\"https://external-preview.redd.it/BigPOLrEv4aoIzZvWPSAsBkYpMh3a24RgYyAYgt6fBw.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=c5f9d475197af84852379b112231df5534ec9bd0\" alt=\"How I use Vue and AI together today\" title=\"How I use Vue and AI together today\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Hey everyone! I just did a talk at VueConf US and I thought I&#39;d share a video and blog post I created on this same topic. Love to get your reactions to how you use Vue with AI today! (hope mods this is ok!)</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Fzbravozf\"> /u/Fzbravozf </a> <br/> <span><a href=\"https://www.programwitherik.com/blog/vue-in-the-age-of-ai/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tnior5/how_i_use_vue_and_ai_together_today/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-05-25T19:07:24.000Z",
     "url": "https://www.reddit.com/r/vuejs/comments/1tnior5/how_i_use_vue_and_ai_together_today/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/vuejs",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/vuejs.rss",
-    "title": "Create mobile app with vue lynx",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/vuejs/comments/1tl4z8m/create_mobile_app_with_vue_lynx/\"> <img src=\"https://external-preview.redd.it/c2twMXRhbXkzdDJoMXPJ864agRsu-oxNtpLBcWrVYEnrzXN2UG9G_NHw3zin.png?width=320&amp;crop=smart&amp;auto=webp&amp;s=7f32666a44319472c9a81ebc5637603e536ef22a\" alt=\"Create mobile app with vue lynx\" title=\"Create mobile app with vue lynx\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>👋 I had some free time recently and created a Vue + Lynx Android , iOS Starter Template just for fun.</p> <p>Packed with a few things to help skip the boring setup phase:</p> <p>⚡️ Tailwind CSS (Dark/Light mode) &amp; Pinia</p> <p>🧩 Pre-built UI (Dialogs, Action Sheets, Cards, etc.)</p> <p>📱 Native modules ready (Image Picker, LocalStorage, SafeArea)</p> <p>Repo <a href=\"https://github.com/bekaku/vue-lynx-tailwind-starter\">https://github.com/bekaku/vue-lynx-tailwind-starter</a></p> <p>Experience with lynx</p> <p>It&#39;s fast native performance and use familiar web tools like vue and CSS. The main challenge is adapting to non-browser environment and missing standard web APIs. The biggest pain point is the limited plugin ecosystem. If you need specific device features, you can&#39;t just npm install a library you have to manual write custom Native Modules from scratch for both Android and iOS yourself.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/bekaku\"> /u/bekaku </a> <br/> <span><a href=\"https://v.redd.it/mtcijaty3t2h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/vuejs/comments/1tl4z8m/create_mobile_app_with_vue_lynx/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-05-23T03:30:57.000Z",
-    "url": "https://www.reddit.com/r/vuejs/comments/1tl4z8m/create_mobile_app_with_vue_lynx/"
   }
 ]
