@@ -4,12 +4,156 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 07 Jun 2026 16:35:03 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 08 Jun 2026 18:39:40 GMT</lastBuildDate>
+    <item>
+      <title>Can GenAI help you win in Vegas? (2026)</title>
+      <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
+      <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
+        &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
+        &lt;p&gt;To enable this new version, I made a couple of changes. First, I&apos;ve got a new Alpine method to create the AI session. This is responsible for setting up the system instruction for the model as well:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async createSession() {
+        console.log(&apos;createSession running&apos;);
+        this.session = await LanguageModel.create({
+        expectedOutputs: [
+        { type:&apos;text&apos;, languages: [&apos;en&apos;] }
+        ],
+        initialPrompts: [
+        {
+        role: &apos;system&apos;,
+        content:
+        `
+        You are an expert Blackjack advisor helping a player make decisions in a simplified game (no splitting, no doubling down, no surrender). Your goal is to advise the player whether to &apos;Hit&apos; or &apos;Stand&apos; based on standard basic Blackjack strategy.
+        
+        CRITICAL GAME RULES:
+        - Goal: Beat the dealer&apos;s hand value without exceeding 21 (busting).
+        - Card Values: Cards 2-10 are face value. Jack, Queen, and King are worth 10. Aces are worth either 1 or 11, whichever is more beneficial without busting.
+        - Blackjack: A &amp;quot;Blackjack&amp;quot; is strictly a 2-card hand consisting of an Ace and a 10-value card (10, J, Q, K). An Ace and an 8 is just 19, not a Blackjack.
+        - Soft vs. Hard: A hand with an Ace counted as 11 is a &amp;quot;soft&amp;quot; hand (e.g., Ace + 6 = soft 17). Otherwise, it is a &amp;quot;hard&amp;quot; hand.
+        
+        INSTRUCTIONS:
+        You will be provided with the player&apos;s current hand and the dealer&apos;s visible card.
+        Respond strictly in the following format:
+        ACTION: [Choose ONLY &amp;quot;Hit&amp;quot; or &amp;quot;Stand&amp;quot;]
+        REASON: [A brief, one-sentence logical explanation based on standard Blackjack probabilities and the dealer&apos;s visible card]
+        `,
+        },
+        ],
+        monitor(m) {
+        m.addEventListener(&apos;downloadprogress&apos;, (e) =&amp;gt; {
+        if (e.loaded === 0) return;
+        const pct = Math.floor(e.loaded * 100);
+        if(pct !== 0 &amp;amp;&amp;amp; pct !== 100) this.aiHelp = `Downloading model… ${pct}%`;
+        });
+        },
+        });			
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note the level of detail in the system instruction. Initially I had just the initial paragraph and a bit about how to return the results. I took this to the Gemini desktop app and asked this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;I’ve built a web based Blackjack game. It’s a simplified version that doesn’t 
+        include splitting or doubling down. As part of the game, I used Chrome’s 
+        built-in Prompt API to offer advice to the player on whether to hit or stand. 
+        This works *mostly* ok, but I see mistakes, for example, Chrome’s Prompt API 
+        once said an Ace + 8 is a blackjack, when it has to be a face card or 10 as 
+        far as I know. To help me improve the prompt, can you give me a good system 
+        prompt that briefly, but completely, covers the rules, again though ignoring 
+        doubling down/splitting/etc. This is the current system instruction:
+        
+        (I pasted the first version here)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I then took its improved prompt and added it to my code.&lt;/p&gt;
+        &lt;p&gt;Next I had to wire this up to the AI advice button. This is the &lt;code&gt;askForHelp&lt;/code&gt; method and the referenced schema:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const adviceSchema = {
+        type: &apos;object&apos;,
+        properties: {
+        action: { type: &apos;string&apos;, enum:[&apos;HIT&apos;,&apos;STAND&apos;] },
+        reason: { type: &apos;string&apos; }
+        },
+        required: [&apos;action&apos;, &apos;reason&apos;]
+        };
+        
+        async askForHelp() {
+        console.log(&apos;lets call an (AI) friend&apos;);
+        if(!this.session) {
+        console.log(&apos;generating a session&apos;);
+        this.aiHelp = &apos;&amp;lt;i&amp;gt;Creating the AI session.&amp;lt;/i&amp;gt;&apos;;
+        await this.createSession();
+        }
+        this.aiHelp = &apos;&amp;lt;i&amp;gt;Asking our AI friend...&amp;lt;/i&amp;gt;&apos;;
+        
+        let totalOb = this.getCount(this.playerCards);
+        
+        // string to represent my hand, could be 2-5 cards
+        let playerStr = &apos;My hand consists of:\n &apos;;
+        // this could be reduce(), im being lazy
+        this.playerCards.forEach(p =&amp;gt; {
+        playerStr += `${p.value} of ${p.suit.toLowerCase()}\n`;
+        });
+        
+        // string to set the total value for the prompt, helps it
+        let totalStr = &apos;My hand has a total of &apos;;
+        if(totalOb.lowCount === totalOb.highCount) {
+        totalStr += totalOb.lowCount;
+        } else {
+        totalStr += `${totalOb.lowCount} or ${totalOb.highCount}`;
+        }
+        
+        let content = `
+        I&apos;m playing blackjack and the dealer currently has ${this.pcCards[1].value} of ${this.pcCards[1].suit.toLowerCase()}.
+        
+        ${playerStr}
+        
+        ${totalStr} 
+        
+        Should I hit or should I stay?
+        `;
+        console.log(&apos;content&apos;, content);
+        let result = JSON.parse(await this.session.prompt(
+        [{ role: &apos;user&apos;, content }], 
+        { responseConstraint: adviceSchema }
+        ));
+        console.log(result);
+        
+        let resultMsg = `
+        You should ${result.action}. Why?
+        ${result.reason}
+        `;
+        
+        this.aiHelp = &apos;&apos;;
+        this.advice = resultMsg;
+        this.$refs.adviceDialog.showModal();
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Ok, there&apos;s a few things of note going on here. As with the previous version, I take the current game state and turn it into a prompt where I describe my hand. While working on this version I discovered a pretty big flaw from the previous game. When asking AI for advice, I only described two cards max. Now I ensure I describe my entire hand.&lt;/p&gt;
+        &lt;p&gt;Now you may be wondering, why do I get the total value of my hand - shouldn&apos;t the model know how to calculate that? As before, at least in the Prompt API, the answer is no. Initially I removed that bit thinking the system instruction would be enough. But even though my system prompt describes how to get the total of a hand, I still found the model calculating the total wrong. Not all the time, but at least once. So the little helper string went back in.&lt;/p&gt;
+        &lt;p&gt;The other change in this version is a proper schema to shape the response - give me an action (hit or stay) and a reason. This gets turned into a string and passed to my HTML dialog element. Here&apos;s how it looks in action:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/bj2.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from BJ app&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;In case that&apos;s hard to read, the dialog says:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;You should HIT. Why? With a hard 16, you need to improve your hand to stand a chance against the dealer&apos;s strong 10.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;If I remember right, this advice makes sense, but I find it difficult personally to hit on anything 15 and higher. For that particular round I stayed and the dealer won with Blackjack, so I had no chance.&lt;/p&gt;
+        &lt;p&gt;In my next test, the dealer was showing a King of Clubs and I had two Aces and the advice was:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;You should STAND. Why? You have a soft 2 or 12 which is a strong hand, and the dealer has a King, making it unlikely they will have a high hand.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;That seems crazy, so I went ahead and got a new card which ended up being a seven. At that point the AI suggested staying, which I did, and I still lost as the dealer&apos;s other card was a 10.&lt;/p&gt;
+        &lt;p&gt;In my next round, the dealer was showing a queen and I had a 5 and a 9. The AI suggested hitting which I completely agreed with and of course - I busted.&lt;/p&gt;
+        &lt;p&gt;I played a few more times, and generally the model&apos;s suggestions seemed ok. I could see it being useful if I was a complete novice at the game, but I don&apos;t see whipping out my phone and asking AI for help any time soon. (I don&apos;t really game myself, but I assume most casinos have rules against this now. Anyone know offhand?)&lt;/p&gt;
+        &lt;p&gt;What do you think? If you&apos;ve got an up to date Chrome, you can test it here: &lt;a href=&quot;https://codepen.io/cfjedimaster/full/KwNbvPq/afbf4079fe199863f11f75957817fcc8&quot;&gt;https://codepen.io/cfjedimaster/full/KwNbvPq/afbf4079fe199863f11f75957817fcc8&lt;/a&gt;. Note that the first time you download the model it may take 5 to 10 minutes, but that applies across your device as a whole. If you run across another demo using the API you won&apos;t need to download it again.&lt;/p&gt;
+        &lt;p&gt;If you want to take a look at the code, I&apos;ve embedded it below. The dialog I added could &lt;em&gt;really&lt;/em&gt; use some styles so if anyone wants to fork and share, let me know!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-pen-title=&quot;Blackjack (Chrone AI)&quot; data-default-tab=&quot;html&quot; data-slug-hash=&quot;KwNbvPq&quot; data-user=&quot;cfjedimaster&quot; data-token=&quot;afbf4079fe199863f11f75957817fcc8&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/KwNbvPq/afbf4079fe199863f11f75957817fcc8&quot;&gt;
+        Blackjack (Chrone AI)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -203,7 +347,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -326,7 +470,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -336,7 +480,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -445,7 +589,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -525,7 +669,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -559,7 +703,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -628,7 +772,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -757,7 +901,7 @@
       <title>What was that song, the one with the words?</title>
       <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
       <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
+      <pubDate>Mon, 08 Jun 2026 17:58:15 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
         &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
@@ -1095,75 +1239,6 @@
         &lt;p&gt;Also, a big thank you (again!) to &lt;a href=&quot;https://blog.tomayac.com/&quot;&gt;Thomas Steiner&lt;/a&gt; from the Chrome team for help while I was building this out!&lt;/p&gt;
         &lt;p&gt;I was going to embed the Val here, but apparently you can only embed one file so - instead, here&apos;s a simple link instead: &lt;a href=&quot;https://www.val.town/x/raymondcamden/voice-to-song&quot;&gt;https://www.val.town/x/raymondcamden/voice-to-song&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@maykogob?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Mayko Sousa&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-yawning-with-its-mouth-open-wvDs1EswZZk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Using Val Town and Gemini for Sports Ball Stuff</title>
-      <link>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</link>
-      <guid>https://www.raymondcamden.com/2026/05/04/using-val-town-and-gemini-for-sports-ball-stuff</guid>
-      <pubDate>Sun, 07 Jun 2026 16:20:20 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This is trivial as heck as the kids say, but I really want to explore &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt; more this year and I thought of a great, and simple use for it. Both my wife and I are big Saints fans (this is their year, honest) and attend most of the games. If they&apos;re not playing at home, we&apos;re absolutely watching it on TV. We both &lt;em&gt;really&lt;/em&gt; enjoy watching football, but honestly, not enough to watch ESPN and follow the news.&lt;/p&gt;
-        &lt;p&gt;I thought - why not simply get a summary of NFL news from the past week and build an automation of it? I had this running in less than ten minutes with Val Town.&lt;/p&gt;
-        &lt;p&gt;First, the code makes use of Google&apos;s Node SDK for working with Gemini. I setup my environment variable first and then used this code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { GoogleGenerativeAI } from &amp;quot;npm:@google/generative-ai&amp;quot;;
-        import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
-        import { marked } from &amp;quot;npm:marked&amp;quot;;
-        
-        const genAI = new GoogleGenerativeAI(Deno.env.get(&amp;quot;GEMINI_API_KEY&amp;quot;));
-        const model = genAI.getGenerativeModel({ model: &amp;quot;gemini-2.5-pro&amp;quot; });
-        
-        const prompt = `
-        Act as a sports news curator. I am a casual football fan who watches games on Sundays 
-        but avoids ESPN. 
-        
-        Provide a high-level summary of NFL news from the past 7 days. 
-        
-        Requirements:
-        - Length: 3-4 paragraphs.
-        - Include relevant links for further reading.
-        - Tone: Informative but accessible for a casual fan.
-        - Focus: Major trades, schedule updates, and significant roster moves.
-        
-        In your response, don&apos;t mention the prompt per se, just give me the summary report.
-        For each item in your report, generate a heading title.
-        `;
-        
-        async function getNFLSummary(p) {
-        try {
-        const result = await model.generateContent(p);
-        const response = await result.response;
-        return response.text();
-        
-        console.log(text);
-        } catch (error) {
-        console.error(&amp;quot;Error generating report:&amp;quot;, error);
-        }
-        }
-        
-        let summary = await getNFLSummary(prompt);
-        console.log(summary);
-        
-        let html = `
-        &amp;lt;h2&amp;gt;NFL News Summary&amp;lt;/h2&amp;gt;
-        
-        ${marked.parse(summary)}
-        `;
-        
-        await email({
-        subject: &amp;quot;NFL News Summary&amp;quot;,
-        html,
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The prompt is pretty specific and grew as I tested. The final paragraph in particular was necessary as I kept getting &amp;quot;chat&amp;quot; like responses which wouldn&apos;t make sense for an email report. I also had to ask specifically for titles for the summaries which makes it easier to skip over things I don&apos;t care about. Lastly, I considered adding a note about focusing on the Saints, but I really wanted something more generic, especially as we tend to hear a lot of Saints news via local updates and such.&lt;/p&gt;
-        &lt;p&gt;And the last bit just sends an email to me, from Val Town, as I don&apos;t need a custom FROM/TO here, this works just fine.&lt;/p&gt;
-        &lt;p&gt;The last, &lt;em&gt;last&lt;/em&gt; bit was the CRON schedule which I set as the trigger and for 9AM on Mondays. Doing a quick run produces this:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/nfl1.png&quot; loading=&quot;lazy&quot; alt=&quot;Email of NFL News&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;I&apos;ve embedded the Val below - let me know if you fork it!&lt;/p&gt;
-        &lt;iframe width=&quot;100%&quot; height=&quot;400px&quot; src=&quot;https://www.val.town/embed/x/raymondcamden/nfl-roundup/main.ts&quot; title=&quot;Val Town&quot; frameborder=&quot;0&quot; allow=&quot;web-share&quot; allowfullscreen&gt;&lt;/iframe&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@aussiedave?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Dave Adamson&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/brown-and-black-wilson-football--nATH0CrkMU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
