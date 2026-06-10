@@ -14,12 +14,12 @@
 인수 없이 실행하면 `feeds/` 하위의 모든 그룹을 자동 탐색해 처리합니다.
 그룹명을 인수로 주면 해당 그룹만 처리합니다.
 
-## 현재 그룹 현황 (2026-04-21 기준)
+## 현재 그룹 현황 (2026-06-10 기준)
 
 | 그룹 | 소스(publishers) | 피드 합계 | active | slow | archive |
 |---|---:|---:|---:|---:|---:|
 | `economy` | 15 | 104 | — | — | — |
-| `dev` | 271 | 296 | 153 | 33 | 110 |
+| `dev` | 275 | 300 | 157 | 33 | 110 |
 | `anime` | 8 | 12 | — | — | — |
 
 > `dev` 그룹은 [활성도 기반 청크 분리](docs/FEED_MANAGEMENT.md)를 적용 중이다.
@@ -30,8 +30,21 @@
 ### 그룹별 카테고리
 
 - `economy`: `stock`, `economy`, `finance`, `realestate`, `industry`, `it`, `international`, `politics`, `society`, `culture`, `opinion`, `sports`, `entertainment`
-- `dev`: `frontend`, `backend`, `devops`, `ai`, `trend`, `mobile`
+- `dev`: `frontend`, `backend`, `devops`, `ai`, `trend`, `mobile`, `essentials`
 - `anime`: `game`, `anime`, `review`, `entertainment`, `trend`
+
+### `dev/essentials` — 큐레이션 카테고리
+
+`frontend|backend|ai`는 양이 많고 노이즈도 섞여 있어, **실무에 바로 쓸만한 글이 자주 올라오는 35개 피드**만 골라 별도 태그(`essentials`)로 묶어둔 한 줄이다. 독립 카테고리가 아니라 기존 카테고리에 덧붙는 보조 태그이므로, 큐레이션을 바꾸고 싶으면 `feed_specs.csv`에서 `essentials`를 추가/제거하면 된다.
+
+| 분류 | 개수 | 예시 |
+|---|---:|---|
+| 프레임워크·런타임 공식 | 10 | Next.js / Astro / Nuxt / Vite / Svelte / Angular / TypeScript / Deno / Web.dev / WebKit |
+| 한국 대형 테크 | 7 | 네이버 D2 / 토스 / 카카오페이 / 우아한형제들 / 무신사 / 당근 / 뱅크샐러드 |
+| 큐레이션 뉴스레터 | 5 | JS Weekly / Frontend Focus / This Week in React / CSS Weekly / Naver FE News |
+| Backend·DevOps | 6 | NHN / Netflix / GitHub Eng / Node.js / 이동욱 / Cloudflare |
+| AI | 6 | OpenAI / Google AI / Anthropic / Hugging Face / Simon Willison / Vercel |
+| 시그널 개인 블로그 | 1 | Addy Osmani |
 
 ## 프로젝트 구조
 
@@ -126,6 +139,7 @@ rss/
 
 - `https://{username}.github.io/tera-rss/economy/all.xml`
 - `https://{username}.github.io/tera-rss/dev/categories/frontend.xml`
+- `https://{username}.github.io/tera-rss/dev/categories/essentials.xml`
 - `https://{username}.github.io/tera-rss/anime/publishers/ign.xml`
 
 ## 새 그룹 추가
