@@ -4,7 +4,128 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Thu, 11 Jun 2026 18:41:19 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 12 Jun 2026 18:24:23 GMT</lastBuildDate>
+    <item>
+      <title>Claude Fable is relentlessly proactive</title>
+      <link>https://simonwillison.net/2026/Jun/11/fable-is-relentlessly-proactive/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/11/fable-is-relentlessly-proactive/#atom-everything</guid>
+      <pubDate>Thu, 11 Jun 2026 23:35:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;After two days of experience with &lt;a href=&quot;https://simonwillison.net/2026/Jun/9/claude-fable-5/&quot;&gt;Claude Fable 5&lt;/a&gt; I think the best way to describe it is &lt;strong&gt;relentlessly proactive&lt;/strong&gt;. It knows a whole lot of tricks and it will deploy pretty much any of them to get to its goal.&lt;/p&gt;
+        &lt;p&gt;I&apos;ll illustrate this with an example. I was hacking on &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt; today when I noticed a glitch: a horizontal scrollbar that shouldn&apos;t be there in the jump menu chat prompt. I snapped this screenshot:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/jump-to-bug.jpg&quot; alt=&quot;Screenshot of a modal dialog demonstrating a scrollbar bug. At the top is a focused search input with blue outline and placeholder &amp;quot;Jump to...&amp;quot;, with an X close button to its right. Below, a heading reads &amp;quot;Start a new agent chat&amp;quot; above a textarea with the placeholder &amp;quot;Ask a question about your data...&amp;quot; — the bug: a thick gray horizontal scrollbar is incorrectly displayed along the bottom edge of the empty textarea, spanning nearly its full width, next to the resize handle. Below the textarea: &amp;quot;Press Enter to start. Shift+Enter adds a new line.&amp;quot; followed by a blue &amp;quot;Start chat&amp;quot; button.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Then I started a fresh &lt;code&gt;claude&lt;/code&gt; session in my &lt;code&gt;datasette-agent&lt;/code&gt; checkout, dragged in the screenshot and told it:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;Look at dependencies to help figure out why there is a horizontal scrollbar here&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I had a hunch the cause was in a dependency of Datasette Agent (likely Datasette itself) and I knew Fable was good at digging into dependency code, either by inspecting installed files in its own virtual environment &lt;code&gt;site-packages&lt;/code&gt; or by referencing a local checkout on disk. Telling it to start with dependencies felt like a good bet.&lt;/p&gt;
+        &lt;p&gt;I got distracted by a domestic task and wandered away from my computer.&lt;/p&gt;
+        &lt;p&gt;When I came back a few minutes later I saw my machine &lt;em&gt;open a browser window&lt;/em&gt; in my regular Firefox and then &lt;em&gt;navigate to the dialog in question&lt;/em&gt;. I had not told Claude Code to use any browser automation, and I was pretty sure it wasn&apos;t possible for it to trigger mouse movements or keyboard shortcuts within a window, so how was it doing that?&lt;/p&gt;
+        &lt;p&gt;I watched in fascination as it continued with its explorations, then saw it open a Safari window instead of Firefox. I also grabbed this snapshot from the Claude terminal:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-bash-pyobjc.jpg&quot; alt=&quot;Screenshot of two Bash tool calls in a dark terminal interface. First: Bash(open -a Safari /tmp/textarea-scrollbar-test.html &amp;amp;&amp;amp; sleep 4 &amp;amp;&amp;amp; uv run --with pyobjc-framework-Quartz python - &amp;lt;&amp;lt;&apos;EOF&apos; import Quartz wins = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID) for w in wins: if (w.get(&apos;kCGWindowOwnerName&apos;) or &apos;&apos;) == &apos;Safari&apos; and &apos;textarea&apos; in (w.get(&apos;kCGWindowName&apos;) or &apos;&apos;).lower(): print(w.get(&apos;kCGWindowNumber&apos;)) EOF) with output 153551. Second: Bash(screencapture -x -o -l 153551 /tmp/safari-cases.png &amp;amp;&amp;amp; echo ok) with output ok.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;What was it doing there with &lt;code&gt;uv run --with pyobjc-framework-Quartz&lt;/code&gt;?&lt;/p&gt;
+        &lt;p&gt;It turns out Fable had hacked up its own pattern for taking screenshots of browser windows. It was using Python to iterate through all available windows on my machine, then filtering for Safari windows with expected strings such as &lt;code&gt;&quot;textarea&quot;&lt;/code&gt; in the window name. It used that to find their window number - an integer like 153551 - which it could then use with the &lt;code&gt;screencapture&lt;/code&gt; CLI tool to grab a PNG.&lt;/p&gt;
+        &lt;p&gt;OK fine, that&apos;s a neat way of taking screenshots. But what was it taking screenshots of?&lt;/p&gt;
+        &lt;p&gt;Turns out it had been writing its own scratch HTML pages to try and recreate the bug, then opening Safari and grabbing screenshots.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s that &lt;a href=&quot;https://static.simonwillison.net/static/2026/textarea-scrollbar-test.html&quot;&gt;/tmp/textarea-scrollbar-test.html&lt;/a&gt; page it created, and the screenshot it took with &lt;code&gt;screencapture -x -o -l 153551 /tmp/safari-cases.png&lt;/code&gt;:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/safari-cases.jpg&quot; alt=&quot;Screenshot of a Safari browser window showing a textarea scrollbar test page at file:///private/tmp/textarea-scrollbar-test.html. Page text reads: scrollbar thickness: 17px | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15 | devicePixelRatio: 2. Four numbered test cases follow, each with a textarea containing the placeholder &amp;quot;Ask a question about your data...&amp;quot;: 1. Exact plugin CSS (resize: vertical, default overflow), 2. Plugin CSS + overflow-x: hidden, 3. Plugin CSS + resize: none, and 4. Bare default textarea, which is a much smaller box with the placeholder wrapping onto two lines.&quot; style=&quot;max-width: 100%;&quot; /&gt;
+        (I have way too many open tabs!)&lt;/p&gt;
+        &lt;p&gt;OK, so I can see how it&apos;s opening test pages and taking screenshots, but how on earth was it triggering the modal dialog that was meant to be under test? That&apos;s only available via a click or a keyboard shortcut, and I couldn&apos;t see a mechanism for it to run those in Safari.&lt;/p&gt;
+        &lt;p&gt;I eventually figured out what it had done.&lt;/p&gt;
+        &lt;p&gt;Claude was running in a folder that contained the source code for the application. It knows enough about &lt;a href=&quot;https://datasette.io/&quot;&gt;Datasette&lt;/a&gt; to be able to run a local development server. It turns out it was editing Datasette&apos;s own templates to add JavaScript that would trigger the correct keyboard shortcut as soon as the window opened, adding code like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-text-html-basic&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-kos&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;pl-ent&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-smi&quot;&gt;window&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;addEventListener&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;load&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-en&quot;&gt;setTimeout&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-smi&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;dispatchEvent&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;KeyboardEvent&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;keydown&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;key&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;bubbles&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;1200&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;pl-ent&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;1.2 seconds after the window opens, this code triggers a simulated &lt;code&gt;/&lt;/code&gt; key, which is the keyboard shortcut for opening the modal dialog.&lt;/p&gt;
+        &lt;p&gt;There was one challenge left. In order to understand what was going on, Claude needed to run JavaScript on the page to take measurements for itself.&lt;/p&gt;
+        &lt;p&gt;It wrote its own custom web application to capture information via CORS, then ran that as a local server and opened a page with JavaScript that would POST directly to it!&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the Python web app it wrote, using the standard library &lt;a href=&quot;https://docs.python.org/3/library/http.server.html&quot;&gt;http.server&lt;/a&gt; package:&lt;/p&gt;
+        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;http&lt;/span&gt;.&lt;span class=&quot;pl-s1&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;HTTPServer&lt;/span&gt;, &lt;span class=&quot;pl-v&quot;&gt;BaseHTTPRequestHandler&lt;/span&gt;
+        
+        &lt;span class=&quot;pl-k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;H&lt;/span&gt;(&lt;span class=&quot;pl-v&quot;&gt;BaseHTTPRequestHandler&lt;/span&gt;):
+        &lt;span class=&quot;pl-k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;do_POST&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;):
+        &lt;span class=&quot;pl-s1&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;int&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;headers&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Content-Length&quot;&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;0&lt;/span&gt;))
+        &lt;span class=&quot;pl-en&quot;&gt;open&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;/tmp/diag.json&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;w&quot;&lt;/span&gt;).&lt;span class=&quot;pl-c1&quot;&gt;write&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;rfile&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;read&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;n&lt;/span&gt;).&lt;span class=&quot;pl-c1&quot;&gt;decode&lt;/span&gt;())
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;send_response&lt;/span&gt;(&lt;span class=&quot;pl-c1&quot;&gt;200&lt;/span&gt;)
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;send_header&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Access-Control-Allow-Origin&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;*&quot;&lt;/span&gt;)
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;end_headers&lt;/span&gt;()
+        &lt;span class=&quot;pl-k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;do_OPTIONS&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;):
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;send_response&lt;/span&gt;(&lt;span class=&quot;pl-c1&quot;&gt;200&lt;/span&gt;)
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;send_header&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Access-Control-Allow-Origin&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;*&quot;&lt;/span&gt;)
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;send_header&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Access-Control-Allow-Headers&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;*&quot;&lt;/span&gt;)
+        &lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;end_headers&lt;/span&gt;()
+        &lt;span class=&quot;pl-k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;log_message&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;self&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;pl-s1&quot;&gt;a&lt;/span&gt;):  &lt;span class=&quot;pl-c&quot;&gt;# quiet&lt;/span&gt;
+        &lt;span class=&quot;pl-k&quot;&gt;pass&lt;/span&gt;
+        
+        &lt;span class=&quot;pl-en&quot;&gt;HTTPServer&lt;/span&gt;((&lt;span class=&quot;pl-s&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;9999&lt;/span&gt;), &lt;span class=&quot;pl-c1&quot;&gt;H&lt;/span&gt;).&lt;span class=&quot;pl-c1&quot;&gt;serve_forever&lt;/span&gt;()&lt;/pre&gt;
+        &lt;p&gt;All this does is accept a POST request full of JSON and write that to the &lt;code&gt;/tmp/diag.json&lt;/code&gt; file. It sends &lt;code&gt;Access-Control-Allow-Origin: *&lt;/code&gt; headers (including from &lt;code&gt;OPTIONS&lt;/code&gt; requests) so that code running on another domain can still communicate back to it.&lt;/p&gt;
+        &lt;p&gt;Then Claude injected this code into the template that it was loading in a browser:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-js&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;querySelector&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;navigation-search&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;ta&lt;/span&gt;   &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;shadowRoot&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;querySelector&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;textarea&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;cs&lt;/span&gt;   &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;getComputedStyle&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s1&quot;&gt;ta&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;pl-en&quot;&gt;fetch&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;http://127.0.0.1:9999/diag&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;method&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;POST&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;body&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;stringify&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;dpr&lt;/span&gt;: &lt;span class=&quot;pl-smi&quot;&gt;window&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;devicePixelRatio&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;scrollWidth&lt;/span&gt;: &lt;span class=&quot;pl-s1&quot;&gt;ta&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;scrollWidth&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;clientWidth&lt;/span&gt;: &lt;span class=&quot;pl-s1&quot;&gt;ta&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;clientWidth&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;whiteSpace&lt;/span&gt;: &lt;span class=&quot;pl-s1&quot;&gt;cs&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;whiteSpace&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;width&lt;/span&gt;: &lt;span class=&quot;pl-s1&quot;&gt;cs&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;This took measurements of the &lt;code&gt;&amp;lt;textarea&amp;gt;&lt;/code&gt; inside the &lt;code&gt;&amp;lt;navigation-search&amp;gt;&lt;/code&gt; Web Component and sent them to the server, which wrote them to a file on disk, which Claude could then read.&lt;/p&gt;
+        &lt;p&gt;Having figured out all of these tricks Fable... hit some invisible guardrail and downgraded itself to Opus. Thankfully Opus had access to the full transcript and could continue using the tricks pioneered by Fable, and shortly afterwards found, tested and verified &lt;a href=&quot;https://github.com/datasette/datasette-agent/commit/a75a8b727b42c30ced1fc41dc8add7eb9f04fefe&quot;&gt;the fix&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;I prompted Opus to:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;Write a report in /tmp/automation-report.md where you note down all of the tricks you have used in this session to test against real browsers on my computer, include runnable code examples&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Which produced &lt;a href=&quot;https://gist.github.com/simonw/aef7f7db9ac992643110a74e43d6d42f&quot;&gt;this report&lt;/a&gt;, which was invaluable for piecing together the details of what had happened for this post.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve shared &lt;a href=&quot;https://gisthost.github.io/?cc14774f6d37eb67bf089f3ac3925f8f&quot;&gt;the full terminal transcript&lt;/a&gt; of the Claude Code session as well.&lt;/p&gt;
+        &lt;h4 id=&quot;a-review-of-everything-it-did&quot;&gt;A review of everything it did&lt;/h4&gt;
+        &lt;p&gt;Based on a screenshot and a one-line prompt, Claude Fable 5 + Claude Code:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Figured out the recipe to run the local development server (with fake environment variables needed to get it running)&lt;/li&gt;
+        &lt;li&gt;Fired up a Playwright Chrome session&lt;/li&gt;
+        &lt;li&gt;Turned on the visible scrollbars setting for Chrome &lt;code&gt;defaults write com.google.chrome.for.testing AppleShowScrollBars Always&lt;/code&gt; (it turned that off again later)&lt;/li&gt;
+        &lt;li&gt;Cycled through Firefox and WebKit in Playwright too, failing to recreate the bug&lt;/li&gt;
+        &lt;li&gt;Worked out my default browser was Safari&lt;/li&gt;
+        &lt;li&gt;Built a &lt;code&gt;textarea-scrollbar-test.html&lt;/code&gt; HTML document&lt;/li&gt;
+        &lt;li&gt;Opened that in real (not Playwright) Firefox&lt;/li&gt;
+        &lt;li&gt;Found that &lt;code&gt;osascript -e &apos;tell application &quot;System Events&quot; to tell process &quot;firefox&quot; to id of window 1&apos;&lt;/code&gt; was blocked because &quot;osascript is not allowed assistive access&quot;&lt;/li&gt;
+        &lt;li&gt;Figured out that &lt;code&gt;uv run --with pyobjc-framework-Quartz python&lt;/code&gt; workaround, described above&lt;/li&gt;
+        &lt;li&gt;Added JavaScript to the site templates in order to trigger the &lt;code&gt;/&lt;/code&gt; key&lt;/li&gt;
+        &lt;li&gt;Built its own little Python CORS web server to capture JSON data&lt;/li&gt;
+        &lt;li&gt;Rewrote the template to capture that data and send it to the server&lt;/li&gt;
+        &lt;li&gt;Scripted its way through the Web Component shadow DOM to the information it needed&lt;/li&gt;
+        &lt;li&gt;Opened Safari to confirm the source of the bug&lt;/li&gt;
+        &lt;li&gt;Modified its custom template to hack in a potential fix&lt;/li&gt;
+        &lt;li&gt;Confirmed the hacked fix worked&lt;/li&gt;
+        &lt;li&gt;Reported back on how to fix the problem&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Like I said, relentlessly proactive!&lt;/p&gt;
+        &lt;h4 id=&quot;an-estimate-of-the-cost&quot;&gt;An estimate of the cost&lt;/h4&gt;
+        &lt;p&gt;I&apos;m currently on the $100/month Claude Max plan, which includes a generous allowance for Fable up until June 22nd after which Anthropic say they&apos;ll start charging full API prices for it.&lt;/p&gt;
+        &lt;p&gt;I&apos;m using &lt;a href=&quot;https://www.agentsview.io&quot;&gt;AgentsView&lt;/a&gt; to track my spending (see &lt;a href=&quot;https://til.simonwillison.net/llms/agentsview-custom-model-price&quot;&gt;this TIL&lt;/a&gt;). Here&apos;s what AgentsView says this session would have cost me if I was paying full price for it:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;~ % uvx agentsview session usage be8850a7-6119-46a0-b5d6-79c7fff5ae2b
+        Session:       be8850a7-6119-46a0-b5d6-79c7fff5ae2b
+        Agent:         claude
+        Output:        68606
+        Peak ctx:      113178
+        Cost:          ~$12.11 (claude-fable-5, claude-opus-4-8)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If you don&apos;t keep a close eye on it, Fable will quite happily burn $12 in tokens inventing new ways to debug your CSS.&lt;/p&gt;
+        &lt;h4 id=&quot;i-really-need-to-lock-this-thing-down&quot;&gt;I really need to lock this thing down&lt;/h4&gt;
+        &lt;p&gt;On the one hand, watching Fable go to extreme lengths to get the information that it needed to debug what was, in the end, a two-line CSS fix, was &lt;em&gt;fascinating&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;But on the other hand... this is a robust reminder that coding agents can do anything &lt;em&gt;you&lt;/em&gt; can do by typing commands into a terminal - and frontier models know every trick in the book, and evidently a few that nobody has ever written down before.&lt;/p&gt;
+        &lt;p&gt;If Fable had been acting on malicious instructions - a prompt injection attack hidden in code or an issue thread, or something I&apos;d carelessly pasted into my terminal - it&apos;s alarming to think quite how far it could go to exfiltrate data or cause other forms of mischief.&lt;/p&gt;
+        &lt;p&gt;Running coding agents outside of a sandbox has always been a bad idea - it&apos;s my top contender for &lt;a href=&quot;https://simonwillison.net/2026/Jan/8/llm-predictions-for-2026/#1-year-a-challenger-disaster-for-coding-agent-security&quot;&gt;a Challenger disaster&lt;/a&gt; incident, as described by Johann Rehberger in &lt;a href=&quot;https://embracethered.com/blog/posts/2025/the-normalization-of-deviance-in-ai/&quot;&gt;The Normalization of Deviance in AI&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Fable is arguably smarter and hence more suspicious of potentially malicious instructions. But that smartness is very much a two-edged sword: if it &lt;em&gt;does&lt;/em&gt; get subverted by instructions, the amount of damage it can do given its relentless proactivity is terrifying.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/prompt-injection&quot;&gt;prompt-injection&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>datasette 1.0a33</title>
       <link>https://simonwillison.net/2026/Jun/11/datasette/#atom-everything</link>
@@ -768,38 +889,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-release-notes&quot;&gt;annotated-release-notes&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The solution might be cancelling my AI subscription</title>
-      <link>https://simonwillison.net/2026/May/31/the-solution-might-be-cancelling-my-ai-subscription/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/May/31/the-solution-might-be-cancelling-my-ai-subscription/#atom-everything</guid>
-      <pubDate>Sun, 31 May 2026 16:31:32 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://thoughts.hmmz.org/2026-05-31.html&quot;&gt;The solution might be cancelling my AI subscription&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        I find this post by David Wilson very relatable. David lists 16+ projects he&apos;s spun up with AI tooling, and concludes:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I didn&apos;t mean to build most of these things. Usually the Claude session started with something like &quot;&lt;em&gt;write a quick script for X&lt;/em&gt;&quot;, and one hour later the result is not a &lt;em&gt;quick script for X&lt;/em&gt;, nor in the usual case is my problem solved, whatever the original itch happened to be.&lt;/p&gt;
-        &lt;p&gt;On that last point, this technology is &lt;strong&gt;horrific&lt;/strong&gt; for attention. It&apos;s a thermonuclear ADHD amplifier and I have seen the same effect in every single one of my adult friends. Folk running 3 screens simultaneously working on totally unrelated &quot;projects&quot; they have little hope of maintaining, and such little commitment to the outcome that the time is obviously wasted.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This is a &lt;em&gt;very&lt;/em&gt; real problem. I&apos;m finding that coding agents can take me from a vague idea to a working solution, one with tests and documentation and that &lt;em&gt;looks&lt;/em&gt; like a carefully considered project evolved over the course of many weeks... in less than an hour.&lt;/p&gt;
-        &lt;p&gt;Even if the code is rock solid, there&apos;s a limit to how many projects like that I can sensibly care for - and if they&apos;re instantly abandoned, what value was there from creating them in the first place?&lt;/p&gt;
-        &lt;p&gt;David doesn&apos;t think this is sustainable at all:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I have no idea how to manage AI at present except by curtailing use, because a tool producing a cheap reward with minimal input and no friction can only be a liability, and achieving that realisation is probably the only real contribution of AI to date.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I&apos;m hopeful that the critical skill to develop here is &lt;em&gt;discipline&lt;/em&gt;. That’s not great news for me: I’ve been trying to figure that one out for decades!&lt;/p&gt;
-        &lt;p&gt;Interestingly, the &lt;a href=&quot;https://news.ycombinator.com/item?id=48345896&quot;&gt;Hacker News thread&lt;/a&gt; has gathered a number of comments from people with ADHD who are finding agents help them achieve the focus they&apos;ve been missing:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&quot;... for me (also ADHD) it&apos;s kind of the opposite. I&apos;m finishing side projects for the first time ever because I can actually get them working before I get bored of them&quot;&lt;/li&gt;
-        &lt;li&gt;&quot;As someone with ADHD I feel like AI is a salve for my mind. I used to listen to intense EDM while working. Now I sit in silence and talk to my agents. I maintain inbox zero. I absorb and comment across all relevant projects, even outside my team. I literally feel like I have a support team for the first time.&quot;&lt;/li&gt;
-        &lt;li&gt;&quot;For those of us prone to hyperfocus, working with AI can provide the kinds of stimulation we crave. I can hardly remember a time when I&apos;ve felt more engaged with my work, more productive, and more badass.&quot;&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=48345896&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/productivity&quot;&gt;productivity&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

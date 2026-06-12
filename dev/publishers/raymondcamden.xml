@@ -4,12 +4,72 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 11 Jun 2026 18:41:18 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 12 Jun 2026 18:24:23 GMT</lastBuildDate>
+    <item>
+      <title>Testing Diffbot&apos;s Web Search API</title>
+      <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
+      <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
+        &lt;p&gt;Diffbot&apos;s API (which quietly launched about two weeks ago) is against their own crawled index. Why does this matter? Honestly the docs do a &lt;em&gt;damn&lt;/em&gt; good job of explaining why you should care (emphasis mine):&lt;/p&gt;
+        &lt;p&gt;&amp;quot;Candidates are retrieved and reranked with a cross encoder model trained to rank &lt;strong&gt;factual relevance over popularity&lt;/strong&gt;, primary sources over domain monopolies, and organic page rank over &lt;strong&gt;paid spend&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;The net effect is search results that &lt;strong&gt;assume the user is not an idiot&lt;/strong&gt;. A search for &amp;quot;hypothyroidism&amp;quot; returns relevant research study papers alongside content from publicly administered websites and reputable non-profit institutions.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;Assuming users aren&apos;t idiots?!?!&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/cotton.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Bold move cotton&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Alright, so what&apos;s the API actually like? Cribbing from the docs, you make a &lt;code&gt;GET&lt;/code&gt; to &lt;code&gt;https://llm.diffbot.com/api/v1/web_search/&lt;/code&gt; with:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Your search term as &lt;code&gt;text&lt;/code&gt; in a query param&lt;/li&gt;
+        &lt;li&gt;A max number of results via &lt;code&gt;size&lt;/code&gt; that defaults to 10&lt;/li&gt;
+        &lt;li&gt;An optional &lt;code&gt;maxTokens&lt;/code&gt; value related to processing of the results&lt;/li&gt;
+        &lt;li&gt;Lastly, a Diffbot key passed via an &lt;code&gt;Authorization&lt;/code&gt; header&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As of &lt;em&gt;today&lt;/em&gt;, the API itself has no limits:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;Usage is currently unmetered while we open Web Search API up for public testing.
+        Don&apos;t be the person to screw this up for everyone.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;I&apos;d expect in the future this will change and I&apos;d check their main &lt;a href=&quot;https://docs.diffbot.com/reference/rate-limits&quot;&gt;rate limits doc&lt;/a&gt; for the latest info.&lt;/p&gt;
+        &lt;p&gt;As for actually using it, they&apos;ve got a great &lt;a href=&quot;https://github.com/diffbot/diffbot-python&quot;&gt;Python SDK&lt;/a&gt; which makes this incredibly simple:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from diffbot import Diffbot
+        
+        db = Diffbot(token=&amp;quot;YOUR_TOKEN&amp;quot;)
+        results = db.web_search(&amp;quot;diffbot knowledge graph&amp;quot;)
+        for r in results[&amp;quot;search_results&amp;quot;]:
+        print(r[&amp;quot;score&amp;quot;], r[&amp;quot;title&amp;quot;], r[&amp;quot;pageUrl&amp;quot;])
+        print(r[&amp;quot;content&amp;quot;])
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But with the REST API being so simple, I thought I&apos;d build a quick demo in JavaScript and use my new favorite home for stuff like this, &lt;a href=&quot;https://val.town&quot;&gt;val.town&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;building-a-web-search-alert&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-web-search-alert&quot;&gt;Building a Web Search Alert&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So this is probably the &lt;em&gt;simplest&lt;/em&gt; implementation (and in the last hour the Diffbot team literally added new stuff to the docs, which means more content, woot) but I built a simple system that:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Once a week, hits the Diffbot Web Search API looking for a term&lt;/li&gt;
+        &lt;li&gt;Filters the results based on the score value to only consider higher quality results&lt;/li&gt;
+        &lt;li&gt;Emails it to me&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;You, my highly intelligent reader, are probably already thinking of ways to tweak that, and as I said, I plan to follow up on this (tomorrow probably), but here&apos;s the entirety of the system in one file:&lt;/p&gt;
+        &lt;iframe width=&quot;100%&quot; height=&quot;600px&quot; src=&quot;https://www.val.town/embed/x/raymondcamden/diffbot-search-alert/main.ts&quot; title=&quot;Val Town&quot; frameborder=&quot;0&quot; allow=&quot;web-share&quot; allowfullscreen&gt;&lt;/iframe&gt;
+        &lt;p&gt;I&apos;ve got my key in an environment variable I snag first, and then define some core values:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;My search term (and yes, you can craft more complex queries than just my name)&lt;/li&gt;
+        &lt;li&gt;A max number of results&lt;/li&gt;
+        &lt;li&gt;A filter to apply on the results&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Then it&apos;s just a matter of hitting the endpoint. I take the results and filter based on my minimum desired value (scores go from 0 to 1 and in my testing, 0.5 helped).&lt;/p&gt;
+        &lt;p&gt;Each result contains the URL of the result, the title, the score, and a portion of the content. For my email, I show each of the values, but I was a bit torn on how to handle the &lt;code&gt;content&lt;/code&gt; value. It&apos;s markdown and I can easily turn Markdown into HTML, but it&apos;s a part of a web page and greatly screws up an HTML email.&lt;/p&gt;
+        &lt;p&gt;So how does it look?&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/df1.png&quot; loading=&quot;lazy&quot; alt=&quot;Email example&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Ok, that&apos;s not &lt;em&gt;terribly&lt;/em&gt; exciting, but you get the idea. I think where this starts to get cool is in combination with other tools as well. You will probably &lt;em&gt;not&lt;/em&gt; be surprised to know this is covered in their &lt;a href=&quot;https://github.com/diffbot/diffbot-skills&quot;&gt;AI skills&lt;/a&gt; as well, and I&apos;m going to demonstrate that soon as well. Check it out for yourself and let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -153,7 +213,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -347,7 +407,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -470,7 +530,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -480,7 +540,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -589,7 +649,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -669,7 +729,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -703,7 +763,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -772,7 +832,7 @@
       <title>Send me a message in a panel...</title>
       <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
       <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
+      <pubDate>Fri, 12 Jun 2026 17:43:30 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
         &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
@@ -895,350 +955,6 @@
         &lt;h2 id=&quot;try-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#try-it&quot;&gt;Try It&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;Ready to try it? I make no guarantees it will work, but then again, you&apos;ll never know. ;) Hit the form here: &lt;a href=&quot;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&quot;&gt;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@jayneharr33?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Jayne Harris&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-message-in-a-bottle-sitting-on-the-beach-EDTXcRCCVGk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>What was that song, the one with the words?</title>
-      <link>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</link>
-      <guid>https://www.raymondcamden.com/2026/05/13/what-was-that-song-the-one-with-the-words</guid>
-      <pubDate>Thu, 11 Jun 2026 18:17:59 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;My wife and I are both big music lovers, and I&apos;m happy to have influenced her listening habits a bit and have loved what she&apos;s introduced me to. Given we both love music, we&apos;ve also been known to sing along at times. (You can take a guess as to how well that goes.) She normally gets the lyrics right. I&apos;m normally a bit more... loose in terms of how well I remember the lyrics. I was thinking about this and was curious how well AI could be used to identity lyrics and match them to a song, especially when the lyrics may not be exactly right. I spent some time hacking on it and here&apos;s what I built.&lt;/p&gt;
-        &lt;h2 id=&quot;strike-one&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#strike-one&quot;&gt;Strike One&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I meant to type take one, accidentally wrote strike one, and as it didn&apos;t work, I&apos;m keeping the title. ;) So my first attempt was rather simple:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Use the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition&quot;&gt;SpeechRecognition&lt;/a&gt; API to get a transcript while you talk or sing.&lt;/li&gt;
-        &lt;li&gt;Use Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;Built-in AI&lt;/a&gt; to identify the song based on the lyrics.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Obviously Chrome&apos;s model would be date limited and wouldn&apos;t be able to pick up a recent song, but I figured I&apos;d give that a shot first.&lt;/p&gt;
-        &lt;p&gt;The SpeechRecognition API works &lt;em&gt;real&lt;/em&gt; well, but one issue I ran into was on my mobile browser. For some reason the transcription would show up twice. I was working with Cursor to build the demo and it was able to handle that issue well.&lt;/p&gt;
-        &lt;p&gt;Speaking of Cursor, it built the UI for me and honestly I think it did a great job:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/voice1.png&quot; loading=&quot;lazy&quot; alt=&quot;Email of NFL News&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;The code isn&apos;t too terribly long, so I&apos;ll share the whole thing then call out important bits:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-        
-        const isMobileSpeech =
-        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        
-        let recordBtn;
-        let transcriptEl;
-        let statusPanel;
-        let statusMessage;
-        let resultPanel;
-        let songTitleEl;
-        let songArtistEl;
-        
-        let recognition = null;
-        let isRecording = false;
-        let finalTranscript = &amp;quot;&amp;quot;;
-        let displayTranscript = &amp;quot;&amp;quot;;
-        
-        let session = null;
-        
-        const schema = {
-        type:&amp;quot;object&amp;quot;, 
-        properties: {
-        song: {
-        type:&amp;quot;string&amp;quot;,
-        description:&amp;quot;The song name.&amp;quot;
-        },
-        artist: {
-        type:&amp;quot;string&amp;quot;,
-        description:&amp;quot;The artist name.&amp;quot;
-        }
-        },
-        required: [&amp;quot;song&amp;quot;, &amp;quot;artist&amp;quot;],
-        additionalProperties: false
-        };
-        
-        async function canDoIt() {
-        if (!window.LanguageModel) {
-        return false;
-        }
-        
-        return (await LanguageModel.availability()) !== &amp;quot;unavailable&amp;quot;;
-        }
-        
-        function showUnsupportedMessage() {
-        const notice = document.createElement(&amp;quot;p&amp;quot;);
-        notice.className = &amp;quot;intro&amp;quot;;
-        notice.textContent =
-        &amp;quot;Sorry, your browser doesn&apos;t support this. This must be run on Chrome 148 or later.&amp;quot;;
-        document.querySelector(&amp;quot;.app&amp;quot;)?.append(notice);
-        }
-        
-        function setRecordingUi(recording) {
-        isRecording = recording;
-        recordBtn.classList.toggle(&amp;quot;is-recording&amp;quot;, recording);
-        recordBtn.setAttribute(&amp;quot;aria-pressed&amp;quot;, String(recording));
-        
-        const icon = recordBtn.querySelector(&amp;quot;.record-btn__icon&amp;quot;);
-        const label = recordBtn.querySelector(&amp;quot;.record-btn__label&amp;quot;);
-        
-        icon.classList.toggle(&amp;quot;record-btn__icon--mic&amp;quot;, !recording);
-        icon.classList.toggle(&amp;quot;record-btn__icon--stop&amp;quot;, recording);
-        label.textContent = recording ? &amp;quot;Stop&amp;quot; : &amp;quot;Start recording&amp;quot;;
-        }
-        
-        function resetOutput() {
-        statusPanel.hidden = true;
-        resultPanel.hidden = true;
-        statusMessage.textContent = &amp;quot;&amp;quot;;
-        songTitleEl.textContent = &amp;quot;&amp;quot;;
-        songArtistEl.textContent = &amp;quot;&amp;quot;;
-        }
-        
-        function transcriptFromResults(results) {
-        let interimTranscript = &amp;quot;&amp;quot;;
-        let finalPart = &amp;quot;&amp;quot;;
-        
-        for (let i = 0; i &amp;lt; results.length; i += 1) {
-        const result = results[i];
-        const text = result[0].transcript;
-        
-        if (result.isFinal) {
-        finalPart += text;
-        } else {
-        interimTranscript += text;
-        }
-        }
-        
-        return {
-        display: `${finalPart}${interimTranscript}`.trim(),
-        final: finalPart.trim(),
-        };
-        }
-        
-        function startRecording() {
-        if (!SpeechRecognition) {
-        transcriptEl.textContent =
-        &amp;quot;Speech recognition is not supported in this browser. Try Chrome.&amp;quot;;
-        return;
-        }
-        
-        resetOutput();
-        finalTranscript = &amp;quot;&amp;quot;;
-        displayTranscript = &amp;quot;&amp;quot;;
-        transcriptEl.textContent = &amp;quot;Listening...&amp;quot;;
-        
-        recognition = new SpeechRecognition();
-        recognition.lang = &amp;quot;en-US&amp;quot;;
-        recognition.interimResults = true;
-        recognition.continuous = !isMobileSpeech;
-        
-        recognition.onresult = (event) =&amp;gt; {
-        if (isMobileSpeech) {
-        const transcript = transcriptFromResults(event.results);
-        displayTranscript = transcript.display;
-        finalTranscript = transcript.final;
-        } else {
-        let interimTranscript = &amp;quot;&amp;quot;;
-        
-        for (let i = event.resultIndex; i &amp;lt; event.results.length; i += 1) {
-        const result = event.results[i];
-        const text = result[0].transcript;
-        
-        if (result.isFinal) {
-        finalTranscript += `${text} `;
-        } else {
-        interimTranscript += text;
-        }
-        }
-        
-        displayTranscript = `${finalTranscript}${interimTranscript}`.trim();
-        }
-        
-        transcriptEl.textContent = displayTranscript || &amp;quot;Listening...&amp;quot;;
-        };
-        
-        recognition.onerror = (event) =&amp;gt; {
-        transcriptEl.textContent = `Recognition error: ${event.error}`;
-        stopRecording();
-        };
-        
-        recognition.onend = () =&amp;gt; {
-        if (isRecording &amp;amp;&amp;amp; recognition.continuous) {
-        recognition.start();
-        }
-        };
-        
-        recognition.start();
-        setRecordingUi(true);
-        }
-        
-        function stopRecording() {
-        if (!recognition) {
-        return;
-        }
-        
-        setRecordingUi(false);
-        recognition.onend = null;
-        recognition.stop();
-        recognition = null;
-        
-        const transcript = displayTranscript.trim() || finalTranscript.trim();
-        if (transcript) {
-        transcriptEl.textContent = transcript;
-        }
-        recognize(transcript);
-        }
-        
-        async function recognize(transcript) {
-        resetOutput();
-        statusPanel.hidden = false;
-        statusMessage.textContent = &amp;quot;Analyzing your dulcet tones...&amp;quot;;
-        
-        if(!session) {
-        session = await LanguageModel.create({
-        initialInputs: [
-        { 
-        role: &apos;system&apos;, 
-        content: 
-        &apos;You are a song id bot. Given lyrics, sometimes incorrect, you try to identity the song. You only return the song and artist.&apos; 
-        }
-        ],
-        monitor(m) {
-        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
-        if(e.loaded === 0 || e.loaded === 1) return;
-        statusPanel.innerHTML = `Downloading, currently at ${Math.floor(e.loaded * 100)}%`;
-        });
-        }	
-        });
-        }
-        
-        console.log(`Passing: ${transcript}`);
-        let thisSession = await session.clone();
-        let result = await thisSession.prompt(
-        [
-        { role: &apos;user&apos;, content: transcript }
-        ], { responseConstraint: schema });
-        
-        console.log(result);
-        let { song, artist } = JSON.parse(result);
-        songTitleEl.textContent = song;
-        songArtistEl.textContent = artist;
-        resultPanel.hidden = false;
-        }
-        
-        function initApp() {
-        recordBtn = document.getElementById(&amp;quot;recordBtn&amp;quot;);
-        transcriptEl = document.getElementById(&amp;quot;transcript&amp;quot;);
-        statusPanel = document.getElementById(&amp;quot;statusPanel&amp;quot;);
-        statusMessage = document.getElementById(&amp;quot;statusMessage&amp;quot;);
-        resultPanel = document.getElementById(&amp;quot;resultPanel&amp;quot;);
-        songTitleEl = document.getElementById(&amp;quot;songTitle&amp;quot;);
-        songArtistEl = document.getElementById(&amp;quot;songArtist&amp;quot;);
-        
-        document.querySelector(&amp;quot;.controls&amp;quot;).hidden = false;
-        document.querySelector(&amp;quot;.transcript-panel&amp;quot;).hidden = false;
-        
-        recordBtn.addEventListener(&amp;quot;click&amp;quot;, () =&amp;gt; {
-        if (isRecording) {
-        stopRecording();
-        } else {
-        startRecording();
-        }
-        });
-        }
-        
-        document.addEventListener(&amp;quot;DOMContentLoaded&amp;quot;, async () =&amp;gt; {
-        const supported = await canDoIt();
-        
-        if (!supported) {
-        showUnsupportedMessage();
-        return;
-        }
-        
-        initApp();
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;So up top - a bunch of variables that will point to the DOM and two checks - one for speech recognition (it should always exist, just not at the same place - scratch that - not supported in Firefox, sorry) and one for mobile.&lt;/p&gt;
-        &lt;p&gt;I&apos;m using a JSON schema to shape Chrome AI&apos;s response to ensure it just returns the song and artist.&lt;/p&gt;
-        &lt;p&gt;After that - I&apos;ve got code to handle clicking the record button and transcribing. As soon as you stop recording, the transcription is handed off to Chrome for analysis.&lt;/p&gt;
-        &lt;p&gt;And... it worked. Poorly. If you get the lyrics right it can do ok, but it didn&apos;t really work well enough to consider it a success. You, if you are on Chrome 148 or higher, can now test this yourself, no need to flip a feature flag. It&apos;s up and running here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/voice_to_song/&quot;&gt;https://cfjedimaster.github.io/webdemos/voice_to_song/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;But as I said... temper your expectations.&lt;/p&gt;
-        &lt;h2 id=&quot;version-do-re-mi&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#version-do-re-mi&quot;&gt;Version Do Re Mi&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I decided to pivot and go from on-device AI to hitting the Gemini API directly. One nice thing about the Gemini APIs is that they have a proper free tier which meant I could put up a demo and not worry about the cost. (That being said, if you try the demo and it fails due to rate limits and such... I&apos;m sorry. I&apos;ll offer you a full and complete refund at my earlier convenience.)&lt;/p&gt;
-        &lt;p&gt;For this, I went back to to &lt;a href=&quot;https://www.val.town/&quot;&gt;val.town&lt;/a&gt; which I&apos;ve been enjoying the heck out of lately. I first did the quick hack to allow for static files by using this in main.ts:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { staticHTTPServer } from &amp;quot;https://esm.town/v/std/utils/index.ts&amp;quot;;
-        export default staticHTTPServer(import.meta.url);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And then added a HTTP trigger to make it accessible. (This feels like something I think val.town could make even easier.) My HTML stayed the same (except for one tweak I&apos;ll mention below) and my JavaScript changed to remove the check for Chrome&apos;s AI and just do a simple fetch call:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let req = await fetch(API, {
-        method: &amp;quot;post&amp;quot;,
-        body: JSON.stringify({ transcript }),
-        });
-        
-        let result = await req.json();
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This is calling &lt;code&gt;api.ts&lt;/code&gt; which also has a HTTP trigger:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { GoogleGenerativeAI } from &amp;quot;npm:@google/generative-ai&amp;quot;;
-        
-        const schema = {
-        type: &amp;quot;object&amp;quot;,
-        properties: {
-        song: {
-        type: &amp;quot;string&amp;quot;,
-        description: &amp;quot;The song name.&amp;quot;,
-        },
-        artist: {
-        type: &amp;quot;string&amp;quot;,
-        description: &amp;quot;The artist name.&amp;quot;,
-        },
-        },
-        required: [&amp;quot;song&amp;quot;, &amp;quot;artist&amp;quot;],
-        };
-        
-        const genAI = new GoogleGenerativeAI(Deno.env.get(&amp;quot;GEMINI_API_KEY&amp;quot;));
-        const model = genAI.getGenerativeModel({
-        model: &amp;quot;gemini-flash-latest&amp;quot;,
-        });
-        
-        export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
-        const body = await req.json();
-        console.log(&amp;quot;req&amp;quot;, body);
-        
-        let result = await model.generateContent(
-        {
-        contents: [{
-        role: &amp;quot;user&amp;quot;,
-        parts: [{
-        text:
-        `Identify this song based on lyrics remembered. You will be passed lyrics that the user guesses are in the song. Lyrics could be wrong. Search against the lyrics, not the title of the song. Here&apos;s what they remember: ${body.transcript}`,
-        }],
-        }],
-        generationConfig: {
-        responseMimeType: &amp;quot;application/json&amp;quot;,
-        responseSchema: schema,
-        },
-        },
-        );
-        
-        console.log(result.response.text());
-        
-        return Response.json(JSON.parse(result.response.text()));
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;You&apos;ll note I improved the system message a bit here. While testing with a buddy, he noted it seemed to sometimes focus on matching a title in the transcript, so I wanted to try to avoid that.&lt;/p&gt;
-        &lt;p&gt;Back in the HTML, I made one more important change to the instructions:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Sing (or say) a few bars into your mic. We&apos;ll listen, pretend to think
-        very hard, then guess what song you had in mind. No guarantees. Maximum
-        synth.
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I removed the mention of humming as that won&apos;t actually be transcribed. In theory, we could record that audio and send it to Gemini as well, but I was trying to keep this simpler.&lt;/p&gt;
-        &lt;p&gt;Want to try this version? Want to belt out some tunes? Head over to the live version here: &lt;a href=&quot;https://raymondcamden--4d1152f64d8111f1a0fbee650bb23af1.web.val.run/&quot;&gt;https://raymondcamden--4d1152f64d8111f1a0fbee650bb23af1.web.val.run/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;As I said, this is a free tier Gemini call so I fully expect you may hit limits. You can always fork my val (embedded below) and use your own key.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s an example:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/voice1.png&quot; loading=&quot;lazy&quot; alt=&quot;Email of NFL News&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;How well does this one work? Better! But myself, and my friends who tested, still see mistakes. That being said, it was kind of fun. Let me know what you find!&lt;/p&gt;
-        &lt;p&gt;Also, a big thank you (again!) to &lt;a href=&quot;https://blog.tomayac.com/&quot;&gt;Thomas Steiner&lt;/a&gt; from the Chrome team for help while I was building this out!&lt;/p&gt;
-        &lt;p&gt;I was going to embed the Val here, but apparently you can only embed one file so - instead, here&apos;s a simple link instead: &lt;a href=&quot;https://www.val.town/x/raymondcamden/voice-to-song&quot;&gt;https://www.val.town/x/raymondcamden/voice-to-song&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@maykogob?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Mayko Sousa&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-yawning-with-its-mouth-open-wvDs1EswZZk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
