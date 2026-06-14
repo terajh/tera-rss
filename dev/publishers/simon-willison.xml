@@ -4,7 +4,76 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sat, 13 Jun 2026 16:44:43 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jun 2026 17:09:55 GMT</lastBuildDate>
+    <item>
+      <title>Publishing WASM wheels to PyPI for use with Pyodide</title>
+      <link>https://simonwillison.net/2026/Jun/13/publishing-wasm-wheels/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/13/publishing-wasm-wheels/#atom-everything</guid>
+      <pubDate>Sat, 13 Jun 2026 23:55:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;The &lt;a href=&quot;https://blog.pyodide.org/posts/314-release/&quot;&gt;Pyodide 314.0 release announcement&lt;/a&gt; (via &lt;a href=&quot;https://news.ycombinator.com/item?id=48462759&quot;&gt;Hacker News&lt;/a&gt;) includes news I&apos;ve been looking forward to for a long time:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;You can now publish Python packages built for Pyodide (or any Python runtime compatible with &lt;a href=&quot;https://pyodide.org/en/stable/development/abi.html&quot;&gt;the PyEmscripten platform defined in PEP 783&lt;/a&gt;) directly to PyPI and install them at runtime.&lt;/p&gt;
+        &lt;p&gt;Previously, the Pyodide maintainers had to maintain, build, and host over 300 packages ourselves. This created a significant burden on our maintainers and became a major bottleneck for the community, as every new package required manual review.&lt;/p&gt;
+        &lt;p&gt;Moving forward, package maintainers can simply build and publish Pyodide wheels to PyPI, just as they do for native wheels on Linux, macOS, or Windows.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Here&apos;s the &lt;a href=&quot;https://github.com/pypi/warehouse/pull/19804&quot;&gt;PR to PyPI itself supporting this&lt;/a&gt;, which landed on April 21st.&lt;/p&gt;
+        &lt;p&gt;I adore &lt;a href=&quot;https://pyodide.org&quot;&gt;Pyodide&lt;/a&gt;, and have been frustrated in the past by this limitation. It&apos;s possible to compile C or Rust extensions to WASM in a wheel file, but before now there was no easy way to distribute them.&lt;/p&gt;
+        &lt;p&gt;Thanks to the efforts of a whole lot of people, that&apos;s now been fixed!&lt;/p&gt;
+        &lt;h4 id=&quot;trying-it-out-with-luau-wasm&quot;&gt;Trying it out with luau-wasm&lt;/h4&gt;
+        &lt;p&gt;I decided to celebrate by finding something I could package. I have quite a few experimental Pyodide projects lying around, but the best fit for this looked to be my &lt;a href=&quot;https://github.com/simonw/research/tree/main/pluau-wasm-pyodide#readme&quot;&gt;Luau WebAssembly research spike&lt;/a&gt; from 9th March.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://luau.org&quot;&gt;Luau&lt;/a&gt; is a &quot;small, fast, and embeddable programming language based on Lua with a gradual type system&quot;, &lt;a href=&quot;https://luau.org/news/2022-11-04-luau-origins-and-evolution/&quot;&gt;developed by Roblox&lt;/a&gt; and released under an MIT license.&lt;/p&gt;
+        &lt;p&gt;It&apos;s written in C++. I already knew it was possible to compile it to WebAssembly and get it running inside of Pyodide, so I &lt;a href=&quot;https://gist.github.com/simonw/1761eab6ba11d4053f56f955a28ad76b&quot;&gt;set Codex + GPT-5.5 xhigh&lt;/a&gt; the task of packaging my experiment up and publishing it to PyPI using GitHub Actions.&lt;/p&gt;
+        &lt;p&gt;It took some iteration, but here&apos;s the result: &lt;a href=&quot;https://pypi.org/project/luau-wasm/&quot;&gt;luau-wasm&lt;/a&gt; is a brand new PyPI package which publishes a 276KB &lt;code&gt;luau_wasm-0.1a0-cp314-cp314-pyemscripten_2026_0_wasm32.whl&lt;/code&gt; file which can be used in Pyodide like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;micropip&lt;/span&gt;
+        &lt;span class=&quot;pl-k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;micropip&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;install&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;luau-wasm&quot;&lt;/span&gt;)
+        &lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;luau_wasm&lt;/span&gt;
+        &lt;span class=&quot;pl-en&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;luau_wasm&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;execute&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;r&apos;&apos;&apos;&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;local animals = {&quot;fox&quot;, &quot;owl&quot;, &quot;frog&quot;, &quot;rabbit&quot;}&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;table.sort(animals, function(a, b) return #a &amp;lt; #b end)&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;for i, name in animals do print(i .. &quot;. &quot; .. name .. &quot; (&quot; .. #name .. &quot;)&quot;) end&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;&apos;&apos;&apos;&lt;/span&gt;))&lt;/pre&gt;
+        &lt;p&gt;You can run that code &lt;a href=&quot;https://pyodide.org/en/stable/console.html&quot;&gt;in the Pyodide REPL demo&lt;/a&gt; to see it in action.&lt;/p&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://github.com/simonw/luau-wasm&quot;&gt;GitHub repo for luau-wasm&lt;/a&gt; includes all of the build and deploy scripts (using the latest &lt;a href=&quot;https://github.com/pypa/cibuildwheel&quot;&gt;cibuildwheel&lt;/a&gt;) and also deploys an HTML demo page which loads Pyodide, installs &lt;code&gt;luau-wasm&lt;/code&gt; and provides an interface for trying it out: &lt;a href=&quot;https://simonw.github.io/luau-wasm/&quot;&gt;https://simonw.github.io/luau-wasm/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/luau-wasm.jpg&quot; alt=&quot;Screenshot of a web app titled &amp;quot;Luau WASM&amp;quot; with subtitle &amp;quot;Run Luau in the browser through Pyodide after installing the luau-wasm WebAssembly wheel from PyPI.&amp;quot; A green &amp;quot;Ready&amp;quot; status badge is at top right. Below are example buttons: &amp;quot;Hello World&amp;quot;, &amp;quot;Variables&amp;quot;, &amp;quot;Tables&amp;quot;, &amp;quot;Fibonacci&amp;quot;, &amp;quot;Runtime Error&amp;quot;. A &amp;quot;LUAU SOURCE&amp;quot; code editor contains: local function fib(n: number): number / if n &amp;lt; 2 then return n end / return fib(n - 1) + fib(n - 2) / end / local out = {} / for i = 0, 12 do / table.insert(out, tostring(fib(i))) / end / print(table.concat(out, &amp;quot;, &amp;quot;)). On the right is an &amp;quot;OUTPUT&amp;quot; panel with a &amp;quot;Copy&amp;quot; button showing dark terminal output: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144. At the bottom left are a blue &amp;quot;Run&amp;quot; button, a &amp;quot;Clear&amp;quot; button, and the text &amp;quot;6.0 ms&amp;quot;.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        &lt;h4 id=&quot;how-many-packages-are-using-this-so-far-&quot;&gt;How many packages are using this so far?&lt;/h4&gt;
+        &lt;p&gt;I was curious to see how many packages are currently publishing wheels for this platform.&lt;/p&gt;
+        &lt;p&gt;After some &lt;a href=&quot;https://chatgpt.com/share/6a2dee92-b110-83e8-9f53-ba9259b751ed&quot;&gt;tinkering with ChatGPT&lt;/a&gt; I got to &lt;a href=&quot;https://gist.github.com/simonw/4a34a49fca63bc09c50bc31e17b3d33b?permalink_comment_id=6198602#gistcomment-6198602&quot;&gt;this BigQuery SQL&lt;/a&gt; which I ran against PyPI&apos;s &lt;a href=&quot;https://packaging.python.org/en/latest/guides/analyzing-pypi-package-downloads/#public-dataset&quot;&gt;public dataset on BigQuery&lt;/a&gt;. Here&apos;s the &lt;a href=&quot;https://gist.github.com/simonw/4a34a49fca63bc09c50bc31e17b3d33b&quot;&gt;raw JSON&lt;/a&gt; of query results and here&apos;s a SQLite SQL query &lt;a href=&quot;https://lite.datasette.io/?json=https://gist.github.com/simonw/4a34a49fca63bc09c50bc31e17b3d33b#/data?sql=select%0A++name%2C%0A++platform_tag%2C%0A++matching_file_count%2C%0A++max%28latest_upload%29+as+latest_upload%2C%0A++example_files%0Afrom+%28%0A++--+your+existing+query+here%2C+without+order+by%0A++select%0A++++name%2C%0A++++platform_tag%2C%0A++++matching_file_count%2C%0A++++latest_upload%2C%0A++++example_files%0A++from+raw%0A%29%0Agroup+by+name%0Aorder+by+latest_upload+desc%3B&quot;&gt;in Datasette Lite&lt;/a&gt; which dedupes packages by most recent upload date.&lt;/p&gt;
+        &lt;p&gt;If the query is right, there are currently 28 PyPI packages publishing with the new &lt;code&gt;pyemscripten_202*_wasm32&lt;/code&gt; tags:&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://pypi.org/project/luau-wasm/&quot;&gt;luau-wasm&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/uuid7-rs/&quot;&gt;uuid7-rs&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/cmm-16bit/&quot;&gt;cmm-16bit&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/pyOpenTTDAdmin/&quot;&gt;pyOpenTTDAdmin&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/imgui-bundle/&quot;&gt;imgui-bundle&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/numbertoolkit/&quot;&gt;numbertoolkit&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/bashkit/&quot;&gt;bashkit&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/geoarrow-rust-core/&quot;&gt;geoarrow-rust-core&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/arro3-io/&quot;&gt;arro3-io&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/arro3-core/&quot;&gt;arro3-core&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/arro3-compute/&quot;&gt;arro3-compute&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/onnx/&quot;&gt;onnx&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/powerfit-em/&quot;&gt;powerfit-em&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/tcod/&quot;&gt;tcod&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/chonkie-core/&quot;&gt;chonkie-core&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/tokie/&quot;&gt;tokie&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/robotraconteur/&quot;&gt;robotraconteur&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/pydantic_core/&quot;&gt;pydantic_core&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/yaml-rs/&quot;&gt;yaml-rs&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/cadquery-ocp-novtk-OCP.wasm/&quot;&gt;cadquery-ocp-novtk-OCP.wasm&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/uuid_utils/&quot;&gt;uuid_utils&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/base64_utils/&quot;&gt;base64_utils&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/pycdfpp/&quot;&gt;pycdfpp&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/lib3mf-OCP.wasm/&quot;&gt;lib3mf-OCP.wasm&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/typst/&quot;&gt;typst&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/toml-rs/&quot;&gt;toml-rs&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/onnx-weekly/&quot;&gt;onnx-weekly&lt;/a&gt;, &lt;a href=&quot;https://pypi.org/project/dummy-pyodide-ext-test/&quot;&gt;dummy-pyodide-ext-test&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Here&apos;s hoping we see a whole lot more of those showing up over the coming months and years.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/lua&quot;&gt;lua&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pypi&quot;&gt;pypi&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/github-actions&quot;&gt;github-actions&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pyodide&quot;&gt;pyodide&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>luau-wasm 0.1a0</title>
+      <link>https://simonwillison.net/2026/Jun/13/luau-wasm/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/13/luau-wasm/#atom-everything</guid>
+      <pubDate>Sat, 13 Jun 2026 23:14:30 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/luau-wasm/releases/tag/0.1a0&quot;&gt;luau-wasm 0.1a0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;See &lt;a href=&quot;https://simonwillison.net/2026/Jun/13/publishing-wasm-wheels/&quot;&gt;Publishing WASM wheels to PyPI for use with Pyodide&lt;/a&gt; for details.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/lua&quot;&gt;lua&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pyodide&quot;&gt;pyodide&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Mapping SQLite result columns back to their source `table.column`</title>
+      <link>https://simonwillison.net/2026/Jun/13/sqlite-column-provenance/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/13/sqlite-column-provenance/#atom-everything</guid>
+      <pubDate>Sat, 13 Jun 2026 23:05:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Research:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/research/tree/main/sqlite-column-provenance#readme&quot;&gt;Mapping SQLite result columns back to their source `table.column`&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;It would be neat if arbitrary SQL queries in &lt;a href=&quot;https://datasette.io/&quot;&gt;Datasette&lt;/a&gt; could be rendered with additional information based on which columns from which tables were included in the results.&lt;/p&gt;
+        &lt;p&gt;To build that, we would need to be able to look at a SQL query like &lt;code&gt;select users.name, orders.total from users join orders on orders.user_id = users.id&lt;/code&gt; and programmatically identify the &lt;code&gt;table.column&lt;/code&gt; for each result - navigating not just joins but also more complex syntax like CTEs.&lt;/p&gt;
+        &lt;p&gt;I decided to set Claude Code (Opus 4.8, since Fable is currently &lt;a href=&quot;https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/&quot;&gt;banned by the US government&lt;/a&gt;) on the problem. It found several promising solutions - one using &lt;a href=&quot;https://github.com/rogerbinns/apsw&quot;&gt;apsw&lt;/a&gt;, another that uses &lt;code&gt;ctypes&lt;/code&gt; to access the SQLite &lt;code&gt;sqlite3_column_table_name()&lt;/code&gt; &lt;a href=&quot;https://sqlite.org/c3ref/column_database_name.html&quot;&gt;C function&lt;/a&gt; (which is not otherwise exposed to Python), and one using clever interrogation of the output of &lt;code&gt;EXPLAIN&lt;/code&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Statement on the US government directive to suspend access to Fable 5 and Mythos 5</title>
       <link>https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/#atom-everything</link>
@@ -854,46 +923,6 @@
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/micropython-wasm/releases/tag/0.1a1&quot;&gt;micropython-wasm 0.1a1&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Fixes for some limitations that emerged while I was trying to use this to build &lt;code&gt;datasette-agent-micropython&lt;/code&gt;.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/micropython&quot;&gt;micropython&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>California Brown Pelican</title>
-      <link>https://simonwillison.net/2026/Jun/2/sighting-367841339/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/2/sighting-367841339/#atom-everything</guid>
-      <pubDate>Tue, 02 Jun 2026 18:17:03 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;img src=&quot;https://static.inaturalist.org/photos/671786719/large.jpg&quot; alt=&quot;California Brown Pelican&quot;&gt;&lt;/p&gt;&lt;p&gt;California Brown Pelican, in Fort Mason, CA, US&lt;/p&gt;&lt;p&gt;I&apos;m at the &lt;a href=&quot;https://build.microsoft.com/&quot;&gt;Microsoft Build&lt;/a&gt; conference today, held at &lt;a href=&quot;https://en.wikipedia.org/wiki/Fort_Mason&quot;&gt;Fort Mason&lt;/a&gt; in San Francisco. There are California Brown Pelicans diving into the water directly behind venue!&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/microsoft&quot;&gt;microsoft&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Pasted File Editor</title>
-      <link>https://simonwillison.net/2026/Jun/2/pasted-file-editor/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/2/pasted-file-editor/#atom-everything</guid>
-      <pubDate>Tue, 02 Jun 2026 04:13:36 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/pasted-file-editor&quot;&gt;Pasted File Editor&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;I really like how you can paste a large volume of text into &lt;a href=&quot;https://claude.ail&quot;&gt;claude.ai&lt;/a&gt; (or the Claude desktop/mobile apps) and it will detect it as a large paste and turn it into a file attachment instead.&lt;/p&gt;
-        &lt;p&gt;I decided to have Codex desktop &lt;a href=&quot;https://gist.github.com/simonw/74c79119b487a5acce18b4dcc26b9f79&quot;&gt;build me a version of that&lt;/a&gt; as a prototype.&lt;/p&gt;
-        &lt;p&gt;You can also open files directly - including images which will be shown as thumbnails - or drag files onto the textarea.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/javascript&quot;&gt;javascript&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/codex&quot;&gt;codex&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>micropython-wasm 0.1a0</title>
-      <link>https://simonwillison.net/2026/Jun/2/micropython-wasm-2/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/2/micropython-wasm-2/#atom-everything</guid>
-      <pubDate>Tue, 02 Jun 2026 03:43:45 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/micropython-wasm/releases/tag/0.1a0&quot;&gt;micropython-wasm 0.1a0&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;My latest sandboxing experiment: This alpha package bundles a lightly customized WASM build of &lt;a href=&quot;https://micropython.org/&quot;&gt;MicroPython&lt;/a&gt; with a wrapper to execute code in it via &lt;a href=&quot;https://wasmtime.dev/&quot;&gt;wasmtime&lt;/a&gt;.&lt;/p&gt;
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/micropython&quot;&gt;micropython&lt;/a&gt;&lt;/p&gt;
