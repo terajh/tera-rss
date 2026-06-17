@@ -4,12 +4,114 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 16 Jun 2026 19:39:49 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 17 Jun 2026 18:40:39 GMT</lastBuildDate>
+    <item>
+      <title>Creating a Dynamic Favicon with Cloudinary</title>
+      <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
+      <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/fav1.png&quot; loading=&quot;lazy&quot; alt=&quot;Google Calendar favicon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;As there is - at most - 31 days in a month - my assumption is that they simply generated all 31 at some point and in their code serving up the web page, they select the right one. To be honest, it&apos;s subtle and I don&apos;t always notice it, but it&apos;s a nice effect. I decided to take a look at how I&apos;d implement this in Cloudinary with JavaScript.&lt;/p&gt;
+        &lt;h2 id=&quot;the-icon&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-icon&quot;&gt;The Icon&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;For my icon, I grabbed this nice cat icon from Flaticon: &lt;a href=&quot;https://www.flaticon.com/free-icon/cat_8564642&quot;&gt;https://www.flaticon.com/free-icon/cat_8564642&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Nice and simple, and not a bad choice for an icon.&lt;/p&gt;
+        &lt;p&gt;This was originally a png, which you can use for a favicon, but I used Cloudinary&apos;s URL transformations to both resize it and turn it into an ICO (I added a linebreak to the URL to help it wrap):&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/ 
+        fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The size is handled in &lt;code&gt;c_fit,w_32&lt;/code&gt;, setting it to 32 pixels wide while &lt;code&gt;f_ico&lt;/code&gt; changes the format to ICO.&lt;/p&gt;
+        &lt;h2 id=&quot;adding-text&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-text&quot;&gt;Adding Text&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Cloudinary&apos;s transformations support adding text layers to the image, so the next thing I tried was adding that to the icon:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/
+        fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/
+        https://static.raymondcamden.com/images/2026/06/cat.png
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the URL above, the portion beginning &lt;code&gt;l_text&lt;/code&gt; is where I define my font, size, styling, position and finally, the actual number. I also added an opacity to the icon to make the text stand out. You can see that here, &lt;code&gt;o_33&lt;/code&gt;, where 33 is the percent and was based on me just playing around until I felt the text was most clear.&lt;/p&gt;
+        &lt;p&gt;You can see it here:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This worked well with 99 as well, but at most I think 2 characters is all you would want to fit in there.&lt;/p&gt;
+        &lt;h2 id=&quot;putting-it-together&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-it-together&quot;&gt;Putting it Together&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so for my fancy demo, I started off with a bit of HTML and a hard-coded favicon pointing to my cat:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;./style.css&amp;quot;&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
+        &amp;lt;link id=&amp;quot;favicon&amp;quot; rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/x-icon&amp;quot; href=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png&amp;quot;&amp;gt;
+        &amp;lt;title&amp;gt;Pen&amp;lt;/title&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        
+        &amp;lt;h2&amp;gt;Dynamic Favicon via Cloudinary&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;
+        This demo shows how to dynamically create a favicon
+        via Cloudinary. It uses a source image that&apos;s resized and converted to ICO, but then can also support dynamic text (well, a small amount) written to the icon.
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;button id=&amp;quot;addBtn&amp;quot;&amp;gt;Click me to increase the #&amp;lt;/button&amp;gt;
+        &amp;lt;button id=&amp;quot;resetBtn&amp;quot;&amp;gt;Click me to reset the #&amp;lt;/button&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script src=&amp;quot;./script.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note I&apos;ve got two buttons. Each time you click the add button, I&apos;m going to update the favicon with a number, while the reset button simply resets to the default.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Number used in the favicon
+        let NUMBER = 0;
+        
+        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
+        
+        const $favico = document.querySelector(&apos;#favicon&apos;);
+        const defaultIco = $favico.href;
+        
+        document.querySelector(&apos;#addBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
+        NUMBER++
+        setIco();
+        });
+        
+        document.querySelector(&apos;#resetBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
+        NUMBER = 0;
+        setIco();
+        });
+        
+        const setIco = () =&amp;gt; {
+        if(NUMBER &amp;gt; 0) {
+        $favico.href = `https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:${NUMBER}/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png`;
+        } else {
+        $favico.href = defaultIco;
+        }
+        };
+        
+        }, false);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I grab a pointer to the favicon link in my HTML and copy out the default href value. Then I simply use two event handlers to handle each button. One increases the number, one resets it to 0. The last bit, &lt;code&gt;setIco&lt;/code&gt;, just changes the href value.&lt;/p&gt;
+        &lt;p&gt;You can test this yourself here: &lt;a href=&quot;https://giving-flower-sunfish.codepen.app&quot;&gt;https://giving-flower-sunfish.codepen.app&lt;/a&gt;. In my testing with Chrome, it worked well. I saw the favicon update within about a second of clicking. YMMV of course. I just tested in Firefox and it worked just fine as well.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve embedded the CodePen below, but of course you will need to run the deployed version to see it in action. Enjoy!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Untitled&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRNago&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ed120-9ee6-7141-af43-13ae7c7cc8f1&quot;&gt;
+        Untitled&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -69,7 +171,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -213,7 +315,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -407,7 +509,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -530,7 +632,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -540,7 +642,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -649,7 +751,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -729,7 +831,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -763,7 +865,7 @@
       <title>Is it hotter or colder this year?</title>
       <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
       <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
+      <pubDate>Wed, 17 Jun 2026 18:00:29 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
         &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
@@ -826,135 +928,6 @@
         &lt;h2 id=&quot;so%2C-was-it-cooler%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#so%2C-was-it-cooler%3F&quot;&gt;So, was it cooler?&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;No. I was wrong. Last year was cooler than this year, but the three years before that were all higher, with 2022 being pure hell. I remember that year seeing the city working on a road that had literally buckled because of heat.&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@peteralbanese?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Peter Albanese&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/black-and-white-cat-on-glass-window-K9_Igf8ZpC0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Send me a message in a panel...</title>
-      <link>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</link>
-      <guid>https://www.raymondcamden.com/2026/05/14/send-me-a-message-in-a-panel</guid>
-      <pubDate>Tue, 16 Jun 2026 19:01:24 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;On my birthday a few weeks ago, one of things I got was something I&apos;ve wanted to play with for a while, the &lt;a href=&quot;https://divoom.com/products/pixoo-64&quot;&gt;Divoom Pixoo64&lt;/a&gt; pixel frame. This is pixel art frame you can hang on your wall and with an app, select art, clock faces, and more. It&apos;s fun, although the app itself isn&apos;t my favorite. But - what excites me is that it has an API you can use to change what&apos;s shown on the frame. I actually built a demo of this with Webflow you can see below:&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;oRyVxxi6ew8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/oRyVxxi6ew8/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=oRyVxxi6ew8&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
-        &lt;p&gt;I was thinking about how else I could play with the API and decided to do something a bit risky - build a tool that lets you (yes, you!) send me a message right to my device. How did I do it? Let me describe the process from the bottom up.&lt;/p&gt;
-        &lt;h2 id=&quot;the-python-server&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-python-server&quot;&gt;The Python Server&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;At the lowest level is a Python server running on my machine. Yes, this isn&apos;t persistent and not stable, but who cares. The server handles accepting a string to display and rendering it on the Pixoo:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-        from urllib.parse import urlparse, parse_qs
-        from pixoo_ng import Pixoo, Channel
-        from pixoo_ng.config import PixooConfig
-        import time
-        
-        def split_string(text: str, max_chars: int) -&amp;gt; list[str]:
-        &amp;quot;&amp;quot;&amp;quot;Split a string into chunks of up to max_chars characters, without breaking words.&amp;quot;&amp;quot;&amp;quot;
-        words = text.split()
-        chunks = []
-        current = &amp;quot;&amp;quot;
-        
-        for word in words:
-        if not current:
-        current = word
-        elif len(current) + 1 + len(word) &amp;lt;= max_chars:
-        current += &amp;quot; &amp;quot; + word
-        else:
-        chunks.append(current)
-        current = word
-        
-        if current:
-        chunks.append(current)
-        
-        return chunks
-        
-        class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-        if self.path == &apos;/favicon.ico&apos;:
-        self.send_response(404)
-        self.end_headers()
-        return
-        
-        query = parse_qs(urlparse(self.path).query)
-        input_text = (query.get(&apos;input&apos;, [&apos;&apos;])[0]).strip()
-        
-        if not input_text:
-        self.send_response(400)
-        self.end_headers()
-        self.wfile.write(b&amp;quot;Missing &apos;input&apos; query parameter&amp;quot;)
-        return
-        
-        pix = Pixoo(PixooConfig(address=&apos;192.168.0.191&apos;))
-        
-        startY = 5
-        strings = split_string(input_text, 15)
-        
-        for line in strings[:8]:
-        print(line, startY)
-        pix.draw_text(line, (2, startY), (0, 255, 0))
-        startY += 5
-        
-        pix.push()
-        
-        self.send_response(204)
-        self.end_headers()
-        self.wfile.flush()
-        
-        # Show it for 10 seconds...
-        time.sleep(10)
-        
-        # Then go back to my regular face
-        pix.set_channel(Channel.FACES)
-        pix.set_face(0)
-        
-        def log_message(self, format, *args):
-        print(f&amp;quot;{self.address_string()} - {format % args}&amp;quot;)
-        
-        
-        if __name__ == &amp;quot;__main__&amp;quot;:
-        server = ThreadingHTTPServer((&amp;quot;&amp;quot;, 8099), Handler)
-        print(&amp;quot;Listening on port 8099&amp;quot;)
-        server.serve_forever()
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The important bits is how it handles dynamic strings. When you send text to the Pixoo, you have to handle ensuring it actually fits, so to do that, I used a function, &lt;code&gt;split_string&lt;/code&gt;, which wraps text on words into an array. I then take that array (up to 7 lines) and send each line progressively lower on the panel.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s an example:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/pix2.png&quot; loading=&quot;lazy&quot; alt=&quot;Pixoo device&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;To make this little server &amp;quot;live&amp;quot;, I simply used ngrok to expose it.&lt;/p&gt;
-        &lt;h2 id=&quot;calling-the-server&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#calling-the-server&quot;&gt;Calling the Server&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;To call the server, I set up an API route on &lt;a href=&quot;val.town&quot;&gt;https://val.town&lt;/a&gt; that does the minimal work of proxying a front end call:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
-        const body = await req.json();
-        
-        //trim message to 80
-        let msg = body.message.substring(0, 80);
-        let API = Deno.env.get(&amp;quot;API&amp;quot;);
-        console.log(`Sending ${msg}`);
-        await fetch(API + `?input=${msg}`);
-        
-        return Response.json({ ok: true });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The ngrok URL is an environment variable and as I don&apos;t care about the response, I return a basic boolean value back.&lt;/p&gt;
-        &lt;h2 id=&quot;the-front-end&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-front-end&quot;&gt;The Front End&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;And lastly, I used Claude to build a simple front end. It&apos;s just a form with a field and button:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/pix3.png&quot; loading=&quot;lazy&quot; alt=&quot;Pixoo device&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;The JavaScript literally just takes the field and sends it to the server code above, but if you want to see the complete project, you can check it out on val.town: &lt;a href=&quot;https://www.val.town/x/raymondcamden/send-me-a-message&quot;&gt;https://www.val.town/x/raymondcamden/send-me-a-message&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Want to try it? I&apos;ll share the URL, but first...&lt;/p&gt;
-        &lt;h2 id=&quot;privilege&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#privilege&quot;&gt;Privilege&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I feel safe sharing this demo as my device is in my office, a room my kids don&apos;t go into, and I can shut it down in seconds. Heck, I&apos;ll probably forget it&apos;s running and next time I boot this machine, it won&apos;t run anyway. So yeah, no big deal.&lt;/p&gt;
-        &lt;p&gt;But also - I&apos;m a guy. Probably the worst thing I&apos;ll get is someone calling me foul names.&lt;/p&gt;
-        &lt;p&gt;I can&apos;t imagine there is any world where a woman would feel safe with this kind of connection to random people on the internet.&lt;/p&gt;
-        &lt;h2 id=&quot;try-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#try-it&quot;&gt;Try It&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ready to try it? I make no guarantees it will work, but then again, you&apos;ll never know. ;) Hit the form here: &lt;a href=&quot;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&quot;&gt;https://raymondcamden--45cb2f404fa111f1b5dcee650bb23af1.web.val.run/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@jayneharr33?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Jayne Harris&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-message-in-a-bottle-sitting-on-the-beach-EDTXcRCCVGk?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
