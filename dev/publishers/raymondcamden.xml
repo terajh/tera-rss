@@ -4,12 +4,196 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 18 Jun 2026 18:23:49 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2026 18:05:26 GMT</lastBuildDate>
+    <item>
+      <title>Building a Form Handling Service in Val Town</title>
+      <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
+      <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
+        &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- random form on your site --&amp;gt;
+        &amp;lt;form action=&amp;quot;https://formspree.io/f/{form_id}&amp;quot; method=&amp;quot;post&amp;quot;&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Your Email&amp;lt;/label&amp;gt;
+        &amp;lt;input name=&amp;quot;Email&amp;quot; id=&amp;quot;email&amp;quot; type=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Submit&amp;lt;/button&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Emailing isn&apos;t the only option for processing the result of course. Formspree&apos;s home page lists a bunch of integrations you can use, like Airtable and Google Sheets. Another feature of these services is that various form fields will trigger different behaviors. For example, I can use a hidden form field to set where the form should redirect to after submission. Or, if there is a field named &lt;code&gt;email&lt;/code&gt;, when the form data is sent to the site owner, set the reply value to that value.&lt;/p&gt;
+        &lt;p&gt;So with that in mind, a few days ago, the Val Town folks &lt;a href=&quot;https://blog.val.town/talk-of-the-town-june-2026&quot;&gt;blogged&lt;/a&gt; about various examples in the community (I had a few included too!). In that blog, they shared this post:&lt;/p&gt;
+        &lt;blockquote class=&quot;bluesky-embed&quot; data-bluesky-uri=&quot;at://did:plc:thuylqmisypnmekwzfgymm3z/app.bsky.feed.post/3moaamfpx4u27&quot; data-bluesky-cid=&quot;bafyreiba65vlw52hti437sou5yvsrclt6jzgovgqbzj6xyutp7kfdirbxa&quot; data-bluesky-embed-color-mode=&quot;system&quot;&gt;&lt;p lang=&quot;en&quot;&gt;I run my forms now via a free val.town instance, very easy to setup with ai and no lock in&lt;/p&gt;&amp;mdash; meta (&lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z?ref_src=embed&quot;&gt;@metaend.eth.xyz&lt;/a&gt;) &lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z/post/3moaamfpx4u27?ref_src=embed&quot;&gt;June 14, 2026 at 2:27 AM&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://embed.bsky.app/static/embed.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;That clicked with me - &lt;em&gt;of course&lt;/em&gt; Val Town would be a great solution for handling form posts - and I wondered - could we build a &lt;em&gt;generic&lt;/em&gt; service such that any form could use it?&lt;/p&gt;
+        &lt;p&gt;I came up with the following requirements:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;First and foremost - the implementation should respond to regular form posts. In other words, I didn&apos;t want to build an API that would require JavaScript code in the form. Instead I wanted to follow the lead of services like Formspree and let you simply point your &apos;vanilla&apos; form to a specific URL.&lt;/li&gt;
+        &lt;li&gt;The form should allow me to specify who gets the result. That&apos;s a huge security issue of course, so my service will have a white list of allowed email addresses.&lt;/li&gt;
+        &lt;li&gt;The form should allow me to specify where to redirect after submission. Like the above, this could be a security issue, so my service will have a white list of URLs that allow for partial matching, so you can allow foo.com for example and any redirect &lt;em&gt;under&lt;/em&gt; that would work.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;So far so good? Alright, let&apos;s look at the implementation.&lt;/p&gt;
+        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show me the code!&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;ll link to the Val itself when done, but here&apos;s the entirety of the code, tied to a HTTP trigger so it can actually be used in forms:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
+        
+        /*
+        We are only allowed to send to one of these.
+        */
+        const SAFE_EMAILS_TO = [
+        &amp;quot;raymondcamden@gmail.com&amp;quot;,
+        &amp;quot;rcamden@gmail.com&amp;quot;,
+        ];
+        
+        /*
+        A URL that is matched against redirects - the redirect must match the domain, well anything _after_ the input
+        */
+        const SAFE_REDIRECT_TO = [
+        &amp;quot;https://boring-morning-yak.codepen.app&amp;quot;,
+        ];
+        
+        /*
+        The &apos;special keys&apos; don&apos;t need to be in the form email.
+        */
+        const SPECIAL_KEYS = [&amp;quot;_send&amp;quot;, &amp;quot;_redirect&amp;quot;, &amp;quot;_formname&amp;quot;];
+        
+        /*
+        Every form must have a _send and _redirect field. Later we may add more validations.
+        Like validating _redirect. Duh.
+        */
+        function verifyForm(f) {
+        console.log(&amp;quot;verifyForm&amp;quot;, f.get(&amp;quot;_send&amp;quot;), f.get(&amp;quot;_redirect&amp;quot;));
+        
+        if (!f.get(&amp;quot;_send&amp;quot;) || f.get(&amp;quot;_send&amp;quot;).length === 0) return false;
+        if (!f.get(&amp;quot;_redirect&amp;quot;) || f.get(&amp;quot;_redirect&amp;quot;).length === 0) return false;
+        
+        // ensure the email is ok
+        if(SAFE_EMAILS_TO.indexOf(f.get(&amp;quot;_send&amp;quot;)) === -1) return false;
+        
+        //now ensure _redirect matches against at least one
+        let validRedirect = false;
+        const redirect = f.get(&amp;quot;_redirect&amp;quot;).toLowerCase();
+        
+        SAFE_REDIRECT_TO.forEach((u) =&amp;gt; {
+        u = u.toLowerCase();
+        if (redirect.startsWith(u)) validRedirect = true;
+        });
+        
+        return validRedirect;
+        }
+        
+        /*
+        As there are multiple things that can go wrong, here&apos;s the general
+        error handler. As this is meant for Form POSTs, its ok to give a simple response.
+        */
+        function returnError() {
+        return new Response(
+        &amp;quot;&amp;lt;!doctype html&amp;gt;&amp;lt;meta charset=utf-8&amp;gt;&amp;lt;title&amp;gt;500&amp;lt;/title&amp;gt;&amp;lt;h1&amp;gt;500 — Server Error&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Sorry, something broke on our end.&amp;lt;/p&amp;gt;&amp;quot;,
+        { status: 500, headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;text/html; charset=utf-8&amp;quot; } },
+        );
+        }
+        
+        export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        let formData;
+        const obj: Record&amp;lt;string, string&amp;gt; = {};
+        
+        try {
+        formData = await req.formData();
+        console.log(&amp;quot;fd&amp;quot;, formData);
+        } catch (_e) {
+        return returnError();
+        }
+        
+        if (!verifyForm(formData)) return returnError();
+        
+        const redirect = formData.get(&amp;quot;_redirect&amp;quot;);
+        
+        let formName = &amp;quot;&amp;quot;;
+        /*
+        One special field is _formname. If we have it, we include it
+        in the subject + email
+        */
+        
+        if (formData.get(&amp;quot;_formname&amp;quot;)) {
+        formName = formData.get(&amp;quot;_formname&amp;quot;);
+        } else {
+        formName = `Form at ${req.headers.get(&amp;quot;referer&amp;quot;) ?? &amp;quot;unknown&amp;quot;}`;
+        }
+        
+        const subject = `Form submission: ${formName}`;
+        
+        for (const key of new Set(formData.keys())) {
+        obj[key] = formData.getAll(key).map(String).join(&amp;quot;, &amp;quot;);
+        }
+        
+        let html = `
+        &amp;lt;h2&amp;gt;Form Submission - ${formName}&amp;lt;/h2&amp;gt; 
+        &amp;lt;table&amp;gt;
+        `;
+        
+        for (const [key, value] of Object.entries(obj)) {
+        console.log(key, value);
+        if (SPECIAL_KEYS.indexOf(key) === -1) {
+        html += `
+        &amp;lt;tr&amp;gt;&amp;lt;td style=&amp;quot;min-width:300px&amp;quot;&amp;gt;${key}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;${value}&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        `;
+        }
+        }
+        
+        html += `
+        &amp;lt;/table&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        Form submitted at ${new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, { dateStyle: &amp;quot;short&amp;quot;, timeStyle: &amp;quot;short&amp;quot;, timeZone: &amp;quot;America/Chicago&amp;quot; }).format(new Date())}.
+        &amp;lt;/p&amp;gt;
+        `;
+        
+        console.log(html);
+        
+        const emailOptions = {
+        // to: &amp;quot;someone_else@example.com&amp;quot;, this would be formData.get(&apos;_email&apos;)
+        html,
+        subject,
+        };
+        
+        if (obj[&amp;quot;email&amp;quot;]) emailOptions.replyTo = obj[&amp;quot;email&amp;quot;];
+        
+        await email(emailOptions);
+        
+        return new Response(null, {
+        status: 303,
+        headers: { Location: redirect },
+        });
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Up on top, you can see the various security variables I use to ensure the service can&apos;t be abused. I&apos;ve got a list of emails that can receive the form data and a list of URLs where the user can be redirected. Again, the URLs are partially matched so you can do anything as long as it matches at the beginning.&lt;/p&gt;
+        &lt;p&gt;The next variable, &lt;code&gt;SPECIAL_KEYS&lt;/code&gt;, is just used to filter out the &apos;meta&apos; values for my service and not include them in the email. This just reduces the noise for the reader.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;verifyForm&lt;/code&gt; handles checking our two required form fields. &lt;code&gt;_send&lt;/code&gt; sets the recipient of the form data and &lt;code&gt;_redirect&lt;/code&gt; handles where to go when done. For both, they have to exist, and then I check for valid values against the two variables defined on top of the script.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;returnError&lt;/code&gt; is just a utility function to render an error. This can happen if the form didn&apos;t have the required, or correct values, or if there is an error reading the form data. I use a simple 500 error but I could imagine redirecting to an error page on the calling site instead.&lt;/p&gt;
+        &lt;p&gt;Finally - the core default function does the real work. I get my form data, verify it, and then create an email. I&apos;ve got code that looks for a hidden form field, &lt;code&gt;_formname&lt;/code&gt;, which lets you give a nice label to the email.&lt;/p&gt;
+        &lt;p&gt;The only real tricky part here is handling multi-value form fields, like checkboxes for example. The &lt;code&gt;for&lt;/code&gt; loop over &lt;code&gt;formData.keys()&lt;/code&gt; handles this and I&apos;ve got Val Town&apos;s AI service to thank for the help here. I had an idea of how I was going to handle this, but the AI service suggested the code you see and honestly it was much better than what I would have written. More on the AI stuff in a second.&lt;/p&gt;
+        &lt;p&gt;The last bit is just the email. Now, in a &amp;quot;real&amp;quot; implementation of this, I&apos;d use an email service instead of Val&apos;s built-in service, but it works well enough for this demo. You can see the &lt;a href=&quot;https://docs.val.town/reference/std/email/&quot;&gt;docs&lt;/a&gt; for their service to understand exactly what it can and cannot do, but the big thing for this demo is that I&apos;m on the free tier so I can&apos;t specify the &apos;to&apos; value. Note that I look for &lt;code&gt;email&lt;/code&gt; in the form and if set, use that as the &lt;code&gt;replyTo&lt;/code&gt; value. I call that out in my code so just note if you fork my Val and use it yourself, change this if you are on the paid tier. Or switch to an email service. You get the idea.&lt;/p&gt;
+        &lt;h2 id=&quot;the-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-demo&quot;&gt;The Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, finally, I built a simple CodePen form to show this in action: &lt;a href=&quot;https://boring-morning-yak.codepen.app/&quot;&gt;https://boring-morning-yak.codepen.app/&lt;/a&gt;. On this page you will see three forms. The first one is intentionally bad and results in a 500. The next two should work and will email me so - thanks for that. ;)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example of the email sent out:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/form1.png&quot; loading=&quot;lazy&quot; alt=&quot;Sample form result&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;h2 id=&quot;final-thoughts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#final-thoughts&quot;&gt;Final Thoughts&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, before I ramble on a bit, you can find my val here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/form-bouncer&quot;&gt;https://www.val.town/x/raymondcamden/form-bouncer&lt;/a&gt;. If you use it, let me know! Now for some things to consider.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;My form does not handle file attachments. It &lt;em&gt;could&lt;/em&gt;, but you would need something a bit more complex for that. Val Town has blob support so you could store it there, but I&apos;d probably consider a private S3/R2 bucket instead. You could generate a link and include it in the email. You would have to also build something to handle removing old files from the bucket eventually. You would also want to sanity check the file types and sizes. Doable - but more work than I wanted to for this demo.&lt;/li&gt;
+        &lt;li&gt;For form fields that can be null, like checkboxes and radio elements, they don&apos;t show up in the email at all. I could imagine a few ways around that. You could use a hidden form field to specify things like that. Maybe: &lt;code&gt;&amp;lt;input name=&amp;quot;_nullField&amp;quot; value=&amp;quot;favoritemovie,favoritefoods&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;. The code would notice if one of these items isn&apos;t present and then render it in the email at least so it&apos;s clear the value was blank.&lt;/li&gt;
+        &lt;li&gt;Another idea I had would be specifying &apos;friendly&apos; labels for form fields. So example, my favorite movie comes out as &lt;code&gt;favoriteMovie: Star Wars&lt;/code&gt;. If the idea here is to make &amp;quot;human readable&amp;quot; form results, I could see perhaps supporting something like this: &lt;code&gt;&amp;lt;input name=&amp;quot;_favoriteMovie_label&amp;quot; value=&amp;quot;Favorite Movie&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;For validation, I&apos;d do that all in the client, and by that I mean HTML first and then JavaScript.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;And finally, Val Town&apos;s had an AI assistant for a while, but I never bothered with it till this demo, and damn was it useful. Not only did it help me with parsing the form object, it also reminded me of various aspects of the Request object that for the life of me I struggle to remember. It was a great companion. I will say on the free tier it doesn&apos;t take long to hit the limit, but I &lt;em&gt;was&lt;/em&gt; able to get all the help I needed before I maxed it out. (I did get to a warning though.) Val Town&apos;s got a lot of good reasons to consider paying for it, and this is just one more. (I don&apos;t have a job and I just build dumb demos, so that&apos;s my excuse. ;)&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Creating a Dynamic Favicon with Cloudinary</title>
       <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
       <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
         &lt;p&gt;
@@ -111,7 +295,7 @@
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -171,7 +355,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -315,7 +499,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -509,7 +693,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -632,7 +816,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -642,7 +826,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -751,7 +935,7 @@
       <title>My First AI Skill for My Blog</title>
       <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
         &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
@@ -831,7 +1015,7 @@
       <title>Links For You (5/17/26)</title>
       <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
       <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
+      <pubDate>Fri, 19 Jun 2026 17:24:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
         &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
@@ -859,75 +1043,6 @@
         &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
         &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
         &lt;p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Is it hotter or colder this year?</title>
-      <link>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</link>
-      <guid>https://www.raymondcamden.com/2026/05/15/is-it-hotter-or-colder-this-year</guid>
-      <pubDate>Thu, 18 Jun 2026 18:05:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Where I live could generously be called &amp;quot;warm&amp;quot;, but is usually closer to the surface of the sun, especially in late summer. That&apos;s why when the weather is &lt;em&gt;not&lt;/em&gt; oppressively hot, I try my best to enjoy it. We&apos;re mid-May now and honestly, this spring has been... pleasant. Suspiciously pleasant but I&apos;ll take what I can get.&lt;/p&gt;
-        &lt;p&gt;The last few weeks I&apos;ve been telling myself that the weather must be a good bit cooler than last year, and I finally decided to do something about it. I worked with Claude and created a little web app that:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Lets you enter a free form address and then use &lt;a href=&quot;https://www.geocod.io/&quot;&gt;Geocoding&lt;/a&gt; to convert it to a proper longitude and latitude. This is a super simple geocoding API with a generous free tier. Do note though it&apos;s North America only.&lt;/li&gt;
-        &lt;li&gt;Uses the &lt;a href=&quot;https://pirateweather.net/en/latest/&quot;&gt;Pirate Weather&lt;/a&gt; API to get historical weather information. Date wise, I&apos;m using this week, and then the same days over the previous four days.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;As I mentioned, I worked with Claude on this and let it design the layout and write the code initially. I was kinda impressed by one part - the &lt;code&gt;mapWithConcurrency&lt;/code&gt; function that lets you pass an array of async function with a desired max number to run at once. It handles doing the batching and returning the final result. That makes the calls for the weather data a bit more gentle on the provider.&lt;/p&gt;
-        &lt;p&gt;However - I noticed it was taking a &lt;em&gt;long&lt;/em&gt; time to finish. In theory, I&apos;m doing 7 times 5 (this week plus four previous years) of calls which is 35 which doesn&apos;t &lt;em&gt;seem&lt;/em&gt; like a lot, but I did some digging. Claude had used an endpoint that was a bit old. Doing some more research I switched to the proper endpoint... which didn&apos;t support CORS.&lt;/p&gt;
-        &lt;p&gt;Oh no!&lt;/p&gt;
-        &lt;p&gt;Oh - actually - I just moved to this to &lt;a href=&quot;https://val.town&quot;&gt;val.town&lt;/a&gt; and built a quick server side proxy. It takes in the same arguments that&apos;s send to my client side code (lat, lng, and a timestamp), and passes it to the historical Pirate Weather endpoint. So here&apos;s the frontend code - again - this is being driven by a concurrency function:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function fetchDayTemperatures(lat, lng, unixSeconds) {
-        let req = await fetch(PIRATE_WEATHER_API_BASE, {
-        method: &amp;quot;POST&amp;quot;,
-        body: JSON.stringify({
-        lat,
-        lng,
-        unixSeconds,
-        }),
-        });
-        return await req.json();
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And here&apos;s the backend code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
-        const body = await req.json();
-        const key = Deno.env.get(&amp;quot;PIRATE&amp;quot;);
-        
-        const url = new URL(
-        `https://timemachine.pirateweather.net/forecast/${key}/${body.lat},${body.lng},${body.unixSeconds}`,
-        );
-        url.searchParams.set(&amp;quot;units&amp;quot;, &amp;quot;us&amp;quot;);
-        url.searchParams.set(&amp;quot;exclude&amp;quot;, &amp;quot;minutely,hourly,alerts,flags&amp;quot;);
-        
-        const response = await fetch(url);
-        const payload = await response.json();
-        
-        if (!response.ok) {
-        throw new Error(payload.error || &amp;quot;Weather lookup failed.&amp;quot;);
-        }
-        
-        const day = payload.daily?.data?.[0];
-        if (!day) {
-        throw new Error(&amp;quot;Weather data did not include a daily summary.&amp;quot;);
-        }
-        
-        return Response.json({
-        timezone: payload.timezone,
-        high: day.temperatureMax,
-        low: day.temperatureMin,
-        });
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I barely modified this from the original client side code - only switching to an environment variable for the API (their API is free, but I might as well) and returning a proper &lt;code&gt;Response&lt;/code&gt; object.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a screenshot of it in action:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/weather.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;You can try this yourself here: &lt;a href=&quot;https://weathercomparison.val.run/&quot;&gt;https://weathercomparison.val.run/&lt;/a&gt;. If you want to see the code, and possibly fork the val, you can do so here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/weather-comparison&quot;&gt;https://www.val.town/x/raymondcamden/weather-comparison&lt;/a&gt;&lt;/p&gt;
-        &lt;h2 id=&quot;so%2C-was-it-cooler%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#so%2C-was-it-cooler%3F&quot;&gt;So, was it cooler?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;No. I was wrong. Last year was cooler than this year, but the three years before that were all higher, with 2022 being pure hell. I remember that year seeing the city working on a road that had literally buckled because of heat.&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@peteralbanese?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Peter Albanese&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/black-and-white-cat-on-glass-window-K9_Igf8ZpC0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

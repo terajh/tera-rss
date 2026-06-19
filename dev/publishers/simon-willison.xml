@@ -4,7 +4,100 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Thu, 18 Jun 2026 18:23:50 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2026 18:05:27 GMT</lastBuildDate>
+    <item>
+      <title>Datasette Apps: Host custom HTML applications inside Datasette</title>
+      <link>https://simonwillison.net/2026/Jun/18/datasette-apps/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/18/datasette-apps/#atom-everything</guid>
+      <pubDate>Thu, 18 Jun 2026 23:58:38 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Today we launched a new plugin for Datasette, &lt;a href=&quot;https://github.com/datasette/datasette-apps&quot;&gt;datasette-apps&lt;/a&gt;, with &lt;a href=&quot;https://datasette.io/blog/2026/datasette-apps/&quot;&gt;this launch announcement post&lt;/a&gt; on the Datasette project blog. That post has the &lt;em&gt;what&lt;/em&gt;, but I&apos;m going to expand on that a little bit here to provide the &lt;em&gt;why&lt;/em&gt;.&lt;/p&gt;
+        &lt;h4 id=&quot;the-tl-dr&quot;&gt;The TL;DR&lt;/h4&gt;
+        &lt;p&gt;Datasette Apps are self-contained HTML+JavaScript applications that run in a tightly constrained &lt;code&gt;&amp;lt;iframe&amp;gt;&lt;/code&gt; sandbox hosted on your Datasette application. They can use JavaScript to run read-only SQL queries against data in Datasette, and can run write queries too if you configure them &lt;a href=&quot;https://datasette.io/blog/2026/sql-write-queries/&quot;&gt;with some stored queries&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a &lt;a href=&quot;https://agent.datasette.io/-/apps/01kvdp1d26g8trye3r4gc3yy9c&quot;&gt;very simple example&lt;/a&gt; and a &lt;a href=&quot;https://agent.datasette.io/-/apps/01ktvyaejhk07zskdx2tewxppe&quot;&gt;more complex custom timeline example&lt;/a&gt; - the latter looks like this:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/datasette-timeline-app.jpg&quot; alt=&quot;Screenshot of a web app titled &amp;quot;Datasette timeline&amp;quot; with &amp;quot;All apps&amp;quot;, &amp;quot;Edit app&amp;quot;, and &amp;quot;Pin&amp;quot; buttons top-right and a &amp;quot;Full screen&amp;quot; button below them. Inside a bordered panel, the heading &amp;quot;Datasette timeline&amp;quot; sits above a search box reading &amp;quot;Search news, blog posts and releases…&amp;quot; with three checked checkboxes labeled News, Blog, and Releases. Below, text reads &amp;quot;Showing 200 of 1,953 items&amp;quot;, followed by a scrollable list of timeline entries. Each entry has a colored tag (blue &amp;quot;BLOG&amp;quot; or green &amp;quot;RELEASE&amp;quot;), a date, a blue linked title, and a paragraph of description. The visible entries are a &amp;quot;BLOG&amp;quot; post dated 2026-06-11 titled &amp;quot;Datasette 1.0a33 with JSON extras in the API&amp;quot;, a &amp;quot;RELEASE&amp;quot; dated 2026-06-11 titled &amp;quot;datasette 1.0a33&amp;quot;, and a &amp;quot;RELEASE&amp;quot; dated 2026-06-09 titled &amp;quot;llm 0.32a3&amp;quot;, each with body text and a &amp;quot;▶ Show more&amp;quot; toggle. A separate panel at the bottom shows a collapsed &amp;quot;▶ 2 log entries&amp;quot; toggle.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Apps are allowed to run JavaScript and render HTML and CSS. They are limited in terms of access - the &lt;code&gt;&amp;lt;iframe sandbox=&quot;allow-scripts allow-forms&quot;&amp;gt;&lt;/code&gt; they run in prevents them from accessing cookies or localStorage and they also have an injected CSP header (thanks to &lt;a href=&quot;https://simonwillison.net/2026/Apr/3/test-csp-iframe-escape/&quot;&gt;this research&lt;/a&gt;) which prevents them from making HTTP requests to outside hosts, preventing a malicious or buggy app from exfiltrating private data.&lt;/p&gt;
+        &lt;p&gt;Datasette Apps started out as my attempt at building a Claude Artifacts mechanism for &lt;a href=&quot;https://datasette.io/blog/2026/datasette-agent/&quot;&gt;Datasette Agent&lt;/a&gt;, but I quickly realised that the sandboxed pattern is interesting for way more than just adding custom apps to the interface surface and promoted it to its own top-level concept within the Datasette ecosystem.&lt;/p&gt;
+        &lt;p&gt;They&apos;re also a fun way to turn my &lt;a href=&quot;https://tools.simonwillison.net/&quot;&gt;multi-year experiment in vibe-coded HTML tools&lt;/a&gt; into a core feature of my main project!&lt;/p&gt;
+        &lt;p&gt;You can try out Datasette Apps by signing in with GitHub to the &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;agent.datasette.io&lt;/a&gt; demo instance.&lt;/p&gt;
+        &lt;h4 id=&quot;why-build-this-&quot;&gt;Why build this?&lt;/h4&gt;
+        &lt;p&gt;Since the very first release, Datasette has offered a flexible backend for creating custom HTML apps via its JSON API.&lt;/p&gt;
+        &lt;p&gt;One of my earliest Datasette projects was an internal search engine for documentation when I worked at Eventbrite - it worked by importing documents from different systems into SQLite on a cron and then serving them through a Datasette instance with a custom HTML+JavaScript search interface that directly queried the Datasette API.&lt;/p&gt;
+        &lt;p&gt;I had client-side JavaScript constructing SQL queries, which originally was intended as an engineering joke but turned out to be a &lt;em&gt;really productive&lt;/em&gt; way of iterating on the app!&lt;/p&gt;
+        &lt;p&gt;That project, combined with my experience &lt;a href=&quot;https://simonwillison.net/2025/Dec/10/html-tools/&quot;&gt;building my HTML tools collection&lt;/a&gt; and my &lt;a href=&quot;https://simonwillison.net/2024/Oct/21/claude-artifacts/&quot;&gt;experiments with Claude Artifacts&lt;/a&gt;, has convinced me that adding a Datasette-style backend to a self-contained HTML frontend is an astonishingly powerful combination.&lt;/p&gt;
+        &lt;p&gt;Imagine how much more useful Claude Artifacts could be if they had access to a persistent relational database. That&apos;s what I&apos;m building with Datasette Apps!&lt;/p&gt;
+        &lt;h4 id=&quot;neat-ideas-in-datasette-apps&quot;&gt;Neat ideas in Datasette Apps&lt;/h4&gt;
+        &lt;p&gt;Here are a few of the ideas and patterns I&apos;ve figured out building this which I think have staying power.&lt;/p&gt;
+        &lt;h5 id=&quot;iframe-sandbox-allow&quot;&gt;
+        &lt;code&gt;&amp;lt;iframe sandbox=&quot;allow-scripts&quot; srcdoc=&quot;...&quot;&amp;gt;&lt;/code&gt; + &lt;code&gt;&amp;lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &apos;none&apos;; script-src &apos;unsafe-inline&apos;; style-src &apos;unsafe-inline&apos;; img-src data: blob:;&quot;&amp;gt;&lt;/code&gt;
+        &lt;/h5&gt;
+        &lt;p&gt;This is the magic combination that makes Datasette Apps feasible in the first place. I need to run untrusted HTML and JavaScript on a highly sensitive domain - an authenticated Datasette instance can contain all sorts of private data. The &lt;code&gt;sandbox=&lt;/code&gt; attribute lets me run that untrusted code in a way that cannot interact with the parent application - it can&apos;t read the DOM, or access cookies, or steal secrets from &lt;code&gt;localStorage&lt;/code&gt;. It can however use &lt;code&gt;fetch()&lt;/code&gt; and friends to load content (or exfiltrate data) from other domains. But... it turns out if you &lt;em&gt;start&lt;/em&gt; an HTML page with a &lt;code&gt;&amp;lt;meta http-equiv=&quot;Content-Security-Policy&quot;&amp;gt;&lt;/code&gt; header you can &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP&quot;&gt;set additional policies&lt;/a&gt; that lock down access to other domains. I was worried that malicious JavaScript would be able to update or remove that header but it turns out &lt;a href=&quot;https://github.com/simonw/research/tree/main/test-csp-iframe-escape#readme&quot;&gt;that doesn&apos;t work&lt;/a&gt; - once set, the CSP policy is immutable for the content of that frame.&lt;/p&gt;
+        &lt;h5 id=&quot;locked-down-apis-with-postmessage-and-messagechannel-&quot;&gt;Locked down APIs with &lt;code&gt;postMessage()&lt;/code&gt; and &lt;code&gt;MessageChannel()&lt;/code&gt;
+        &lt;/h5&gt;
+        &lt;p&gt;Having locked down those iframes to the point that they couldn&apos;t do anything interesting at all, the challenge was to open them back again such that they could run an allow-list of operations, starting with read-only SQL queries against specified databases.&lt;/p&gt;
+        &lt;p&gt;I built the first version of this with &lt;code&gt;postMessage()&lt;/code&gt;, which allows a child iframe to send messages to the parent window. I created a simple protocol for requesting that the parent run a SQL query - the parent could then verify it was against an allow-listed database before executing it.&lt;/p&gt;
+        &lt;p&gt;One of the LLM tools, I think it was GPT-5.5, suggested that &lt;code&gt;postMessage()&lt;/code&gt; on its own can be exploited if the iframe somehow loads additional code from an untrusted domain. I don&apos;t think that applies to Datasette Apps, but I also believe in defense in depth, so I &lt;a href=&quot;https://gist.github.com/simonw/0b29f301c2007808314eb04675c66916&quot;&gt;had GPT-5.5 help me&lt;/a&gt; port to a &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel&quot;&gt;MessageChannel()&lt;/a&gt; based transport instead.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;MessageChannel()&lt;/code&gt; has the advantage that if a page navigates to somewhere else the channel closes automatically, removing any chance of executing commands sent from an untrusted external page.&lt;/p&gt;
+        &lt;h5 id=&quot;visible-logs-for-queries-and-errors&quot;&gt;Visible logs, for queries and errors&lt;/h5&gt;
+        &lt;p&gt;If you navigate to &lt;a href=&quot;https://agent.datasette.io/-/apps/01ktvyaejhk07zskdx2tewxppe&quot;&gt;the timeline demo&lt;/a&gt; and search for the string &lt;code&gt;usercontent&lt;/code&gt; you&apos;ll pull in some search results that embed images from the &lt;code&gt;user-images.githubusercontent.com&lt;/code&gt; domain. This domain is not in the CSP allow-list, so it trips an error.&lt;/p&gt;
+        &lt;p&gt;Those errors are captured and transmitted back to the parent frame, where they can be displayed in a useful error log. This is meant to make hacking on apps more productive by surfacing otherwise-invisible problems.&lt;/p&gt;
+        &lt;p&gt;I built &lt;a href=&quot;https://simonwillison.net/2026/May/13/csp-allow/&quot;&gt;an experiment&lt;/a&gt; demonstrating that you can even turn this into a one-click-to-allow mechanism for building the CSP allow-list based on what breaks, but I haven&apos;t integrated that idea into &lt;code&gt;datasette-apps&lt;/code&gt; just yet.&lt;/p&gt;
+        &lt;p&gt;SQL queries are also visibly logged - scroll to the &lt;a href=&quot;https://agent.datasette.io/-/apps/01ktvyaejhk07zskdx2tewxppe&quot;&gt;bottom of the timeline page&lt;/a&gt; to see that in action.&lt;/p&gt;
+        &lt;h5 id=&quot;stored-queries-for-write-operations&quot;&gt;Stored queries for write operations&lt;/h5&gt;
+        &lt;p&gt;I want apps to be able to conditionally write to the database, but this is an &lt;em&gt;even more&lt;/em&gt; dangerous proposition than SQL reads!&lt;/p&gt;
+        &lt;p&gt;My solution involves Datasette&apos;s &lt;a href=&quot;https://docs.datasette.io/en/latest/sql_queries.html#stored-queries&quot;&gt;stored queries&lt;/a&gt; feature, rebranded from &quot;canned queries&quot; and given a major upgrade &lt;a href=&quot;https://datasette.io/blog/2026/sql-write-queries/&quot;&gt;in the recent Datasette 1.0a31&lt;/a&gt; - work that was directly inspired by Datasette Apps.&lt;/p&gt;
+        &lt;p&gt;Users can create a stored write query that performs an insert or update, then allow-list that specific query for an app to use. Usage from code inside an app looks like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-js&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;datasette&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;pl-en&quot;&gt;storedQuery&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;todos&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;&quot;add_todo&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;title&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;Buy milk&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;due_date&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;2026-06-20&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;priority&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;high&quot;&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;pl-c1&quot;&gt;completed&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;false&lt;/span&gt;
+        &lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;I&apos;m only just beginning to explore the possibilities this unlocks myself, but my goal is to support full read-write applications built safely as Datasette Apps.&lt;/p&gt;
+        &lt;h5 id=&quot;copy-and-paste-a-prompt-to-build-an-app&quot;&gt;Copy and paste a prompt to build an app&lt;/h5&gt;
+        &lt;p&gt;The Datasette Apps plugin has no dependency on LLMs at all, but these self-contained apps are the perfect shape to be written by a modern LLM.&lt;/p&gt;
+        &lt;p&gt;The create app form includes a copyable prompt at the end. This prompt has everything a model needs to know to build a new app, including the schema of any selected databases.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://datasette.io/static/blog/2026/create-app-prompt.jpg&quot; alt=&quot;Screenshot of the lower part of a &amp;quot;Create app&amp;quot; page. At the top is the tail end of an HTML code editor (lines 35–43, closing the script, body, and html tags) and a blue &amp;quot;Create app&amp;quot; button. Below is a section headed &amp;quot;Use AI to build this app&amp;quot; with the text &amp;quot;Describe the app you want in an LLM chat, then copy this prompt in as context so it can generate or revise the app HTML. Paste the result into the HTML editor above.&amp;quot; A blue &amp;quot;Copy prompt&amp;quot; button sits above a &amp;quot;▼ Show full prompt&amp;quot; toggle. An expanded text box shows the prompt: &amp;quot;Build a Datasette HTML app. App name: Latest news. Return a complete single-file HTML document. Include &amp;lt;DOCTYPE, CSS, and JavaScript in the same file. This app will run inside a sandboxed iframe protected by a strict Content Security Policy. Important limitations: – Direct network access is disabled by default. – The app cannot fetch from Datasette, localhost, or arbitrary origins. – External fetch() requests only work for exact https:// origins explicitly granted in the app&apos;s network access settings. – Remote images are allowed from those same exact https:// origins. Local file previews using data: and blob: image URLs are allowed. – External script tags are allowed from those same exact https:// origins. – External stylesheet links and style elements are allowed from those same exact https:// origins. – history.replaceState(), history.pushState(), history.back(), history.forward(), and history.go() are no-ops in the sandbox. – CORS still applies even when an origin is granted. Use this API for data access: – await datasette.query(database, sql, params?)&amp;quot;&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;This means you can click &quot;copy&quot;, paste it into ChatGPT or Claude or Gemini, tell it what you need, and there&apos;s a good chance the model will spit out the code necessary to build the app.&lt;/p&gt;
+        &lt;p&gt;If you have &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt; installed your AI assistant will also gain tools to both create new apps and edit existing ones, Claude Artifacts style.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://datasette.io/static/blog/2026/create-app-agent.jpg&quot; alt=&quot;Screenshot of a &amp;quot;Chat&amp;quot; interface with a &amp;quot;← Back&amp;quot; link top-left and an &amp;quot;EXPORT&amp;quot; button top-right. A blue user message bubble reads &amp;quot;Build an app showing the 5 most recent headlines from the blog_posts table&amp;quot;. Below are two collapsed toggles: &amp;quot;► Tool: describe_table&amp;quot; and &amp;quot;► Result: describe_table&amp;quot;. A thinking line reads &amp;quot;Thinking: …will transition to creating the application using app_create as the next step.&amp;quot; A section headed &amp;quot;Querying Latest Posts&amp;quot; reads &amp;quot;I&apos;ve successfully queried the blog_posts table for the 5 most recent titles. The SQL query, SELECT title FROM blog_posts ORDER BY datetime_utc DESC LIMIT 5, is working as expected. Now, I will transition to creating the application using app_create as the next step.&amp;quot; An expanded &amp;quot;▼ Tool: app_create&amp;quot; box shows escaped JSON HTML: { &amp;quot;html&amp;quot;: &amp;quot;....&amp;quot; Below: &amp;quot;Recent Blog Headlines created.&amp;quot; with &amp;quot;View app&amp;quot; and &amp;quot;Edit&amp;quot; buttons, a collapsed &amp;quot;► Result: app_create&amp;quot; toggle, and a final message: &amp;quot;The app &amp;quot;Recent Blog Headlines&amp;quot; has been created. It displays the 5 most recent headlines from the blog_posts table in the content database.&amp;quot;&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;h4 id=&quot;built-with-so-much-ai-assistance&quot;&gt;Built with so much AI assistance&lt;/h4&gt;
+        &lt;p&gt;Datasette Apps started life back in April as &lt;a href=&quot;https://github.com/datasette/datasette-agent-edit/commits/b242a8fc2e200d01820dacb5bf9a060f659c3a18/&quot;&gt;datasette-agent-artifacts&lt;/a&gt;, a plugin I have since renamed to &lt;code&gt;datasette-agent-edit&lt;/code&gt; keeping only &lt;a href=&quot;https://simonwillison.net/2026/Jun/7/datasette-agent-edit/&quot;&gt;its editing tools&lt;/a&gt;. I built that as one of the first plugins for &lt;a href=&quot;https://datasette.io/blog/2026/datasette-agent/&quot;&gt;Datasette Agent&lt;/a&gt;, to help get the plugin hooks into the right shape. That first prototype was mainly built using Claude Opus 4.6 in Claude Code.&lt;/p&gt;
+        &lt;p&gt;When I switched track to Datasette Apps I started &lt;a href=&quot;https://github.com/datasette/datasette-apps/commit/fc1e23b801b5845647dcd423d632339648acf19c#diff-de64950fcb0bc622027de0d657eeb322f3520ce502d826813ff7653b51cf6059&quot;&gt;with a plan&lt;/a&gt; constructed using Codex Desktop and GPT-5.5 xhigh, based on extensive dialog and feeding in both &lt;code&gt;datasette-agent-artifacts&lt;/code&gt; and other prototypes I had built.&lt;/p&gt;
+        &lt;p&gt;Most of the work that followed stuck with Codex, but in the few short days that we had access &lt;a href=&quot;https://simonwillison.net/2026/Jun/9/claude-fable-5/&quot;&gt;to Claude Fable 5&lt;/a&gt; I had it run a security evaluation of the product (an ability that would get it &lt;a href=&quot;https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/&quot;&gt;banned by the US government&lt;/a&gt; shortly afterwards) and it found a very real problem.&lt;/p&gt;
+        &lt;p&gt;I was allowing users to allow-list CSP hosts for their apps, but Fable pointed out the following attack:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;A less privileged user with &lt;code&gt;create-app&lt;/code&gt; permission creates an app that queries SQLite for all available tables and selects and exfiltrates all of the data to a host they had allow-listed via CSP.&lt;/li&gt;
+        &lt;li&gt;They then trick an administrator user with access to private data into visiting their app.&lt;/li&gt;
+        &lt;li&gt;... and the app can now run queries as &lt;em&gt;that&lt;/em&gt; user and steal their private data!&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;That&apos;s clearly unacceptable. I fixed it by restricting the ability to allow-list any domain to a new &lt;code&gt;apps-set-csp&lt;/code&gt; permission, which is intended just for trusted staff. Site administrators can also &lt;a href=&quot;https://github.com/datasette/datasette-apps#sandboxed-apps&quot;&gt;configure Datasette&lt;/a&gt; with a list of &lt;code&gt;allowed_csp_origins&lt;/code&gt;, which regular users can then select. This means you can do things like allow &lt;code&gt;cdnjs.cloudflare.com&lt;/code&gt; and your users will be able to build apps that load extra JavaScript libraries from the &lt;a href=&quot;https://cdnjs.com&quot;&gt;cdnjs&lt;/a&gt; CDN.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve reviewed Datasette Apps extremely closely, especially the security-adjacent parts of it. The critical sandbox and CSP configuration are based on multiple AI-assisted prototypes and tests.&lt;/p&gt;
+        &lt;h4 id=&quot;it-s-looking-good-so-far&quot;&gt;It&apos;s looking good so far&lt;/h4&gt;
+        &lt;p&gt;I&apos;m really pleased with this initial release.&lt;/p&gt;
+        &lt;p&gt;Datasette is growing beyond its origins as an application for serving read-only data into a much richer ecosystem of tools for doing useful things with that data once it has been collected.&lt;/p&gt;
+        &lt;p&gt;Datasette&apos;s roots are in data journalism. I&apos;ve always been interested in the question of what comes &lt;em&gt;next&lt;/em&gt; after a journalist gets their hands on a giant dump of data about the world. Datasette supports exploring and publishing it. Datasette Agent adds interrogating it with AI assistance. Now Datasette Apps expands that to building custom interfaces and visualizations to help unlock the stories that are hidden within.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/iframes&quot;&gt;iframes&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/javascript&quot;&gt;javascript&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/content-security-policy&quot;&gt;content-security-policy&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-acl 0.6a0</title>
+      <link>https://simonwillison.net/2026/Jun/18/datasette-acl/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/18/datasette-acl/#atom-everything</guid>
+      <pubDate>Thu, 18 Jun 2026 19:03:13 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-acl/releases/tag/0.6a0&quot;&gt;datasette-acl 0.6a0&lt;/a&gt;&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;This release expands &lt;code&gt;datasette-acl&lt;/code&gt; from table-only permissions toward a general resource-sharing system.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Alex Garcia did most of the work for this release - we&apos;re fleshing out the plugin that will allow multi-user Datasette instances finely grained control over who can access which resources within Datasette.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/alex-garcia&quot;&gt;alex-garcia&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>GLM-5.2 is probably the most powerful text-only open weights LLM</title>
       <link>https://simonwillison.net/2026/Jun/17/glm-52/#atom-everything</link>
@@ -188,6 +281,44 @@
       </content:encoded>
     </item>
     <item>
+      <title>datasette-apps 0.1a3</title>
+      <link>https://simonwillison.net/2026/Jun/15/datasette-apps-2/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/15/datasette-apps-2/#atom-everything</guid>
+      <pubDate>Mon, 15 Jun 2026 20:25:07 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-apps/releases/tag/0.1a3&quot;&gt;datasette-apps 0.1a3&lt;/a&gt;&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Fixed a bug where users without the &lt;code&gt;create-app&lt;/code&gt; permission could still create apps. &lt;a href=&quot;https://github.com/datasette/datasette-apps/issues/27&quot;&gt;#27&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Fixed a bug where it was impossible to grant permission to edit an app to users who were not the app&apos;s owner. The rules for edit/delete are now the same as view: if the app is private only the owner can modify it, otherwise permission is controlled by Datasette&apos;s regular permission system. &lt;a href=&quot;https://github.com/datasette/datasette-apps/issues/29&quot;&gt;#29&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-apps 0.1a2</title>
+      <link>https://simonwillison.net/2026/Jun/15/datasette-apps/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/15/datasette-apps/#atom-everything</guid>
+      <pubDate>Mon, 15 Jun 2026 17:26:11 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-apps/releases/tag/0.1a2&quot;&gt;datasette-apps 0.1a2&lt;/a&gt;&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Custom network/CSP origins for apps are now guarded by a new &lt;code&gt;apps-set-csp&lt;/code&gt; permission, with an optional &lt;code&gt;allowed_csp_origins&lt;/code&gt; plugin allow-list for non-privileged users. The Datasette Agent app creation tool enforces the same rules. &lt;a href=&quot;https://github.com/datasette/datasette-apps/issues/24&quot;&gt;#24&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Stored query picker now supports keyboard navigation and shows the three most recent accessible stored queries when focused.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;#fragment&lt;/code&gt; links inside apps are no longer intercepted by the external-link confirmation modal. &lt;a href=&quot;https://github.com/datasette/datasette-apps/issues/23&quot;&gt;#23&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Fixed link confirmation modal and logging panels in &lt;code&gt;?full=1&lt;/code&gt; full-screen mode. &lt;a href=&quot;https://github.com/datasette/datasette-apps/issues/26&quot;&gt;#26&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
       <title>datasette-agent 0.3a0</title>
       <link>https://simonwillison.net/2026/Jun/15/datasette-agent/#atom-everything</link>
       <guid>https://simonwillison.net/2026/Jun/15/datasette-agent/#atom-everything</guid>
@@ -225,7 +356,7 @@
         Lots of &quot;source familiar with the administration&apos;s thinking&quot; and &quot;source close to Anthropic&quot; in this Axios piece, which is the best collection of behind-the-scenes gossip I&apos;ve seen about the US government &lt;a href=&quot;https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/&quot;&gt;export control Mythos/Fable story&lt;/a&gt; so far.&lt;/p&gt;
         &lt;p&gt;Logan Graham (&lt;a href=&quot;https://logangraham.xyz&quot;&gt;I lead the Frontier Red Team at Anthropic&lt;/a&gt;), Dave Orr (Head of Safeguards, previously a Director of Engineering at Google DeepMind), and blog favorite &lt;a href=&quot;https://simonwillison.net/tags/nicholas-carlini/&quot;&gt;Nicholas Carlini&lt;/a&gt; are reported to be meeting with the Commerce Department today in D.C. Good luck to them!&lt;/p&gt;
         &lt;p&gt;(I just noticed Logan was &quot;Special Adviser to the Prime Minister&quot; in the Boris Johnson era, covering AI, science, and technology policy - so significant political experience.)&lt;/p&gt;
-        &lt;p&gt;This closing notes doesn&apos;t give me much optimism that we&apos;ll be getting Fable back any time soon:&lt;/p&gt;
+        &lt;p&gt;This closing note doesn&apos;t give me much optimism that we&apos;ll be getting Fable back any time soon:&lt;/p&gt;
         &lt;blockquote&gt;
         &lt;p&gt;&lt;strong&gt;The bottom line&lt;/strong&gt;: One option is to make sure Anthropic&apos;s models can&apos;t be jailbroken — though perfect jailbreak resistance &lt;a href=&quot;https://www.anthropic.com/news/fable-mythos-access&quot;&gt;may be&lt;/a&gt; impossible.&lt;/p&gt;
         &lt;p&gt;Absent that, a source familiar with the administration&apos;s thinking said it may simply come down to an attitude fix where, instead of feeling dismissed, &quot;everyone feels safe, secure and happy.&quot;&lt;/p&gt;
@@ -616,241 +747,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/google&quot;&gt;google&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/nvidia&quot;&gt;nvidia&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gemma&quot;&gt;gemma&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-performance&quot;&gt;llm-performance&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Jeremy Howard</title>
-      <link>https://simonwillison.net/2026/Jun/10/jeremy-howard/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/10/jeremy-howard/#atom-everything</guid>
-      <pubDate>Wed, 10 Jun 2026 15:23:34 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://twitter.com/jeremyphoward/status/2064595816875217362&quot;&gt;&lt;p&gt;Easy solution to slow down recursive AI self improvement:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;The lab with the top-ranked model must agree THEY must not use it for working on frontier AI&lt;/li&gt;
-        &lt;li&gt;But everyone else should have access to it.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;By definition, this means the frontier doesn&apos;t advance.&lt;/p&gt;
-        &lt;p&gt;It also has the critical benefit of avoiding a dangerous power imbalance.&lt;/p&gt;
-        &lt;p&gt;Anthropic has chosen the &lt;em&gt;opposite&lt;/em&gt; of the safe path: they are allowing themselves, the current top lab, to use their top model for frontier AI research. They&apos;ve said they&apos;ll sabotage others who try.&lt;/p&gt;
-        &lt;p&gt;This means the AI frontier advances, &amp;amp; power imbalance increases.&lt;/p&gt;
-        &lt;p&gt;(To be clear, &lt;em&gt;I&lt;/em&gt; don&apos;t think we should try to slow down recursive AI self improvement - I think we should open it up and democratize it as much as possible. My point is: if &lt;em&gt;you&lt;/em&gt; claim we should slow down, and you have the best model, you should ensure your org can&apos;t use it.)&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/jeremyphoward/status/2064595816875217362&quot;&gt;Jeremy Howard&lt;/a&gt;, in a Twitter thread&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jeremy-howard&quot;&gt;jeremy-howard&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>If Claude Fable stops helping you, you&apos;ll never know</title>
-      <link>https://simonwillison.net/2026/Jun/10/if-claude-fable-stops-helping-you/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/10/if-claude-fable-stops-helping-you/#atom-everything</guid>
-      <pubDate>Wed, 10 Jun 2026 00:37:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://jonready.com/blog/posts/claude-fable5-is-allowed-to-sabotage-your-app-if-youre-a-competitor.html&quot;&gt;If Claude Fable stops helping you, you&amp;#x27;ll never know&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Jonathon Ready highlights one of the more eyebrow-raising details from the &lt;a href=&quot;https://www-cdn.anthropic.com/d00db56fa754a1b115b6dd7cb2e3c342ee809620.pdf&quot;&gt;319 page system card&lt;/a&gt; for Fable 5 and Mythos 5. Here&apos;s a longer excerpt, highlights mine:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;In light of the ability of recent models to &lt;a href=&quot;https://www.anthropic.com/institute/recursive-self-improvement&quot;&gt;accelerate their own development&lt;/a&gt;, we’ve &lt;strong&gt;implemented new interventions&lt;/strong&gt; that limit Claude’s effectiveness for requests targeting frontier LLM development (for example, on &lt;strong&gt;building pretraining pipelines, distributed training infrastructure, or ML accelerator design&lt;/strong&gt;). Using Claude to develop competing models already violates our &lt;a href=&quot;https://www.anthropic.com/legal/consumer-terms&quot;&gt;Terms of Service&lt;/a&gt;, but enforcing this restriction through our safeguards avoids accelerating the actors most willing to violate these terms.&lt;/p&gt;
-        &lt;p&gt;Unlike our interventions for cybersecurity, biology and chemistry, and distillation attempts, &lt;strong&gt;these safeguards will not be visible to the user&lt;/strong&gt;. Fable 5 will not fall back to a different model. Instead, the safeguards will limit effectiveness through methods such as prompt modification, steering vectors, or parameter-efficient fine-tuning (PEFT). These interventions will not affect the vast majority of coding work. We estimate they will impact ~0.03% of traffic, concentrated in fewer than 0.1% of organizations.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I believe this is the first time Anthropic have announced these kinds of silent interventions. The justification still feels pretty science-fiction to me - the linked article talks about &quot;recursive self-improvement&quot;. I&apos;m not at all keen on a model that silently corrupts its replies to questions about &quot;ML accelerator design&quot; purely to slow down research that might conflict with Anthropic&apos;s own goals!&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: Anthropic &lt;a href=&quot;https://simonwillison.net/2026/Jun/11/anthropic-walks-back-policy/&quot;&gt;walked back this policy&lt;/a&gt; in the face of widespread outrage from the research community.
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=48467896&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Initial impressions of Claude Fable 5</title>
-      <link>https://simonwillison.net/2026/Jun/9/claude-fable-5/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/9/claude-fable-5/#atom-everything</guid>
-      <pubDate>Tue, 09 Jun 2026 23:59:54 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I didn&apos;t have early access to today&apos;s &lt;a href=&quot;https://www.anthropic.com/news/claude-fable-5-mythos-5&quot;&gt;Claude Fable 5&lt;/a&gt; release, but I&apos;ve spent the past ~5.5 hours putting it through its paces. My initial impressions are that this is something of a &lt;em&gt;beast&lt;/em&gt;. It&apos;s slow, expensive and has been quite happily churning through everything I&apos;ve thrown at it so far. As is frequently the case with current frontier models the challenge is finding tasks that it can&apos;t do.&lt;/p&gt;
-        &lt;p&gt;First, let&apos;s review the key characteristics.&lt;/p&gt;
-        &lt;p&gt;Anthropic claim that &lt;a href=&quot;https://www.anthropic.com/news/claude-fable-5-mythos-5&quot;&gt;Claude Fable 5&lt;/a&gt; offers the same performance as Claude Mythos 5, except with much more strict guardrails in place to prevent it being used for harmful things. Those guardrails trigger often enough that the Claude API has new mechanisms for letting you know when you hit them, and even has a &lt;a href=&quot;https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback&quot;&gt;new option&lt;/a&gt; to request it falls back to another model automatically if something gets rejected.&lt;/p&gt;
-        &lt;p&gt;Claude Mythos 5 is out today as well, &lt;a href=&quot;https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5&quot;&gt;Anthropic say it&lt;/a&gt; &quot;Shares Claude Fable 5&apos;s capabilities without the safety classifiers&quot;.&lt;/p&gt;
-        &lt;p&gt;The models have a 1 million token context window, 128,000 maximum output tokens and a knowledge cut-off date of January 2026.&lt;/p&gt;
-        &lt;p&gt;They are priced at twice the price of Claude Opus 4.5/4.6/4.7/4.8: $10/million input tokens and $50/million output tokens. There&apos;s no increase in price for longer context usage.&lt;/p&gt;
-        &lt;p&gt;Other than that the &lt;a href=&quot;https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5&quot;&gt;upgrade guide&lt;/a&gt; is substantially thinner than &lt;a href=&quot;https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8&quot;&gt;the similar guide for Opus 4.8&lt;/a&gt;.&lt;/p&gt;
-        &lt;h4 id=&quot;the-big-model-smell&quot;&gt;The big model smell&lt;/h4&gt;
-        &lt;p&gt;The best way to describe Fable is that it feels &lt;em&gt;big&lt;/em&gt;. Not just in terms of speed and cost, but also in how much it knows.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s an example prompt, which I used to compare Fable&apos;s knowledge with Opus 4.8 (typo included):&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;List all of Simon Willion&apos;s open source projects, most recent first, each with a rough date of when they were first released&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Opus 4.8&apos;s reply &lt;a href=&quot;https://gist.github.com/simonw/e77abf645156ade8c5c610f524226dcb#response-1&quot;&gt;started like this&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I don&apos;t have a reliable, comprehensive, and date-verified list of all of Simon Willison&apos;s open source projects, and I want to be honest about that rather than risk giving you inaccurate dates or fabricated entries.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s what I can tell you with reasonable confidence:&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Well-known projects by Simon Willison:&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;LLM&lt;/strong&gt; (~2023) – A command-line tool and Python library for interacting with large language models.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;Datasette&lt;/strong&gt; (~2017) – A tool for exploring and publishing data, probably his most prominent recent project.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;sqlite-utils&lt;/strong&gt; (~2018-2019) – A Python library and CLI tool for manipulating SQLite databases, often used alongside Datasette.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;Django&lt;/strong&gt; (2005) – He is one of the co-creators of the Django web framework, along with Adrian Holovaty, originally developed at the Lawrence Journal-World newspaper.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;He also maintains a large ecosystem of &lt;strong&gt;Datasette plugins&lt;/strong&gt; and many smaller utilities (often with names like &lt;code&gt;shot-scraper&lt;/code&gt;, various &lt;code&gt;*-to-sqlite&lt;/code&gt; tools for importing data, etc.).&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;That&apos;s not bad. Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/e77abf645156ade8c5c610f524226dcb#response&quot;&gt;the start of the response&lt;/a&gt; for the exact same prompt from Fable 5 - both models were running without access to search:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I think you mean &lt;strong&gt;Simon Willison&lt;/strong&gt; — the prolific open source developer, co-creator of Django, and creator of Datasette.&lt;/p&gt;
-        &lt;p&gt;An important caveat upfront: a truly complete list isn&apos;t feasible. Simon Willison is famously prolific — he has published &lt;strong&gt;hundreds&lt;/strong&gt; of repositories (Datasette alone has 100+ plugins, many written by him), and my knowledge has a cutoff date, so I&apos;ll be missing his most recent work. Below are his &lt;strong&gt;notable&lt;/strong&gt; projects with approximate initial release dates, most recent first:&lt;/p&gt;
-        &lt;h2 id=&quot;notable-projects-approximate-dates-&quot;&gt;Notable projects (approximate dates)&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;strong&gt;files-to-prompt&lt;/strong&gt; (April 2024) – concatenates files into a single prompt for LLMs&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;datasette-extract&lt;/strong&gt; (2024) – plugin for extracting structured data using LLMs&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;LLM&lt;/strong&gt; (May–June 2023) – CLI tool and Python library for interacting with large language models, plus a large ecosystem of plugins (llm-gpt4all, llm-mistral, llm-claude, etc., 2023 onward)&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;symbex&lt;/strong&gt; (June 2023) – search Python code for symbols&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;ttok&lt;/strong&gt; and &lt;strong&gt;strip-tags&lt;/strong&gt; (May 2023) – CLI tools for token counting and HTML cleanup for LLM pipelines&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;datasette-lite&lt;/strong&gt; (May 2022) – Datasette running entirely in the browser via WebAssembly/Pyodide&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;shot-scraper&lt;/strong&gt; (March 2022) – automated website screenshots via Playwright&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;s3-credentials&lt;/strong&gt; (November 2021) – CLI for creating scoped AWS S3 credentials&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;django-sql-dashboard&lt;/strong&gt; (2021) – SQL reporting dashboards for Django&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Dogsheep suite&lt;/strong&gt; (2019) – personal analytics tools: twitter-to-sqlite, github-to-sqlite, healthkit-to-sqlite, dogsheep-beta, etc.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;sqlite-utils&lt;/strong&gt; (2018) – CLI and Python library for manipulating SQLite databases&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Datasette&lt;/strong&gt; (November 2017) – his flagship project; tool for exploring and publishing data&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;csvs-to-sqlite&lt;/strong&gt; (2017) – convert CSV files to SQLite&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Various early tools&lt;/strong&gt; (~2007–2010) – soupselect, json-head, geocoders, and others&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Django&lt;/strong&gt; (developed 2003–2005, open-sourced July 2005) – co-created with Adrian Holovaty at the Lawrence Journal-World&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;(Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/8d05ce836d44bd8543055c9614f7c478&quot;&gt;GPT-5.5 for good measure&lt;/a&gt;. It listed even more projects than Fable did!)&lt;/p&gt;
-        &lt;p&gt;In the past I&apos;ve stated that I don&apos;t care about how much models &lt;em&gt;know&lt;/em&gt; - I want them to be able to manipulate text and code in useful ways and actively look up the information they need via search tools, not bake it into their weights.&lt;/p&gt;
-        &lt;p&gt;But knowledge like this is a reasonably good proxy for model size - you can cram a whole lot more details about the world into a larger number of parameters.&lt;/p&gt;
-        &lt;p&gt;Does &lt;em&gt;knowing more stuff&lt;/em&gt; mean the model is better at the tasks we pose to it? I can certainly imagine how a coding model with deeper knowledge of modern libraries and patterns could crunch through coding tasks more effectively.&lt;/p&gt;
-        &lt;p&gt;Is Fable really bigger than Opus? Anthropic haven&apos;t said anything about model size, so all we have are tea-leaves, but the speed, pricing and my own poking at its knowledge make me think that it&apos;s a large model. Maybe the largest yet from any vendor.&lt;/p&gt;
-        &lt;h4 id=&quot;using-fable-in-claude-ai&quot;&gt;Using Fable in Claude.ai&lt;/h4&gt;
-        &lt;p&gt;Anthropic made Fable 5 available across all of their surfaces - the &lt;a href=&quot;https://claude.ai/&quot;&gt;Claude.ai&lt;/a&gt; chat interface, Claude Code for web, Claude Code CLI and Claude Cowork as well. The model is available &quot;until June 22nd&quot; on the subscription plans (I&apos;m on $100/month Max at the moment), after which it will be billed extra.&lt;/p&gt;
-        &lt;p&gt;Claude.ai is often under-estimated. Since &lt;a href=&quot;https://simonwillison.net/2025/Sep/9/claude-code-interpreter/&quot;&gt;September 2025&lt;/a&gt; every chat has had access to a full container environment to run code, including the ability to install additional packages and even clone repositories directly from GitHub.&lt;/p&gt;
-        &lt;p&gt;Last week &lt;a href=&quot;https://simonwillison.net/2026/Jun/6/micropython-in-a-sandbox/&quot;&gt;I released micropython-wasm&lt;/a&gt;, a Python library that uses &lt;a href=&quot;https://wasmtime.dev/&quot;&gt;wasmtime&lt;/a&gt; to run a custom build of MicroPython in WebAssembly to act as a sandbox for untrusted Python code.&lt;/p&gt;
-        &lt;p&gt;I decided to see if Fable could upgrade that to running full Python instead. I started with this prompt:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Clone simonw/micropython-wasm from GitHub and research how this could use a full Python as opposed to MicroPython&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Fable identified that it could use Brett Cannon&apos;s &lt;a href=&quot;https://github.com/brettcannon/cpython-wasi-build/releases&quot;&gt;cpython-wasi-build&lt;/a&gt; builds for this, but was unable to download them itself due to environment restrictions.&lt;/p&gt;
-        &lt;p&gt;So I grabbed the two zip files from that page and uploaded them to Claude:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Here&apos;s the Brett Cannon builds&lt;/code&gt; (&lt;code&gt;python-3.zip&lt;/code&gt;, &lt;code&gt;_build-python-3.zip&lt;/code&gt; as attachments)&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;And that was that. It churned away for a few minutes and got the entire thing working.&lt;/p&gt;
-        &lt;p&gt;Part of the response included:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I tried the cleaner single-zip-stdlib approach to shrink the filesystem surface, but CPython&apos;s &lt;code&gt;getpath&lt;/code&gt; bootstrap fails to find &lt;code&gt;encodings&lt;/code&gt; from inside a zip without more prefix finessing — the directory-preopen approach works reliably, so that&apos;s what the PoC uses. The zip path is solvable but needs &lt;code&gt;_PYTHONHOME&lt;/code&gt;/frozen-getpath work.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;So I said:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Try a bit more at the single-zip-stdlib problem&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Then a little later:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;I want a wheel that has the whole system in it, the Python wrappers and the WASM files and the stdlibrary, so I can do uv run --with path-to-whl python -c &quot;demo code&quot;&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;... and it gave me &lt;a href=&quot;https://static.simonwillison.net/static/cors-allow/2026/cpython_wasm-0.1.0-py3-none-any.whl&quot;&gt;this 13.9MB cpython_wasm-0.1.0-py3-none-any.whl&lt;/a&gt; file. You can try running Python code in a sandbox using that wheel URL and &lt;code&gt;uv&lt;/code&gt; like this:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;uv run --with https://static.simonwillison.net/static/cors-allow/2026/cpython_wasm-0.1.0-py3-none-any.whl \
-        cpython-wasm -c &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;print(45 ** 56)&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://claude.ai/share/a73b8b8b-8ebc-4fef-9e5c-7438e5e7ae35&quot;&gt;the full chat transcript&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;This was a &lt;em&gt;very&lt;/em&gt; strong start.&lt;/p&gt;
-        &lt;h4 id=&quot;adding-features-to-datasette-agent-and-llm-using-claude-code&quot;&gt;Adding features to Datasette Agent and LLM using Claude Code&lt;/h4&gt;
-        &lt;p&gt;Before I&apos;d realized it was Fable day, my stretch goal for today was to add a new feature to &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt;: I wanted tool calls within that agent software to gain the ability to pause mid-execution and request approval directly from the user.&lt;/p&gt;
-        &lt;p&gt;This felt like a suitably meaty task to throw at the new model.&lt;/p&gt;
-        &lt;p&gt;Over the course of the day Fable not only &lt;a href=&quot;https://github.com/datasette/datasette-agent/pull/20&quot;&gt;solved that problem&lt;/a&gt;, it also identified and then implemented four issues in my underlying LLM library that would help support this kind of advanced pause-resume mechanism in tool calls.&lt;/p&gt;
-        &lt;p&gt;It got everything working first using somewhat gnarly hacks, but the moment I told it that changes to LLM itself were in scope it set to work unraveling the hacks and turning them into supported features of LLM instead.&lt;/p&gt;
-        &lt;p&gt;My stretch goal turned into &lt;a href=&quot;https://llm.datasette.io/en/latest/changelog.html#a3-2026-06-09&quot;&gt;LLM 0.32a3&lt;/a&gt;, almost entirely written by Fable. Here are the release notes:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Driven by the needs of &lt;a href=&quot;https://github.com/datasette/datasette-agent&quot;&gt;Datasette Agent&lt;/a&gt;&apos;s human-in-the-loop &lt;code&gt;ask_user()&lt;/code&gt; feature, made the following improvements to how tool calls work:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Tool implementations can declare a parameter named &lt;code&gt;llm_tool_call&lt;/code&gt; in order to be passed the &lt;code&gt;llm.ToolCall&lt;/code&gt; object for the current invocation. This allows them to access the current &lt;code&gt;llm_tool_call.tool_call_id&lt;/code&gt;. See &lt;a href=&quot;https://llm.datasette.io/en/latest/python-api.html#python-api-tools-llm-tool-call&quot;&gt;Accessing the tool call from inside a tool&lt;/a&gt;. &lt;a href=&quot;https://github.com/simonw/llm/pull/1480&quot;&gt;#1480&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Every tool call is now guaranteed a unique &lt;code&gt;tool_call_id&lt;/code&gt; - providers that do not supply one get a synthesized &lt;code&gt;tc_&lt;/code&gt;-prefixed ULID. &lt;a href=&quot;https://github.com/simonw/llm/pull/1481&quot;&gt;#1481&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Tools can raise a &lt;code&gt;llm.PauseChain&lt;/code&gt; exception to cleanly pause the tool chain, useful for things like waiting for human approval. The exception propagates to the caller with &lt;code&gt;.tool_call&lt;/code&gt; and &lt;code&gt;.tool_results&lt;/code&gt; (completed sibling results) attached, and no model call is made with a placeholder result. See &lt;a href=&quot;https://llm.datasette.io/en/latest/python-api.html#python-api-tools-pause&quot;&gt;Pausing a chain from inside a tool&lt;/a&gt;. &lt;a href=&quot;https://github.com/simonw/llm/pull/1482&quot;&gt;#1482&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Failure semantics for concurrent tool execution: async sibling tool calls always run to completion before a pause or hook exception propagates. &lt;a href=&quot;https://github.com/simonw/llm/pull/1482&quot;&gt;#1482&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Chains can now resume from a &lt;code&gt;messages=&lt;/code&gt; history ending in unresolved tool calls: the calls are executed through the normal &lt;code&gt;before_call&lt;/code&gt;/&lt;code&gt;after_call&lt;/code&gt; machinery before the first model call, skipping any that already have results. The &lt;code&gt;execute_tool_calls()&lt;/code&gt; method also accepts a new optional &lt;code&gt;tool_calls_list=&lt;/code&gt; argument for executing an explicit list of &lt;code&gt;ToolCall&lt;/code&gt; objects in place of the calls requested by the response. See &lt;a href=&quot;https://llm.datasette.io/en/latest/python-api.html#python-api-tools-resume&quot;&gt;Resuming a chain with pending tool calls&lt;/a&gt;. &lt;a href=&quot;https://github.com/simonw/llm/pull/1482&quot;&gt;#1482&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Fixed a bug where the async tool executor silently dropped calls to tools not present in &lt;code&gt;tools=&lt;/code&gt; - these now return &lt;code&gt;Error: tool &quot;...&quot; does not exist&lt;/code&gt; results, matching the sync executor. &lt;a href=&quot;https://github.com/simonw/llm/pull/1483&quot;&gt;#1483&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I&apos;m really impressed with the quality of API design, tests, code and documentation that Fable put together for this. I spent several hours on it today, but it feels like several days&apos; worth of work.&lt;/p&gt;
-        &lt;h4 id=&quot;how-much-i-ve-spent&quot;&gt;How much I&apos;ve spent&lt;/h4&gt;
-        &lt;p&gt;I recently started using &lt;a href=&quot;https://agentsview.io&quot;&gt;AgentsView&lt;/a&gt; to help track my local LLM usage across all of the different coding agents. I published a &lt;a href=&quot;https://til.simonwillison.net/llms/agentsview-custom-model-price&quot;&gt;TIL today&lt;/a&gt; about adding custom Fable pricing to that tool, which I expect will not be necessary in the very near future.&lt;/p&gt;
-        &lt;p&gt;After setting the price, I ran this command to start a localhost web server to explore my usage:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;uvx agentsview serve
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the treemap showing the breakdown of my Fable usage across various projects today:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/agentsview-fable-full-day.jpg&quot; alt=&quot;Screenshot of a cost tracking dashboard with two panels. The first panel is titled &amp;quot;Cost Attribution&amp;quot; with toggle buttons for Project / Model / Agent and Treemap / List, with Project and Treemap selected. Italic text reads &amp;quot;Click to hide from chart&amp;quot;. A treemap shows a large red block labeled prod_datasette_agent $99.26 89.9%, with smaller blocks to its right labeled cloud (blue), datasette (teal), llm (red), and money (pink), plus a tiny orange sliver. A legend lists: 1 prod_datasette_agent $99.26, 2 cloud $3.98, 3 datasette $2.81, 4 llm $2.30, 5 money $1.92, 6 simon $0.15. The second panel is titled &amp;quot;Top Sessions by Cost&amp;quot; and lists nine sessions, each with a &amp;quot;Claude&amp;quot; badge, a prompt excerpt, a project name with a session UUID (omitted here), a token count, and a cost: 1. Review ./datasette-agent and ./datasette-apps - we are going to add a new feature to agent but you ... prod_datasette_agent, 78.2M, $99.26. 2. issues.db is a copy of the Datasette issues database. There are a LOT of notes in there relating to... datasette, 826.8k, $2.81. 3. Consult fly-docs and then look at datasette.cloud (which launches fly machines) and datasettecloud-... cloud, 924.7k, $2.61. 4. simonwillisonblog.db is a copy of my blog, plus all my software releases and other interesting thin... money, 542.9k, $1.92. 5. Look in datasette.cloud and figure out all remaining steps and decisions that need to be made in or... cloud, 455k, $1.37. 6. Review PRs and issues filed against this repo within the last 4 weeks and see if any deserve to be ... llm, 323.3k, $0.95. 7. run mypy, llm, 320.9k, $0.76. 8. [Image #1] fix this in github actions, llm, 183.9k, $0.59. 9. simon, simon, 26.4k, $0.15.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;I used $110.42 worth of tokens today, all as part of my $100/month subscription.&lt;/p&gt;
-        &lt;h4 id=&quot;and-some-pelicans&quot;&gt;And some pelicans&lt;/h4&gt;
-        &lt;p&gt;I ran &quot;Generate an SVG of a pelican riding a bicycle&quot; against all five thinking effort levels with Fable.&lt;/p&gt;
-        &lt;p&gt;Here are &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F94fde31c34a0400c1d29f57e6a708e6b&quot;&gt;the results&lt;/a&gt;, including the token cost for each one:&lt;/p&gt;
-        
-        &lt;div style=&quot;display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1em&quot;&gt;
-        &lt;figure style=&quot;margin: 0; flex: 1 1 30%;&quot;&gt;
-        &lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-low.jpg&quot; alt=&quot;low&quot; style=&quot;width: 100%; height: auto;&quot; /&gt;
-        &lt;figcaption style=&quot;text-align: center;&quot;&gt;low: &lt;a href=&quot;https://www.llm-prices.com/#it=25&amp;amp;ot=1929&amp;amp;sel=claude-fable-5&quot;&gt;1,929 out, 9.67c&lt;/a&gt;&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;figure style=&quot;margin: 0; flex: 1 1 30%;&quot;&gt;
-        &lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-medium.jpg&quot; alt=&quot;medium&quot; style=&quot;width: 100%; height: auto;&quot; /&gt;
-        &lt;figcaption style=&quot;text-align: center;&quot;&gt;medium: &lt;a href=&quot;https://www.llm-prices.com/#it=25&amp;amp;ot=2290&amp;amp;sel=claude-fable-5&quot;&gt;2,290 out, 11.475c&lt;/a&gt;&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;figure style=&quot;margin: 0; flex: 1 1 30%;&quot;&gt;
-        &lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-high.jpg&quot; alt=&quot;high&quot; style=&quot;width: 100%; height: auto;&quot; /&gt;
-        &lt;figcaption style=&quot;text-align: center;&quot;&gt;high: &lt;a href=&quot;https://www.llm-prices.com/#it=25&amp;amp;ot=2057&amp;amp;sel=claude-fable-5&quot;&gt;2,057 out, 10.31c&lt;/a&gt;&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;figure style=&quot;margin: 0; flex: 1 1 45%;&quot;&gt;
-        &lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-xhigh.jpg&quot; alt=&quot;xhigh&quot; style=&quot;width: 100%; height: auto;&quot; /&gt;
-        &lt;figcaption style=&quot;text-align: center;&quot;&gt;xhigh: &lt;a href=&quot;https://www.llm-prices.com/#it=25&amp;amp;ot=5992&amp;amp;sel=claude-fable-5&quot;&gt;5,992 out, 29.985c&lt;/a&gt;&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;figure style=&quot;margin: 0; flex: 1 1 45%;&quot;&gt;
-        &lt;img src=&quot;https://static.simonwillison.net/static/2026/fable-max.jpg&quot; alt=&quot;max&quot; style=&quot;width: 100%; height: auto;&quot; /&gt;
-        &lt;figcaption style=&quot;text-align: center;&quot;&gt;max: &lt;a href=&quot;https://www.llm-prices.com/#it=25&amp;amp;ot=14430&amp;amp;sel=claude-fable-5&quot;&gt;14,430 out, 72.175c&lt;/a&gt;&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/div&gt;
-        
-        &lt;p&gt;It&apos;s interesting that high ended up using fewer tokens than medium for this particular run.&lt;/p&gt;
-        
-        &lt;p&gt;Here are the &lt;a href=&quot;https://simonwillison.net/2026/May/28/claude-opus-4-8/#and-some-pelicans&quot;&gt;Opus 4.8 pelicans&lt;/a&gt; for comparison.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm 0.32a3</title>
-      <link>https://simonwillison.net/2026/Jun/9/llm/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/9/llm/#atom-everything</guid>
-      <pubDate>Tue, 09 Jun 2026 22:27:03 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.32a3&quot;&gt;llm 0.32a3&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Almost entirely written by the new Claude Fable 5, see &lt;a href=&quot;https://simonwillison.net/2026/Jun/9/claude-fable-5/#adding-features-to-datasette-agent-and-llm-using-claude-code&quot;&gt;my write-up for more details&lt;/a&gt;.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
