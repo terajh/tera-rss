@@ -4,7 +4,43 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Fri, 19 Jun 2026 18:05:30 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 20 Jun 2026 16:38:47 GMT</lastBuildDate>
+    <item>
+      <title>Why is TypeScript rejecting Quasar alias?</title>
+      <link>https://stackoverflow.com/questions/79963325/why-is-typescript-rejecting-quasar-alias</link>
+      <guid>https://stackoverflow.com/questions/79963325/why-is-typescript-rejecting-quasar-alias</guid>
+      <pubDate>Fri, 19 Jun 2026 18:36:35 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Why does my &lt;code&gt;@&lt;/code&gt; alias not work with TypeScript?&lt;/p&gt;
+        &lt;p&gt;I have these settings in my &lt;code&gt;quasar.config.ts&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-typescript prettyprint-override&quot;&gt;&lt;code&gt;    build: {
+        target: {
+        browser: &apos;baseline-widely-available&apos;,
+        node: &apos;node22&apos;,
+        },
+        
+        typescript: {
+        strict: true,
+        vueShim: true,
+        // extendTsConfig (tsConfig) {}
+        },
+        
+        alias: {
+        &apos;@&apos;: &apos;/src&apos;,
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and this setting in &lt;code&gt;tsconfig.json&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;extends&amp;quot;: &amp;quot;./.quasar/tsconfig.json&amp;quot;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The app is running correctly but I have error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Cannot find module &apos;@/features/theme/lib&apos; or its corresponding type declarations.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The imports with @ working, components successfully importing.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>vue-html2pdf: Line of text is split between pages when generating multi-page PDFs [closed]</title>
       <link>https://stackoverflow.com/questions/79951435/vue-html2pdf-line-of-text-is-split-between-pages-when-generating-multi-page-pdf</link>
@@ -337,93 +373,6 @@
         &lt;/li&gt;
         &lt;/ul&gt;
         &lt;p&gt;How can this be implemented properly in a Frappe + Vue setup? What configurations or tools are needed to achieve automatic reload on &lt;code&gt;localhost:8000&lt;/code&gt; itself without manually refreshing the page?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Mobile Chrome crash when taking a photo with HTML5 input inside a Vue.js dialog</title>
-      <link>https://stackoverflow.com/questions/79944109/mobile-chrome-crash-when-taking-a-photo-with-html5-input-inside-a-vue-js-dialog</link>
-      <guid>https://stackoverflow.com/questions/79944109/mobile-chrome-crash-when-taking-a-photo-with-html5-input-inside-a-vue-js-dialog</guid>
-      <pubDate>Wed, 20 May 2026 14:11:03 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am developing a Vue.js web application that involves a photo upload feature. It works perfectly on desktop browsers, but I am encountering a critical issue on &lt;strong&gt;Mobile Chrome (Android)&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;The Symptom:&lt;/strong&gt; When I open the camera (using &lt;code&gt;capture=&amp;quot;camera&amp;quot;&lt;/code&gt;) inside a modal dialog, take a photo, and return to the app, the dialog immediately closes or the entire browser page crashes/reloads. This only happens when taking a photo; selecting an existing file usually works fine.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;What I have implemented:&lt;/strong&gt; I am using &lt;code&gt;URL.createObjectURL&lt;/code&gt; for image previews and ensuring that &lt;code&gt;URL.revokeObjectURL&lt;/code&gt; is called in the &lt;code&gt;onUnmounted&lt;/code&gt; hook to prevent memory leaks. I also have a custom &lt;code&gt;resizeImage&lt;/code&gt; function that runs before setting the state.&lt;/p&gt;
-        &lt;p&gt;Here is the relevant code snippet:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;        &amp;lt;div class=&amp;quot;photo-section&amp;quot;&amp;gt;
-        &amp;lt;div v-for=&amp;quot;type in photoTypes&amp;quot; :key=&amp;quot;type.value&amp;quot; class=&amp;quot;photo-item&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;photo-header&amp;quot;&amp;gt;
-        &amp;lt;span class=&amp;quot;photo-label&amp;quot;&amp;gt;{{ type.label }}&amp;lt;/span&amp;gt;
-        &amp;lt;div class=&amp;quot;button-group&amp;quot;&amp;gt;
-        &amp;lt;label :for=&amp;quot;&apos;camera-&apos; + type.value&amp;quot;&amp;gt;
-        &amp;lt;span class=&amp;quot;material-symbols-outlined&amp;quot; style=&amp;quot;pointer-events: none;&amp;quot;&amp;gt;photo_camera&amp;lt;/span&amp;gt;
-        &amp;lt;/label&amp;gt;
-        &amp;lt;input 
-        type=&amp;quot;file&amp;quot; 
-        :id=&amp;quot;&apos;camera-&apos; + type.value&amp;quot; 
-        accept=&amp;quot;image/*&amp;quot;
-        capture=&amp;quot;camera&amp;quot;
-        style=&amp;quot;display: none;&amp;quot; 
-        @change=&amp;quot;onPhotoChange($event, type.value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;label :for=&amp;quot;&apos;file-&apos; + type.value&amp;quot;&amp;gt;
-        &amp;lt;span class=&amp;quot;material-symbols-outlined&amp;quot; style=&amp;quot;pointer-events: none;&amp;quot;&amp;gt;file_open&amp;lt;/span&amp;gt;
-        &amp;lt;/label&amp;gt;
-        &amp;lt;input 
-        type=&amp;quot;file&amp;quot; 
-        :id=&amp;quot;&apos;file-&apos; + type.value&amp;quot; 
-        accept=&amp;quot;image/*&amp;quot; 
-        style=&amp;quot;display: none;&amp;quot; 
-        @change=&amp;quot;onPhotoChange($event, type.value)&amp;quot;
-        /&amp;gt;
-        
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;photo-window&amp;quot; @click=&amp;quot;openZoom(type.value)&amp;quot; style=&amp;quot;cursor: pointer;&amp;quot;&amp;gt;
-        &amp;lt;span v-if=&amp;quot;!readingData.photos?.[type.value] &amp;amp;&amp;amp; !photoPreviews[type.value]&amp;quot;&amp;gt;등록 필요&amp;lt;/span&amp;gt;
-        &amp;lt;img v-else :src=&amp;quot;photoPreviews[type.value] || readingData.photos[type.value]&amp;quot; alt=&amp;quot;미리보기&amp;quot; /&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        
-        
-        ..................
-        
-        
-        const onPhotoChange = async (event, photoType) =&amp;gt; {
-        try {
-        const file = event.target.files[0];
-        if (file) {
-        try {
-        const resizedFile = await resizeImage(file); // Utility function
-        readingData.photos[photoType] = resizedFile;
-        
-        if (photoPreviews[photoType]?.startsWith(&apos;blob:&apos;)) {
-        URL.revokeObjectURL(photoPreviews[photoType]);
-        }
-        
-        photoPreviews[photoType] = URL.createObjectURL(resizedFile);
-        photoDirtyFlags[photoType] = true;
-        } catch (error) {
-        console.error(&amp;quot;Resizing error:&amp;quot;, error);
-        }
-        }
-        } catch (error) {
-        alert(error);
-        } finally {
-        event.target.value = &apos;&apos;;
-        }
-        };
-        
-        // Cleanup in onUnmounted
-        onUnmounted(() =&amp;gt; {
-        [&apos;FAR&apos;, &apos;NEAR&apos;, &apos;ETC&apos;].forEach(type =&amp;gt; {
-        if (photoPreviews[type]?.startsWith(&apos;blob:&apos;)) {
-        URL.revokeObjectURL(photoPreviews[type]);
-        }
-        });
-        });
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
     <item>
