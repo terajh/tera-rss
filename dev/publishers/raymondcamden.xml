@@ -4,12 +4,500 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 21 Jun 2026 16:53:31 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jun 2026 19:11:14 GMT</lastBuildDate>
+    <item>
+      <title>Use AI to not use AI (as much)</title>
+      <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
+      <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
+        &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Email from GitHub warning about Actions Usage&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I know &lt;em&gt;of&lt;/em&gt; GitHub Actions, but I don&apos;t really use them much myself. That being said, GitHub&apos;s billing and usage reports were good for an aggregate high level look at my account, but were surprisingly &lt;em&gt;unhelpful&lt;/em&gt; in terms of telling me &lt;em&gt;where&lt;/em&gt; my usage was coming from. Apparently I was supposed to go through my 300+ repositories and find this out by checking the settings for each? That&apos;s crazy. It&apos;s also completely possible I missed a way to get this value easier, but honestly, I wasn&apos;t sure what to do.&lt;/p&gt;
+        &lt;p&gt;I finally found a usage report generator in my settings, I used that, and quickly got a CSV report. I took a quick look at it, nothing stood out, so I went to my AI tool and simply asked it to parse it for me.&lt;/p&gt;
+        &lt;p&gt;And it did - swimmingly - giving me a culprit to point to - or in my case - simply delete. It was a repo I had set up to test something that was apparently storing some artifacts I didn&apos;t need. Problem solved.&lt;/p&gt;
+        &lt;p&gt;But... I wasn&apos;t convinced this wasn&apos;t going to happen again, so I used the technique that first occurred to me a few months back, and is pretty obvious, but I simply asked my tool to generate a Python script for me that would create a report.&lt;/p&gt;
+        &lt;p&gt;For this I used &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;, a tool I&apos;ve been using a lot lately, and in Plan mode, simply asked:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;pay attention to the csv. it is a GitHub usage report. I need a general Python script that can be run at the command line that parses this CSV and reports on usage. the idea is to help me figure out what repo is causing the most usage&amp;quot;&lt;/p&gt;
+        &lt;p&gt;It chewed on the CSV a bit, and then asked what it should prioritize in terms of the report. Now, my email warning was about &lt;em&gt;storage&lt;/em&gt;, but Cursor suggested total cost, so I went along. After it built the script, I liked the output, but the &apos;problem&apos; repo (that I had already corrected) wasn&apos;t necessarily given enough attention.&lt;/p&gt;
+        &lt;p&gt;I then went back to Cursor with:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;this works, but i noticed that testing-boxlang-desktop, which used a lot of storage, doesn&apos;t get call out quite as much. can we maybe add another report after the gross amount one that shows top repos by stoage?&amp;quot;&lt;/p&gt;
+        &lt;p&gt;Thank god AI doesn&apos;t complain about typos so much as I didn&apos;t even notice that till just now. This iteration added a second report and really made it a great v1 for the script. Speaking of...&lt;/p&gt;
+        &lt;h2 id=&quot;just-show-me-the-code-already...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-show-me-the-code-already...&quot;&gt;Just show me the code already...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, so if you are also looking at a GitHub usage report and not sure what repo to blame, generate your summary, save the file, and use this script:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;#!/usr/bin/env python3
+        &amp;quot;&amp;quot;&amp;quot;Parse GitHub summarized usage CSV exports and report repo-level usage.&amp;quot;&amp;quot;&amp;quot;
+        
+        from __future__ import annotations
+        
+        import argparse
+        import csv
+        import json
+        import sys
+        from dataclasses import dataclass, field
+        from pathlib import Path
+        
+        REQUIRED_COLUMNS = {
+        &amp;quot;date&amp;quot;,
+        &amp;quot;product&amp;quot;,
+        &amp;quot;sku&amp;quot;,
+        &amp;quot;quantity&amp;quot;,
+        &amp;quot;unit_type&amp;quot;,
+        &amp;quot;gross_amount&amp;quot;,
+        &amp;quot;net_amount&amp;quot;,
+        &amp;quot;discount_amount&amp;quot;,
+        &amp;quot;repository&amp;quot;,
+        }
+        
+        
+        def parse_float(value: str) -&amp;gt; float:
+        if not value or not value.strip():
+        return 0.0
+        return float(value)
+        
+        
+        def parse_args() -&amp;gt; argparse.Namespace:
+        parser = argparse.ArgumentParser(
+        description=&amp;quot;Parse a GitHub summarized usage CSV and rank repositories by cost.&amp;quot;
+        )
+        parser.add_argument(&amp;quot;csv_file&amp;quot;, type=Path, help=&amp;quot;Path to summarized usage CSV&amp;quot;)
+        parser.add_argument(
+        &amp;quot;--top&amp;quot;,
+        type=int,
+        default=10,
+        metavar=&amp;quot;N&amp;quot;,
+        help=&amp;quot;Number of repositories to show in ranking (default: 10)&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--product&amp;quot;,
+        help=&amp;quot;Filter rows by product (e.g. actions, git_lfs)&amp;quot;,
+        )
+        parser.add_argument(&amp;quot;--sku&amp;quot;, help=&amp;quot;Filter rows by SKU&amp;quot;)
+        parser.add_argument(
+        &amp;quot;--from&amp;quot;,
+        dest=&amp;quot;date_from&amp;quot;,
+        metavar=&amp;quot;YYYY-MM-DD&amp;quot;,
+        help=&amp;quot;Include rows on or after this date&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--to&amp;quot;,
+        dest=&amp;quot;date_to&amp;quot;,
+        metavar=&amp;quot;YYYY-MM-DD&amp;quot;,
+        help=&amp;quot;Include rows on or before this date&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--json&amp;quot;,
+        action=&amp;quot;store_true&amp;quot;,
+        help=&amp;quot;Emit structured JSON instead of formatted text&amp;quot;,
+        )
+        return parser.parse_args()
+        
+        
+        def load_rows(path: Path) -&amp;gt; list[dict[str, str]]:
+        if not path.is_file():
+        print(f&amp;quot;Error: file not found: {path}&amp;quot;, file=sys.stderr)
+        sys.exit(1)
+        
+        with path.open(newline=&amp;quot;&amp;quot;, encoding=&amp;quot;utf-8-sig&amp;quot;) as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+        print(f&amp;quot;Error: {path} is empty or has no header row&amp;quot;, file=sys.stderr)
+        sys.exit(1)
+        
+        missing = REQUIRED_COLUMNS - set(reader.fieldnames)
+        if missing:
+        missing_list = &amp;quot;, &amp;quot;.join(sorted(missing))
+        print(
+        f&amp;quot;Error: {path} is missing required columns: {missing_list}&amp;quot;,
+        file=sys.stderr,
+        )
+        sys.exit(1)
+        
+        return list(reader)
+        
+        
+        def filter_rows(
+        rows: list[dict[str, str]],
+        *,
+        product: str | None,
+        sku: str | None,
+        date_from: str | None,
+        date_to: str | None,
+        ) -&amp;gt; list[dict[str, str]]:
+        filtered: list[dict[str, str]] = []
+        for row in rows:
+        if product and row[&amp;quot;product&amp;quot;] != product:
+        continue
+        if sku and row[&amp;quot;sku&amp;quot;] != sku:
+        continue
+        if date_from and row[&amp;quot;date&amp;quot;] &amp;lt; date_from:
+        continue
+        if date_to and row[&amp;quot;date&amp;quot;] &amp;gt; date_to:
+        continue
+        filtered.append(row)
+        return filtered
+        
+        
+        @dataclass
+        class SkuBreakdown:
+        sku: str
+        unit_type: str
+        quantity: float = 0.0
+        gross_amount: float = 0.0
+        
+        
+        @dataclass
+        class RepoUsage:
+        repository: str
+        gross_amount: float = 0.0
+        net_amount: float = 0.0
+        discount_amount: float = 0.0
+        row_count: int = 0
+        skus: dict[tuple[str, str], SkuBreakdown] = field(default_factory=dict)
+        
+        def add_row(self, row: dict[str, str]) -&amp;gt; None:
+        gross = parse_float(row[&amp;quot;gross_amount&amp;quot;])
+        net = parse_float(row[&amp;quot;net_amount&amp;quot;])
+        discount = parse_float(row[&amp;quot;discount_amount&amp;quot;])
+        quantity = parse_float(row[&amp;quot;quantity&amp;quot;])
+        sku = row[&amp;quot;sku&amp;quot;]
+        unit_type = row[&amp;quot;unit_type&amp;quot;]
+        
+        self.gross_amount += gross
+        self.net_amount += net
+        self.discount_amount += discount
+        self.row_count += 1
+        
+        key = (sku, unit_type)
+        if key not in self.skus:
+        self.skus[key] = SkuBreakdown(sku=sku, unit_type=unit_type)
+        breakdown = self.skus[key]
+        breakdown.quantity += quantity
+        breakdown.gross_amount += gross
+        
+        
+        def aggregate_by_repo(rows: list[dict[str, str]]) -&amp;gt; list[RepoUsage]:
+        repos: dict[str, RepoUsage] = {}
+        for row in rows:
+        repository = row[&amp;quot;repository&amp;quot;].strip() or &amp;quot;(unknown)&amp;quot;
+        if repository not in repos:
+        repos[repository] = RepoUsage(repository=repository)
+        repos[repository].add_row(row)
+        
+        return sorted(repos.values(), key=lambda repo: repo.gross_amount, reverse=True)
+        
+        
+        def is_storage_row(row: dict[str, str]) -&amp;gt; bool:
+        return &amp;quot;storage&amp;quot; in row[&amp;quot;sku&amp;quot;].lower()
+        
+        
+        @dataclass
+        class RepoStorage:
+        repository: str
+        quantity: float = 0.0
+        gross_amount: float = 0.0
+        row_count: int = 0
+        skus: dict[str, SkuBreakdown] = field(default_factory=dict)
+        
+        def add_row(self, row: dict[str, str]) -&amp;gt; None:
+        gross = parse_float(row[&amp;quot;gross_amount&amp;quot;])
+        quantity = parse_float(row[&amp;quot;quantity&amp;quot;])
+        sku = row[&amp;quot;sku&amp;quot;]
+        unit_type = row[&amp;quot;unit_type&amp;quot;]
+        
+        self.gross_amount += gross
+        self.quantity += quantity
+        self.row_count += 1
+        
+        if sku not in self.skus:
+        self.skus[sku] = SkuBreakdown(sku=sku, unit_type=unit_type)
+        breakdown = self.skus[sku]
+        breakdown.quantity += quantity
+        breakdown.gross_amount += gross
+        
+        
+        def aggregate_storage_by_repo(rows: list[dict[str, str]]) -&amp;gt; list[RepoStorage]:
+        repos: dict[str, RepoStorage] = {}
+        for row in rows:
+        if not is_storage_row(row):
+        continue
+        repository = row[&amp;quot;repository&amp;quot;].strip() or &amp;quot;(unknown)&amp;quot;
+        if repository not in repos:
+        repos[repository] = RepoStorage(repository=repository)
+        repos[repository].add_row(row)
+        
+        return sorted(repos.values(), key=lambda repo: repo.quantity, reverse=True)
+        
+        
+        def storage_repo_payload(repo: RepoStorage, total_storage: float) -&amp;gt; dict:
+        return {
+        &amp;quot;repository&amp;quot;: repo.repository,
+        &amp;quot;quantity_gigabyte_hours&amp;quot;: repo.quantity,
+        &amp;quot;gross_amount&amp;quot;: repo.gross_amount,
+        &amp;quot;percent_of_total_storage&amp;quot;: (
+        (repo.quantity / total_storage * 100) if total_storage else 0.0
+        ),
+        &amp;quot;row_count&amp;quot;: repo.row_count,
+        &amp;quot;skus&amp;quot;: [
+        {
+        &amp;quot;sku&amp;quot;: item.sku,
+        &amp;quot;unit_type&amp;quot;: item.unit_type,
+        &amp;quot;quantity&amp;quot;: item.quantity,
+        &amp;quot;gross_amount&amp;quot;: item.gross_amount,
+        }
+        for item in sorted(repo.skus.values(), key=lambda sku_item: sku_item.quantity, reverse=True)
+        ],
+        }
+        
+        
+        def format_money(amount: float) -&amp;gt; str:
+        return f&amp;quot;${amount:.4f}&amp;quot;
+        
+        
+        def format_percent(part: float, whole: float) -&amp;gt; str:
+        if whole == 0:
+        return &amp;quot;0.0%&amp;quot;
+        return f&amp;quot;{(part / whole) * 100:.1f}%&amp;quot;
+        
+        
+        def print_storage_table(storage_repos: list[RepoStorage], top: int) -&amp;gt; None:
+        print(&amp;quot;Top repositories by storage&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 28)
+        
+        if not storage_repos:
+        print(&amp;quot;No storage usage found.&amp;quot;)
+        print()
+        return
+        
+        total_storage = sum(repo.quantity for repo in storage_repos)
+        print(
+        f&amp;quot;{&apos;#&apos;:&amp;gt;3}  {&apos;Repository&apos;:&amp;lt;26} {&apos;GB-hours&apos;:&amp;gt;10} {&apos;%&apos;:&amp;gt;7} {&apos;Gross&apos;:&amp;gt;10} {&apos;Rows&apos;:&amp;gt;5}&amp;quot;
+        )
+        for index, repo in enumerate(storage_repos[:top], start=1):
+        print(
+        f&amp;quot;{index:&amp;gt;3}  {repo.repository:&amp;lt;26} &amp;quot;
+        f&amp;quot;{repo.quantity:&amp;gt;10.2f} &amp;quot;
+        f&amp;quot;{format_percent(repo.quantity, total_storage):&amp;gt;7} &amp;quot;
+        f&amp;quot;{format_money(repo.gross_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{repo.row_count:&amp;gt;5}&amp;quot;
+        )
+        print()
+        
+        
+        def print_text_report(
+        path: Path,
+        rows: list[dict[str, str]],
+        repos: list[RepoUsage],
+        storage_repos: list[RepoStorage],
+        top: int,
+        ) -&amp;gt; None:
+        total_gross = sum(repo.gross_amount for repo in repos)
+        total_net = sum(repo.net_amount for repo in repos)
+        dates = [row[&amp;quot;date&amp;quot;] for row in rows]
+        date_range = f&amp;quot;{min(dates)} to {max(dates)}&amp;quot; if dates else &amp;quot;n/a&amp;quot;
+        
+        print(&amp;quot;GitHub Usage Report&amp;quot;)
+        print(&amp;quot;=&amp;quot; * 19)
+        print(f&amp;quot;File: {path.name}&amp;quot;)
+        print(f&amp;quot;Period: {date_range} ({len(rows)} rows)&amp;quot;)
+        print(f&amp;quot;Total gross: {format_money(total_gross)}   Total net: {format_money(total_net)}&amp;quot;)
+        print()
+        
+        if not repos:
+        print(&amp;quot;No matching usage rows found.&amp;quot;)
+        return
+        
+        print(&amp;quot;Top repositories by gross amount&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 32)
+        print(f&amp;quot;{&apos;#&apos;:&amp;gt;3}  {&apos;Repository&apos;:&amp;lt;26} {&apos;Gross&apos;:&amp;gt;10} {&apos;%&apos;:&amp;gt;7} {&apos;Net&apos;:&amp;gt;10} {&apos;Rows&apos;:&amp;gt;5}&amp;quot;)
+        for index, repo in enumerate(repos[:top], start=1):
+        print(
+        f&amp;quot;{index:&amp;gt;3}  {repo.repository:&amp;lt;26} &amp;quot;
+        f&amp;quot;{format_money(repo.gross_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{format_percent(repo.gross_amount, total_gross):&amp;gt;7} &amp;quot;
+        f&amp;quot;{format_money(repo.net_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{repo.row_count:&amp;gt;5}&amp;quot;
+        )
+        
+        print()
+        print_storage_table(storage_repos, top)
+        print(&amp;quot;Details for top repos&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 19)
+        for repo in repos[:top]:
+        print(f&amp;quot;{repo.repository} ({format_money(repo.gross_amount)} gross)&amp;quot;)
+        sku_items = sorted(repo.skus.values(), key=lambda item: item.gross_amount, reverse=True)
+        for item in sku_items:
+        print(
+        f&amp;quot;  {item.sku:&amp;lt;22} {item.quantity:&amp;gt;10.2f} {item.unit_type:&amp;lt;16} &amp;quot;
+        f&amp;quot;{format_money(item.gross_amount):&amp;gt;10}&amp;quot;
+        )
+        print()
+        
+        
+        def print_json_report(
+        path: Path,
+        rows: list[dict[str, str]],
+        repos: list[RepoUsage],
+        storage_repos: list[RepoStorage],
+        top: int,
+        ) -&amp;gt; None:
+        total_gross = sum(repo.gross_amount for repo in repos)
+        total_net = sum(repo.net_amount for repo in repos)
+        total_storage = sum(repo.quantity for repo in storage_repos)
+        dates = [row[&amp;quot;date&amp;quot;] for row in rows]
+        
+        payload = {
+        &amp;quot;file&amp;quot;: str(path),
+        &amp;quot;row_count&amp;quot;: len(rows),
+        &amp;quot;date_from&amp;quot;: min(dates) if dates else None,
+        &amp;quot;date_to&amp;quot;: max(dates) if dates else None,
+        &amp;quot;total_gross_amount&amp;quot;: total_gross,
+        &amp;quot;total_net_amount&amp;quot;: total_net,
+        &amp;quot;total_storage_gigabyte_hours&amp;quot;: total_storage,
+        &amp;quot;repositories&amp;quot;: [
+        {
+        &amp;quot;rank&amp;quot;: index,
+        &amp;quot;repository&amp;quot;: repo.repository,
+        &amp;quot;gross_amount&amp;quot;: repo.gross_amount,
+        &amp;quot;net_amount&amp;quot;: repo.net_amount,
+        &amp;quot;discount_amount&amp;quot;: repo.discount_amount,
+        &amp;quot;row_count&amp;quot;: repo.row_count,
+        &amp;quot;percent_of_total_gross&amp;quot;: (
+        (repo.gross_amount / total_gross * 100) if total_gross else 0.0
+        ),
+        &amp;quot;skus&amp;quot;: [
+        {
+        &amp;quot;sku&amp;quot;: item.sku,
+        &amp;quot;unit_type&amp;quot;: item.unit_type,
+        &amp;quot;quantity&amp;quot;: item.quantity,
+        &amp;quot;gross_amount&amp;quot;: item.gross_amount,
+        }
+        for item in sorted(
+        repo.skus.values(),
+        key=lambda sku_item: sku_item.gross_amount,
+        reverse=True,
+        )
+        ],
+        }
+        for index, repo in enumerate(repos[:top], start=1)
+        ],
+        &amp;quot;storage_repositories&amp;quot;: [
+        {&amp;quot;rank&amp;quot;: index, **storage_repo_payload(repo, total_storage)}
+        for index, repo in enumerate(storage_repos[:top], start=1)
+        ],
+        }
+        print(json.dumps(payload, indent=2))
+        
+        
+        def main() -&amp;gt; None:
+        args = parse_args()
+        rows = load_rows(args.csv_file)
+        filtered = filter_rows(
+        rows,
+        product=args.product,
+        sku=args.sku,
+        date_from=args.date_from,
+        date_to=args.date_to,
+        )
+        repos = aggregate_by_repo(filtered)
+        storage_repos = aggregate_storage_by_repo(filtered)
+        
+        if args.json:
+        print_json_report(args.csv_file, filtered, repos, storage_repos, args.top)
+        else:
+        print_text_report(args.csv_file, filtered, repos, storage_repos, args.top)
+        
+        
+        if __name__ == &amp;quot;__main__&amp;quot;:
+        main()
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can also find this here: &lt;a href=&quot;https://github.com/cfjedimaster/pythondemos/tree/main/ghusageparser&quot;&gt;https://github.com/cfjedimaster/pythondemos/tree/main/ghusageparser&lt;/a&gt;. Note that this uses no external dependencies outside of standard library modules. Usage is simple:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;python -h
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which gives:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai2.png&quot; loading=&quot;lazy&quot; alt=&quot;Help text from CLI tool&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Honestly, none of those arguments were ideas I had but they all make sense. And here&apos;s how the report looks:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai3.png&quot; loading=&quot;lazy&quot; alt=&quot;Help text from CLI tool&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The &apos;culprit&apos; was &lt;code&gt;testing-boxlang-desktop&lt;/code&gt; which as I said, was just for testing, so easy to delete. Honestly, &lt;code&gt;tweetback&lt;/code&gt; surprised me. This is a repo I created as an export from Twitter and apparently it&apos;s got a lot of media. I didn&apos;t delete it - but may do so in the future.&lt;/p&gt;
+        &lt;p&gt;Anyway, let me know what you think and if this could be helpful to you!&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@simonkadula?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Simon Kadula&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-factory-filled-with-lots-of-orange-machines-8gr6bObQLOI?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Links For You (6/21/26)</title>
+      <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
+      <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
+        &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;First up is a presentation by Thomas Steiner demonstrating Chrome built-in AI APIs doing language detection and translation for Mastodon. I&apos;m a pretty big fan of those APIs (my last presentation was on them!) so I enjoyed this quite a bit. Thomas has been a &lt;em&gt;big&lt;/em&gt; help with my demos and posts on these APIs and is a scary smart dev.&lt;/p&gt;
+        &lt;lite-youtube videoid=&quot;-l2BUUdBDS8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/-l2BUUdBDS8/hqdefault.jpg&apos;);&quot;&gt;
+        &lt;a href=&quot;https://youtube.com/watch?v=-l2BUUdBDS8&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
+        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
+        &lt;/a&gt;
+        &lt;/lite-youtube&gt;
+        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
+        &lt;p&gt;
+        &lt;h2 id=&quot;datatype---text-into-charts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#datatype---text-into-charts&quot;&gt;Datatype - Text into Charts&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Next is &lt;a href=&quot;https://franktisellano.github.io/datatype/&quot;&gt;Datatype&lt;/a&gt;, a font that creates charts. Seriously. For example:&lt;/p&gt;
+        &lt;style&gt;
+        @font-face {
+        font-family: &apos;Datatype&apos;;
+        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
+        font-weight: 100 900;      /* Variable weight axis */
+        font-stretch: 0% 100%;     /* Variable width axis */
+        font-display: swap;
+        }
+        
+        .chart {
+        font-family: &apos;Datatype&apos;, monospace;
+        }
+        &lt;/style&gt;
+        &lt;p&gt;Sales &lt;span class=&quot;chart&quot;&gt;{l:20,45,60,55,80,95}&lt;/span&gt; are up this quarter.&lt;/p&gt;
+        &lt;p&gt;And this was driven by CSS and text:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;style&amp;gt;
+        @font-face {
+        font-family: &apos;Datatype&apos;;
+        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
+        font-weight: 100 900;      /* Variable weight axis */
+        font-stretch: 0% 100%;     /* Variable width axis */
+        font-display: swap;
+        }
+        
+        .chart {
+        font-family: &apos;Datatype&apos;, monospace;
+        }
+        &amp;lt;/style&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;chart&amp;quot;&amp;gt;{l:20,45,60,55,80,95}&amp;lt;/span&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It supports bar charts, sparklines, and pie charts. As it&apos;s just text, in theory it would be easy to animate and make it &apos;live&apos; with just a bit of JavaScript.&lt;/p&gt;
+        &lt;h2 id=&quot;you-don&apos;t-know-html-lists&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#you-don&apos;t-know-html-lists&quot;&gt;You Don&apos;t Know HTML Lists&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Finally there&apos;s a spectacular deep dive into HTML lists by Frank Taylor, &lt;a href=&quot;https://blog.frankmtaylor.com/2026/05/13/you-dont-know-html-lists/&quot;&gt;You don&apos;t know HTML lists&lt;/a&gt;. You know this is going to be a great article with a sentence like this in the intro:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;We&apos;re skipping over the MDN and W3Schools introductory pages and instead we&apos;re going into the kind of stuff you discover after accidentally taking your cousin&apos;s Ritalin right before you open up the W3C specs.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;I knew maybe... half of this? Maybe a bit more? Either way, it&apos;s a damn good investigation into a part of HTML you may not know even got that complex.&lt;/p&gt;
+        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Looking for your next read? Are you mostly through your current book and getting a bit of anxiety over whether or not you&apos;ll have your next read as soon as you finish? Good news, you&apos;re in luck. I&apos;ve spoken about Scott Stroz in the past (and linked to some of his cool blogs too), he&apos;s one of my oldest, and best friends. He&apos;s a father as well to two incredible kids, one of which just released his first novel, &amp;quot;The Dreaded.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;
+        &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;&lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/dreaded.png&quot; loading=&quot;lazy&quot; alt=&quot;The Dreaded cover&quot; class=&quot;imgborder imgcenter&quot;&gt;&lt;/a&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Tyler&apos;s shared some of his works for me in the past so as soon as this one became available, I went ahead and purchased a copy for myself. Grab your &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;copy&lt;/a&gt; today - available on Kindle, paper and hardback.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building a Form Handling Service in Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
         &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
@@ -193,7 +681,7 @@
       <title>Creating a Dynamic Favicon with Cloudinary</title>
       <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
       <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
         &lt;p&gt;
@@ -295,7 +783,7 @@
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -355,7 +843,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -499,7 +987,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -693,7 +1181,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -816,7 +1304,7 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
@@ -826,7 +1314,7 @@
       <title>Dang good Office parsing on the web with officeParser</title>
       <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
+      <pubDate>Mon, 22 Jun 2026 18:51:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
         &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
@@ -929,120 +1417,6 @@
         on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
         &lt;/p&gt;
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>My First AI Skill for My Blog</title>
-      <link>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</link>
-      <guid>https://www.raymondcamden.com/2026/05/19/my-first-ai-skill-for-my-blog</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve been a professional writer now for thirty plus years, and honestly, it&apos;s one of the things I&apos;m most proud about. When generative AI first exploded on the scene, a lot of people used it to help them write, and frankly, that wasn&apos;t for me. I&apos;m not the best writer, but I damn well know how to write and damn well know my own voice. That being said, I&apos;ve been really interested in how GenAI can &lt;em&gt;help&lt;/em&gt; with the process.&lt;/p&gt;
-        &lt;p&gt;I first wrote about this over two years ago: &lt;a href=&quot;https://www.raymondcamden.com/2024/02/02/using-generative-ai-as-your-content-assistant&quot;&gt;Using Generative AI as Your Content Assistant&lt;/a&gt;. In that post I talked about using GenAI for two very specific tasks:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Helping with my titles&lt;/li&gt;
-        &lt;li&gt;Writing the description (which is part of the metadata for a post)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Honestly, I built those tools as proof of concept implementations and don&apos;t think I used them ever again. But lately it&apos;s been on my mind that I should think about those tools and see if there would possibly be an easier way to use GenAI to help me with my content. Specifically I&apos;m looking for two things:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Spelling and grammar. I&apos;ve got a Visual Studio Code extension for that but it&apos;s not perfect and I also just miss it sometimes.&lt;/li&gt;
-        &lt;li&gt;And here&apos;s the big one. Sometimes I&apos;ll write about a topic and simply forget to cover something. I&apos;d love to use my AI tool to try to find those missing aspects and let me know. Maybe I won&apos;t care. Maybe I &lt;em&gt;intentionally&lt;/em&gt; skipped something. That being said, I&apos;d still like to know.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;You&apos;ll notice that none of the above involves AI actually &lt;em&gt;writing&lt;/em&gt; for me. Outside of correcting spelling mistakes I made, I don&apos;t want to use my tool for that. But both of these could really help me catch things before I publish and just make the final result a little bit better.&lt;/p&gt;
-        &lt;h2 id=&quot;the-skill&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-skill&quot;&gt;The Skill&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;To build this, I made use of &lt;a href=&quot;https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview&quot;&gt;Claude Skills&lt;/a&gt;. Skills are persistent instructions that can be used across your entire environment or per project. They&apos;re written in simple Markdown and are stored in a particular folder depending on your use. I actually cheated a bit and used Claude itself to help me create the skill.&lt;/p&gt;
-        &lt;p&gt;I knew about skills, knew they needed to be in a particular folder, but rather than looking it up I simply asked Claude to help me create a skill based on the needs above. It did an admirable job but I took over and tweaked things a bit.&lt;/p&gt;
-        &lt;p&gt;The directory is in my repository now, at &lt;code&gt;.claude/skills/prepublish&lt;/code&gt;. Here&apos;s what it looks like now (I say &apos;now&apos; as I expect to be tweaking this over time - you can also check out the &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;repo&lt;/a&gt; to see the latest!):&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;---
-        name: prepublish
-        description: Review a new blog post before publishing. Finds the latest post by its dated path under `src/posts/`, then spell-checks and offers content suggestions — without touching tone.
-        ---
-        
-        # Prepublish blog post review
-        
-        Run this right before pushing a new post. Blog posts live in `src/posts/YYYY/MM/DD/` as `.md` files.
-        
-        ## Step 1 — Find the post
-        
-        Do NOT use git to figure out which post is newest. Use the dated path under `src/posts/` — sort highest year → month → day and pick the most recent `.md` file.
-        
-        A reliable command: `find src/posts -type f -name &apos;*.md&apos; | sort -r | head -5`. The first entry is the latest post; the rest are there in case there&apos;s a tie or the user wants to pick another.
-        
-        If multiple `.md` files share the newest date directory, ask the user which one. Otherwise, confirm in one line (&amp;quot;Reviewing `path/to/post.md` — sound right?&amp;quot;) before proceeding.
-        
-        ## Step 2 — Spell check
-        
-        Read the post and surface misspellings. Ignore code blocks, fenced code, inline `code`, URLs, and proper nouns the user clearly intended (product names, people, libraries).
-        
-        Present findings as a short list: `word → suggestion (line N)`. Don&apos;t auto-edit. Ask which corrections to apply, then apply them with Edit.
-        
-        ## Step 3 — Content review
-        
-        Read the post end-to-end and give feedback focused on substance, not tone:
-        
-        - **Things that sound stupid or unclear** — sentences that don&apos;t land, claims that need backing, awkward logic jumps.
-        - **Gaps worth filling** — missing context a reader would want, an example that would help, a link the user usually includes (docs, repo, related post).
-        - **Factual / technical accuracy** — flag anything that looks wrong or outdated. If the post references code, check it makes sense.
-        - **Loose ends** — TODO markers, &amp;quot;fill this in&amp;quot;, broken-looking links, placeholder text.
-        
-        **Do NOT** comment on tone, voice, snark level, casual phrasing, or stylistic choices. The user likes their voice; leave it alone.
-        
-        Present feedback as a numbered list grouped by category. Keep each item to one or two sentences. Don&apos;t rewrite paragraphs — point at the issue and let the user decide.
-        
-        ## Step 4 — Apply changes
-        
-        Ask which suggestions to act on. Apply only what&apos;s confirmed. Then stop — the user handles the actual publish/push.
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2 id=&quot;an-example-in-action&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#an-example-in-action&quot;&gt;An Example in Action&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;To test, I&apos;m going to run this right now on this post, which means it may get a bit confused as the post isn&apos;t actually done, but let&apos;s just see what happens:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/claude1.png&quot; loading=&quot;lazy&quot; alt=&quot;Results&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Hopefully that image is readable, let me know if not. But it did a great job of finding multiple grammar issues. My VS Code extension doesn&apos;t handle that (obviously).&lt;/p&gt;
-        &lt;p&gt;I disagreed/didn&apos;t care about the awkward comment. I did care about linking to Claude Skills so I added a link. Gap 3 was incorrect. I do talk about how I &apos;cheated&apos; (to be clear, it isn&apos;t cheating) in the following paragraph. And of course, issue 5 is simply because I ran this before I was done. Item 8 is the same.&lt;/p&gt;
-        &lt;p&gt;You&apos;ll notice it also offered to correct those mistakes, but I did them myself and I imagine I&apos;ll do so usually.&lt;/p&gt;
-        &lt;p&gt;In the end, these are all things a good editor would handle, but this is my personal blog and unfortunately I don&apos;t have an editor on call. (And even so, I&apos;d want to do this kind of check beforehand anyway.)&lt;/p&gt;
-        &lt;h2 id=&quot;what-next%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-next%3F&quot;&gt;What next?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Looking at the skill I wrote, and recognizing my own weaknesses (grammar, forgetting to cover things I should), I may actually move this skill into my global directory so I can use it for my non-blog writing as well. Anybody want to chime in and share if they&apos;ve done something similar?&lt;/p&gt;
-        &lt;p&gt;p.s. I ran the skill one more time - here&apos;s the latest:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/05/claude1.png&quot; loading=&quot;lazy&quot; alt=&quot;Final Results&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@ningdamao?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;宁 宁&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-peacefully-sits-on-a-stack-of-papers-xDDkC_odjbU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (5/17/26)</title>
-      <link>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</link>
-      <guid>https://www.raymondcamden.com/2026/05/17/links-for-you-51726</guid>
-      <pubDate>Sun, 21 Jun 2026 16:35:45 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Happy Sunday, and I hope your Sunday is going better than mine. One of my kids just went to use the dryer and sparks flew. I don&apos;t mean metaphorically. Nothing like the thought of replacing another major appliance to brighten up your day, amiright?!?!&lt;/p&gt;
-        &lt;h2 id=&quot;find-your-(tech)-community&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#find-your-(tech)-community&quot;&gt;Find Your (Tech) Community&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;First up is a new endeavour by Brian Rinaldi to help fill the gap left behind by Meetup.com (which is still a thing just not a good thing lately) and the lack of smaller and more affordable community conferences. &lt;a href=&quot;https://devrelish.tech/&quot;&gt;DevRel(ish)&lt;/a&gt; is a community site supporting tech groups of all sizes and nature who need help organizing IRL meetups. According to the &lt;a href=&quot;https://remotesynthesis.com/posts/introducting-devrelish/&quot;&gt;launch announcement&lt;/a&gt;, this is not meant to be a replacement for larger event apps, but hopefully something more suitable for smaller groups.&lt;/p&gt;
-        &lt;p&gt;Check it out at &lt;a href=&quot;https://devrelish.tech/&quot;&gt;https://devrelish.tech/&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;blame-the-ox&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#blame-the-ox&quot;&gt;Blame the Ox&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, this isn&apos;t tech related at all, but, &amp;quot;The Ox That&apos;s Breaking Your Fantasy Map&amp;quot; is one of the most fascinating videos I&apos;ve seen in a while. And yes, it is about oxen - and fantasy maps. Even if you don&apos;t like fantasy (or oxen), it&apos;s a great watch and reminder of just how the economy affects organization and government.&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;MIqpvpNS5pI&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/MIqpvpNS5pI/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=MIqpvpNS5pI&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
-        &lt;h2 id=&quot;ai-and-goblins&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#ai-and-goblins&quot;&gt;AI and Goblins&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Last up is a good look into why &lt;a href=&quot;https://openai.com/index/where-the-goblins-came-from/&quot;&gt;goblins started appearing&lt;/a&gt; in OpenAI models. The post details how initial reports of the behavior led to investigations that ultimately led to the smoking &lt;strike&gt;goblin&lt;/strike&gt; gun.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Speaking of fantasy, I recently remembered that my young kids still have yet to see the Never Ending Story. One of them really loves horses too. This is going to be great!&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;2WN0T-Ee3q4&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/2WN0T-Ee3q4/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=2WN0T-Ee3q4&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
       </content:encoded>
     </item>
   </channel>

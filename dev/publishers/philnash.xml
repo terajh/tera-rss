@@ -4,7 +4,107 @@
     <title>dev RSS - Phil Nash</title>
     <link>https://philna.sh/</link>
     <description>Phil Nash RSS 피드</description>
-    <lastBuildDate>Sun, 21 Jun 2026 16:53:32 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jun 2026 19:11:15 GMT</lastBuildDate>
+    <item>
+      <title>Generate AI-powered related content for your Astro site</title>
+      <link>https://philna.sh/blog/2026/06/22/ai-powered-related-content-astro-site/</link>
+      <guid>https://philna.sh/blog/2026/06/22/ai-powered-related-content-astro-site/</guid>
+      <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;Showing related posts beneath a blog post is a great way to give your visitors more to read and encourage them to spend more time on your site.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Existing methods of showing related content include &amp;lt;a href=&amp;quot;https://www.joshfinnie.com/blog/creating-a-similar-posts-component-in-astrojs/&amp;quot;&amp;gt;matching posts by tags&amp;lt;/a&amp;gt; or by &amp;lt;a href=&amp;quot;https://johndalesandro.com/blog/astro-add-related-posts-to-blog-entries/&amp;quot;&amp;gt;manually adding related posts to your frontmatter&amp;lt;/a&amp;gt;. Both of these work, and I used to use tag-based related posts myself, but I wanted something a bit less manual. It&amp;apos;s a perfect use-case for vector embeddings to help tell what content is similar to other content.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;I have created an integration for Astro sites called &amp;lt;a href=&amp;quot;https://www.npmjs.com/package/@philnash/astro-related-content&amp;quot;&amp;gt;Astro Related Content (@philnash/astro-related-content)&amp;lt;/a&amp;gt; that generates related posts for your content collections that you can display in your UI. You can see an example of this in action at the bottom of this post and every blog post on my site. Read on to find out how to use it.&amp;lt;/p&amp;gt;
+        &amp;lt;h2&amp;gt;What are vector embeddings?&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;A vector embedding is a list of floating-point numbers that represents the meaning of a body of text. Vectors are points in a multidimensional space which means you can measure the distance between them. Content items with vectors that are near each other in this space are more related and vectors that are further away are less related. By creating vector embeddings for each piece of content in a collection we can measure the similarity of pieces of content to suggest semantically related content.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Vector embeddings are created by AI models, and I have written about &amp;lt;a href=&amp;quot;/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;&amp;gt;how to generate vector embeddings in Node.js&amp;lt;/a&amp;gt; on this blog before. One of those techniques is used in the Astro Related Content integration.&amp;lt;/p&amp;gt;
+        &amp;lt;h2&amp;gt;How to use it&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;The integration runs during the development or build phases, generates embeddings for your configured collections, stores the results in your repo, and exposes a virtual module you can use from your Astro components to retrieve and display the related content.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;To use the Astro Related Content integration in your Astro app start by installing the npm module:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;npm install @philnash/astro-related-content
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Next you need to configure it. In your &amp;lt;code&amp;gt;astro.config.mjs&amp;lt;/code&amp;gt; file import the package:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;import astroRelatedContent from &amp;quot;@philnash/astro-related-content&amp;quot;;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Then add the &amp;lt;code&amp;gt;astroRelatedContent&amp;lt;/code&amp;gt; integration to the config via the &amp;lt;code&amp;gt;integrations&amp;lt;/code&amp;gt; property.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;To configure the integration you need to set the collections for which you want to generate vectors. In this site, the blog post collection is called &amp;quot;blog&amp;quot;, so I would use the following configuration:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;export default defineConfig({
+        integrations: [
+        astroRelatedContent({
+        collections: [&amp;quot;blog&amp;quot;],
+        }),
+        ],
+        });
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Now, when you run your application, in either Astro&amp;apos;s dev or build mode, an embedding model will be downloaded and used to generate vector embeddings for each of the items in the collections you specify. This first generation step may take a while to complete, depending on how many items are in your collection and how fast your machine can run the model.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The vectors are stored in a JSON file called &amp;lt;code&amp;gt;vectors.json&amp;lt;/code&amp;gt; in a directory called &amp;lt;code&amp;gt;.astro-related-content&amp;lt;/code&amp;gt;. For each collection the five most similar items are pre-calculated and stored in a file called &amp;lt;code&amp;gt;data.json&amp;lt;/code&amp;gt; in the same directory. Once you have these files, vectors and related items will only be regenerated when a content item changes. It is recommended that you check these files into source control to avoid regenerating embeddings during deployment. Depending on your collection size and embedding model, &amp;lt;code&amp;gt;vectors.json&amp;lt;/code&amp;gt; can get quite large, so you might want to watch out for that.&amp;lt;/p&amp;gt;
+        &amp;lt;h3&amp;gt;Generation config&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;There is more you can configure. There are options for the generation:&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;limit&amp;lt;/code&amp;gt;: how many related posts to generate&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;code&amp;gt;watch&amp;lt;/code&amp;gt;: whether to keep re-generating vectors and related posts while in dev mode, which is &amp;lt;code&amp;gt;true&amp;lt;/code&amp;gt; by default&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;You can set these like:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;export default defineConfig({
+        integrations: [
+        astroRelatedContent({
+        collections: [&amp;quot;blog&amp;quot;],
+        generation: {
+        limit: 4,
+        watch: false,
+        },
+        }),
+        ],
+        });
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;h3&amp;gt;Displaying related content&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Now that the integration has generated the related posts you need to display the posts on the site.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;To use the generated files, the integration makes available a virtual module: &amp;lt;code&amp;gt;virtual:astro-related-content&amp;lt;/code&amp;gt;. Import the &amp;lt;code&amp;gt;getRelatedContent&amp;lt;/code&amp;gt; function, then pass the collection you want to look up and the ID of the content item that you want the related content for.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;import { getRelatedContent } from &amp;quot;virtual:astro-related-content&amp;quot;;
+        
+        const { id } = Astro.props;
+        
+        const relatedContent = await getRelatedContent(&amp;quot;blog&amp;quot;, id);
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;In the above code, &amp;lt;code&amp;gt;relatedContent&amp;lt;/code&amp;gt; is an array of objects with an &amp;lt;code&amp;gt;entry&amp;lt;/code&amp;gt; which is of type &amp;lt;code&amp;gt;CollectionEntry&amp;amp;lt;&amp;quot;blog&amp;quot;&amp;amp;gt;&amp;lt;/code&amp;gt; and a &amp;lt;code&amp;gt;score&amp;lt;/code&amp;gt;, which is the similarity.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;You can now display the related posts however you wish.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;h2&amp;amp;gt;Related posts&amp;amp;lt;/h2&amp;amp;gt;
+        
+        &amp;amp;lt;ul&amp;amp;gt;
+        {
+        relatedContent.map((item) =&amp;amp;gt; (
+        &amp;amp;lt;li&amp;amp;gt;{item.entry.data.title}&amp;amp;lt;/li&amp;amp;gt;
+        ))
+        }
+        &amp;amp;lt;/ul&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;h3&amp;gt;Vector embedding options&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Once you have it working, you can tweak the model that you use to generate the vectors for your content items. You can use any of &amp;lt;a href=&amp;quot;https://huggingface.co/models?pipeline_tag=feature-extraction&amp;amp;amp;library=transformers.js&amp;amp;amp;sort=trending&amp;quot;&amp;gt;the models on Hugging Face that work with transformers.js&amp;lt;/a&amp;gt;. On this blog I started off with the &amp;lt;a href=&amp;quot;https://huggingface.co/onnx-community/Qwen3-Embedding-0.6B-ONNX&amp;quot;&amp;gt;Qwen 3 Embedding 0.6b&amp;lt;/a&amp;gt; model, tried out the much smaller &amp;lt;a href=&amp;quot;https://huggingface.co/onnx-community/granite-embedding-small-english-r2-ONNX&amp;quot;&amp;gt;Granite Embedding Small English R2 from IBM&amp;lt;/a&amp;gt; and eventually settled on &amp;lt;a href=&amp;quot;https://huggingface.co/onnx-community/embeddinggemma-300m-ONNX&amp;quot;&amp;gt;Google&amp;apos;s EmbeddingGemma 300m&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;https://ai.google.dev/gemma/docs/embeddinggemma?utm_campaign=deveco_gdemembers&amp;amp;amp;utm_source=deveco&amp;quot;&amp;gt;EmbeddingGemma&amp;lt;/a&amp;gt; is a great model; it&amp;apos;s not very big, it is multilingual, and it has a context size of 2k tokens. It seems to work well for my blog posts.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;My config for this site looks like:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;export default defineConfig({
+        integrations: [
+        astroRelatedContent({
+        collections: [&amp;quot;blog&amp;quot;],
+        generation: {
+        limit: 4,
+        },
+        embeddings: {
+        model: &amp;quot;onnx-community/embeddinggemma-300m-ONNX&amp;quot;,
+        dtype: &amp;quot;fp32&amp;quot;,
+        pooling: &amp;quot;mean&amp;quot;,
+        batchSize: 1,
+        },
+        }),
+        ],
+        });
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;You can read &amp;lt;a href=&amp;quot;https://github.com/philnash/astro-components/tree/main/packages/astro-related-content#transformersjs-embeddings&amp;quot;&amp;gt;more about the embeddings options in the project documentation&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;h2&amp;gt;Future plans&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Currently the package supports running models on your own machine via &amp;lt;a href=&amp;quot;https://huggingface.co/docs/transformers.js/en/index&amp;quot;&amp;gt;transformers.js&amp;lt;/a&amp;gt;, but if there is interest, it should be easy to add support for other local methods of running models, like Ollama, or API-based methods, like using &amp;lt;a href=&amp;quot;https://developers.openai.com/api/docs/models/text-embedding-3-small&amp;quot;&amp;gt;OpenAI&amp;apos;s text-embedding-3-small&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;h2&amp;gt;Try it out today&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;If you&amp;apos;d like to display related content for an Astro content collection without manually selecting links or relying on tags, check out &amp;lt;a href=&amp;quot;https://www.npmjs.com/package/@philnash/astro-related-content&amp;quot;&amp;gt;&amp;lt;code&amp;gt;@philnash/astro-related-content&amp;lt;/code&amp;gt;&amp;lt;/a&amp;gt; and let me know how it goes for you. If there are any problems, let me know with an &amp;lt;a href=&amp;quot;https://github.com/philnash/astro-components/issues&amp;quot;&amp;gt;issue on the GitHub repo&amp;lt;/a&amp;gt;, and if it&amp;apos;s any good, &amp;lt;a href=&amp;quot;https://github.com/philnash/astro-components&amp;quot;&amp;gt;give the repo a star&amp;lt;/a&amp;gt;!&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>I built a new app and I don&apos;t know how I feel about it</title>
       <link>https://philna.sh/blog/2026/05/25/i-built-a-new-app-and-i-dont-know-how-i-feel-about-it/</link>
@@ -254,7 +354,7 @@
         &amp;lt;/ul&amp;gt;
         &amp;lt;p&amp;gt;There are many ways that you can create vector embeddings in Python. In this post, we’ll take a look at four ways to generate vector embeddings: locally, via API, via a framework, and with &amp;lt;a href=&amp;quot;https://docs.datastax.com/en/astra-db-serverless/databases/embedding-generation.html&amp;quot;&amp;gt;Astra DB&amp;apos;s Vectorize&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;&amp;amp;lt;div class=&amp;quot;info&amp;quot;&amp;amp;gt;
-        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s purchase&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
+        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s acquisition&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
         &amp;amp;lt;/div&amp;amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;h2&amp;gt;Local vector embeddings&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;There are many &amp;lt;a href=&amp;quot;https://huggingface.co/models?pipeline_tag=sentence-similarity&amp;amp;amp;sort=trending&amp;quot;&amp;gt;pre-trained embedding models available on Hugging Face&amp;lt;/a&amp;gt; that you can use to create vector embeddings. &amp;lt;a href=&amp;quot;https://www.sbert.net/&amp;quot;&amp;gt;Sentence Transformers (SBERT)&amp;lt;/a&amp;gt; is a library that makes it easy to use these models for vector embedding, as well as cross-encoding for reranking. It even has tools for finetuning models, if that’s something that might be of use.&amp;lt;/p&amp;gt;
@@ -513,7 +613,7 @@
         &amp;lt;p&amp;gt;Scraping web pages is one way to fetch content for your &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/retrieval-augmented-generation&amp;quot;&amp;gt;retrieval-augmented generation (RAG)&amp;lt;/a&amp;gt; application. But parsing the content from a web page can be a pain.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Mozilla&amp;apos;s open-source library &amp;lt;a href=&amp;quot;https://github.com/mozilla/readability&amp;quot;&amp;gt;Readability.js&amp;lt;/a&amp;gt; is a useful tool for extracting just the important parts of a web page. Let&amp;apos;s look at how to use it as part of a data ingestion pipeline for a RAG application.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;&amp;amp;lt;div class=&amp;quot;info&amp;quot;&amp;amp;gt;
-        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s purchase&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
+        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s acquisition&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
         &amp;amp;lt;/div&amp;amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;h2&amp;gt;Retrieving unstructured data from a web page&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;Web pages are a source of unstructured data that we can use in RAG-based apps. But web pages are often full of content that is irrelevant; things like headers, sidebars, and footers. They contain useful context for someone browsing the site, but detract from the main subject of a page.&amp;lt;/p&amp;gt;
@@ -525,7 +625,7 @@
         &amp;lt;h2&amp;gt;How to scrape data with Node.js and Readability.js&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;Let&amp;apos;s take a look at an example of scraping the article content from my previous blog post on &amp;lt;a href=&amp;quot;/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;&amp;gt;creating vector embeddings in Node.js&amp;lt;/a&amp;gt;. Here&amp;apos;s some JavaScript you can use to retrieve the HTML for the page:&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;const html = await fetch(
-        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;
+        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;,
         ).then((res) =&amp;amp;gt; res.text());
         console.log(html);
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
@@ -536,7 +636,7 @@
         &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;import * as cheerio from &amp;quot;cheerio&amp;quot;;
         
         const html = await fetch(
-        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;
+        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;,
         ).then((res) =&amp;amp;gt; res.text());
         
         const $ = cheerio.load(html);
@@ -593,7 +693,7 @@
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;We use the &amp;lt;code&amp;gt;HTMLWebBaseLoader&amp;lt;/code&amp;gt; to load the raw HTML from the URL we provide. The HTML is then passed through the &amp;lt;code&amp;gt;MozillaReadabilityTransformer&amp;lt;/code&amp;gt; to extract the text, which is then split into chunks by the &amp;lt;code&amp;gt;RecursiveCharacterTextSplitter&amp;lt;/code&amp;gt;. Finally, we create an embedding provider and an Astra DB vector store that will be used to turn the text chunks into vector embeddings and store them in the vector database.&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;const loader = new HTMLWebBaseLoader(
-        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;
+        &amp;quot;https://philna.sh/blog/2024/09/25/how-to-create-vector-embeddings-in-node-js/&amp;quot;,
         );
         const transformer = new MozillaReadabilityTransformer();
         const splitter = new RecursiveCharacterTextSplitter({
@@ -730,7 +830,7 @@
         &amp;lt;p&amp;gt;When you’re building a &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/retrieval-augmented-generation&amp;quot;&amp;gt;retrieval-augmented generation (RAG)&amp;lt;/a&amp;gt; app, job number one is preparing your data. You’ll need to take your unstructured data and &amp;lt;a href=&amp;quot;/blog/2024/09/18/how-to-chunk-text-in-javascript-for-rag-applications/&amp;quot;&amp;gt;split it up into chunks&amp;lt;/a&amp;gt;, turn those chunks into &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/vector-embedding&amp;quot;&amp;gt;vector embeddings&amp;lt;/a&amp;gt;, and finally, store the embeddings in a &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/vector-database&amp;quot;&amp;gt;vector database&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;There are many ways that you can create vector embeddings in JavaScript. In this post, we’ll investigate four ways to generate vector embeddings in Node.js: locally, via API, via a framework, and with Astra DB&amp;apos;s Vectorize.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;&amp;amp;lt;div class=&amp;quot;info&amp;quot;&amp;amp;gt;
-        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s purchase&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
+        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s acquisition&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
         &amp;amp;lt;/div&amp;amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;h2&amp;gt;Local vector embeddings&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;There are lots of open-source models available on &amp;lt;a href=&amp;quot;https://huggingface.co/&amp;quot;&amp;gt;HuggingFace&amp;lt;/a&amp;gt; that can be used to create vector embeddings. &amp;lt;a href=&amp;quot;https://huggingface.co/docs/transformers.js/en/index&amp;quot;&amp;gt;Transformers.js&amp;lt;/a&amp;gt; is a module that lets you use machine learning models in JavaScript, both in the browser and Node.js. It uses the &amp;lt;a href=&amp;quot;https://onnxruntime.ai/&amp;quot;&amp;gt;ONNX runtime&amp;lt;/a&amp;gt; to achieve this; it works with models that have published ONNX weights, of which there are plenty. Some of those models we can use to create vector embeddings.&amp;lt;/p&amp;gt;
@@ -745,14 +845,14 @@
         
         const extractor = await pipeline(
         &amp;quot;feature-extraction&amp;quot;,
-        &amp;quot;Xenova/all-MiniLM-L6-v2&amp;quot;
+        &amp;quot;Xenova/all-MiniLM-L6-v2&amp;quot;,
         );
         
         const response = await extractor(
         [
         &amp;quot;A robot may not injure a human being or, through inaction, allow a human being to come to harm.&amp;quot;,
         ],
-        { pooling: &amp;quot;mean&amp;quot;, normalize: true }
+        { pooling: &amp;quot;mean&amp;quot;, normalize: true },
         );
         
         console.log(Array.from(response.data));
@@ -765,7 +865,7 @@
         &amp;quot;A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.&amp;quot;,
         &amp;quot;A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.&amp;quot;,
         ],
-        { pooling: &amp;quot;mean&amp;quot;, normalize: true }
+        { pooling: &amp;quot;mean&amp;quot;, normalize: true },
         );
         
         console.log(response.tolist());
@@ -840,12 +940,12 @@
         const vectorStore = await AstraDBVectorStore.fromDocuments(
         documents, // a list of document objects to put in the store
         embeddings, // the embeddings model
-        astraConfig // config to connect to Astra DB
+        astraConfig, // config to connect to Astra DB
         );
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;When you provide the embeddings model to the database object, you can then use it to perform vector searches too.&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;const results = vectorStore.similaritySearch(
-        &amp;quot;Are robots allowed to protect themselves?&amp;quot;
+        &amp;quot;Are robots allowed to protect themselves?&amp;quot;,
         );
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;LlamaIndex allows for similar creation of embedding models and vector stores that use them. Check out &amp;lt;a href=&amp;quot;https://ts.llamaindex.ai/docs/llamaindex/tutorials/rag&amp;quot;&amp;gt;the LlamaIndex documentation on RAG&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
@@ -888,7 +988,7 @@
         {
         sort: { $vectorize: &amp;quot;Are robots allowed to protect themselve?&amp;quot; },
         limit: 5,
-        }
+        },
         );
         const results = await cursor.toArray();
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
@@ -911,7 +1011,7 @@
       <content:encoded>
         &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/retrieval-augmented-generation&amp;quot;&amp;gt;Retrieval-augmented generation (RAG)&amp;lt;/a&amp;gt; applications begin with data, so getting your data in the right shape to work well with &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/vector-database&amp;quot;&amp;gt;vector databases&amp;lt;/a&amp;gt; and &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/large-language-models&amp;quot;&amp;gt;large language models (LLMs)&amp;lt;/a&amp;gt; is the first challenge you’re likely to face when you get started building. In this post, we&amp;apos;ll discuss the different ways to work with text data in JavaScript, exploring how to split it up into chunks and prepare it for use in a RAG app.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;&amp;amp;lt;div class=&amp;quot;info&amp;quot;&amp;amp;gt;
-        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s purchase&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
+        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s acquisition&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
         &amp;amp;lt;/div&amp;amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;h2&amp;gt;Why chunking is important&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;Often you will have swaths of unstructured text content that need to be broken down into smaller chunks of data. These chunks of text are turned into vector embeddings and stored in a vector database like &amp;lt;a href=&amp;quot;https://docs.datastax.com/en/astra-db-serverless/index.html&amp;quot;&amp;gt;Astra DB&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
@@ -1092,7 +1192,7 @@
       <content:encoded>
         &amp;lt;p&amp;gt;Generative AI enables us to build incredible new types of applications, but large language model (LLM) responses can be slow. If we wait for the full response before updating the user interface, we might be making our users wait more than they need to. Thankfully, most LLM APIs—including OpenAI, Anthropic, and &amp;lt;a href=&amp;quot;https://langflow.org&amp;quot;&amp;gt;Langflow&amp;lt;/a&amp;gt; provide streaming endpoints that you can use to stream responses as they are generated. In this post, we&amp;apos;re going to see how to use &amp;lt;a href=&amp;quot;https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API&amp;quot;&amp;gt;JavaScript&amp;apos;s &amp;lt;code&amp;gt;fetch&amp;lt;/code&amp;gt; API&amp;lt;/a&amp;gt; to immediately update your front-end application as an LLM generates output and create a better user experience.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;&amp;amp;lt;div class=&amp;quot;info&amp;quot;&amp;amp;gt;
-        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s purchase&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
+        &amp;amp;lt;p&amp;amp;gt;This post was originally written for DataStax, but didn&amp;apos;t survive a content migration as part of &amp;amp;lt;a href=&amp;quot;https://www.ibm.com/new/announcements/ibm-to-acquire-datastax-helping-clients-bring-the-power-of-unstructured-data-to-enterprise-ai-applications&amp;quot;&amp;amp;gt;IBM&amp;apos;s acquisition&amp;amp;lt;/a&amp;amp;gt;. I thought the content was useful, so have republished it here.&amp;amp;lt;/p&amp;amp;gt;
         &amp;amp;lt;/div&amp;amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;h2&amp;gt;Slow responses without streaming&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;Let&amp;apos;s start with an example to show what a slow result looks like to a user. &amp;lt;a href=&amp;quot;https://fetch-streaming.vercel.app/&amp;quot;&amp;gt;You can try it here&amp;lt;/a&amp;gt;. This &amp;lt;a href=&amp;quot;https://github.com/philnash/fetch-streaming&amp;quot;&amp;gt;example GitHub repo&amp;lt;/a&amp;gt; demonstrates an Express application that serves up static files and has one endpoint that streams some &amp;lt;a href=&amp;quot;https://en.wikipedia.org/wiki/Lorem_ipsum&amp;quot;&amp;gt;lorem ipsum&amp;lt;/a&amp;gt; text to the front-end. The following code is how the server streams the response:&amp;lt;/p&amp;gt;
