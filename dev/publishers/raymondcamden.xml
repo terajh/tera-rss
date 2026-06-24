@@ -4,12 +4,186 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 23 Jun 2026 17:39:39 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jun 2026 17:54:01 GMT</lastBuildDate>
+    <item>
+      <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
+      <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
+      <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
+        &lt;p&gt;Of course there is.&lt;/p&gt;
+        &lt;p&gt;The aptly named &lt;a href=&quot;https://github.com/wanasit/chrono&quot;&gt;Chrono&lt;/a&gt; library does just that. It can parse a string with one assumed date and return the date, so for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        chrono.parseDate(&apos;An appointment on Sep 12-13&apos;); 
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This returns: &lt;code&gt;Sat Sep 12 2026 12:00:00 GMT-0500 (Central Daylight Time)&lt;/code&gt;. It can also take a string and give you a parsed set of results, so for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;chrono.parse(&apos;An appointment on Sep 12-13&apos;);
+        /* [{ 
+        index: 18,
+        text: &apos;Sep 12-13&apos;,
+        start: ...
+        }] */
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; method will return one result per matched item, with the result including the original string, lots of info on how it parsed it, and the ability to get the proper date object from it. It can also handle durations and a reference date too, so if your input was, &amp;quot;I will eat sushi tomorrow&amp;quot; and the reference was January 2nd, 2026, it would recognize that tomorrow is January 3rd, 2026.&lt;/p&gt;
+        &lt;p&gt;So, how about a demo? I created a quick CodePen that has a textarea for arbitrary input. You can type anything, and when it finds stuff, it dumps it out below and then follows up that dump with parsed dates. I&apos;ll skip over the HTML (you can see it in the embedded CodePen), but here&apos;s the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        const $input = document.querySelector(&apos;#input&apos;);
+        const $output = document.querySelector(&apos;#output&apos;);
+        
+        $input.addEventListener(&apos;input&apos;, () =&amp;gt; {
+        const input = $input.value.trim();
+        $output.innerText = &apos;&apos;;
+        if(input === &apos;&apos;) return;
+        /*
+        temp test to set a reference:
+        let yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        let parsed = chrono.parse(input, yesterday);
+        */
+        let parsed = chrono.parse(input);
+        
+        if(parsed.length) {
+        $output.innerText = JSON.stringify(parsed, null, &apos;\t&apos;) + &apos;\n&apos;;
+        
+        for(const p of parsed) {
+        console.log(p.start.date());
+        $output.innerText += `Parsed date: ${p.start.date()} `;
+        if(p.end) $output.innerText += ` - ${p.end.date()}`;
+        $output.innerText += &apos;\n&apos;;
+        }
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Basically import the library, note changes in the textarea, and parse. If results are found I do the simple dump as I mentioned. One small oddity with the library is that the initial result does &lt;em&gt;not&lt;/em&gt; actually include the date. You have to run &lt;code&gt;.date()&lt;/code&gt; on the &lt;code&gt;start&lt;/code&gt; and (optional) &lt;code&gt;end&lt;/code&gt; values to get that. Hence that for loop. You can also see, commented out, how easy it is to use a reference date.&lt;/p&gt;
+        &lt;p&gt;Go ahead and test it below.&lt;/p&gt;
+        &lt;p&gt;I will say I found the &apos;duration&apos; support didn&apos;t work terribly well. By that I mean it would find the date reference, but not always the &apos;end&apos;. The sample input, &amp;quot;I have an appointment tomorrow from 10 to 11 AM&amp;quot;, worked fine, but in my tests it was hit or miss. Again though, it got the start every time so that&apos;s something.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;500&quot; data-pen-title=&quot;chrono test&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;WbROxQm&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9de-fbbf-778f-9e68-7a9a0d44ecc6&quot;&gt;
+        chrono test&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;turning-it-into-a-web-component&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#turning-it-into-a-web-component&quot;&gt;Turning it into a Web Component&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;At this point, I thought it might be cool to build a web component that would:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Use Chrono to find the date strings&lt;/li&gt;
+        &lt;li&gt;Wrap each matched item with a &lt;code&gt;&amp;lt;time&amp;gt;&lt;/code&gt; element, setting &lt;code&gt;datetime&lt;/code&gt; and &lt;code&gt;title&lt;/code&gt; to the parsed date&lt;/li&gt;
+        &lt;li&gt;Use a bit of CSS to highlight the text&lt;/li&gt;
+        &lt;li&gt;Allow for an attribute that lets you specify the date. In my mind, the main use for this is UGC (user generated content), things like comments for example. Comments are made at a point in time which means it should be easy to pass that to the component.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I named my component &lt;code&gt;time-parse&lt;/code&gt; because I&apos;m incredibly creative. Here&apos;s an example of it in play, both with and without a reference date:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div&amp;gt;
+        &amp;lt;time-parse&amp;gt;
+        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
+        &amp;lt;/time-parse&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div&amp;gt;
+        &amp;lt;time-parse date=&amp;quot;2026-06-04&amp;quot;&amp;gt;
+        This is an example in the past. I set the date to June 4th. 
+        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
+        &amp;lt;/time-parse&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s the code I used. I&apos;ll talk a bit about my design decisions after:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        class TimeParseComponent extends HTMLElement {
+        
+        constructor() {
+        super();
+        }
+        
+        connectedCallback() {
+        
+        // doing an inline style so i dont have to worry about specifying it just for the WC. This feels wrong a bit...
+        const STYLE = &apos;text-decoration: underline;text-decoration-color: #ccc;&apos;;
+        
+        let dateRef = null;
+        
+        // look for date attribute
+        if(this.hasAttribute(&amp;quot;date&amp;quot;)) {
+        console.log(&apos;Date found, using as ref&apos;);
+        dateRef = this.#parseLocalDate(this.getAttribute(&amp;quot;date&amp;quot;));
+        console.log(&apos;dateRef is &apos;, dateRef);
+        }
+        
+        let input = this.innerHTML;
+        const parsed = chrono.parse(input, dateRef);
+        if(!parsed || !parsed.length) return;
+        console.log(`Found ${parsed.length} items to update`);
+        /*
+        For each, find the initial string, and wrap it with:
+        &amp;lt;time datetime=PARSEDTIME title=PARSEDTIME&amp;gt;orig&amp;lt;/time&amp;gt;
+        
+        Go backwards as we are changing the string
+        */
+        for(let x=parsed.length-1; x &amp;gt;= 0; x--) {
+        console.log(parsed[x]);
+        // first get the date, currently not supporting end
+        let date = this.#formatDateTime(parsed[x].start.date());
+        let orig = input.substring(parsed[x].index, parsed[x].index + parsed[x].text.length);
+        // now make the new string
+        let newStr = `
+        &amp;lt;time datetime=&amp;quot;${date}&amp;quot; title=&amp;quot;${date}&amp;quot; style=&amp;quot;${STYLE}&amp;quot;&amp;gt;${orig}&amp;lt;/time&amp;gt;
+        `.trim();
+        //console.log(newStr);
+        
+        input = input.slice(0, parsed[x].index) + newStr + input.slice(parsed[x].index + parsed[x].text.length);
+        }
+        
+        // All done - 
+        console.log(&apos;Final Result&apos;, input);
+        this.innerHTML = input;
+        }
+        
+        #formatDateTime(x) {
+        const pad = (n) =&amp;gt; String(n).padStart(2, &apos;0&apos;);
+        
+        return [
+        x.getFullYear(),
+        pad(x.getMonth() + 1),
+        pad(x.getDate()),
+        ].join(&apos;-&apos;) + &apos; &apos; + [
+        pad(x.getHours()),
+        pad(x.getMinutes()),
+        pad(x.getSeconds()),
+        ].join(&apos;:&apos;);
+        }
+        
+        #parseLocalDate(isoDate) {
+        const [y, m, d] = isoDate.split(&apos;-&apos;).map(Number);
+        return new Date(y, m - 1, d); // local midnight on that date
+        }
+        }
+        
+        if(!customElements.get(&apos;time-parse&apos;)) customElements.define(&apos;time-parse&apos;, TimeParseComponent);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Alright, so ignoring the basic web component setup, you can see the basic flow is:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Look to see if a &lt;code&gt;date&lt;/code&gt; attribute was used, if so, that&apos;s our reference date.&lt;/li&gt;
+        &lt;li&gt;Get the text inside the component and parse it.&lt;/li&gt;
+        &lt;li&gt;For each found result, looping backwards, replace the match with new HTML that uses the &lt;code&gt;time&lt;/code&gt; tag.&lt;/li&gt;
+        &lt;li&gt;Finally, update the inner HTML inside the component.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Up top you&apos;ll notice a &lt;code&gt;STYLE&lt;/code&gt; variable. I went with an inline style for... I don&apos;t know. I just didn&apos;t want to think about the shadow DOM and so forth. I figure with something so small it&apos;s ok. Feel free to fork the pen. ;)&lt;/p&gt;
+        &lt;p&gt;You can try it out below. Also, once again, I love web components.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;time-parse demo&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRwbwv&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9fa-d6e2-7d49-a140-43a457c7d347&quot;&gt;
+        time-parse demo&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -434,7 +608,7 @@
       <title>Links For You (6/21/26)</title>
       <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
       <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
         &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
@@ -497,7 +671,7 @@
       <title>Building a Form Handling Service in Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
         &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
@@ -681,7 +855,7 @@
       <title>Creating a Dynamic Favicon with Cloudinary</title>
       <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
       <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
         &lt;p&gt;
@@ -783,7 +957,7 @@
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -843,7 +1017,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -987,7 +1161,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -1181,7 +1355,7 @@
       <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
         &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
@@ -1304,119 +1478,10 @@
       <title>Looking for My Next Role - Hire Me</title>
       <link>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</link>
       <guid>https://www.raymondcamden.com/2026/05/27/looking-for-my-next-role-hire-me</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
+      <pubDate>Wed, 24 Jun 2026 17:10:52 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yep, I get to write this post again...&lt;/p&gt;
         &lt;p&gt;Well, today I find myself in the same position I&apos;ve been a few times over the past few years. Webflow went through a company-wide restructuring today and as part of that re-org, my role (and many others) were eliminated. So once again - I&apos;m asking my faithful readers to help me find my next role. You can find my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; if you need the latest edition and feel free to contact me with any opportunities you may have!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Dang good Office parsing on the web with officeParser</title>
-      <link>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</link>
-      <guid>https://www.raymondcamden.com/2026/05/20/dang-good-office-parsing-on-the-web-with-officeparser</guid>
-      <pubDate>Tue, 23 Jun 2026 17:21:55 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;A few weeks ago I wrote about using Chrome&apos;s built-in AI support to summarize documents - &lt;a href=&quot;https://www.raymondcamden.com/2026/04/17/summarizing-docs-with-built-in-ai&quot;&gt;&amp;quot;Summarizing Docs with Built-in AI&amp;quot;&lt;/a&gt;. This was a followup on an earlier post that was PDF only and made use of an excellent library, &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt;, to work with Microsoft Office files. This library worked well, but had one issue that made it a bit harder to use.&lt;/p&gt;
-        &lt;p&gt;Parsing a doc itself was super easy:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;But the issue I ran into was taking that result and turning it into something meaningful for Chrome&apos;s model to analyze. PDFs supported a &lt;code&gt;toText()&lt;/code&gt; method but for other formats I had to do a bit of work to get a text value. For example, here&apos;s the code I used to turn an Excel file into CSV:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let arrayBuffer = await file.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        
-        const getCSV = s =&amp;gt; {
-        let result = &apos;&apos;;
-        let rows = s.children.filter(c =&amp;gt; c.type === &apos;row&apos;);
-        console.log(rows[0]);
-        rows.forEach(r =&amp;gt; {
-        let data = [];
-        let cells = r.children.filter(c =&amp;gt; c.type === &apos;cell&apos;);
-        cells.forEach(c =&amp;gt; data.push(c.text));
-        result += data.join(&apos;, &apos;) + &apos;\n&apos;;
-        
-        });
-        return result;
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Yeah that&apos;s not bad, but it did mean a bit of work for each of the different Office types.&lt;/p&gt;
-        &lt;p&gt;Well, the good news is Harsh Ankur (the author of this awesome library) released a &lt;a href=&quot;https://github.com/harshankur/officeParser/blob/master/CHANGELOG.md&quot;&gt;v7&lt;/a&gt; that added a &lt;code&gt;to&lt;/code&gt; method that supports converting files to CSV, Markdown, RTF, PDF, Text, and HTML. Even better, his HTML support isn&apos;t just &amp;quot;convert to Markdown then render the Markdown to html&amp;quot;, but proper support straight from the parsed doc to create a richer result.&lt;/p&gt;
-        &lt;p&gt;I went ahead and built a demo you can use to test right now (and this demo doesn&apos;t use any of the Chrome AI stuff). I created a simple HTML file with a file field and 4 tabs: Text, Markdown, HTML, CSV. You can select a PDF or Office file and it will render into each of the tabs (well, only Excel will use CSV). The HTML isn&apos;t interesting, but here&apos;s the JavaScript:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { OfficeParser } from &apos;https://esm.sh/officeparser&apos;;
-        
-        let $sourceFile;
-        let $textResult, $mdResult, $htmlResult, $csvResult;
-        
-        const supportedFiles = [&apos;pdf&apos;,&apos;xlsx&apos;,&apos;docx&apos;,&apos;pptx&apos;];
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, init, false);
-        async function init() {
-        console.log(&apos;lets go&apos;);
-        $sourceFile = document.querySelector(&apos;#sourceFile&apos;);
-        $textResult = document.querySelector(&apos;#textResult&apos;);
-        $mdResult = document.querySelector(&apos;#mdResult&apos;);
-        $htmlResult = document.querySelector(&apos;#htmlResult&apos;);
-        $csvResult = document.querySelector(&apos;#csvResult&apos;);
-        
-        $sourceFile.addEventListener(&apos;change&apos;, filePreview, false);
-        }
-        
-        async function filePreview(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        let ext = file.name.split(&apos;.&apos;).pop();
-        if(!supportedFiles.includes(ext)) return;
-        let arrayBuffer = await file.arrayBuffer();
-        let data = await getAST(arrayBuffer, {});
-        
-        let text = await data.to(&apos;text&apos;);
-        $textResult.innerText = text.value;
-        
-        let md = await data.to(&apos;md&apos;);
-        $mdResult.innerText = md.value;
-        
-        let html = await data.to(&apos;html&apos;);
-        $htmlResult.contentDocument.open();
-        $htmlResult.contentDocument.write(html.value);
-        $htmlResult.contentDocument.close();
-        
-        if(ext === &apos;xlsx&apos;) {
-        $csvResult.innerText = (await data.to(&apos;csv&apos;)).value;
-        } else $csvResult.innerText = &apos;Only used for Excel files.&apos;;
-        }
-        
-        const getAST = async (file, config) =&amp;gt; (await OfficeParser.parseOffice(file, config));
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;You can play with this below:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;officeParser demo&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;NPbpNqp&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019e3d03-91b9-7e58-a88f-b730b7371377&quot;&gt;
-        officeParser demo&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;So - given that - I took a look at my previous &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/MYjxbrv&quot;&gt;demo&lt;/a&gt; and modified the code to make use of these new features. Here&apos;s the new code that gets the text version of a document and passes it to the AI model:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;document.querySelector(&apos;#upload&apos;).addEventListener(&apos;change&apos;, async (e) =&amp;gt; {
-        $output.innerHTML = &apos;&apos;;
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        let ast = await getAST(await file.arrayBuffer());
-        
-        let summary = {
-        title: ast.metadata?.title ?? &apos;No Title&apos;,
-        text: (await ast.to(&apos;md&apos;)).value
-        }
-        
-        doSummary(summary);
-        
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Compared to the previous version, this one is over a hundred lines shorter. As I said... ddddaaaaannnnnngggg. You can try out this version below, but note that it is Chrome only. (If folks ask, or heck, even if you don&apos;t ask, I may build a Transformer.js version.)&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;600&quot; data-pen-title=&quot;Chrome AI, Doc Summaries (V3)&quot; data-preview=&quot;true&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;PwbpLJQ&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/PwbpLJQ&quot;&gt;
-        Chrome AI, Doc Summaries (V3)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>

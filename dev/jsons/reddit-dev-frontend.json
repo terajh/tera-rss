@@ -20,10 +20,10 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Why \"perceptually even\" color scales look washed-out — and how to shape them so they don't",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/\"> <img src=\"https://preview.redd.it/ao1zyi4n419h1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=7c26b48786cb7f9559e1c6c42acab602b69d60bb\" alt=\"Why &quot;perceptually even&quot; color scales look washed-out — and how to shape them so they don't\" title=\"Why &quot;perceptually even&quot; color scales look washed-out — and how to shape them so they don't\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>A perceptually even color scale gives you predictable contrast, but on its own, it can feel a little sterile: equal brightness looks washed-out, pale tints go chalky, and every step ends up interchangeable. OKLCH is also awkward to reason about because the maximum chroma a color can have shifts with its hue and lightness — there&#39;s no fixed range to picture, as there is in HSL.</p> <p>An even scale is the foundation, though, not the finished thing. Four controls put the character back, and none of them ask you to do OKLCH math in your head:</p> <p>Lightness range — set how dark and light the ends go before you shape anything else.</p> <p>Chroma curve — when colors lighten, a flat curve makes tints chalky; ease it down toward the highlights, and they stay clean.</p> <p>Hue shift — pinning one hue across the whole range is part of what reads as synthetic. Warm the highlights a few degrees, cool the shadows, and the scale gains depth.</p> <p>Lightness curve — same two endpoints, but where you spend the contrast (dark / even / mid) changes the whole mood.</p> <p>Full write-up with side-by-side before/afters and live demos you can drag: <a href=\"https://lab.colormeup.co/custom-color-scales\">https://lab.colormeup.co/custom-color-scales</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/gilbarbara\"> /u/gilbarbara </a> <br/> <span><a href=\"https://i.redd.it/ao1zyi4n419h1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-06-23T12:54:06.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/"
+    "title": "Auto-generating harmonious OKLCH gradients from a single base color (for a loader color preset system)",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1uehzf7/autogenerating_harmonious_oklch_gradients_from_a/\"> <img src=\"https://external-preview.redd.it/cHFsYXdwbWw5OTloMZyTyqHXTe2uQLT4KWa23rEJuvienbDCuvMQ_UrDLPpy.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=0ad1e8b3b1f662df0f28fde189c89606a13f8875\" alt=\"Auto-generating harmonious OKLCH gradients from a single base color (for a loader color preset system)\" title=\"Auto-generating harmonious OKLCH gradients from a single base color (for a loader color preset system)\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Working on a <a href=\"https://loading-ui.com\">Loading UI</a> project, I needed 8 color presets where each one has both a solid color and a gradient variant that actually matches. Hand-picking 16 values felt fragile.</p> <p><strong>Approach:</strong> one OKLCH base per preset, then derive gradient stops with fixed modifiers:</p> <pre><code>// Base: oklch(L C H) // Start stop: L + 0.509, C - 0.006, H - 17.26 // End stop: L - 0.233, C + 0.114, H + 28.01 --loader-blue: oklch(0.6204 0.195 253.83); --loader-blue-gradient: linear-gradient( in oklch 135deg, oklch(1 0.189 236.57) 0%, oklch(0.6204 0.195 253.83) 50%, oklch(0.3878 0.3086 281.84) 100% ); </code></pre> <p>Same modifiers applied to every preset (blue, violet, orange, red, green, yellow, sky, black). Gradients stay in-gamut-ish without per-color tuning.</p> <p><strong>Dark mode twist:</strong> only the black preset inverts (white in <code>.dark</code>). Accent presets keep the same OKLCH values since they already work on dark backgrounds.</p> <p>You can see all 8 presets applied to ~45 loaders live: <a href=\"https://loading-ui.com\">https://loading-ui.com</a> (color picker below the hero).</p> <p>Full source: <a href=\"https://github.com/turbostarter/loading-ui\">https://github.com/turbostarter/loading-ui</a> (<code>lib/colors.ts</code> generates the CSS)</p> <p>Anyone doing something similar for design tokens? Wondering if fixed modifiers scale past ~10 colors or you need per-hue tuning.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/zagrodzki\"> /u/zagrodzki </a> <br/> <span><a href=\"https://v.redd.it/5apiroml999h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1uehzf7/autogenerating_harmonious_oklch_gradients_from_a/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-06-24T16:15:18.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1uehzf7/autogenerating_harmonious_oklch_gradients_from_a/"
   },
   {
     "publisherId": "reddit-dev",
@@ -37,6 +37,58 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1udm812/is_this_possible_in_css/\"> <img src=\"https://preview.redd.it/jio6e26q829h1.png?width=140&amp;height=129&amp;auto=webp&amp;s=aa2acdfcbbbe8e51ed171c6e04cbf31985983261\" alt=\"Is this possible in css?\" title=\"Is this possible in css?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I&#39;m trying to build this dashboard UI entirely in CSS. no images, no JS. </p> <p>The parts I&#39;m stuck on:</p> <p>- The circular gauge, conic-gradient with radial mask feels right, but is there a better way for the segmented ring?</p> <p>- The glowing border box-shadow layers vs. animated gradient border. Which performs better?</p> <p>- The waveform inline SVG path or CSS background pattern?</p> <p>Anyone have good references for pure CSS dashboard UIs with neon glows? Not looking for a full solution, just technique pointers so I don&#39;t head down the wrong rabbit hole.</p> <p>Ty! </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Mstep85\"> /u/Mstep85 </a> <br/> <span><a href=\"https://www.reddit.com/gallery/1udm812\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1udm812/is_this_possible_in_css/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-06-23T16:37:41.000Z",
     "url": "https://www.reddit.com/r/css/comments/1udm812/is_this_possible_in_css/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Animating the <dialog> element using the View Transition API",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1ue4zed/animating_the_dialog_element_using_the_view/\"> <img src=\"https://external-preview.redd.it/jot9ygq1nAgfA3N-rKkqueZtrgnOfP0j7aRSX2H1Vog.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=33daaba3676841abcc9f001e1bf1bc45c9a77f39\" alt=\"Animating the &lt;dialog&gt; element using the View Transition API\" title=\"Animating the &lt;dialog&gt; element using the View Transition API\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/schrik\"> /u/schrik </a> <br/> <span><a href=\"https://pqina.nl/blog/animating-the-dialog-element-using-view-transitions/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1ue4zed/animating_the_dialog_element_using_the_view/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-06-24T05:50:05.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1ue4zed/animating_the_dialog_element_using_the_view/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Why \"perceptually even\" color scales look washed-out — and how to shape them so they don't",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/\"> <img src=\"https://preview.redd.it/ao1zyi4n419h1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=7c26b48786cb7f9559e1c6c42acab602b69d60bb\" alt=\"Why &quot;perceptually even&quot; color scales look washed-out — and how to shape them so they don't\" title=\"Why &quot;perceptually even&quot; color scales look washed-out — and how to shape them so they don't\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>A perceptually even color scale gives you predictable contrast, but on its own, it can feel a little sterile: equal brightness looks washed-out, pale tints go chalky, and every step ends up interchangeable. OKLCH is also awkward to reason about because the maximum chroma a color can have shifts with its hue and lightness — there&#39;s no fixed range to picture, as there is in HSL.</p> <p>An even scale is the foundation, though, not the finished thing. Four controls put the character back, and none of them ask you to do OKLCH math in your head:</p> <p>Lightness range — set how dark and light the ends go before you shape anything else.</p> <p>Chroma curve — when colors lighten, a flat curve makes tints chalky; ease it down toward the highlights, and they stay clean.</p> <p>Hue shift — pinning one hue across the whole range is part of what reads as synthetic. Warm the highlights a few degrees, cool the shadows, and the scale gains depth.</p> <p>Lightness curve — same two endpoints, but where you spend the contrast (dark / even / mid) changes the whole mood.</p> <p>Full write-up with side-by-side before/afters and live demos you can drag: <a href=\"https://lab.colormeup.co/custom-color-scales\">https://lab.colormeup.co/custom-color-scales</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/gilbarbara\"> /u/gilbarbara </a> <br/> <span><a href=\"https://i.redd.it/ao1zyi4n419h1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-06-23T12:54:06.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1udgcss/why_perceptually_even_color_scales_look_washedout/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Rate my portfolio page 😁",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1uedyl8/rate_my_portfolio_page/\"> <img src=\"https://external-preview.redd.it/anQxNDk0Mm1pODloMQphm0aMH8ArmrbjQq-liVz2KRERgcWF3abCguAUDrA_.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=dc01084942436ddd092e30561f73e7fb047d084d\" alt=\"Rate my portfolio page 😁\" title=\"Rate my portfolio page 😁\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Rate my portfolio page</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Opening_Ear_8571\"> /u/Opening_Ear_8571 </a> <br/> <span><a href=\"https://v.redd.it/zfxiuy0mi89h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1uedyl8/rate_my_portfolio_page/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-06-24T13:45:21.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1uedyl8/rate_my_portfolio_page/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Help the newbie out",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I’m pretty new to html &amp; css. After finishing a tutorial, I jumped straight into a small project basically a wiki for a game I love I managed to complete the homepage, but my CSS file turned into a mess. I ended up asking AI to help me organize it, and it suggested a structure similar to what Mdn recommends.</p> <p>What I’m curious about is how experienced developers write CSS so they don’t have to reorganize everything later?</p> <p>Also, is it fine to use ChatGpt as a helper for CSS? I don’t mean outsourcing the whole stylesheet (“here’s my HTML, give me CSS”), but more like:</p> <ul> <li>when I forget syntax</li> <li>when I’m not sure how to achieve a certain effect</li> <li>or when I want to try out design suggestions like colors.</li> </ul> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Icy_Criticism7822\"> /u/Icy_Criticism7822 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1udqdcr/help_the_newbie_out/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1udqdcr/help_the_newbie_out/\">[comments]</a></span>",
+    "date": "2026-06-23T19:07:53.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1udqdcr/help_the_newbie_out/"
   },
   {
     "publisherId": "reddit-dev",
@@ -271,57 +323,5 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1u9umgz/css_grid_for_beginners_infographic/\"> <img src=\"https://preview.redd.it/d32r6rjor68h1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=1ee77e650243461dd9862685ec4341bc61492420\" alt=\"CSS Grid for Beginners [INFOGRAPHIC]\" title=\"CSS Grid for Beginners [INFOGRAPHIC]\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/bigblasupp\"> /u/bigblasupp </a> <br/> <span><a href=\"https://i.redd.it/d32r6rjor68h1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1u9umgz/css_grid_for_beginners_infographic/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-06-19T06:47:15.000Z",
     "url": "https://www.reddit.com/r/css/comments/1u9umgz/css_grid_for_beginners_infographic/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Pure CSS gradient/progressive blur! I used background-filter, mask with linear-gradient, and the @supports at-rule for a fallback.",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1u8lc70/pure_css_gradientprogressive_blur_i_used/\"> <img src=\"https://external-preview.redd.it/wtm5Sb9-7XUgZe2G1cwuwtYHmJh9_1DEngKd3xHiEHw.jpeg?width=320&amp;crop=smart&amp;auto=webp&amp;s=a3c2a6a8d69bbe127636f974d217593b9e1bd94f\" alt=\"Pure CSS gradient/progressive blur! I used background-filter, mask with linear-gradient, and the @supports at-rule for a fallback.\" title=\"Pure CSS gradient/progressive blur! I used background-filter, mask with linear-gradient, and the @supports at-rule for a fallback.\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/RosyCalvael\"> /u/RosyCalvael </a> <br/> <span><a href=\"https://i.imgur.com/mH00YhZ.jpeg\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1u8lc70/pure_css_gradientprogressive_blur_i_used/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-06-17T20:17:05.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1u8lc70/pure_css_gradientprogressive_blur_i_used/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Is it possible to let users input css",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I want users to put in css and have it change my website for them is that possible. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/PotentPlank\"> /u/PotentPlank </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1u8fa7o/is_it_possible_to_let_users_input_css/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1u8fa7o/is_it_possible_to_let_users_input_css/\">[comments]</a></span>",
-    "date": "2026-06-17T16:36:58.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1u8fa7o/is_it_possible_to_let_users_input_css/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "built this cool button with html css only",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1u82buu/built_this_cool_button_with_html_css_only/\"> <img src=\"https://external-preview.redd.it/dzJrNmpkb2RlczdoMe5N28xTuNH54uLKoKDsTTNEFdfFYdInZNOQ0dZXGjGP.png?width=320&amp;crop=smart&amp;auto=webp&amp;s=140a3d846bb2a467af6282795e571a4bbe14be3a\" alt=\"built this cool button with html css only\" title=\"built this cool button with html css only\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Cool Button CSS:<br/> having inset shadow and dots text on hover interaction and when clicked scale down animation</p> <p><a href=\"https://codepen.io/mudasirbuilds/pen/yygVwZj\">https://codepen.io/mudasirbuilds/pen/yygVwZj</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/MudasirItoo\"> /u/MudasirItoo </a> <br/> <span><a href=\"https://v.redd.it/wbs97tmdes7h1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1u82buu/built_this_cool_button_with_html_css_only/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-06-17T06:28:06.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1u82buu/built_this_cool_button_with_html_css_only/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "CSS coding issue",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1u8pxb9/css_coding_issue/\"> <img src=\"https://preview.redd.it/a4xt94h9ex7h1.png?width=140&amp;height=67&amp;auto=webp&amp;s=463e90661006441c4bfda94775543644875ddf03\" alt=\"CSS coding issue\" title=\"CSS coding issue\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I&#39;m trying to code an organization of my folders in <a href=\"http://Toyhou.se\">Toyhou.se</a> but the problem I&#39;m running into is how my folders organize themselves. I&#39;ve been trying to figure it out myself but I&#39;m not getting anywhere with this one. I&#39;m trying to line up my folders to be across from each other, but they are top down causing one to scroll, but I don&#39;t like that. The first image I posted is a screenshot, but the second is how I want it to look. How is it possible to get my folders to look like the second image?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/castrovalva1\"> /u/castrovalva1 </a> <br/> <span><a href=\"https://www.reddit.com/gallery/1u8pxb9\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1u8pxb9/css_coding_issue/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-06-17T23:18:35.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1u8pxb9/css_coding_issue/"
   }
 ]
