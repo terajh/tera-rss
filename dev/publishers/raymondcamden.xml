@@ -1,0 +1,1734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>dev RSS - Raymond Camden</title>
+    <link>https://www.raymondcamden.com/</link>
+    <description>Raymond Camden RSS 피드</description>
+    <lastBuildDate>Sun, 28 Jun 2026 16:55:56 GMT</lastBuildDate>
+    <item>
+      <title>Decoding VINs with an API</title>
+      <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
+      <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
+        &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;A VIN is a vehicle identification number. It&apos;s a standard that &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number&quot;&gt;dates back to 1954&lt;/a&gt; and identifies a particular car by manufacturer, make, model, year, and a heck of a lot more. A VIN is 17 characters avoiding the letters O, I, U, and Q to avoid confusion with some numbers.&lt;/p&gt;
+        &lt;p&gt;You can break down a VIN into various &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number#Components&quot;&gt;components&lt;/a&gt; if you want - but would still need to know various lookup values, for example a manufacturer referred to as &lt;code&gt;1FT&lt;/code&gt; maps to Ford Truck.&lt;/p&gt;
+        &lt;h2 id=&quot;decoding-a-vin-via-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#decoding-a-vin-via-api&quot;&gt;Decoding a VIN via API&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;As part of the demo that didn&apos;t quite make it, I needed to decode a VIN value. I had a commercial service in mind but it had a pretty limited free tier (50 calls). Turns out, the &lt;a href=&quot;https://www.nhtsa.gov/&quot;&gt;National Highway Traffic Safety Administration&lt;/a&gt; actually has a bunch of APIs, multiple of which work with VINs.&lt;/p&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/&quot;&gt;Vehicle API&lt;/a&gt; is free, with no limits (outside of not being a jerk), and requires no API keys at all.&lt;/p&gt;
+        &lt;p&gt;The one we want is the &lt;code&gt;Decode VIN Extended (flat format)&lt;/code&gt; endpoint. Why &amp;quot;flat format&amp;quot;? The initial API returns information that very much looks like XML translated to JSON, which to be fair, it is, and while the data is all there, it&apos;s a bit ugly. The &lt;code&gt;flat format&lt;/code&gt; makes it look quite a bit nicer.&lt;/p&gt;
+        &lt;p&gt;To use the API, simply include the VIN in the URL and ensure you add &lt;code&gt;?format=json&lt;/code&gt;: &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&quot;&gt;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This returns:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;Count&amp;quot;: 1,
+        &amp;quot;Message&amp;quot;: &amp;quot;Results returned successfully. NOTE: Any missing decoded values should be interpreted as NHTSA does not have data on the specific variable. Missing value should NOT be interpreted as an indication that a feature or technology is unavailable for a vehicle.&amp;quot;,
+        &amp;quot;SearchCriteria&amp;quot;: &amp;quot;VIN(s): 3VV3B7AXXNM077525&amp;quot;,
+        &amp;quot;Results&amp;quot;: [
+        {
+        &amp;quot;ABS&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;ActiveSafetySysNote&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AdaptiveCruiseControl&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AdaptiveDrivingBeam&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AdaptiveHeadlights&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AdditionalErrorText&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocCurtain&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AirBagLocFront&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AirBagLocKnee&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocSeatCushion&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocSide&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AutoReverseSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AutomaticPedestrianAlertingSound&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AxleConfiguration&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Axles&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BasePrice&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryA&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryA_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryCells&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryKWh&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryKWh_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryModules&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryPacks&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryV&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryV_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BedLengthIN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BedType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BlindSpotIntervention&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BlindSpotMon&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;BodyCabType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BodyClass&amp;quot;: &amp;quot;Sport Utility Vehicle [SUV]/Multipurpose Vehicle [MPV]&amp;quot;,
+        &amp;quot;BrakeSystemDesc&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BrakeSystemType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BusFloorConfigType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;BusLength&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BusType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;CAN_AACN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CIB&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;CashForClunkers&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ChargerLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ChargerPowerKW&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CombinedBrakingSystem&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CoolingType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CurbWeightLB&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CustomMotorcycleType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;DaytimeRunningLight&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;DestinationMarket&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DisplacementCC&amp;quot;: &amp;quot;2000.0&amp;quot;,
+        &amp;quot;DisplacementCI&amp;quot;: &amp;quot;122.04748818946&amp;quot;,
+        &amp;quot;DisplacementL&amp;quot;: &amp;quot;2.0&amp;quot;,
+        &amp;quot;Doors&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DriveType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DriverAssist&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DynamicBrakeSupport&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;EDR&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ESC&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;EVDriveUnit&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ElectrificationLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineConfiguration&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineCycles&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineCylinders&amp;quot;: &amp;quot;4&amp;quot;,
+        &amp;quot;EngineHP&amp;quot;: &amp;quot;184&amp;quot;,
+        &amp;quot;EngineHP_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineKW&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineManufacturer&amp;quot;: &amp;quot;Volkswagen&amp;quot;,
+        &amp;quot;EngineModel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EntertainmentSystem&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ErrorCode&amp;quot;: &amp;quot;0&amp;quot;,
+        &amp;quot;ErrorText&amp;quot;: &amp;quot;0 - VIN decoded clean. Check Digit (9th position) is correct&amp;quot;,
+        &amp;quot;ForwardCollisionWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;FuelInjectionType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTankMaterial&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTankType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTypePrimary&amp;quot;: &amp;quot;Gasoline&amp;quot;,
+        &amp;quot;FuelTypeSecondary&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GCWR&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GCWR_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GVWR&amp;quot;: &amp;quot;Class 1D: 5,001 - 6,000 lb (2,268 - 2,722 kg)&amp;quot;,
+        &amp;quot;GVWR_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;KeylessIgnition&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LaneCenteringAssistance&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;LaneDepartureWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LaneKeepSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LowerBeamHeadlampLightSource&amp;quot;: &amp;quot;LED&amp;quot;,
+        &amp;quot;Make&amp;quot;: &amp;quot;VOLKSWAGEN&amp;quot;,
+        &amp;quot;MakeID&amp;quot;: &amp;quot;482&amp;quot;,
+        &amp;quot;Manufacturer&amp;quot;: &amp;quot;VOLKSWAGEN DE MEXICO SA DE CV&amp;quot;,
+        &amp;quot;ManufacturerId&amp;quot;: &amp;quot;16478&amp;quot;,
+        &amp;quot;Model&amp;quot;: &amp;quot;Tiguan&amp;quot;,
+        &amp;quot;ModelID&amp;quot;: &amp;quot;8151&amp;quot;,
+        &amp;quot;ModelYear&amp;quot;: &amp;quot;2022&amp;quot;,
+        &amp;quot;MotorcycleChassisType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;MotorcycleSuspensionType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;NCSABodyType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMake&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMapExcApprovedBy&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMapExcApprovedOn&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMappingException&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAModel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSANote&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NonLandUse&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Note&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherBusInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherEngineInfo&amp;quot;: &amp;quot;Test Group: NVGAJ02.0V3A / Emission Std.: Tier 3 BIN 30 LEV3 SULEV30&amp;quot;,
+        &amp;quot;OtherMotorcycleInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherRestraintSystemInfo&amp;quot;: &amp;quot;Seat Belt: Active-Dr/Pass / Advanced Front Airbags&amp;quot;,
+        &amp;quot;OtherTrailerInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ParkAssist&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PedestrianAutomaticEmergencyBraking&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PlantCity&amp;quot;: &amp;quot;PUEBLA&amp;quot;,
+        &amp;quot;PlantCompanyName&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PlantCountry&amp;quot;: &amp;quot;MEXICO&amp;quot;,
+        &amp;quot;PlantState&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PossibleValues&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Pretensioner&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;RearAutomaticEmergencyBraking&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;RearCrossTrafficAlert&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;RearVisibilitySystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;SAEAutomationLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SAEAutomationLevel_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SeatBeltsAll&amp;quot;: &amp;quot;Manual&amp;quot;,
+        &amp;quot;SeatRows&amp;quot;: &amp;quot;2&amp;quot;,
+        &amp;quot;Seats&amp;quot;: &amp;quot;5&amp;quot;,
+        &amp;quot;SemiautomaticHeadlampBeamSwitching&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;Series&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Series2&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SteeringLocation&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SuggestedVIN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TPMS&amp;quot;: &amp;quot;Indirect&amp;quot;,
+        &amp;quot;TopSpeedMPH&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TrackWidth&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TractionControl&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;TrailerBodyType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;TrailerLength&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TrailerType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;TransmissionSpeeds&amp;quot;: &amp;quot;8&amp;quot;,
+        &amp;quot;TransmissionStyle&amp;quot;: &amp;quot;Automatic&amp;quot;,
+        &amp;quot;Trim&amp;quot;: &amp;quot;SE&amp;quot;,
+        &amp;quot;Trim2&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Turbo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;VIN&amp;quot;: &amp;quot;3VV3B7AXXNM077525&amp;quot;,
+        &amp;quot;ValveTrainDesign&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;VehicleDescriptor&amp;quot;: &amp;quot;3VV3B7AX*NM&amp;quot;,
+        &amp;quot;VehicleType&amp;quot;: &amp;quot;MULTIPURPOSE PASSENGER VEHICLE (MPV)&amp;quot;,
+        &amp;quot;WheelBaseLong&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelBaseShort&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelBaseType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelSizeFront&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelSizeRear&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelieMitigation&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Wheels&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Windows&amp;quot;: &amp;quot;&amp;quot;
+        }
+        ]
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is, indeed, my car and the data is spot on. If you pass an invalid VIN, the values for &lt;code&gt;ErrorCode&lt;/code&gt; and &lt;code&gt;ErrorText&lt;/code&gt; will include pertinent information. As an example, this &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/999999999993VV3B7AXXNM077525?format=json&quot;&gt;URL&lt;/a&gt; with a messed up VIN gives:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;{ 
+        // All the usual keys
+        &amp;quot;ErrorCode&amp;quot;: &amp;quot;1,7,400&amp;quot;,
+        &amp;quot;ErrorText&amp;quot;: &amp;quot;1 - Check Digit (9th position) does not calculate properly; 7 - Manufacturer is not registered with NHTSA for sale or importation in the U.S. for use on U.S roads; Please contact the manufacturer directly for more information; 400 - Invalid Characters Present&amp;quot;,
+        // more
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note that as I said in the code block, you still get &lt;em&gt;all&lt;/em&gt; the other keys as well, so you need to check for &lt;code&gt;ErrorCode&lt;/code&gt; being &amp;quot;0&amp;quot; (note that it&apos;s a string, not a number) before you can use the data.&lt;/p&gt;
+        &lt;p&gt;But - the API tries its best to decode as much as possible. So for example, if I remove one value from my VIN, I get an error (&amp;quot;6 - Incomplete VIN&amp;quot;), but it still returns the right make and model for my car.&lt;/p&gt;
+        &lt;p&gt;Depending on your particular need, you may not want to treat errors as a boolean state and see what you can get away with.&lt;/p&gt;
+        &lt;h2 id=&quot;putting-a-bow-on-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-a-bow-on-it&quot;&gt;Putting a Bow on It&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so while this worked, I thought I&apos;d make a quick trip to &lt;a href=&quot;https://val.town&quot;&gt;Val Town&lt;/a&gt; to build a slightly nicer API wrapper for this. My code would do two things:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Return an object with two keys, &lt;code&gt;vehicle&lt;/code&gt; and &lt;code&gt;error&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;vehicle&lt;/code&gt; is the vehicle information result, just the first one, but with keys lowercased because there&apos;s no need to write more APIs the Microsoft way.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;error&lt;/code&gt; will check if &lt;code&gt;ErrorCode&lt;/code&gt; isn&apos;t &amp;quot;0&amp;quot;, and if so, will be populated with &lt;code&gt;ErrorText&lt;/code&gt;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In Val Town, I created a new val with a HTTP trigger. I look for the VIN in the URL, and if it&apos;s there, pass it to the NHTSA&apos;s API and shape the API as I described above. That&apos;s literally it.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        const url = new URL(req.url);
+        const vin = url.searchParams.get(&amp;quot;vin&amp;quot;);
+        
+        if (!vin) {
+        return new Response(
+        JSON.stringify({ error: &amp;quot;Missing &apos;vin&apos; query parameter&amp;quot; }),
+        {
+        status: 400,
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        },
+        );
+        }
+        
+        const vinreq = await fetch(
+        `https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`,
+        );
+        const data = await vinreq.json();
+        
+        const result = {
+        vehicle: lowerCaseKeys(data.Results[0]),
+        error: null,
+        };
+        
+        if (data.Results[0].ErrorCode !== &amp;quot;0&amp;quot;) {
+        result.error = data.Results[0].ErrorText;
+        }
+        
+        return new Response(JSON.stringify(result), {
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        });
+        }
+        
+        function lowerCaseKeys(obj) {
+        const result = {};
+        for (const key of Object.keys(obj)) {
+        result[key.toLowerCase()] = obj[key];
+        }
+        return result;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This API is up and running at https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run, and you can see the full Val here, &lt;a href=&quot;https://www.val.town/x/raymondcamden/vin-api&quot;&gt;https://www.val.town/x/raymondcamden/vin-api&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;quick-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#quick-demo&quot;&gt;Quick Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I went to &lt;em&gt;another&lt;/em&gt; code hosting service, Code Pen, to create a quick and simple demo. If you open your browser to &lt;a href=&quot;https://new-thunder-treefrog.codepen.app/&quot;&gt;https://new-thunder-treefrog.codepen.app/&lt;/a&gt;, you can enter a VIN, hit the button, and see the result dumped on screen. The entire Val Town integration was just a &lt;code&gt;fetch&lt;/code&gt; call:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let req = await fetch(`https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run/?vin=${vin}`);
+        let result = await req.json();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s the CodePen itself if you want to fork, or run the demo here.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;VIN API Tester&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;MYJvybX&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f0545-661f-7a5d-9000-89ba9b41fca3&quot;&gt;
+        VIN API Tester&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@elisasch?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Elisa Schmidt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/cat-on-a-car-during-daytime-C2c4G3by4ZE?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
+      <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
+      <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
+        &lt;p&gt;Of course there is.&lt;/p&gt;
+        &lt;p&gt;The aptly named &lt;a href=&quot;https://github.com/wanasit/chrono&quot;&gt;Chrono&lt;/a&gt; library does just that. It can parse a string with one assumed date and return the date, so for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        chrono.parseDate(&apos;An appointment on Sep 12-13&apos;); 
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This returns: &lt;code&gt;Sat Sep 12 2026 12:00:00 GMT-0500 (Central Daylight Time)&lt;/code&gt;. It can also take a string and give you a parsed set of results, so for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;chrono.parse(&apos;An appointment on Sep 12-13&apos;);
+        /* [{ 
+        index: 18,
+        text: &apos;Sep 12-13&apos;,
+        start: ...
+        }] */
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; method will return one result per matched item, with the result including the original string, lots of info on how it parsed it, and the ability to get the proper date object from it. It can also handle durations and a reference date too, so if your input was, &amp;quot;I will eat sushi tomorrow&amp;quot; and the reference was January 2nd, 2026, it would recognize that tomorrow is January 3rd, 2026.&lt;/p&gt;
+        &lt;p&gt;So, how about a demo? I created a quick CodePen that has a textarea for arbitrary input. You can type anything, and when it finds stuff, it dumps it out below and then follows up that dump with parsed dates. I&apos;ll skip over the HTML (you can see it in the embedded CodePen), but here&apos;s the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        const $input = document.querySelector(&apos;#input&apos;);
+        const $output = document.querySelector(&apos;#output&apos;);
+        
+        $input.addEventListener(&apos;input&apos;, () =&amp;gt; {
+        const input = $input.value.trim();
+        $output.innerText = &apos;&apos;;
+        if(input === &apos;&apos;) return;
+        /*
+        temp test to set a reference:
+        let yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        let parsed = chrono.parse(input, yesterday);
+        */
+        let parsed = chrono.parse(input);
+        
+        if(parsed.length) {
+        $output.innerText = JSON.stringify(parsed, null, &apos;\t&apos;) + &apos;\n&apos;;
+        
+        for(const p of parsed) {
+        console.log(p.start.date());
+        $output.innerText += `Parsed date: ${p.start.date()} `;
+        if(p.end) $output.innerText += ` - ${p.end.date()}`;
+        $output.innerText += &apos;\n&apos;;
+        }
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Basically import the library, note changes in the textarea, and parse. If results are found I do the simple dump as I mentioned. One small oddity with the library is that the initial result does &lt;em&gt;not&lt;/em&gt; actually include the date. You have to run &lt;code&gt;.date()&lt;/code&gt; on the &lt;code&gt;start&lt;/code&gt; and (optional) &lt;code&gt;end&lt;/code&gt; values to get that. Hence that for loop. You can also see, commented out, how easy it is to use a reference date.&lt;/p&gt;
+        &lt;p&gt;Go ahead and test it below.&lt;/p&gt;
+        &lt;p&gt;I will say I found the &apos;duration&apos; support didn&apos;t work terribly well. By that I mean it would find the date reference, but not always the &apos;end&apos;. The sample input, &amp;quot;I have an appointment tomorrow from 10 to 11 AM&amp;quot;, worked fine, but in my tests it was hit or miss. Again though, it got the start every time so that&apos;s something.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;500&quot; data-pen-title=&quot;chrono test&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;WbROxQm&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9de-fbbf-778f-9e68-7a9a0d44ecc6&quot;&gt;
+        chrono test&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;h2 id=&quot;turning-it-into-a-web-component&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#turning-it-into-a-web-component&quot;&gt;Turning it into a Web Component&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;At this point, I thought it might be cool to build a web component that would:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Use Chrono to find the date strings&lt;/li&gt;
+        &lt;li&gt;Wrap each matched item with a &lt;code&gt;&amp;lt;time&amp;gt;&lt;/code&gt; element, setting &lt;code&gt;datetime&lt;/code&gt; and &lt;code&gt;title&lt;/code&gt; to the parsed date&lt;/li&gt;
+        &lt;li&gt;Use a bit of CSS to highlight the text&lt;/li&gt;
+        &lt;li&gt;Allow for an attribute that lets you specify the date. In my mind, the main use for this is UGC (user generated content), things like comments for example. Comments are made at a point in time which means it should be easy to pass that to the component.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I named my component &lt;code&gt;time-parse&lt;/code&gt; because I&apos;m incredibly creative. Here&apos;s an example of it in play, both with and without a reference date:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div&amp;gt;
+        &amp;lt;time-parse&amp;gt;
+        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
+        &amp;lt;/time-parse&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div&amp;gt;
+        &amp;lt;time-parse date=&amp;quot;2026-06-04&amp;quot;&amp;gt;
+        This is an example in the past. I set the date to June 4th. 
+        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
+        &amp;lt;/time-parse&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s the code I used. I&apos;ll talk a bit about my design decisions after:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
+        
+        class TimeParseComponent extends HTMLElement {
+        
+        constructor() {
+        super();
+        }
+        
+        connectedCallback() {
+        
+        // doing an inline style so i dont have to worry about specifying it just for the WC. This feels wrong a bit...
+        const STYLE = &apos;text-decoration: underline;text-decoration-color: #ccc;&apos;;
+        
+        let dateRef = null;
+        
+        // look for date attribute
+        if(this.hasAttribute(&amp;quot;date&amp;quot;)) {
+        console.log(&apos;Date found, using as ref&apos;);
+        dateRef = this.#parseLocalDate(this.getAttribute(&amp;quot;date&amp;quot;));
+        console.log(&apos;dateRef is &apos;, dateRef);
+        }
+        
+        let input = this.innerHTML;
+        const parsed = chrono.parse(input, dateRef);
+        if(!parsed || !parsed.length) return;
+        console.log(`Found ${parsed.length} items to update`);
+        /*
+        For each, find the initial string, and wrap it with:
+        &amp;lt;time datetime=PARSEDTIME title=PARSEDTIME&amp;gt;orig&amp;lt;/time&amp;gt;
+        
+        Go backwards as we are changing the string
+        */
+        for(let x=parsed.length-1; x &amp;gt;= 0; x--) {
+        console.log(parsed[x]);
+        // first get the date, currently not supporting end
+        let date = this.#formatDateTime(parsed[x].start.date());
+        let orig = input.substring(parsed[x].index, parsed[x].index + parsed[x].text.length);
+        // now make the new string
+        let newStr = `
+        &amp;lt;time datetime=&amp;quot;${date}&amp;quot; title=&amp;quot;${date}&amp;quot; style=&amp;quot;${STYLE}&amp;quot;&amp;gt;${orig}&amp;lt;/time&amp;gt;
+        `.trim();
+        //console.log(newStr);
+        
+        input = input.slice(0, parsed[x].index) + newStr + input.slice(parsed[x].index + parsed[x].text.length);
+        }
+        
+        // All done - 
+        console.log(&apos;Final Result&apos;, input);
+        this.innerHTML = input;
+        }
+        
+        #formatDateTime(x) {
+        const pad = (n) =&amp;gt; String(n).padStart(2, &apos;0&apos;);
+        
+        return [
+        x.getFullYear(),
+        pad(x.getMonth() + 1),
+        pad(x.getDate()),
+        ].join(&apos;-&apos;) + &apos; &apos; + [
+        pad(x.getHours()),
+        pad(x.getMinutes()),
+        pad(x.getSeconds()),
+        ].join(&apos;:&apos;);
+        }
+        
+        #parseLocalDate(isoDate) {
+        const [y, m, d] = isoDate.split(&apos;-&apos;).map(Number);
+        return new Date(y, m - 1, d); // local midnight on that date
+        }
+        }
+        
+        if(!customElements.get(&apos;time-parse&apos;)) customElements.define(&apos;time-parse&apos;, TimeParseComponent);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Alright, so ignoring the basic web component setup, you can see the basic flow is:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Look to see if a &lt;code&gt;date&lt;/code&gt; attribute was used, if so, that&apos;s our reference date.&lt;/li&gt;
+        &lt;li&gt;Get the text inside the component and parse it.&lt;/li&gt;
+        &lt;li&gt;For each found result, looping backwards, replace the match with new HTML that uses the &lt;code&gt;time&lt;/code&gt; tag.&lt;/li&gt;
+        &lt;li&gt;Finally, update the inner HTML inside the component.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Up top you&apos;ll notice a &lt;code&gt;STYLE&lt;/code&gt; variable. I went with an inline style for... I don&apos;t know. I just didn&apos;t want to think about the shadow DOM and so forth. I figure with something so small it&apos;s ok. Feel free to fork the pen. ;)&lt;/p&gt;
+        &lt;p&gt;You can try it out below. Also, once again, I love web components.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;time-parse demo&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRwbwv&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9fa-d6e2-7d49-a140-43a457c7d347&quot;&gt;
+        time-parse demo&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Use AI to not use AI (as much)</title>
+      <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
+      <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
+        &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Email from GitHub warning about Actions Usage&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I know &lt;em&gt;of&lt;/em&gt; GitHub Actions, but I don&apos;t really use them much myself. That being said, GitHub&apos;s billing and usage reports were good for an aggregate high level look at my account, but were surprisingly &lt;em&gt;unhelpful&lt;/em&gt; in terms of telling me &lt;em&gt;where&lt;/em&gt; my usage was coming from. Apparently I was supposed to go through my 300+ repositories and find this out by checking the settings for each? That&apos;s crazy. It&apos;s also completely possible I missed a way to get this value easier, but honestly, I wasn&apos;t sure what to do.&lt;/p&gt;
+        &lt;p&gt;I finally found a usage report generator in my settings, I used that, and quickly got a CSV report. I took a quick look at it, nothing stood out, so I went to my AI tool and simply asked it to parse it for me.&lt;/p&gt;
+        &lt;p&gt;And it did - swimmingly - giving me a culprit to point to - or in my case - simply delete. It was a repo I had set up to test something that was apparently storing some artifacts I didn&apos;t need. Problem solved.&lt;/p&gt;
+        &lt;p&gt;But... I wasn&apos;t convinced this wasn&apos;t going to happen again, so I used the technique that first occurred to me a few months back, and is pretty obvious, but I simply asked my tool to generate a Python script for me that would create a report.&lt;/p&gt;
+        &lt;p&gt;For this I used &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;, a tool I&apos;ve been using a lot lately, and in Plan mode, simply asked:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;pay attention to the csv. it is a GitHub usage report. I need a general Python script that can be run at the command line that parses this CSV and reports on usage. the idea is to help me figure out what repo is causing the most usage&amp;quot;&lt;/p&gt;
+        &lt;p&gt;It chewed on the CSV a bit, and then asked what it should prioritize in terms of the report. Now, my email warning was about &lt;em&gt;storage&lt;/em&gt;, but Cursor suggested total cost, so I went along. After it built the script, I liked the output, but the &apos;problem&apos; repo (that I had already corrected) wasn&apos;t necessarily given enough attention.&lt;/p&gt;
+        &lt;p&gt;I then went back to Cursor with:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;this works, but i noticed that testing-boxlang-desktop, which used a lot of storage, doesn&apos;t get call out quite as much. can we maybe add another report after the gross amount one that shows top repos by stoage?&amp;quot;&lt;/p&gt;
+        &lt;p&gt;Thank god AI doesn&apos;t complain about typos so much as I didn&apos;t even notice that till just now. This iteration added a second report and really made it a great v1 for the script. Speaking of...&lt;/p&gt;
+        &lt;h2 id=&quot;just-show-me-the-code-already...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-show-me-the-code-already...&quot;&gt;Just show me the code already...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, so if you are also looking at a GitHub usage report and not sure what repo to blame, generate your summary, save the file, and use this script:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;#!/usr/bin/env python3
+        &amp;quot;&amp;quot;&amp;quot;Parse GitHub summarized usage CSV exports and report repo-level usage.&amp;quot;&amp;quot;&amp;quot;
+        
+        from __future__ import annotations
+        
+        import argparse
+        import csv
+        import json
+        import sys
+        from dataclasses import dataclass, field
+        from pathlib import Path
+        
+        REQUIRED_COLUMNS = {
+        &amp;quot;date&amp;quot;,
+        &amp;quot;product&amp;quot;,
+        &amp;quot;sku&amp;quot;,
+        &amp;quot;quantity&amp;quot;,
+        &amp;quot;unit_type&amp;quot;,
+        &amp;quot;gross_amount&amp;quot;,
+        &amp;quot;net_amount&amp;quot;,
+        &amp;quot;discount_amount&amp;quot;,
+        &amp;quot;repository&amp;quot;,
+        }
+        
+        
+        def parse_float(value: str) -&amp;gt; float:
+        if not value or not value.strip():
+        return 0.0
+        return float(value)
+        
+        
+        def parse_args() -&amp;gt; argparse.Namespace:
+        parser = argparse.ArgumentParser(
+        description=&amp;quot;Parse a GitHub summarized usage CSV and rank repositories by cost.&amp;quot;
+        )
+        parser.add_argument(&amp;quot;csv_file&amp;quot;, type=Path, help=&amp;quot;Path to summarized usage CSV&amp;quot;)
+        parser.add_argument(
+        &amp;quot;--top&amp;quot;,
+        type=int,
+        default=10,
+        metavar=&amp;quot;N&amp;quot;,
+        help=&amp;quot;Number of repositories to show in ranking (default: 10)&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--product&amp;quot;,
+        help=&amp;quot;Filter rows by product (e.g. actions, git_lfs)&amp;quot;,
+        )
+        parser.add_argument(&amp;quot;--sku&amp;quot;, help=&amp;quot;Filter rows by SKU&amp;quot;)
+        parser.add_argument(
+        &amp;quot;--from&amp;quot;,
+        dest=&amp;quot;date_from&amp;quot;,
+        metavar=&amp;quot;YYYY-MM-DD&amp;quot;,
+        help=&amp;quot;Include rows on or after this date&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--to&amp;quot;,
+        dest=&amp;quot;date_to&amp;quot;,
+        metavar=&amp;quot;YYYY-MM-DD&amp;quot;,
+        help=&amp;quot;Include rows on or before this date&amp;quot;,
+        )
+        parser.add_argument(
+        &amp;quot;--json&amp;quot;,
+        action=&amp;quot;store_true&amp;quot;,
+        help=&amp;quot;Emit structured JSON instead of formatted text&amp;quot;,
+        )
+        return parser.parse_args()
+        
+        
+        def load_rows(path: Path) -&amp;gt; list[dict[str, str]]:
+        if not path.is_file():
+        print(f&amp;quot;Error: file not found: {path}&amp;quot;, file=sys.stderr)
+        sys.exit(1)
+        
+        with path.open(newline=&amp;quot;&amp;quot;, encoding=&amp;quot;utf-8-sig&amp;quot;) as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+        print(f&amp;quot;Error: {path} is empty or has no header row&amp;quot;, file=sys.stderr)
+        sys.exit(1)
+        
+        missing = REQUIRED_COLUMNS - set(reader.fieldnames)
+        if missing:
+        missing_list = &amp;quot;, &amp;quot;.join(sorted(missing))
+        print(
+        f&amp;quot;Error: {path} is missing required columns: {missing_list}&amp;quot;,
+        file=sys.stderr,
+        )
+        sys.exit(1)
+        
+        return list(reader)
+        
+        
+        def filter_rows(
+        rows: list[dict[str, str]],
+        *,
+        product: str | None,
+        sku: str | None,
+        date_from: str | None,
+        date_to: str | None,
+        ) -&amp;gt; list[dict[str, str]]:
+        filtered: list[dict[str, str]] = []
+        for row in rows:
+        if product and row[&amp;quot;product&amp;quot;] != product:
+        continue
+        if sku and row[&amp;quot;sku&amp;quot;] != sku:
+        continue
+        if date_from and row[&amp;quot;date&amp;quot;] &amp;lt; date_from:
+        continue
+        if date_to and row[&amp;quot;date&amp;quot;] &amp;gt; date_to:
+        continue
+        filtered.append(row)
+        return filtered
+        
+        
+        @dataclass
+        class SkuBreakdown:
+        sku: str
+        unit_type: str
+        quantity: float = 0.0
+        gross_amount: float = 0.0
+        
+        
+        @dataclass
+        class RepoUsage:
+        repository: str
+        gross_amount: float = 0.0
+        net_amount: float = 0.0
+        discount_amount: float = 0.0
+        row_count: int = 0
+        skus: dict[tuple[str, str], SkuBreakdown] = field(default_factory=dict)
+        
+        def add_row(self, row: dict[str, str]) -&amp;gt; None:
+        gross = parse_float(row[&amp;quot;gross_amount&amp;quot;])
+        net = parse_float(row[&amp;quot;net_amount&amp;quot;])
+        discount = parse_float(row[&amp;quot;discount_amount&amp;quot;])
+        quantity = parse_float(row[&amp;quot;quantity&amp;quot;])
+        sku = row[&amp;quot;sku&amp;quot;]
+        unit_type = row[&amp;quot;unit_type&amp;quot;]
+        
+        self.gross_amount += gross
+        self.net_amount += net
+        self.discount_amount += discount
+        self.row_count += 1
+        
+        key = (sku, unit_type)
+        if key not in self.skus:
+        self.skus[key] = SkuBreakdown(sku=sku, unit_type=unit_type)
+        breakdown = self.skus[key]
+        breakdown.quantity += quantity
+        breakdown.gross_amount += gross
+        
+        
+        def aggregate_by_repo(rows: list[dict[str, str]]) -&amp;gt; list[RepoUsage]:
+        repos: dict[str, RepoUsage] = {}
+        for row in rows:
+        repository = row[&amp;quot;repository&amp;quot;].strip() or &amp;quot;(unknown)&amp;quot;
+        if repository not in repos:
+        repos[repository] = RepoUsage(repository=repository)
+        repos[repository].add_row(row)
+        
+        return sorted(repos.values(), key=lambda repo: repo.gross_amount, reverse=True)
+        
+        
+        def is_storage_row(row: dict[str, str]) -&amp;gt; bool:
+        return &amp;quot;storage&amp;quot; in row[&amp;quot;sku&amp;quot;].lower()
+        
+        
+        @dataclass
+        class RepoStorage:
+        repository: str
+        quantity: float = 0.0
+        gross_amount: float = 0.0
+        row_count: int = 0
+        skus: dict[str, SkuBreakdown] = field(default_factory=dict)
+        
+        def add_row(self, row: dict[str, str]) -&amp;gt; None:
+        gross = parse_float(row[&amp;quot;gross_amount&amp;quot;])
+        quantity = parse_float(row[&amp;quot;quantity&amp;quot;])
+        sku = row[&amp;quot;sku&amp;quot;]
+        unit_type = row[&amp;quot;unit_type&amp;quot;]
+        
+        self.gross_amount += gross
+        self.quantity += quantity
+        self.row_count += 1
+        
+        if sku not in self.skus:
+        self.skus[sku] = SkuBreakdown(sku=sku, unit_type=unit_type)
+        breakdown = self.skus[sku]
+        breakdown.quantity += quantity
+        breakdown.gross_amount += gross
+        
+        
+        def aggregate_storage_by_repo(rows: list[dict[str, str]]) -&amp;gt; list[RepoStorage]:
+        repos: dict[str, RepoStorage] = {}
+        for row in rows:
+        if not is_storage_row(row):
+        continue
+        repository = row[&amp;quot;repository&amp;quot;].strip() or &amp;quot;(unknown)&amp;quot;
+        if repository not in repos:
+        repos[repository] = RepoStorage(repository=repository)
+        repos[repository].add_row(row)
+        
+        return sorted(repos.values(), key=lambda repo: repo.quantity, reverse=True)
+        
+        
+        def storage_repo_payload(repo: RepoStorage, total_storage: float) -&amp;gt; dict:
+        return {
+        &amp;quot;repository&amp;quot;: repo.repository,
+        &amp;quot;quantity_gigabyte_hours&amp;quot;: repo.quantity,
+        &amp;quot;gross_amount&amp;quot;: repo.gross_amount,
+        &amp;quot;percent_of_total_storage&amp;quot;: (
+        (repo.quantity / total_storage * 100) if total_storage else 0.0
+        ),
+        &amp;quot;row_count&amp;quot;: repo.row_count,
+        &amp;quot;skus&amp;quot;: [
+        {
+        &amp;quot;sku&amp;quot;: item.sku,
+        &amp;quot;unit_type&amp;quot;: item.unit_type,
+        &amp;quot;quantity&amp;quot;: item.quantity,
+        &amp;quot;gross_amount&amp;quot;: item.gross_amount,
+        }
+        for item in sorted(repo.skus.values(), key=lambda sku_item: sku_item.quantity, reverse=True)
+        ],
+        }
+        
+        
+        def format_money(amount: float) -&amp;gt; str:
+        return f&amp;quot;${amount:.4f}&amp;quot;
+        
+        
+        def format_percent(part: float, whole: float) -&amp;gt; str:
+        if whole == 0:
+        return &amp;quot;0.0%&amp;quot;
+        return f&amp;quot;{(part / whole) * 100:.1f}%&amp;quot;
+        
+        
+        def print_storage_table(storage_repos: list[RepoStorage], top: int) -&amp;gt; None:
+        print(&amp;quot;Top repositories by storage&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 28)
+        
+        if not storage_repos:
+        print(&amp;quot;No storage usage found.&amp;quot;)
+        print()
+        return
+        
+        total_storage = sum(repo.quantity for repo in storage_repos)
+        print(
+        f&amp;quot;{&apos;#&apos;:&amp;gt;3}  {&apos;Repository&apos;:&amp;lt;26} {&apos;GB-hours&apos;:&amp;gt;10} {&apos;%&apos;:&amp;gt;7} {&apos;Gross&apos;:&amp;gt;10} {&apos;Rows&apos;:&amp;gt;5}&amp;quot;
+        )
+        for index, repo in enumerate(storage_repos[:top], start=1):
+        print(
+        f&amp;quot;{index:&amp;gt;3}  {repo.repository:&amp;lt;26} &amp;quot;
+        f&amp;quot;{repo.quantity:&amp;gt;10.2f} &amp;quot;
+        f&amp;quot;{format_percent(repo.quantity, total_storage):&amp;gt;7} &amp;quot;
+        f&amp;quot;{format_money(repo.gross_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{repo.row_count:&amp;gt;5}&amp;quot;
+        )
+        print()
+        
+        
+        def print_text_report(
+        path: Path,
+        rows: list[dict[str, str]],
+        repos: list[RepoUsage],
+        storage_repos: list[RepoStorage],
+        top: int,
+        ) -&amp;gt; None:
+        total_gross = sum(repo.gross_amount for repo in repos)
+        total_net = sum(repo.net_amount for repo in repos)
+        dates = [row[&amp;quot;date&amp;quot;] for row in rows]
+        date_range = f&amp;quot;{min(dates)} to {max(dates)}&amp;quot; if dates else &amp;quot;n/a&amp;quot;
+        
+        print(&amp;quot;GitHub Usage Report&amp;quot;)
+        print(&amp;quot;=&amp;quot; * 19)
+        print(f&amp;quot;File: {path.name}&amp;quot;)
+        print(f&amp;quot;Period: {date_range} ({len(rows)} rows)&amp;quot;)
+        print(f&amp;quot;Total gross: {format_money(total_gross)}   Total net: {format_money(total_net)}&amp;quot;)
+        print()
+        
+        if not repos:
+        print(&amp;quot;No matching usage rows found.&amp;quot;)
+        return
+        
+        print(&amp;quot;Top repositories by gross amount&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 32)
+        print(f&amp;quot;{&apos;#&apos;:&amp;gt;3}  {&apos;Repository&apos;:&amp;lt;26} {&apos;Gross&apos;:&amp;gt;10} {&apos;%&apos;:&amp;gt;7} {&apos;Net&apos;:&amp;gt;10} {&apos;Rows&apos;:&amp;gt;5}&amp;quot;)
+        for index, repo in enumerate(repos[:top], start=1):
+        print(
+        f&amp;quot;{index:&amp;gt;3}  {repo.repository:&amp;lt;26} &amp;quot;
+        f&amp;quot;{format_money(repo.gross_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{format_percent(repo.gross_amount, total_gross):&amp;gt;7} &amp;quot;
+        f&amp;quot;{format_money(repo.net_amount):&amp;gt;10} &amp;quot;
+        f&amp;quot;{repo.row_count:&amp;gt;5}&amp;quot;
+        )
+        
+        print()
+        print_storage_table(storage_repos, top)
+        print(&amp;quot;Details for top repos&amp;quot;)
+        print(&amp;quot;-&amp;quot; * 19)
+        for repo in repos[:top]:
+        print(f&amp;quot;{repo.repository} ({format_money(repo.gross_amount)} gross)&amp;quot;)
+        sku_items = sorted(repo.skus.values(), key=lambda item: item.gross_amount, reverse=True)
+        for item in sku_items:
+        print(
+        f&amp;quot;  {item.sku:&amp;lt;22} {item.quantity:&amp;gt;10.2f} {item.unit_type:&amp;lt;16} &amp;quot;
+        f&amp;quot;{format_money(item.gross_amount):&amp;gt;10}&amp;quot;
+        )
+        print()
+        
+        
+        def print_json_report(
+        path: Path,
+        rows: list[dict[str, str]],
+        repos: list[RepoUsage],
+        storage_repos: list[RepoStorage],
+        top: int,
+        ) -&amp;gt; None:
+        total_gross = sum(repo.gross_amount for repo in repos)
+        total_net = sum(repo.net_amount for repo in repos)
+        total_storage = sum(repo.quantity for repo in storage_repos)
+        dates = [row[&amp;quot;date&amp;quot;] for row in rows]
+        
+        payload = {
+        &amp;quot;file&amp;quot;: str(path),
+        &amp;quot;row_count&amp;quot;: len(rows),
+        &amp;quot;date_from&amp;quot;: min(dates) if dates else None,
+        &amp;quot;date_to&amp;quot;: max(dates) if dates else None,
+        &amp;quot;total_gross_amount&amp;quot;: total_gross,
+        &amp;quot;total_net_amount&amp;quot;: total_net,
+        &amp;quot;total_storage_gigabyte_hours&amp;quot;: total_storage,
+        &amp;quot;repositories&amp;quot;: [
+        {
+        &amp;quot;rank&amp;quot;: index,
+        &amp;quot;repository&amp;quot;: repo.repository,
+        &amp;quot;gross_amount&amp;quot;: repo.gross_amount,
+        &amp;quot;net_amount&amp;quot;: repo.net_amount,
+        &amp;quot;discount_amount&amp;quot;: repo.discount_amount,
+        &amp;quot;row_count&amp;quot;: repo.row_count,
+        &amp;quot;percent_of_total_gross&amp;quot;: (
+        (repo.gross_amount / total_gross * 100) if total_gross else 0.0
+        ),
+        &amp;quot;skus&amp;quot;: [
+        {
+        &amp;quot;sku&amp;quot;: item.sku,
+        &amp;quot;unit_type&amp;quot;: item.unit_type,
+        &amp;quot;quantity&amp;quot;: item.quantity,
+        &amp;quot;gross_amount&amp;quot;: item.gross_amount,
+        }
+        for item in sorted(
+        repo.skus.values(),
+        key=lambda sku_item: sku_item.gross_amount,
+        reverse=True,
+        )
+        ],
+        }
+        for index, repo in enumerate(repos[:top], start=1)
+        ],
+        &amp;quot;storage_repositories&amp;quot;: [
+        {&amp;quot;rank&amp;quot;: index, **storage_repo_payload(repo, total_storage)}
+        for index, repo in enumerate(storage_repos[:top], start=1)
+        ],
+        }
+        print(json.dumps(payload, indent=2))
+        
+        
+        def main() -&amp;gt; None:
+        args = parse_args()
+        rows = load_rows(args.csv_file)
+        filtered = filter_rows(
+        rows,
+        product=args.product,
+        sku=args.sku,
+        date_from=args.date_from,
+        date_to=args.date_to,
+        )
+        repos = aggregate_by_repo(filtered)
+        storage_repos = aggregate_storage_by_repo(filtered)
+        
+        if args.json:
+        print_json_report(args.csv_file, filtered, repos, storage_repos, args.top)
+        else:
+        print_text_report(args.csv_file, filtered, repos, storage_repos, args.top)
+        
+        
+        if __name__ == &amp;quot;__main__&amp;quot;:
+        main()
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can also find this here: &lt;a href=&quot;https://github.com/cfjedimaster/pythondemos/tree/main/ghusageparser&quot;&gt;https://github.com/cfjedimaster/pythondemos/tree/main/ghusageparser&lt;/a&gt;. Note that this uses no external dependencies outside of standard library modules. Usage is simple:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;python -h
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which gives:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai2.png&quot; loading=&quot;lazy&quot; alt=&quot;Help text from CLI tool&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Honestly, none of those arguments were ideas I had but they all make sense. And here&apos;s how the report looks:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/ai3.png&quot; loading=&quot;lazy&quot; alt=&quot;Help text from CLI tool&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The &apos;culprit&apos; was &lt;code&gt;testing-boxlang-desktop&lt;/code&gt; which as I said, was just for testing, so easy to delete. Honestly, &lt;code&gt;tweetback&lt;/code&gt; surprised me. This is a repo I created as an export from Twitter and apparently it&apos;s got a lot of media. I didn&apos;t delete it - but may do so in the future.&lt;/p&gt;
+        &lt;p&gt;Anyway, let me know what you think and if this could be helpful to you!&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@simonkadula?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Simon Kadula&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-factory-filled-with-lots-of-orange-machines-8gr6bObQLOI?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Links For You (6/21/26)</title>
+      <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
+      <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
+        &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;First up is a presentation by Thomas Steiner demonstrating Chrome built-in AI APIs doing language detection and translation for Mastodon. I&apos;m a pretty big fan of those APIs (my last presentation was on them!) so I enjoyed this quite a bit. Thomas has been a &lt;em&gt;big&lt;/em&gt; help with my demos and posts on these APIs and is a scary smart dev.&lt;/p&gt;
+        &lt;lite-youtube videoid=&quot;-l2BUUdBDS8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/-l2BUUdBDS8/hqdefault.jpg&apos;);&quot;&gt;
+        &lt;a href=&quot;https://youtube.com/watch?v=-l2BUUdBDS8&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
+        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
+        &lt;/a&gt;
+        &lt;/lite-youtube&gt;
+        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
+        &lt;p&gt;
+        &lt;h2 id=&quot;datatype---text-into-charts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#datatype---text-into-charts&quot;&gt;Datatype - Text into Charts&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Next is &lt;a href=&quot;https://franktisellano.github.io/datatype/&quot;&gt;Datatype&lt;/a&gt;, a font that creates charts. Seriously. For example:&lt;/p&gt;
+        &lt;style&gt;
+        @font-face {
+        font-family: &apos;Datatype&apos;;
+        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
+        font-weight: 100 900;      /* Variable weight axis */
+        font-stretch: 0% 100%;     /* Variable width axis */
+        font-display: swap;
+        }
+        
+        .chart {
+        font-family: &apos;Datatype&apos;, monospace;
+        }
+        &lt;/style&gt;
+        &lt;p&gt;Sales &lt;span class=&quot;chart&quot;&gt;{l:20,45,60,55,80,95}&lt;/span&gt; are up this quarter.&lt;/p&gt;
+        &lt;p&gt;And this was driven by CSS and text:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;style&amp;gt;
+        @font-face {
+        font-family: &apos;Datatype&apos;;
+        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
+        font-weight: 100 900;      /* Variable weight axis */
+        font-stretch: 0% 100%;     /* Variable width axis */
+        font-display: swap;
+        }
+        
+        .chart {
+        font-family: &apos;Datatype&apos;, monospace;
+        }
+        &amp;lt;/style&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;chart&amp;quot;&amp;gt;{l:20,45,60,55,80,95}&amp;lt;/span&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It supports bar charts, sparklines, and pie charts. As it&apos;s just text, in theory it would be easy to animate and make it &apos;live&apos; with just a bit of JavaScript.&lt;/p&gt;
+        &lt;h2 id=&quot;you-don&apos;t-know-html-lists&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#you-don&apos;t-know-html-lists&quot;&gt;You Don&apos;t Know HTML Lists&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Finally there&apos;s a spectacular deep dive into HTML lists by Frank Taylor, &lt;a href=&quot;https://blog.frankmtaylor.com/2026/05/13/you-dont-know-html-lists/&quot;&gt;You don&apos;t know HTML lists&lt;/a&gt;. You know this is going to be a great article with a sentence like this in the intro:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;We&apos;re skipping over the MDN and W3Schools introductory pages and instead we&apos;re going into the kind of stuff you discover after accidentally taking your cousin&apos;s Ritalin right before you open up the W3C specs.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;I knew maybe... half of this? Maybe a bit more? Either way, it&apos;s a damn good investigation into a part of HTML you may not know even got that complex.&lt;/p&gt;
+        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Looking for your next read? Are you mostly through your current book and getting a bit of anxiety over whether or not you&apos;ll have your next read as soon as you finish? Good news, you&apos;re in luck. I&apos;ve spoken about Scott Stroz in the past (and linked to some of his cool blogs too), he&apos;s one of my oldest, and best friends. He&apos;s a father as well to two incredible kids, one of which just released his first novel, &amp;quot;The Dreaded.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;
+        &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;&lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/dreaded.png&quot; loading=&quot;lazy&quot; alt=&quot;The Dreaded cover&quot; class=&quot;imgborder imgcenter&quot;&gt;&lt;/a&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Tyler&apos;s shared some of his works for me in the past so as soon as this one became available, I went ahead and purchased a copy for myself. Grab your &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;copy&lt;/a&gt; today - available on Kindle, paper and hardback.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Building a Form Handling Service in Val Town</title>
+      <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
+      <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
+        &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- random form on your site --&amp;gt;
+        &amp;lt;form action=&amp;quot;https://formspree.io/f/{form_id}&amp;quot; method=&amp;quot;post&amp;quot;&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Your Email&amp;lt;/label&amp;gt;
+        &amp;lt;input name=&amp;quot;Email&amp;quot; id=&amp;quot;email&amp;quot; type=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Submit&amp;lt;/button&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Emailing isn&apos;t the only option for processing the result of course. Formspree&apos;s home page lists a bunch of integrations you can use, like Airtable and Google Sheets. Another feature of these services is that various form fields will trigger different behaviors. For example, I can use a hidden form field to set where the form should redirect to after submission. Or, if there is a field named &lt;code&gt;email&lt;/code&gt;, when the form data is sent to the site owner, set the reply value to that value.&lt;/p&gt;
+        &lt;p&gt;So with that in mind, a few days ago, the Val Town folks &lt;a href=&quot;https://blog.val.town/talk-of-the-town-june-2026&quot;&gt;blogged&lt;/a&gt; about various examples in the community (I had a few included too!). In that blog, they shared this post:&lt;/p&gt;
+        &lt;blockquote class=&quot;bluesky-embed&quot; data-bluesky-uri=&quot;at://did:plc:thuylqmisypnmekwzfgymm3z/app.bsky.feed.post/3moaamfpx4u27&quot; data-bluesky-cid=&quot;bafyreiba65vlw52hti437sou5yvsrclt6jzgovgqbzj6xyutp7kfdirbxa&quot; data-bluesky-embed-color-mode=&quot;system&quot;&gt;&lt;p lang=&quot;en&quot;&gt;I run my forms now via a free val.town instance, very easy to setup with ai and no lock in&lt;/p&gt;&amp;mdash; meta (&lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z?ref_src=embed&quot;&gt;@metaend.eth.xyz&lt;/a&gt;) &lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z/post/3moaamfpx4u27?ref_src=embed&quot;&gt;June 14, 2026 at 2:27 AM&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://embed.bsky.app/static/embed.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;That clicked with me - &lt;em&gt;of course&lt;/em&gt; Val Town would be a great solution for handling form posts - and I wondered - could we build a &lt;em&gt;generic&lt;/em&gt; service such that any form could use it?&lt;/p&gt;
+        &lt;p&gt;I came up with the following requirements:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;First and foremost - the implementation should respond to regular form posts. In other words, I didn&apos;t want to build an API that would require JavaScript code in the form. Instead I wanted to follow the lead of services like Formspree and let you simply point your &apos;vanilla&apos; form to a specific URL.&lt;/li&gt;
+        &lt;li&gt;The form should allow me to specify who gets the result. That&apos;s a huge security issue of course, so my service will have a white list of allowed email addresses.&lt;/li&gt;
+        &lt;li&gt;The form should allow me to specify where to redirect after submission. Like the above, this could be a security issue, so my service will have a white list of URLs that allow for partial matching, so you can allow foo.com for example and any redirect &lt;em&gt;under&lt;/em&gt; that would work.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;So far so good? Alright, let&apos;s look at the implementation.&lt;/p&gt;
+        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show me the code!&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;ll link to the Val itself when done, but here&apos;s the entirety of the code, tied to a HTTP trigger so it can actually be used in forms:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
+        
+        /*
+        We are only allowed to send to one of these.
+        */
+        const SAFE_EMAILS_TO = [
+        &amp;quot;raymondcamden@gmail.com&amp;quot;,
+        &amp;quot;rcamden@gmail.com&amp;quot;,
+        ];
+        
+        /*
+        A URL that is matched against redirects - the redirect must match the domain, well anything _after_ the input
+        */
+        const SAFE_REDIRECT_TO = [
+        &amp;quot;https://boring-morning-yak.codepen.app&amp;quot;,
+        ];
+        
+        /*
+        The &apos;special keys&apos; don&apos;t need to be in the form email.
+        */
+        const SPECIAL_KEYS = [&amp;quot;_send&amp;quot;, &amp;quot;_redirect&amp;quot;, &amp;quot;_formname&amp;quot;];
+        
+        /*
+        Every form must have a _send and _redirect field. Later we may add more validations.
+        Like validating _redirect. Duh.
+        */
+        function verifyForm(f) {
+        console.log(&amp;quot;verifyForm&amp;quot;, f.get(&amp;quot;_send&amp;quot;), f.get(&amp;quot;_redirect&amp;quot;));
+        
+        if (!f.get(&amp;quot;_send&amp;quot;) || f.get(&amp;quot;_send&amp;quot;).length === 0) return false;
+        if (!f.get(&amp;quot;_redirect&amp;quot;) || f.get(&amp;quot;_redirect&amp;quot;).length === 0) return false;
+        
+        // ensure the email is ok
+        if(SAFE_EMAILS_TO.indexOf(f.get(&amp;quot;_send&amp;quot;)) === -1) return false;
+        
+        //now ensure _redirect matches against at least one
+        let validRedirect = false;
+        const redirect = f.get(&amp;quot;_redirect&amp;quot;).toLowerCase();
+        
+        SAFE_REDIRECT_TO.forEach((u) =&amp;gt; {
+        u = u.toLowerCase();
+        if (redirect.startsWith(u)) validRedirect = true;
+        });
+        
+        return validRedirect;
+        }
+        
+        /*
+        As there are multiple things that can go wrong, here&apos;s the general
+        error handler. As this is meant for Form POSTs, its ok to give a simple response.
+        */
+        function returnError() {
+        return new Response(
+        &amp;quot;&amp;lt;!doctype html&amp;gt;&amp;lt;meta charset=utf-8&amp;gt;&amp;lt;title&amp;gt;500&amp;lt;/title&amp;gt;&amp;lt;h1&amp;gt;500 — Server Error&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Sorry, something broke on our end.&amp;lt;/p&amp;gt;&amp;quot;,
+        { status: 500, headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;text/html; charset=utf-8&amp;quot; } },
+        );
+        }
+        
+        export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        let formData;
+        const obj: Record&amp;lt;string, string&amp;gt; = {};
+        
+        try {
+        formData = await req.formData();
+        console.log(&amp;quot;fd&amp;quot;, formData);
+        } catch (_e) {
+        return returnError();
+        }
+        
+        if (!verifyForm(formData)) return returnError();
+        
+        const redirect = formData.get(&amp;quot;_redirect&amp;quot;);
+        
+        let formName = &amp;quot;&amp;quot;;
+        /*
+        One special field is _formname. If we have it, we include it
+        in the subject + email
+        */
+        
+        if (formData.get(&amp;quot;_formname&amp;quot;)) {
+        formName = formData.get(&amp;quot;_formname&amp;quot;);
+        } else {
+        formName = `Form at ${req.headers.get(&amp;quot;referer&amp;quot;) ?? &amp;quot;unknown&amp;quot;}`;
+        }
+        
+        const subject = `Form submission: ${formName}`;
+        
+        for (const key of new Set(formData.keys())) {
+        obj[key] = formData.getAll(key).map(String).join(&amp;quot;, &amp;quot;);
+        }
+        
+        let html = `
+        &amp;lt;h2&amp;gt;Form Submission - ${formName}&amp;lt;/h2&amp;gt; 
+        &amp;lt;table&amp;gt;
+        `;
+        
+        for (const [key, value] of Object.entries(obj)) {
+        console.log(key, value);
+        if (SPECIAL_KEYS.indexOf(key) === -1) {
+        html += `
+        &amp;lt;tr&amp;gt;&amp;lt;td style=&amp;quot;min-width:300px&amp;quot;&amp;gt;${key}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;${value}&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        `;
+        }
+        }
+        
+        html += `
+        &amp;lt;/table&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        Form submitted at ${new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, { dateStyle: &amp;quot;short&amp;quot;, timeStyle: &amp;quot;short&amp;quot;, timeZone: &amp;quot;America/Chicago&amp;quot; }).format(new Date())}.
+        &amp;lt;/p&amp;gt;
+        `;
+        
+        console.log(html);
+        
+        const emailOptions = {
+        // to: &amp;quot;someone_else@example.com&amp;quot;, this would be formData.get(&apos;_email&apos;)
+        html,
+        subject,
+        };
+        
+        if (obj[&amp;quot;email&amp;quot;]) emailOptions.replyTo = obj[&amp;quot;email&amp;quot;];
+        
+        await email(emailOptions);
+        
+        return new Response(null, {
+        status: 303,
+        headers: { Location: redirect },
+        });
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Up on top, you can see the various security variables I use to ensure the service can&apos;t be abused. I&apos;ve got a list of emails that can receive the form data and a list of URLs where the user can be redirected. Again, the URLs are partially matched so you can do anything as long as it matches at the beginning.&lt;/p&gt;
+        &lt;p&gt;The next variable, &lt;code&gt;SPECIAL_KEYS&lt;/code&gt;, is just used to filter out the &apos;meta&apos; values for my service and not include them in the email. This just reduces the noise for the reader.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;verifyForm&lt;/code&gt; handles checking our two required form fields. &lt;code&gt;_send&lt;/code&gt; sets the recipient of the form data and &lt;code&gt;_redirect&lt;/code&gt; handles where to go when done. For both, they have to exist, and then I check for valid values against the two variables defined on top of the script.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;returnError&lt;/code&gt; is just a utility function to render an error. This can happen if the form didn&apos;t have the required, or correct values, or if there is an error reading the form data. I use a simple 500 error but I could imagine redirecting to an error page on the calling site instead.&lt;/p&gt;
+        &lt;p&gt;Finally - the core default function does the real work. I get my form data, verify it, and then create an email. I&apos;ve got code that looks for a hidden form field, &lt;code&gt;_formname&lt;/code&gt;, which lets you give a nice label to the email.&lt;/p&gt;
+        &lt;p&gt;The only real tricky part here is handling multi-value form fields, like checkboxes for example. The &lt;code&gt;for&lt;/code&gt; loop over &lt;code&gt;formData.keys()&lt;/code&gt; handles this and I&apos;ve got Val Town&apos;s AI service to thank for the help here. I had an idea of how I was going to handle this, but the AI service suggested the code you see and honestly it was much better than what I would have written. More on the AI stuff in a second.&lt;/p&gt;
+        &lt;p&gt;The last bit is just the email. Now, in a &amp;quot;real&amp;quot; implementation of this, I&apos;d use an email service instead of Val&apos;s built-in service, but it works well enough for this demo. You can see the &lt;a href=&quot;https://docs.val.town/reference/std/email/&quot;&gt;docs&lt;/a&gt; for their service to understand exactly what it can and cannot do, but the big thing for this demo is that I&apos;m on the free tier so I can&apos;t specify the &apos;to&apos; value. Note that I look for &lt;code&gt;email&lt;/code&gt; in the form and if set, use that as the &lt;code&gt;replyTo&lt;/code&gt; value. I call that out in my code so just note if you fork my Val and use it yourself, change this if you are on the paid tier. Or switch to an email service. You get the idea.&lt;/p&gt;
+        &lt;h2 id=&quot;the-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-demo&quot;&gt;The Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, finally, I built a simple CodePen form to show this in action: &lt;a href=&quot;https://boring-morning-yak.codepen.app/&quot;&gt;https://boring-morning-yak.codepen.app/&lt;/a&gt;. On this page you will see three forms. The first one is intentionally bad and results in a 500. The next two should work and will email me so - thanks for that. ;)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example of the email sent out:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/form1.png&quot; loading=&quot;lazy&quot; alt=&quot;Sample form result&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;h2 id=&quot;final-thoughts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#final-thoughts&quot;&gt;Final Thoughts&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, before I ramble on a bit, you can find my val here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/form-bouncer&quot;&gt;https://www.val.town/x/raymondcamden/form-bouncer&lt;/a&gt;. If you use it, let me know! Now for some things to consider.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;My form does not handle file attachments. It &lt;em&gt;could&lt;/em&gt;, but you would need something a bit more complex for that. Val Town has blob support so you could store it there, but I&apos;d probably consider a private S3/R2 bucket instead. You could generate a link and include it in the email. You would have to also build something to handle removing old files from the bucket eventually. You would also want to sanity check the file types and sizes. Doable - but more work than I wanted to for this demo.&lt;/li&gt;
+        &lt;li&gt;For form fields that can be null, like checkboxes and radio elements, they don&apos;t show up in the email at all. I could imagine a few ways around that. You could use a hidden form field to specify things like that. Maybe: &lt;code&gt;&amp;lt;input name=&amp;quot;_nullField&amp;quot; value=&amp;quot;favoritemovie,favoritefoods&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;. The code would notice if one of these items isn&apos;t present and then render it in the email at least so it&apos;s clear the value was blank.&lt;/li&gt;
+        &lt;li&gt;Another idea I had would be specifying &apos;friendly&apos; labels for form fields. So example, my favorite movie comes out as &lt;code&gt;favoriteMovie: Star Wars&lt;/code&gt;. If the idea here is to make &amp;quot;human readable&amp;quot; form results, I could see perhaps supporting something like this: &lt;code&gt;&amp;lt;input name=&amp;quot;_favoriteMovie_label&amp;quot; value=&amp;quot;Favorite Movie&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;For validation, I&apos;d do that all in the client, and by that I mean HTML first and then JavaScript.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;And finally, Val Town&apos;s had an AI assistant for a while, but I never bothered with it till this demo, and damn was it useful. Not only did it help me with parsing the form object, it also reminded me of various aspects of the Request object that for the life of me I struggle to remember. It was a great companion. I will say on the free tier it doesn&apos;t take long to hit the limit, but I &lt;em&gt;was&lt;/em&gt; able to get all the help I needed before I maxed it out. (I did get to a warning though.) Val Town&apos;s got a lot of good reasons to consider paying for it, and this is just one more. (I don&apos;t have a job and I just build dumb demos, so that&apos;s my excuse. ;)&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Creating a Dynamic Favicon with Cloudinary</title>
+      <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
+      <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/fav1.png&quot; loading=&quot;lazy&quot; alt=&quot;Google Calendar favicon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;As there is - at most - 31 days in a month - my assumption is that they simply generated all 31 at some point and in their code serving up the web page, they select the right one. To be honest, it&apos;s subtle and I don&apos;t always notice it, but it&apos;s a nice effect. I decided to take a look at how I&apos;d implement this in Cloudinary with JavaScript.&lt;/p&gt;
+        &lt;h2 id=&quot;the-icon&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-icon&quot;&gt;The Icon&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;For my icon, I grabbed this nice cat icon from Flaticon: &lt;a href=&quot;https://www.flaticon.com/free-icon/cat_8564642&quot;&gt;https://www.flaticon.com/free-icon/cat_8564642&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Nice and simple, and not a bad choice for an icon.&lt;/p&gt;
+        &lt;p&gt;This was originally a png, which you can use for a favicon, but I used Cloudinary&apos;s URL transformations to both resize it and turn it into an ICO (I added a linebreak to the URL to help it wrap):&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/ 
+        fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The size is handled in &lt;code&gt;c_fit,w_32&lt;/code&gt;, setting it to 32 pixels wide while &lt;code&gt;f_ico&lt;/code&gt; changes the format to ICO.&lt;/p&gt;
+        &lt;h2 id=&quot;adding-text&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-text&quot;&gt;Adding Text&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Cloudinary&apos;s transformations support adding text layers to the image, so the next thing I tried was adding that to the icon:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/
+        fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/
+        https://static.raymondcamden.com/images/2026/06/cat.png
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the URL above, the portion beginning &lt;code&gt;l_text&lt;/code&gt; is where I define my font, size, styling, position and finally, the actual number. I also added an opacity to the icon to make the text stand out. You can see that here, &lt;code&gt;o_33&lt;/code&gt;, where 33 is the percent and was based on me just playing around until I felt the text was most clear.&lt;/p&gt;
+        &lt;p&gt;You can see it here:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This worked well with 99 as well, but at most I think 2 characters is all you would want to fit in there.&lt;/p&gt;
+        &lt;h2 id=&quot;putting-it-together&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-it-together&quot;&gt;Putting it Together&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so for my fancy demo, I started off with a bit of HTML and a hard-coded favicon pointing to my cat:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;./style.css&amp;quot;&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
+        &amp;lt;link id=&amp;quot;favicon&amp;quot; rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/x-icon&amp;quot; href=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png&amp;quot;&amp;gt;
+        &amp;lt;title&amp;gt;Pen&amp;lt;/title&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        
+        &amp;lt;h2&amp;gt;Dynamic Favicon via Cloudinary&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;
+        This demo shows how to dynamically create a favicon
+        via Cloudinary. It uses a source image that&apos;s resized and converted to ICO, but then can also support dynamic text (well, a small amount) written to the icon.
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;button id=&amp;quot;addBtn&amp;quot;&amp;gt;Click me to increase the #&amp;lt;/button&amp;gt;
+        &amp;lt;button id=&amp;quot;resetBtn&amp;quot;&amp;gt;Click me to reset the #&amp;lt;/button&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script src=&amp;quot;./script.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note I&apos;ve got two buttons. Each time you click the add button, I&apos;m going to update the favicon with a number, while the reset button simply resets to the default.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Number used in the favicon
+        let NUMBER = 0;
+        
+        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
+        
+        const $favico = document.querySelector(&apos;#favicon&apos;);
+        const defaultIco = $favico.href;
+        
+        document.querySelector(&apos;#addBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
+        NUMBER++
+        setIco();
+        });
+        
+        document.querySelector(&apos;#resetBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
+        NUMBER = 0;
+        setIco();
+        });
+        
+        const setIco = () =&amp;gt; {
+        if(NUMBER &amp;gt; 0) {
+        $favico.href = `https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:${NUMBER}/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png`;
+        } else {
+        $favico.href = defaultIco;
+        }
+        };
+        
+        }, false);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I grab a pointer to the favicon link in my HTML and copy out the default href value. Then I simply use two event handlers to handle each button. One increases the number, one resets it to 0. The last bit, &lt;code&gt;setIco&lt;/code&gt;, just changes the href value.&lt;/p&gt;
+        &lt;p&gt;You can test this yourself here: &lt;a href=&quot;https://giving-flower-sunfish.codepen.app&quot;&gt;https://giving-flower-sunfish.codepen.app&lt;/a&gt;. In my testing with Chrome, it worked well. I saw the favicon update within about a second of clicking. YMMV of course. I just tested in Firefox and it worked just fine as well.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve embedded the CodePen below, but of course you will need to run the deployed version to see it in action. Enjoy!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Untitled&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRNago&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ed120-9ee6-7141-af43-13ae7c7cc8f1&quot;&gt;
+        Untitled&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Testing Diffbot&apos;s Web Search API</title>
+      <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
+      <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
+        &lt;p&gt;Diffbot&apos;s API (which quietly launched about two weeks ago) is against their own crawled index. Why does this matter? Honestly the docs do a &lt;em&gt;damn&lt;/em&gt; good job of explaining why you should care (emphasis mine):&lt;/p&gt;
+        &lt;p&gt;&amp;quot;Candidates are retrieved and reranked with a cross encoder model trained to rank &lt;strong&gt;factual relevance over popularity&lt;/strong&gt;, primary sources over domain monopolies, and organic page rank over &lt;strong&gt;paid spend&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;The net effect is search results that &lt;strong&gt;assume the user is not an idiot&lt;/strong&gt;. A search for &amp;quot;hypothyroidism&amp;quot; returns relevant research study papers alongside content from publicly administered websites and reputable non-profit institutions.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;Assuming users aren&apos;t idiots?!?!&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/cotton.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Bold move cotton&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Alright, so what&apos;s the API actually like? Cribbing from the docs, you make a &lt;code&gt;GET&lt;/code&gt; to &lt;code&gt;https://llm.diffbot.com/api/v1/web_search/&lt;/code&gt; with:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Your search term as &lt;code&gt;text&lt;/code&gt; in a query param&lt;/li&gt;
+        &lt;li&gt;A max number of results via &lt;code&gt;size&lt;/code&gt; that defaults to 10&lt;/li&gt;
+        &lt;li&gt;An optional &lt;code&gt;maxTokens&lt;/code&gt; value related to processing of the results&lt;/li&gt;
+        &lt;li&gt;Lastly, a Diffbot key passed via an &lt;code&gt;Authorization&lt;/code&gt; header&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As of &lt;em&gt;today&lt;/em&gt;, the API itself has no limits:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;Usage is currently unmetered while we open Web Search API up for public testing.
+        Don&apos;t be the person to screw this up for everyone.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;I&apos;d expect in the future this will change and I&apos;d check their main &lt;a href=&quot;https://docs.diffbot.com/reference/rate-limits&quot;&gt;rate limits doc&lt;/a&gt; for the latest info.&lt;/p&gt;
+        &lt;p&gt;As for actually using it, they&apos;ve got a great &lt;a href=&quot;https://github.com/diffbot/diffbot-python&quot;&gt;Python SDK&lt;/a&gt; which makes this incredibly simple:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from diffbot import Diffbot
+        
+        db = Diffbot(token=&amp;quot;YOUR_TOKEN&amp;quot;)
+        results = db.web_search(&amp;quot;diffbot knowledge graph&amp;quot;)
+        for r in results[&amp;quot;search_results&amp;quot;]:
+        print(r[&amp;quot;score&amp;quot;], r[&amp;quot;title&amp;quot;], r[&amp;quot;pageUrl&amp;quot;])
+        print(r[&amp;quot;content&amp;quot;])
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But with the REST API being so simple, I thought I&apos;d build a quick demo in JavaScript and use my new favorite home for stuff like this, &lt;a href=&quot;https://val.town&quot;&gt;val.town&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;building-a-web-search-alert&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-web-search-alert&quot;&gt;Building a Web Search Alert&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So this is probably the &lt;em&gt;simplest&lt;/em&gt; implementation (and in the last hour the Diffbot team literally added new stuff to the docs, which means more content, woot) but I built a simple system that:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Once a week, hits the Diffbot Web Search API looking for a term&lt;/li&gt;
+        &lt;li&gt;Filters the results based on the score value to only consider higher quality results&lt;/li&gt;
+        &lt;li&gt;Emails it to me&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;You, my highly intelligent reader, are probably already thinking of ways to tweak that, and as I said, I plan to follow up on this (tomorrow probably), but here&apos;s the entirety of the system in one file:&lt;/p&gt;
+        &lt;iframe width=&quot;100%&quot; height=&quot;600px&quot; src=&quot;https://www.val.town/embed/x/raymondcamden/diffbot-search-alert/main.ts&quot; title=&quot;Val Town&quot; frameborder=&quot;0&quot; allow=&quot;web-share&quot; allowfullscreen&gt;&lt;/iframe&gt;
+        &lt;p&gt;I&apos;ve got my key in an environment variable I snag first, and then define some core values:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;My search term (and yes, you can craft more complex queries than just my name)&lt;/li&gt;
+        &lt;li&gt;A max number of results&lt;/li&gt;
+        &lt;li&gt;A filter to apply on the results&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Then it&apos;s just a matter of hitting the endpoint. I take the results and filter based on my minimum desired value (scores go from 0 to 1 and in my testing, 0.5 helped).&lt;/p&gt;
+        &lt;p&gt;Each result contains the URL of the result, the title, the score, and a portion of the content. For my email, I show each of the values, but I was a bit torn on how to handle the &lt;code&gt;content&lt;/code&gt; value. It&apos;s markdown and I can easily turn Markdown into HTML, but it&apos;s a part of a web page and greatly screws up an HTML email.&lt;/p&gt;
+        &lt;p&gt;So how does it look?&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/df1.png&quot; loading=&quot;lazy&quot; alt=&quot;Email example&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Ok, that&apos;s not &lt;em&gt;terribly&lt;/em&gt; exciting, but you get the idea. I think where this starts to get cool is in combination with other tools as well. You will probably &lt;em&gt;not&lt;/em&gt; be surprised to know this is covered in their &lt;a href=&quot;https://github.com/diffbot/diffbot-skills&quot;&gt;AI skills&lt;/a&gt; as well, and I&apos;m going to demonstrate that soon as well. Check it out for yourself and let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Can GenAI help you win in Vegas? (2026)</title>
+      <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
+      <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
+        &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
+        &lt;p&gt;To enable this new version, I made a couple of changes. First, I&apos;ve got a new Alpine method to create the AI session. This is responsible for setting up the system instruction for the model as well:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async createSession() {
+        console.log(&apos;createSession running&apos;);
+        this.session = await LanguageModel.create({
+        expectedOutputs: [
+        { type:&apos;text&apos;, languages: [&apos;en&apos;] }
+        ],
+        initialPrompts: [
+        {
+        role: &apos;system&apos;,
+        content:
+        `
+        You are an expert Blackjack advisor helping a player make decisions in a simplified game (no splitting, no doubling down, no surrender). Your goal is to advise the player whether to &apos;Hit&apos; or &apos;Stand&apos; based on standard basic Blackjack strategy.
+        
+        CRITICAL GAME RULES:
+        - Goal: Beat the dealer&apos;s hand value without exceeding 21 (busting).
+        - Card Values: Cards 2-10 are face value. Jack, Queen, and King are worth 10. Aces are worth either 1 or 11, whichever is more beneficial without busting.
+        - Blackjack: A &amp;quot;Blackjack&amp;quot; is strictly a 2-card hand consisting of an Ace and a 10-value card (10, J, Q, K). An Ace and an 8 is just 19, not a Blackjack.
+        - Soft vs. Hard: A hand with an Ace counted as 11 is a &amp;quot;soft&amp;quot; hand (e.g., Ace + 6 = soft 17). Otherwise, it is a &amp;quot;hard&amp;quot; hand.
+        
+        INSTRUCTIONS:
+        You will be provided with the player&apos;s current hand and the dealer&apos;s visible card.
+        Respond strictly in the following format:
+        ACTION: [Choose ONLY &amp;quot;Hit&amp;quot; or &amp;quot;Stand&amp;quot;]
+        REASON: [A brief, one-sentence logical explanation based on standard Blackjack probabilities and the dealer&apos;s visible card]
+        `,
+        },
+        ],
+        monitor(m) {
+        m.addEventListener(&apos;downloadprogress&apos;, (e) =&amp;gt; {
+        if (e.loaded === 0) return;
+        const pct = Math.floor(e.loaded * 100);
+        if(pct !== 0 &amp;amp;&amp;amp; pct !== 100) this.aiHelp = `Downloading model… ${pct}%`;
+        });
+        },
+        });			
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note the level of detail in the system instruction. Initially I had just the initial paragraph and a bit about how to return the results. I took this to the Gemini desktop app and asked this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;I’ve built a web based Blackjack game. It’s a simplified version that doesn’t 
+        include splitting or doubling down. As part of the game, I used Chrome’s 
+        built-in Prompt API to offer advice to the player on whether to hit or stand. 
+        This works *mostly* ok, but I see mistakes, for example, Chrome’s Prompt API 
+        once said an Ace + 8 is a blackjack, when it has to be a face card or 10 as 
+        far as I know. To help me improve the prompt, can you give me a good system 
+        prompt that briefly, but completely, covers the rules, again though ignoring 
+        doubling down/splitting/etc. This is the current system instruction:
+        
+        (I pasted the first version here)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I then took its improved prompt and added it to my code.&lt;/p&gt;
+        &lt;p&gt;Next I had to wire this up to the AI advice button. This is the &lt;code&gt;askForHelp&lt;/code&gt; method and the referenced schema:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const adviceSchema = {
+        type: &apos;object&apos;,
+        properties: {
+        action: { type: &apos;string&apos;, enum:[&apos;HIT&apos;,&apos;STAND&apos;] },
+        reason: { type: &apos;string&apos; }
+        },
+        required: [&apos;action&apos;, &apos;reason&apos;]
+        };
+        
+        async askForHelp() {
+        console.log(&apos;lets call an (AI) friend&apos;);
+        if(!this.session) {
+        console.log(&apos;generating a session&apos;);
+        this.aiHelp = &apos;&amp;lt;i&amp;gt;Creating the AI session.&amp;lt;/i&amp;gt;&apos;;
+        await this.createSession();
+        }
+        this.aiHelp = &apos;&amp;lt;i&amp;gt;Asking our AI friend...&amp;lt;/i&amp;gt;&apos;;
+        
+        let totalOb = this.getCount(this.playerCards);
+        
+        // string to represent my hand, could be 2-5 cards
+        let playerStr = &apos;My hand consists of:\n &apos;;
+        // this could be reduce(), im being lazy
+        this.playerCards.forEach(p =&amp;gt; {
+        playerStr += `${p.value} of ${p.suit.toLowerCase()}\n`;
+        });
+        
+        // string to set the total value for the prompt, helps it
+        let totalStr = &apos;My hand has a total of &apos;;
+        if(totalOb.lowCount === totalOb.highCount) {
+        totalStr += totalOb.lowCount;
+        } else {
+        totalStr += `${totalOb.lowCount} or ${totalOb.highCount}`;
+        }
+        
+        let content = `
+        I&apos;m playing blackjack and the dealer currently has ${this.pcCards[1].value} of ${this.pcCards[1].suit.toLowerCase()}.
+        
+        ${playerStr}
+        
+        ${totalStr} 
+        
+        Should I hit or should I stay?
+        `;
+        console.log(&apos;content&apos;, content);
+        let result = JSON.parse(await this.session.prompt(
+        [{ role: &apos;user&apos;, content }], 
+        { responseConstraint: adviceSchema }
+        ));
+        console.log(result);
+        
+        let resultMsg = `
+        You should ${result.action}. Why?
+        ${result.reason}
+        `;
+        
+        this.aiHelp = &apos;&apos;;
+        this.advice = resultMsg;
+        this.$refs.adviceDialog.showModal();
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Ok, there&apos;s a few things of note going on here. As with the previous version, I take the current game state and turn it into a prompt where I describe my hand. While working on this version I discovered a pretty big flaw from the previous game. When asking AI for advice, I only described two cards max. Now I ensure I describe my entire hand.&lt;/p&gt;
+        &lt;p&gt;Now you may be wondering, why do I get the total value of my hand - shouldn&apos;t the model know how to calculate that? As before, at least in the Prompt API, the answer is no. Initially I removed that bit thinking the system instruction would be enough. But even though my system prompt describes how to get the total of a hand, I still found the model calculating the total wrong. Not all the time, but at least once. So the little helper string went back in.&lt;/p&gt;
+        &lt;p&gt;The other change in this version is a proper schema to shape the response - give me an action (hit or stay) and a reason. This gets turned into a string and passed to my HTML dialog element. Here&apos;s how it looks in action:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/bj2.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from BJ app&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;In case that&apos;s hard to read, the dialog says:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;You should HIT. Why? With a hard 16, you need to improve your hand to stand a chance against the dealer&apos;s strong 10.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;If I remember right, this advice makes sense, but I find it difficult personally to hit on anything 15 and higher. For that particular round I stayed and the dealer won with Blackjack, so I had no chance.&lt;/p&gt;
+        &lt;p&gt;In my next test, the dealer was showing a King of Clubs and I had two Aces and the advice was:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;You should STAND. Why? You have a soft 2 or 12 which is a strong hand, and the dealer has a King, making it unlikely they will have a high hand.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;That seems crazy, so I went ahead and got a new card which ended up being a seven. At that point the AI suggested staying, which I did, and I still lost as the dealer&apos;s other card was a 10.&lt;/p&gt;
+        &lt;p&gt;In my next round, the dealer was showing a queen and I had a 5 and a 9. The AI suggested hitting which I completely agreed with and of course - I busted.&lt;/p&gt;
+        &lt;p&gt;I played a few more times, and generally the model&apos;s suggestions seemed ok. I could see it being useful if I was a complete novice at the game, but I don&apos;t see whipping out my phone and asking AI for help any time soon. (I don&apos;t really game myself, but I assume most casinos have rules against this now. Anyone know offhand?)&lt;/p&gt;
+        &lt;p&gt;What do you think? If you&apos;ve got an up to date Chrome, you can test it here: &lt;a href=&quot;https://codepen.io/cfjedimaster/full/KwNbvPq/afbf4079fe199863f11f75957817fcc8&quot;&gt;https://codepen.io/cfjedimaster/full/KwNbvPq/afbf4079fe199863f11f75957817fcc8&lt;/a&gt;. Note that the first time you download the model it may take 5 to 10 minutes, but that applies across your device as a whole. If you run across another demo using the API you won&apos;t need to download it again.&lt;/p&gt;
+        &lt;p&gt;If you want to take a look at the code, I&apos;ve embedded it below. The dialog I added could &lt;em&gt;really&lt;/em&gt; use some styles so if anyone wants to fork and share, let me know!&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-pen-title=&quot;Blackjack (Chrone AI)&quot; data-default-tab=&quot;html&quot; data-slug-hash=&quot;KwNbvPq&quot; data-user=&quot;cfjedimaster&quot; data-token=&quot;afbf4079fe199863f11f75957817fcc8&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/cfjedimaster/pen/KwNbvPq/afbf4079fe199863f11f75957817fcc8&quot;&gt;
+        Blackjack (Chrone AI)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>AI versus a Grue</title>
+      <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
+      <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
+        &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before I could even begin trying to test AI&apos;s ability to play a 50 year old game (almost 50, Zork 1 launched in 1977), I first needed to find a JavaScript implementation. This turned out to be a bit tricky.&lt;/p&gt;
+        &lt;p&gt;I quickly found &lt;a href=&quot;https://github.com/curiousdannii/ifvms.js&quot;&gt;ifvms.js&lt;/a&gt;, an interactive fiction virtual machine library, but it was tailored to running at the command line. Also, there was little to no documentation on how to make use of the library. The repo mentions another repo, &lt;a href=&quot;https://github.com/curiousdannii/parchment&quot;&gt;parchment&lt;/a&gt; which lets you play games on the web, but I struggled to find documentation there as well, or documentation specific to my use case.&lt;/p&gt;
+        &lt;p&gt;To help, I went to Claude, and had it load &lt;code&gt;ifvms.js&lt;/code&gt; and create a &apos;stubbed&apos; version that I could use via calls like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// all of this loads Zork 1...
+        const res = await fetch(&apos;zork1.b64.txt&apos;);
+        const b64 = await res.text();
+        
+        const binary = atob(b64.trim());
+        const arrayBuffer = new ArrayBuffer(binary.length);
+        const view = new Uint8Array(arrayBuffer);
+        for (let i = 0; i &amp;lt; binary.length; i++) {
+        view[i] = binary.charCodeAt(i);
+        }
+        
+        engine = new ZorkEngine();
+        engine.load(arrayBuffer);
+        
+        // and then later:
+        let gameResponse = engine.getOutput(); // last thing the game did
+        
+        // send a command
+        let lastResponse = engine.send(command);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That source file above mentioned in the first line comes from an online source. Zork itself is open source (&lt;a href=&quot;https://github.com/historicalsource/zork1&quot;&gt;https://github.com/historicalsource/zork1&lt;/a&gt;), but I forget where I got my copy of the source. It&apos;s not a text file, I renamed it to that when initially attempting to build my demo on CodePen. I believe it was pure binary I converted to base64 and then renamed.&lt;/p&gt;
+        &lt;h2 id=&quot;building-the-game&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-the-game&quot;&gt;Building the Game&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So with Claude helping me build the version of &lt;code&gt;ifvms&lt;/code&gt; I could use interactively, I then had to whip up a quick UI and point Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;, which as of Chrome 148 is GA to everyone. (Well, everyone on Chrome.)&lt;/p&gt;
+        &lt;p&gt;My UI was just a giant text area where I&apos;d stream the output from the game and Chrome&apos;s inputs. All of that code is kinda basic, so I&apos;ll focus on the prompt aspect. Here&apos;s how I create my session:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;$session = await LanguageModel.create({
+        initialPrompts:[
+        { 
+        role: &apos;system&apos;, 
+        content: 
+        `
+        You are playing the classic text adventure game Zork. You will be given the current game output, and you will 
+        respond with a single command to play the game. You will not explain your command, just give the command. 
+        
+        Remember to keep your commands concise and to the point, as if you were playing the game yourself. Do not include 
+        any extra text or explanations.
+        
+        Zork is a text-based adventure game where you explore a mysterious underground world filled with treasures, puzzles, 
+        and dangers. Your goal is to navigate through the various locations, solve puzzles, and collect treasures 
+        while avoiding traps and monsters.
+        
+        Here are some examples of commands you might use in Zork:
+        - &amp;quot;go north&amp;quot;
+        - &amp;quot;take lamp&amp;quot;
+        - &amp;quot;open mailbox&amp;quot;
+        - &amp;quot;look around&amp;quot;
+        - &amp;quot;inventory&amp;quot;
+        
+        Do your best to play the game effectively and efficiently, making smart choices based on the current game output.
+        
+        Try not to keep returning to the same location repeatedly, as that can lead to getting stuck in loops. Instead, 
+        explore new areas and try different actions to progress through the game. Remember that you can travel in all directions.
+        `
+        }
+        ],		
+        monitor(m) {
+        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
+        console.log(`Downloaded ${e.loaded * 100}%`);
+        if(e.loaded === 0 || e.loaded === 1) {
+        $output.innerHTML = &apos;&apos;;
+        return;
+        }
+        $output.innerHTML = `Downloading AI model, currently at ${Math.floor(e.loaded * 100)}%`;
+        });
+        }		
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As you can see, a majority of this is the big prompt. I iterated over this multiple times to help guide Chrome to effectively solve the game. (Which to be clear, it never did.)&lt;/p&gt;
+        &lt;p&gt;Outside of that, the main loop of the game is this heartbeat function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function gameHeartBeat() {
+        
+        console.log(&apos;in hb&apos;);
+        let gameResponse = engine.getOutput();
+        if(!gameResponse) gameResponse = lastResponse;
+        
+        if(gameResponse) {
+        $gameoutput.value += gameResponse + &apos;\n&apos;;
+        $gameoutput.scrollTop = $gameoutput.scrollHeight;
+        
+        let command = await $session.prompt(gameResponse);
+        lastResponse = engine.send(command);
+        
+        $gameoutput.value += `&amp;gt; ${command}\n`;
+        $gameoutput.scrollTop = $gameoutput.scrollHeight;
+        
+        console.log(&apos;Resp&apos;,command);
+        setTimeout(gameHeartBeat, 1000 * 2);
+        }
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The variable &lt;code&gt;$gameoutput&lt;/code&gt; is just a DOM pointer to the &lt;code&gt;textarea&lt;/code&gt; used to render the game.&lt;/p&gt;
+        &lt;p&gt;Before going any further, I&apos;ll note a huge issue with my code and that&apos;s the lack of session management. Chrome absolutely provides you a way to monitor that usage and re-init the session when it is nearly filled. I didn&apos;t bother with that because I was being lazy when I built this.&lt;/p&gt;
+        &lt;p&gt;I&apos;d also argue that we could help Chrome&apos;s model quite a bit by keeping track of a list of rooms it has already visited to help it remember and not loop over the same place. My prompt tries to do that, but I could also help it out myself.&lt;/p&gt;
+        &lt;p&gt;All in all - this was a quick implementation and the results were... well what you would expect with a lightweight model and me just hacking quickly on it. ;)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a transcript from a test I just did.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;ZORK I: The Great Underground Empire
+        Infocom interactive fiction - a fantasy story
+        Copyright (c) 1981, 1982, 1983, 1984, 1985, 1986 Infocom, Inc. All rights reserved.
+        ZORK is a registered trademark of Infocom, Inc.
+        Release 119 / Serial number 880429
+        
+        West of House
+        You are standing in an open field west of a white house, with a boarded front door.
+        There is a small mailbox here.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 0
+        &amp;gt; examine mailbox
+        The small mailbox is closed.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 1
+        &amp;gt; open mailbox
+        Opening the small mailbox reveals a leaflet.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 2
+        &amp;gt; read leaflet
+        (Taken)
+        &amp;quot;WELCOME TO ZORK!
+        
+        ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!&amp;quot;
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 3
+        &amp;gt; look around
+        West of House
+        You are standing in an open field west of a white house, with a boarded front door.
+        There is a small mailbox here.
+        
+        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 4
+        &amp;gt; go north
+        North of House
+        You are facing the north side of a white house. There is no door here, and all the windows are boarded up. To the north a narrow path winds through the trees.
+        
+        &amp;gt;                                                                                 North of HouseScore: 0  Turns: 5
+        &amp;gt; go north
+        Forest Path
+        This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 6
+        &amp;gt; examine tree
+        There&apos;s nothing special about the tree.
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 7
+        &amp;gt; go north
+        Clearing
+        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
+        On the ground is a pile of leaves.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 8
+        &amp;gt; take leaves
+        In disturbing the pile of leaves, a grating is revealed.
+        Taken.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 9
+        &amp;gt; open grating
+        The grating is locked.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 10
+        &amp;gt; look around
+        Clearing
+        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
+        There is a grating securely fastened into the ground.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 11
+        &amp;gt; go south
+        Forest Path
+        
+        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 12
+        &amp;gt; go north
+        Clearing
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 13
+        &amp;gt; examine leaves
+        There&apos;s nothing special about the pile of leaves.
+        
+        &amp;gt;                                                                                 ClearingScore: 0  Turns: 14
+        &amp;gt; go south
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In my tests, it never seems to get much further in the game than the outer area, but certainly tries hard, so I guess I&apos;ll give it a gold star for that.&lt;/p&gt;
+        &lt;p&gt;If you want to try this yourself, you can point Chrome at &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/chrome_zork/&quot;&gt;https://cfjedimaster.github.io/webdemos/chrome_zork/&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;If you want to peruse the code yourself, you can check it out here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Now that I&apos;ve got a bit more time on my hands (ahem), I may try hacking on this a bit more, but it was certainly fun to see it in action.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@sortino?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Joshua Sortino&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/photo-of-light-towards-inside-of-cave-rAqzj79GUmA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
+      <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
+      <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
+      <pubDate>Sun, 28 Jun 2026 16:15:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
+        &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop1c.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from RainDrop&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;When I discovered the site, I did some digging and discovered they had an API: &lt;a href=&quot;https://api.raindrop.farm/docs&quot;&gt;https://api.raindrop.farm/docs&lt;/a&gt;. This API gives you &lt;em&gt;incredibly&lt;/em&gt; detailed information about rainfall (and snow) and can even return historical data.&lt;/p&gt;
+        &lt;p&gt;Given an API key passed in an &lt;code&gt;Authorization&lt;/code&gt; header, this gets the current precipitation for my location:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://api.raindrop.farm/v1/precipitation/current?lat=30.216667&amp;amp;lon=-92.033333
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which returns (as of 11:34 AM, and I just heard thunder):&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;lat&amp;quot;: 30.216667,
+        &amp;quot;lon&amp;quot;: -92.033333,
+        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T16:30:00Z&amp;quot;,
+        &amp;quot;precipitationIntensity&amp;quot;: 0.0
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Ok - slight delay here - I just got out of a meeting, and the rain is here:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;lat&amp;quot;: 30.216667,
+        &amp;quot;lon&amp;quot;: -92.033333,
+        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T17:06:00Z&amp;quot;,
+        &amp;quot;precipitationIntensity&amp;quot;: 1.2999999523162842
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That value is in millimeters per hour so it looks like just a trickle, so nothing to worry about. Of course, what if it &lt;em&gt;was&lt;/em&gt; something to worry about? I thought - why not automate checking for this using my go to platform lately, &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so the app I had in mind was fairly simple:&lt;/p&gt;
+        &lt;p&gt;Every X minutes, use the RainDrop API to check the rain intensity and if it is over a certain threshold, send an alert my way.&lt;/p&gt;
+        &lt;p&gt;My RainDrop API access had pretty high usage limits (120 a minute) that were above what made sense to realistically check. On the other hand, my free tier level at Val Town capped me at one execution per fifteen minutes.&lt;/p&gt;
+        &lt;p&gt;To be honest, once every fifteen minutes seemed perfectly reasonable, but keep in mind that both RainDrop and Val Town would support much higher frequencies if necessary.&lt;/p&gt;
+        &lt;p&gt;Given the above, I created a new val and set the trigger to Cron, set to every 15 minutes:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop2.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from Val Town showing the Cron settings&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I then created an environment variable for my RainDrop key. With that in place, the entire &amp;quot;early warning flood system&amp;quot; (that&apos;s what I&apos;ll call it when doing interviews for my next job) is one file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
+        
+        /**
+        * Converts speed from millimeters per hour to inches per hour.
+        * @param {number} mmPerHour - Speed in millimeters per hour.
+        * @returns {number} Speed in inches per hour.
+        */
+        function mmPerHourToInchesPerHour(mmPerHour) {
+        return mmPerHour / 25.4;
+        }
+        
+        function dtFormat(timestamp) {
+        const date = new Date(timestamp);
+        
+        const options = {
+        weekday: &amp;quot;long&amp;quot;,
+        year: &amp;quot;numeric&amp;quot;,
+        month: &amp;quot;long&amp;quot;,
+        day: &amp;quot;numeric&amp;quot;,
+        hour: &amp;quot;2-digit&amp;quot;,
+        minute: &amp;quot;2-digit&amp;quot;,
+        timeZoneName: &amp;quot;short&amp;quot;,
+        };
+        
+        // Create the formatter (e.g., for US English)
+        const formatter = new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, options);
+        
+        return formatter.format(date);
+        }
+        
+        export default async function (interval: Interval) {
+        // Lafayette, LA
+        const lat = &amp;quot;30.216667&amp;quot;;
+        const lng = &amp;quot;-92.033333&amp;quot;;
+        
+        // The threshold value is inches of rain per hour - any value &amp;gt;= will trigger a warning
+        const threshold = 0.5;
+        
+        let key = Deno.env.get(&amp;quot;API_KEY&amp;quot;);
+        let precipReq = await fetch(
+        `https://api.raindrop.farm/v1/precipitation/current?lat=${lat}&amp;amp;lon=${lng}`,
+        {
+        headers: {
+        &amp;quot;Authorization&amp;quot;: key,
+        },
+        },
+        );
+        
+        let precip = await precipReq.json();
+        let rainInches = mmPerHourToInchesPerHour(precip.precipitationIntensity);
+        console.log(&amp;quot;rainInches&amp;quot;, rainInches);
+        console.log(precip);
+        
+        if (rainInches &amp;gt;= threshold) {
+        let html = `
+        &amp;lt;h2&amp;gt;Heavy Rain Alert&amp;lt;/h2&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        As of ${
+        dtFormat(precip.timestamp)
+        }, we have detected ${rainInches.toFixed(2)} inches of rain per hour.
+        &amp;lt;/p&amp;gt;
+        `;
+        
+        await email({
+        subject: &amp;quot;Rain Alert&amp;quot;,
+        html,
+        });
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;On top of my script are two utility functions with the interesting one being the simple wrapper to convert RainDrop&apos;s values to inches.&lt;/p&gt;
+        &lt;p&gt;After that, I hit the API, check against a threshold (currently set to half an inch), and if it matches, I fire off an email. As a reminder, I&apos;m using Val Town&apos;s built in &amp;quot;mail the owner&amp;quot; feature. I could also use a proper email API to have more control over the delivery, but this works well for now.&lt;/p&gt;
+        &lt;p&gt;And of course, as soon as I built this there were no events, which is &lt;em&gt;good&lt;/em&gt; I suppose, but I did a quick tweak to force it to email and here&apos;s an example. Not terribly thrilling with 0 inches:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop3.png&quot; loading=&quot;lazy&quot; alt=&quot;Email example&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;If you want to play with this, you can fork the val here: https://www.val.town/x/raymondcamden/raindropAlert. And of course if you do, let me know!&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@r_shayesrehpour?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;reza shayestehpour&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/grayscale-photography-of-raindrops-Nw_D8v79PM4?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+  </channel>
+</rss>
