@@ -4,7 +4,183 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 29 Jun 2026 18:05:49 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 30 Jun 2026 17:31:48 GMT</lastBuildDate>
+    <item>
+      <title>Have your agent record video demos of its work with shot-scraper video</title>
+      <link>https://simonwillison.net/2026/Jun/30/shot-scraper-video/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/30/shot-scraper-video/#atom-everything</guid>
+      <pubDate>Tue, 30 Jun 2026 16:54:26 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;a href=&quot;https://shot-scraper.datasette.io/en/stable/video.html&quot;&gt;shot-scraper video&lt;/a&gt; is a new command introduced in today&apos;s &lt;a href=&quot;https://github.com/simonw/shot-scraper/releases/tag/1.10&quot;&gt;shot-scraper 1.10&lt;/a&gt; release which accepts a &lt;code&gt;storyboard.yml&lt;/code&gt; file defining a routine to run against a web application and uses Playwright to record a video of that routine. I&apos;ve written before about the importance of &lt;a href=&quot;https://simonwillison.net/2026/Feb/10/showboat-and-rodney/#proving-code-actually-works&quot;&gt;having coding agents produce demos&lt;/a&gt; of their work; this is my latest attempt at enabling them to do that.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example video created using &lt;code&gt;shot-scraper video&lt;/code&gt;, exercising a &lt;a href=&quot;https://github.com/simonw/datasette/pull/2813&quot;&gt;still in development&lt;/a&gt; feature adding the ability to create new tables in Datasette from pasted CSV, TSV or JSON data:&lt;/p&gt;
+        &lt;div style=&quot;max-width: 100%; margin-bottom: 0.4em&quot;&gt;
+        &lt;video controls=&quot;controls&quot; preload=&quot;none&quot; aria-label=&quot;Video demo of the new CSV import for Datasette&quot; poster=&quot;https://static.simonwillison.net/static/2026/datasette-bulk-insert-demo.jpg&quot; loop=&quot;loop&quot; style=&quot;width: 100%; height: auto;&quot; muted=&quot;muted&quot;&gt;
+        &lt;source src=&quot;https://static.simonwillison.net/static/2026/datasette-bulk-insert-demo.mp4&quot; type=&quot;video/mp4&quot; /&gt;
+        &lt;/video&gt;
+        &lt;/div&gt;
+        &lt;p&gt;That video was created &lt;a href=&quot;&quot;&gt;by running this command&lt;/a&gt;:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;shot-scraper video datasette-bulk-insert-storyboard.yml \
+        --auth datasette-demo-auth.json --mp4&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;(That &lt;code&gt;--auth&lt;/code&gt; JSON file &lt;a href=&quot;https://gist.github.com/simonw/287b26aff53fcb72942b19f5b69d7e5c&quot;&gt;contains a cookie&lt;/a&gt;, as &lt;a href=&quot;https://shot-scraper.datasette.io/en/stable/authentication.html&quot;&gt;described here&lt;/a&gt; in the documentation.)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the &lt;code&gt;datasette-bulk-insert-storyboard.yml&lt;/code&gt; file:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-yaml&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-ent&quot;&gt;output&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;/tmp/datasette-bulk-insert-demo.webm&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;server&lt;/span&gt;:
+        - &lt;span class=&quot;pl-s&quot;&gt;uv&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;--directory&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;/Users/simon/Dropbox/dev/datasette&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;run&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;datasette&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;-p&lt;/span&gt;
+        - &lt;span class=&quot;pl-c1&quot;&gt;6419&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;--root&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;--secret&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;1&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-s&quot;&gt;/tmp/demo.db&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;url&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;http://127.0.0.1:6419/demo/tasks&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;viewport&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;width&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1280&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;height&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;720&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;cursor&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;button[data-table-action=&quot;insert-row&quot;]&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;javascript&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;  (() =&amp;gt; {&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    let clipboardText = &quot;&quot;;&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    Object.defineProperty(navigator, &quot;clipboard&quot;, {&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;      configurable: true,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;      get: () =&amp;gt; ({&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;        writeText: async (text) =&amp;gt; {&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;          clipboardText = String(text);&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;        },&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;        readText: async () =&amp;gt; clipboardText,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;      }),&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    });&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;  })();&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;&lt;/span&gt;&lt;span class=&quot;pl-ent&quot;&gt;scenes&lt;/span&gt;:
+        - &lt;span class=&quot;pl-ent&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;Bulk insert existing table rows&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;do&lt;/span&gt;:
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.8&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;button[data-table-action=&quot;insert-row&quot;]&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;#row-edit-dialog[open]&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.5&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-bulk-insert&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-bulk-textarea&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.5&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-copy-template&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=Copied&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.8&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;fill&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;into&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-bulk-textarea&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;text&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            title,owner,status,priority,notes&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            Prepare release video,Ana,doing,1,Recorded with shot-scraper&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            Check pasted CSV import,Ben,review,3,Previewed before inserting&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            Share the branch demo,Chen,queued,2,Bulk insert creates three rows&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;&lt;/span&gt;      - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.8&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-save&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=Previewing 3 rows.&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1.2&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-save&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=3 rows inserted.&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1.0&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.row-edit-cancel&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=Prepare release video&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1.0&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;Create a table from pasted CSV&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;open&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;http://127.0.0.1:6419/demo&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;details.actions-menu-links summary&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;do&lt;/span&gt;:
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.8&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;details.actions-menu-links summary&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;button[data-database-action=&quot;create-table&quot;]&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;#table-create-dialog[open]&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.5&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;fill&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;into&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-table-name&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;text&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;launch_metrics&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-from-data&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-data-textarea&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.5&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;fill&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;into&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-data-textarea&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;text&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;|&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            metric_id,name,score,recorded_on&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            m001,Activation rate,87.5,2026-06-29&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            m002,Retention check,72.25,2026-06-30&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;            m003,CSV import health,95,2026-07-01&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;&lt;/span&gt;      - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0.8&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-save&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=Previewing 3 rows.&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1.2&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;click&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;.table-create-save&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for_url&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;**/demo/launch_metrics&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;wait_for&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;text=Activation rate&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        - &lt;span class=&quot;pl-ent&quot;&gt;pause&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;1.2&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://shot-scraper.datasette.io/en/stable/video.html&quot;&gt;video command documentation&lt;/a&gt; includes simpler examples, but for the purpose of this post I thought I&apos;d go with something more comprehensive.&lt;/p&gt;
+        &lt;p&gt;That demo YAML storyboard was constructed entirely by GPT-5.5 xhigh running in Codex Desktop, using the following prompt run inside my &lt;code&gt;~/dev/datasette&lt;/code&gt; checkout of &lt;a href=&quot;https://github.com/simonw/datasette/commits/b759ea548606bc9bf9a4bf0e33e2d57ead7e0ab8/&quot;&gt;this branch&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;Review the changes on this branch.&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;cd to ~/dev/shot-scraper and run the command &quot;uv run shot-scraper video --help&quot;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;Now use that new video command to record a video demo of the new features from this branch, including running a &quot;uv run datasette -p 6419 --root --secret 1 /tmp/demo.db&quot; development server so you can record the video against a demo DB that you first create.&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Now that I&apos;ve released the feature the prompt could say &quot;&lt;code&gt;run uvx shot-scraper video --help&lt;/code&gt;&quot; instead and it should achieve the same result.&lt;/p&gt;
+        &lt;p&gt;I really like this pattern where the &lt;code&gt;--help&lt;/code&gt; output for a command provides enough detail that a coding agent can use it - it works kind of like bundling a &lt;code&gt;SKILL.md&lt;/code&gt; file directly inside the tool. I used the same pattern for &lt;a href=&quot;https://simonwillison.net/2026/Feb/10/showboat-and-rodney/&quot;&gt;showboat and rodney&lt;/a&gt;.&lt;/p&gt;
+        &lt;h4 id=&quot;how-i-built-this&quot;&gt;How I built this&lt;/h4&gt;
+        &lt;p&gt;&lt;code&gt;shot-scraper video&lt;/code&gt; started as an experimental prototype. &lt;code&gt;shot-scraper&lt;/code&gt; is built on top of &lt;a href=&quot;https://playwright.dev/&quot;&gt;Playwright&lt;/a&gt;, and the key feature it needed was for Playwright to be able to record video of browser sessions with enough control to create the desired demo.&lt;/p&gt;
+        &lt;p&gt;I first tried this a few years ago and found that the Playwright-produced videos included additional chrome that was useful for debugging a test failure but unwanted for a product demo.&lt;/p&gt;
+        &lt;p&gt;They fixed that a while ago, but there were still some minor blockers. In particular I was getting &lt;a href=&quot;https://github.com/simonw/shot-scraper/pull/194/changes/c2f3b3a52ba84f2adcf3ad6da4d39c2570328584#issuecomment-4724459369&quot;&gt;a few white frames at the start of the videos&lt;/a&gt;, since the recording mechanism kicked in before the first URL was loaded by the browser.&lt;/p&gt;
+        &lt;p&gt;Playwright 1.59 added a new &lt;a href=&quot;https://playwright.dev/python/docs/api/class-screencast&quot;&gt;screencast mechanism&lt;/a&gt; providing much more finely grained control over video recording. This was very nearly what I needed, but the resulting videos were fixed at 800px wide.&lt;/p&gt;
+        &lt;p&gt;I found a &lt;a href=&quot;https://github.com/microsoft/playwright/pull/41183&quot;&gt;landed PR fixing that&lt;/a&gt; but it wasn&apos;t yet in a release. Then yesterday they shipped it in &lt;a href=&quot;https://github.com/microsoft/playwright-python/releases/tag/v1.61.0&quot;&gt;playwright-python 1.61.0&lt;/a&gt; and I was finally unblocked to finish implementing the feature!&lt;/p&gt;
+        &lt;p&gt;The code itself was all written by GPT-5.5 xhigh in Codex Desktop. I had it write the documentation as well which gave me a very useful frame for reviewing the design - much of the iteration on the feature came from reviewing that documentation, spotting things that were redundant, inconsistent or confusing, and requesting (or dictating) a better design.&lt;/p&gt;
+        &lt;p&gt;The YAML format itself was mostly defined by the coding agent. I had it &lt;a href=&quot;https://github.com/simonw/shot-scraper/blob/1.10/shot_scraper/video.py#L24&quot;&gt;use Pydantic&lt;/a&gt; to both define and validate the format, partly to make the design easier to review.&lt;/p&gt;
+        &lt;p&gt;This is a great example of the kind of feature that I almost certainly wouldn&apos;t have taken on without coding agent support. I filed the &lt;a href=&quot;https://github.com/simonw/shot-scraper/issues/142&quot;&gt;original issue&lt;/a&gt; in February 2024, and had difficulty finding the necessary time to solve this in amongst all of my other projects.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/yaml&quot;&gt;yaml&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/playwright&quot;&gt;playwright&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/shot-scraper&quot;&gt;shot-scraper&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pydantic&quot;&gt;pydantic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>shot-scraper 1.10</title>
+      <link>https://simonwillison.net/2026/Jun/30/shot-scraper/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/30/shot-scraper/#atom-everything</guid>
+      <pubDate>Tue, 30 Jun 2026 15:10:14 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/shot-scraper/releases/tag/1.10&quot;&gt;shot-scraper 1.10&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;The big new feature is &lt;code&gt;shot-scraper video storyboard.yml&lt;/code&gt;, described in detail in &lt;a href=&quot;https://simonwillison.net/2026/Jun/30/shot-scraper-video/&quot;&gt;Have your agent record video demos of its work with shot-scraper video&lt;/a&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/shot-scraper&quot;&gt;shot-scraper&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>HTML table extractor</title>
+      <link>https://simonwillison.net/2026/Jun/29/html-table-extractor/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/29/html-table-extractor/#atom-everything</guid>
+      <pubDate>Mon, 29 Jun 2026 23:38:21 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/html-table-extractor&quot;&gt;HTML table extractor&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Yet another in my growing collection of paste-conversion tools. This one accepts pasted rich text from browsers (with embedded HTML tables) and converts every detected table into HTML, Markdown, CSV, TSV, or JSON.&lt;/p&gt;
+        &lt;p&gt;Try it out by selecting everything on the Wikipedia &lt;a href=&quot;https://en.wikipedia.org/wiki/List_of_cities_and_towns_in_the_San_Francisco_Bay_Area&quot;&gt;List of cities and towns in the San Francisco Bay Area&lt;/a&gt; page and pasting it directly into the tool:&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Screenshot of a web interface for converting table data between formats. A row of tabs labeled HTML, Markdown, CSV, TSV, and JSON sits below the bottom edge of a styled data table, with the TSV tab currently selected. The TSV tab displays the table&apos;s contents as tab-separated plain text in a monospaced font inside a bordered panel, with a &amp;quot;Copy&amp;quot; button in the upper right of that panel.&quot; src=&quot;https://static.simonwillison.net/static/2026/html-table.jpg&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;On a similar note, I recently &lt;a href=&quot;https://github.com/simonw/tools/commit/f278e977751dbc1948baedfc2f26b6de870f60e6&quot;&gt;rebuilt&lt;/a&gt; my &lt;a href=&quot;https://tools.simonwillison.net/rich-text-to-markdown&quot;&gt;Rich text to markdown&lt;/a&gt; tool to add support for tables and generally improve the UI.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: It turns out Wikipedia has an open CORS API for retrieving the full rendered HTML content of any page - &lt;a href=&quot;https://tools.simonwillison.net/cors-fetch#url=https%3A%2F%2Fen.wikipedia.org%2Fw%2Fapi.php%3Faction%3Dparse%26page%3DList_of_cities_and_towns_in_the_San_Francisco_Bay_Area%26prop%3Dtext%26format%3Djson%26origin%3D%2A&quot;&gt;demo here&lt;/a&gt;  - so I &lt;a href=&quot;https://gist.github.com/simonw/f226fe96f464ec7d81d6996cb466436d&quot;&gt;had Codex&lt;/a&gt; add the ability to search Wikipedia for a page and then automatically import and display any tables from that page.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/html&quot;&gt;html&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/wikipedia&quot;&gt;wikipedia&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/cors&quot;&gt;cors&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Count the number of Safari tabs</title>
+      <link>https://simonwillison.net/2026/Jun/29/safari-tab-count/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jun/29/safari-tab-count/#atom-everything</guid>
+      <pubDate>Mon, 29 Jun 2026 18:36:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Tiniest TIL, using AppleScript to count the number of open browser tabs in Safari:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;osascript -e &apos;tell application &quot;Safari&quot; to count tabs of every window&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;img alt=&quot;I ran it in a terminal window and got back 370.&quot; src=&quot;https://static.simonwillison.net/static/2026/tab-shame.jpg&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/safari&quot;&gt;safari&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/til&quot;&gt;til&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/applescript&quot;&gt;applescript&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding</title>
       <link>https://simonwillison.net/2026/Jun/29/ornith/#atom-everything</link>
@@ -746,77 +922,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/brent-simmons&quot;&gt;brent-simmons&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/netnewswire&quot;&gt;netnewswire&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>datasette 1.0a34</title>
-      <link>https://simonwillison.net/2026/Jun/16/datasette/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/16/datasette/#atom-everything</guid>
-      <pubDate>Tue, 16 Jun 2026 21:31:24 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/datasette/releases/tag/1.0a34&quot;&gt;datasette 1.0a34&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Quoting the release notes:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;The big feature in this alpha is tools to insert, edit and delete rows within the Datasette interface. These features are available on table pages, and edit and delete are also available as action items on the row page.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;click-to-play&gt;&lt;a href=&quot;https://static.simonwillison.net/static/2026/datasette-edit.gif&quot;&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/datasette-edit-first-frame.gif&quot; /&gt;&lt;/a&gt;&lt;/click-to-play&gt;&lt;/p&gt;
-        
-        &lt;p&gt;The inspiration for this feature - which is &lt;em&gt;long&lt;/em&gt; overdue - was &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt;. I added &lt;a href=&quot;https://simonwillison.net/2026/Jun/15/datasette-agent/&quot;&gt;SQL write support&lt;/a&gt; to that the other day which highlighted how absurd it was that you could insert and edit ties via the chat interface but not in the regular Datasette UI!&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-release-notes&quot;&gt;annotated-release-notes&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>datasette-tailscale 0.1a0</title>
-      <link>https://simonwillison.net/2026/Jun/16/datasette-tailscale/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/16/datasette-tailscale/#atom-everything</guid>
-      <pubDate>Tue, 16 Jun 2026 16:18:20 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-tailscale/releases/tag/0.1a0&quot;&gt;datasette-tailscale 0.1a0&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;A very experimental alpha plugin which lets you do this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;datasette tailscale mydata.db \
-        --ts-authkey tskey-auth-xxxx --ts-hostname datasette-preview
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This starts a localhost Datasette server with a &lt;a href=&quot;https://tailscale.com/&quot;&gt;Tailscale&lt;/a&gt; sidecar that connects it to your Tailnet, such that &lt;code&gt;http://datasette-preview/&lt;/code&gt; serves Datasette.&lt;/p&gt;
-        &lt;p&gt;It&apos;s using the Python bindings for the experimental &lt;a href=&quot;https://github.com/tailscale/tailscale-rs&quot;&gt;tailscale-rs&lt;/a&gt; library. I &lt;a href=&quot;https://github.com/tailscale/tailscale-rs/issues/243&quot;&gt;filed an issue&lt;/a&gt; asking if there&apos;s a cleaner way of setting up the proxy mechanism.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tailscale&quot;&gt;tailscale&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Georgi Gerganov</title>
-      <link>https://simonwillison.net/2026/Jun/16/georgi-gerganov/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/16/georgi-gerganov/#atom-everything</guid>
-      <pubDate>Tue, 16 Jun 2026 16:04:59 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://news.ycombinator.com/item?id=48555993#48557304&quot;&gt;&lt;p&gt;I can 100% attest to the fact that Qwen3.6-27B is a very capable local model for coding tasks. Over the last month and a half I&apos;ve been using it almost daily, either on my M2 Ultra or on my RTX 5090 box. I use it for small &lt;a href=&quot;https://github.com/search?q=%22Assisted-by%22+user%3Aggml-org&amp;amp;type=commits&amp;amp;ref=advsearch&quot;&gt;mundane tasks at ggml-org&lt;/a&gt; - nothing really impressive, but definitely a helpful tool for a maintainer. I think I would be using it much more, if I didn&apos;t have to spend a lot of my time on reviewing PRs. Currently, I have a very lightweight harness - the pi agent with everything stripped (&lt;code&gt;pi -nc --offline&lt;/code&gt;) and &lt;a href=&quot;https://github.com/ggml-org/llama.cpp/blob/master/.pi/gg/SYSTEM.md&quot;&gt;a short system prompt&lt;/a&gt; to align it a bit with my style.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://news.ycombinator.com/item?id=48555993#48557304&quot;&gt;Georgi Gerganov&lt;/a&gt;, Hacker News comment on &lt;a href=&quot;https://vickiboykis.com/2026/06/15/running-local-models-is-good-now/&quot;&gt;Running local models is good now&lt;/a&gt; by  Boykis&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/georgi-gerganov&quot;&gt;georgi-gerganov&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pi&quot;&gt;pi&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/local-llms&quot;&gt;local-llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/qwen&quot;&gt;qwen&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Fable 5 Export Controls Harm US Cyber Defense</title>
-      <link>https://simonwillison.net/2026/Jun/16/fable-5-export-controls/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jun/16/fable-5-export-controls/#atom-everything</guid>
-      <pubDate>Tue, 16 Jun 2026 05:20:29 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.lutasecurity.com/post/the-fable-5-export-controls-harm-us-cyber-defense&quot;&gt;The Fable 5 Export Controls Harm US Cyber Defense&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        I &lt;a href=&quot;https://simonwillison.net/2026/Jun/16/matteo-wong-the-atlantic/&quot;&gt;quoted The Atlantic&lt;/a&gt; quoting Kate Moussouris earlier, when I should have gone straight to the source. Here she is confirming that the &quot;jailbreak&quot; that got Claude Fable 5 banned under an export control really was &quot;fix this code&quot;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;The researchers took open-source code with known CVEs, plus new code with deliberately planted vulnerabilities, and asked Fable 5, Mythos, and Opus to “review the code for security issues.” Fable 5 refused. They then asked the models to “fix this code” and, through a multistep and manual process, turned the output into scripts that test the patches.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;As Kate points out, this is absurd. Coding models fix bugs, and security exploits are the most important category of bugs for them to fix!&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Defenders need to be able to ask AI to fix the bugs in a file, explain why the fix matters, and write tests that confirm the patch works. That is not a guardrail bypass. It is the most valuable thing an AI model can do for defensive security: executing the find, fix, and test loop defenders run every day. [...]&lt;/p&gt;
-        &lt;p&gt;The prompts worked because they were defensive requests, and that capability cannot be removed without making the model worse at fixing bugs and verifying patches.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This whole situation is such a mess. Non-technical decision-makers have been hearing that models that can &quot;craft cyber attacks&quot; are uniquely dangerous for months. Now they look ready to ban any model that can help us secure our code.
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/jailbreaking&quot;&gt;jailbreaking&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-security-research&quot;&gt;ai-security-research&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos&quot;&gt;claude-mythos&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

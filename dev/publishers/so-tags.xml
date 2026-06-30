@@ -4,7 +4,26 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Mon, 29 Jun 2026 18:05:52 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 30 Jun 2026 17:31:51 GMT</lastBuildDate>
+    <item>
+      <title>How to use select ui component in Laravel vue-starter-kit</title>
+      <link>https://stackoverflow.com/questions/79971787/how-to-use-select-ui-component-in-laravel-vue-starter-kit</link>
+      <guid>https://stackoverflow.com/questions/79971787/how-to-use-select-ui-component-in-laravel-vue-starter-kit</guid>
+      <pubDate>Tue, 30 Jun 2026 14:57:49 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using Laravel&apos;s &lt;strong&gt;&lt;a href=&quot;https://github.com/laravel/vue-starter-kit&quot; rel=&quot;nofollow noreferrer&quot;&gt;vue-starter-kit&lt;/a&gt;&lt;/strong&gt; and inside &lt;em&gt;&lt;code&gt;resources/js/components/ui/&lt;/code&gt;&lt;/em&gt; folder there are some different ui components. For example If you need to use Input it&apos;s easy, this is how:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Input } from &apos;@/components/ui/input&apos;;
+        
+        &amp;lt;Input id=&amp;quot;name&amp;quot; v-model=&amp;quot;team.name&amp;quot; type=&amp;quot;text&amp;quot; placeholder=&amp;quot;choose a name...&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now I am trying to use &lt;a href=&quot;https://github.com/laravel/vue-starter-kit/tree/main/resources/js/components/ui/select&quot; rel=&quot;nofollow noreferrer&quot;&gt;Select&lt;/a&gt; component and I don&apos;t know how! I have an array of objects called &lt;code&gt;groups&lt;/code&gt; and I need to use them as options for the select component.  (Each Group has a title&amp;lt;string&amp;gt; and an id&amp;lt;number&amp;gt;)&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Select } from &apos;@/components/ui/select&apos;;
+        
+        &amp;lt;Select v-model=&amp;quot;team.group&amp;quot; :options=&amp;quot;groups&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Of course when I try using Select component this way, I get no where! How can I use this select ui component? what do I need to import, how can I pass in my options?&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>High FCP/LCP Huge &quot;Other&quot; time in Main-Thread Work and unused vendor JS</title>
       <link>https://stackoverflow.com/questions/79966399/high-fcp-lcp-huge-other-time-in-main-thread-work-and-unused-vendor-js</link>
@@ -1618,94 +1637,6 @@
         &lt;p&gt;&lt;strong&gt;Example of what I&apos;m seeing:&lt;/strong&gt;
         When an axios request fails with a 400/500 status, a red bar appears at the top showing something like:&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/3GmQvROl.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/3GmQvROl.png&quot; alt=&quot;red bar screenshot&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Chart.js with date-fns adapter throws &quot;This method is not implemented: Check that a complete date adapter is provided&quot; when using time scale</title>
-      <link>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</link>
-      <guid>https://stackoverflow.com/questions/79882828/chart-js-with-date-fns-adapter-throws-this-method-is-not-implemented-check-tha</guid>
-      <pubDate>Wed, 04 Feb 2026 14:37:08 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;m trying to create a time-series line chart using Chart.js (v4.4.0) in a Vue 3 component with the date-fns adapter. The chart works fine with a linear x-axis, but when I set the x-axis to type: &apos;time&apos;, I get the error:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;This method is not implemented: Check that a complete date adapter is provided.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;What I&apos;ve done so far:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;Installed the required packages: chart.js, chartjs-adapter-date-fns, and date-fns (all v3+)&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Imported and registered the adapter as per the documentation&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Tried registering the adapter both globally and at the scale level&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Verified my date data is in proper Date objects&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;canvas ref=&amp;quot;chartRef&amp;quot;&amp;gt;&amp;lt;/canvas&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script&amp;gt;
-        import { Chart, registerables } from &apos;chart.js&apos;;
-        import { de } from &apos;date-fns/locale&apos;;
-        import &apos;chartjs-adapter-date-fns&apos;;
-        
-        Chart.register(...registerables);
-        
-        export default {
-        mounted() {
-        this.createChart();
-        },
-        methods: {
-        createChart() {
-        const ctx = this.$refs.chartRef;
-        
-        // Sample time-series data
-        const xAxisLabels = [&apos;2024-01-01&apos;, &apos;2024-01-02&apos;, &apos;2024-01-03&apos;];
-        const yAxisData = [0.5, 0.7, 0.6];
-        
-        new Chart(ctx, {
-        type: &apos;line&apos;,
-        data: {
-        datasets: [{
-        label: &apos;NDVI&apos;,
-        data: xAxisLabels.map((date, i) =&amp;gt; ({
-        x: new Date(date),
-        y: yAxisData[i]
-        }))
-        }]
-        },
-        options: {
-        scales: {
-        x: {
-        type: &apos;time&apos;, // ← ERROR OCCURS WHEN THIS IS SET
-        adapters: {
-        date: { locale: de }
-        }
-        }
-        }
-        }
-        });
-        }
-        }
-        };
-        &amp;lt;/script&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;code&gt;package.json&lt;/code&gt; dependencies:&lt;/p&gt;
-        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
-        &amp;quot;chart.js&amp;quot;: &amp;quot;^4.4.0&amp;quot;,
-        &amp;quot;chartjs-adapter-date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
-        &amp;quot;date-fns&amp;quot;: &amp;quot;^3.0.0&amp;quot;,
-        &amp;quot;vue&amp;quot;: &amp;quot;^3.2.29&amp;quot;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The error stack trace:&lt;/p&gt;
-        &lt;pre class=&quot;lang-none prettyprint-override&quot;&gt;&lt;code&gt;Error: This method is not implemented: Check that a complete date adapter is provided.
-        at _adapters._date.override (chart.js:12457:1)
-        at Object.parse (chart.js:12516:1)
-        at TimeScale._parseValue (chart.js:13367:1)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;What am I missing to properly configure the date-fns adapter for time scales in Chart.js 4.x?&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
