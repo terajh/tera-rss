@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "Error event not triggered after Vite build",
+    "partialText": "<p>I'm working on a Vue.js project and in the App.vue file I wrote this code that reacts to all exceptions and rejections of my app.</p>\n<pre><code>  window.addEventListener('error', event =&gt; {\n    errorDialog.value = true\n    errorMessage.value = event.error.message\n  })\n\n  window.addEventListener('unhandledrejection', event =&gt; {\n    errorDialog.value = true\n    errorMessage.value = event.reason.message\n  })\n</code></pre>\n<p><strong>In dev mode everything works smoothlessly... But once built it gets weird...</strong></p>\n<p>After many tests I understood that : it doesn't work when and only when the exception is thrown directly by an eventlistener.</p>\n<p>To be clearer here is a usecase</p>\n<pre><code>&lt;template&gt;\n    &lt;button @click=&quot;onClick_1()&quot;&gt;CLIK ME&lt;/button&gt;\n    &lt;button @click=&quot;onClick_2()&quot;&gt;CLIK ME&lt;/button&gt;\n    &lt;button @click=&quot;onClick_3()&quot;&gt;CLIK ME&lt;/button&gt;\n    &lt;button @click=&quot;onClick_4()&quot;&gt;CLIK ME&lt;/button&gt;\n&lt;/template&gt;\n\n&lt;script setup&gt;\n  function onClick_1 () {\n    throw '1' // Doesn't trigger anything\n  }\n\n  async function onClick_2 () {\n    /** With or without 'await' here **/\n    throw '2' // Doesn't trigger anything\n  }\n\n function onClick_3 () {\n    (async () =&gt; {\n      throw '3' // Triggers the unhandledrejection listener\n    })()\n  }\n\n async function onClick_4 () {\n    (async () =&gt; {\n      throw '4' // Triggers the unhandledrejection listener\n    })()\n  }\n&lt;script&gt;\n</code></pre>\n<p>Could someone please explain what's the ding-dong here and how to fix it ?</p>\n<p>Thank you in advance !</p>",
+    "date": "2026-07-01T01:22:15.000Z",
+    "url": "https://stackoverflow.com/questions/79971923/error-event-not-triggered-after-vite-build"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "How to use select ui component in Laravel vue-starter-kit",
     "partialText": "<p>I am using Laravel's <strong><a href=\"https://github.com/laravel/vue-starter-kit\" rel=\"nofollow noreferrer\">vue-starter-kit</a></strong> and inside <em><code>resources/js/components/ui/</code></em> folder there are some different ui components. For example If you need to use Input it's easy, this is how:</p>\n<pre><code>import { Input } from '@/components/ui/input';\n\n&lt;Input id=&quot;name&quot; v-model=&quot;team.name&quot; type=&quot;text&quot; placeholder=&quot;choose a name...&quot; /&gt;\n</code></pre>\n<p>Now I am trying to use <a href=\"https://github.com/laravel/vue-starter-kit/tree/main/resources/js/components/ui/select\" rel=\"nofollow noreferrer\">Select</a> component and I don't know how! I have an array of objects called <code>groups</code> and I need to use them as options for the select component.  (Each Group has a title&lt;string&gt; and an id&lt;number&gt;)</p>\n<pre><code>import { Select } from '@/components/ui/select';\n\n&lt;Select v-model=&quot;team.group&quot; :options=&quot;groups&quot; /&gt;\n</code></pre>\n<p>Of course when I try using Select component this way, I get no where! How can I use this select ui component? what do I need to import, how can I pass in my options?</p>",
     "date": "2026-06-30T14:57:49.000Z",
@@ -375,18 +388,5 @@
     "partialText": "<p>Why doesn't indent work in the taskitem, but after refreshing it works? When I click on the browser's inspect tool and try to set margin-left, the previously set indent takes effect immediately. Why does this happen?</p>\n<pre><code>let docChanged = false\n    doc.nodesBetween(from, to, (node, pos) =&gt; {\n        if (!options.types.includes(node.type.name)) return true\n\n        const currentIndent = node.attrs.indent || 0\n        const change = options.indentUnit * direction\n        const newIndent = Math.max(0, currentIndent + change)\n\n        if (currentIndent !== newIndent) {\n            tr = tr.setNodeMarkup(pos, undefined, {\n                ...node.attrs,\n                indent: newIndent\n            })\n            docChanged = true\n        }\n        return false // 不深入子节点\n    })\n\n    if (docChanged) {\n        if (dispatch) dispatch(tr)\n        return true\n    }\n</code></pre>\n<pre><code>indent: {\n                        default: 0,\n                        parseHTML: element =&gt; {\n                            const level = element.style.marginLeft\n                            return level ? parseInt(level, 10) : 0\n                        },\n                        renderHTML: attributes =&gt; {\n                            if (!attributes.indent) return {}\n                            return { style: `margin-left: ${attributes.indent}px !important` }\n                        }\n                    },\n</code></pre>",
     "date": "2026-02-12T10:05:15.000Z",
     "url": "https://stackoverflow.com/questions/79888000/how-to-fix-indent-not-working-in-tiptap-taskitem-nodes"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "How to disable the error overlay (red bar) in Nuxt 2 when receiving bad responses from backend?",
-    "partialText": "<p>I'm working with a Nuxt 2 application, and whenever I receive a 4XX or 5XX error response from my backend API, a red error &quot;loading&quot; overlay bar appears at the top of the application.</p>\n<p>I want to disable this error overlay because I'm handling errors with custom toast notifications\n2. I want to control error display through my own error handling system</p>\n<p>I've searched the Nuxt 2 documentation but couldn't find a clear way to disable this error overlay. I'm using:</p>\n<ul>\n<li>Nuxt 2.18.1</li>\n<li>Vue 2.7.14</li>\n<li>@nuxtjs/axios for API calls</li>\n</ul>\n<p>Is there a configuration option in <code>nuxt.config.js</code> to disable this error overlay? Or do I need to handle this differently?</p>\n<p><strong>Example of what I'm seeing:</strong>\nWhen an axios request fails with a 400/500 status, a red bar appears at the top showing something like:</p>\n<p><a href=\"https://i.sstatic.net/3GmQvROl.png\" rel=\"nofollow noreferrer\"><img src=\"https://i.sstatic.net/3GmQvROl.png\" alt=\"red bar screenshot\" /></a></p>",
-    "date": "2026-02-05T19:09:50.000Z",
-    "url": "https://stackoverflow.com/questions/79883813/how-to-disable-the-error-overlay-red-bar-in-nuxt-2-when-receiving-bad-response"
   }
 ]

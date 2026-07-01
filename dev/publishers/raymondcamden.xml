@@ -4,12 +4,128 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 30 Jun 2026 17:31:47 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 01 Jul 2026 18:01:51 GMT</lastBuildDate>
+    <item>
+      <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
+      <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
+      <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
+        &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css1.png&quot; loading=&quot;lazy&quot; alt=&quot;Form Sample&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;See the two regular text fields and the cat selection? If I pick one, it visually updates:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css2.png&quot; alt=&quot;Form sample with selected cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;On submitting the form, there will be something representing the selected value, along with any other form field values as well. In theory, the &amp;quot;thing&amp;quot; you select can be any arbitrary block with the selection look and feel being whatever makes sense for your site.&lt;/p&gt;
+        &lt;p&gt;So given this UX, I was curious how I&apos;d build it myself.&lt;/p&gt;
+        &lt;h2 id=&quot;first-thought---web-components&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-thought---web-components&quot;&gt;First thought - Web Components&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Initially, I thought this would be a great use for web components. Web components can participate in forms (see &lt;a href=&quot;https://www.raymondcamden.com/2023/05/24/adding-form-participation-support-to-web-components&quot;&gt;my post&lt;/a&gt; from... wow, three years ago!) so in theory, I could build something like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot;&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
+        This is area select 1.
+        &amp;lt;/area-select&amp;gt;
+        
+        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
+        This is area select 2.
+        &amp;lt;/area-select&amp;gt;
+        
+        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the sample code above, &lt;code&gt;area-select&lt;/code&gt; is a web component which will participate in a form by setting the &lt;code&gt;foo&lt;/code&gt; value to whatever is selected, using the string in &lt;code&gt;value&lt;/code&gt; as the value.&lt;/p&gt;
+        &lt;p&gt;I wrote this out and was about to start hacking away at the code. Because of course JavaScript would be needed for this, right?&lt;/p&gt;
+        &lt;h2 id=&quot;sorry-i-doubted-you-css...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#sorry-i-doubted-you-css...&quot;&gt;Sorry I doubted you CSS...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before I started writing JavaScript, I thought - let me Google some more and research this because maybe, just maybe, a pure CSS solution would work?&lt;/p&gt;
+        &lt;p&gt;I&apos;m glad I did.&lt;/p&gt;
+        &lt;p&gt;Turns out - it&apos;s actually relatively simple to achieve this with a bit of CSS. First, let&apos;s consider this version of the HTML:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;https://postman-echo.com/post&amp;quot;&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
+        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Option 1 - Luna&amp;lt;/h3&amp;gt;
+        &amp;lt;img src=&amp;quot;https://placecats.com/200/250&amp;quot;&amp;gt;
+        &amp;lt;/label&amp;gt;
+        
+        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
+        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Option 2 - Pig&amp;lt;/h3&amp;gt;
+        &amp;lt;img src=&amp;quot;https://placecats.com/300/200&amp;quot;&amp;gt;
+        &amp;lt;/label&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My two &amp;quot;custom selectable doohickies&amp;quot; are just &lt;code&gt;label&lt;/code&gt; elements with an internal radio button. After the button I&apos;ve got arbitrary HTML.&lt;/p&gt;
+        &lt;p&gt;Now for the CSS:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+        
+        /* Style the label container itself as the button */
+        .custom-card {
+        display: inline-block;
+        padding: 12px 24px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 350px;
+        height: 350px;
+        vertical-align: top;
+        }
+        
+        /* Style change when active */
+        .custom-card:has(input[type=&amp;quot;radio&amp;quot;]:checked) {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This does a few things. It completely hides the radio field, styles the label like a &amp;quot;card&amp;quot; element, and defines the &amp;quot;selected&amp;quot; look to add a blue border and background. It also swaps out the text color to white. Because I&apos;m wrapping everything in a label, the entire block is selectable, and a cursor pointer helps make that clear to the user.&lt;/p&gt;
+        &lt;p&gt;In theory... that&apos;s it. I spent a bit of time tweaking the initial CSS I had found and more could be done of course, but this ended up being simpler than I imagined.&lt;/p&gt;
+        &lt;p&gt;You can play with the full demo here: &lt;a href=&quot;https://capital-wood-marlin.codepen.app/&quot;&gt;https://capital-wood-marlin.codepen.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;And here&apos;s the full CodePen:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;600&quot; data-pen-title=&quot;Custom Radio&quot; data-version=&quot;2&quot; data-default-tab=&quot;html,result&quot; data-slug-hash=&quot;xbgXbxd&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f1383-8203-7ff3-ab04-5aa9afa75d18&quot;&gt;
+        Custom Radio&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -265,7 +381,7 @@
       <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
       <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
       <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
         &lt;p&gt;Of course there is.&lt;/p&gt;
@@ -439,7 +555,7 @@
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -864,7 +980,7 @@
       <title>Links For You (6/21/26)</title>
       <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
       <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
         &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
@@ -927,7 +1043,7 @@
       <title>Building a Form Handling Service in Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
         &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
@@ -1111,7 +1227,7 @@
       <title>Creating a Dynamic Favicon with Cloudinary</title>
       <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
       <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
         &lt;p&gt;
@@ -1213,7 +1329,7 @@
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -1273,7 +1389,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -1417,7 +1533,7 @@
       <title>AI versus a Grue</title>
       <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
       <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
+      <pubDate>Wed, 01 Jul 2026 17:18:58 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
         &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
@@ -1605,129 +1721,6 @@
         &lt;p&gt;If you want to peruse the code yourself, you can check it out here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Now that I&apos;ve got a bit more time on my hands (ahem), I may try hacking on this a bit more, but it was certainly fun to see it in action.&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@sortino?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Joshua Sortino&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/photo-of-light-towards-inside-of-cave-rAqzj79GUmA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Creating a Heavy Rain Alert with RainDrop and Val Town</title>
-      <link>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</link>
-      <guid>https://www.raymondcamden.com/2026/06/01/creating-a-heavy-rain-alert-with-raindrop-and-val-town</guid>
-      <pubDate>Tue, 30 Jun 2026 17:11:08 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;One of the &amp;quot;joys&amp;quot; of living in Louisiana is the rainy season, which is heavier in spring but honestly, feels like it lasts all year long. I can still remember being on a business trip in 2016, about to fly home, and hearing about some sort of &apos;rain event&apos; back in Louisiana. This surprised me as there wasn&apos;t a hurricane involved, just an incredible amount of rain (up to 2-3 inches &lt;strong&gt;per hour&lt;/strong&gt;). You can read more about it on the &lt;a href=&quot;https://en.wikipedia.org/wiki/2016_Louisiana_floods&quot;&gt;Wikipedia page&lt;/a&gt; about the event, but it goes without saying - rain is a big deal down here.&lt;/p&gt;
-        &lt;p&gt;A while back I discovered &lt;a href=&quot;https://www.raindrop.farm/&quot;&gt;RainDrop&lt;/a&gt;, which is an app and a web site that lets you check on rainfall totals. You can see my zipcode here, &lt;a href=&quot;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&quot;&gt;https://www.raindrop.farm/rainfall-totals/zipcode/70508#map&lt;/a&gt;, and while we aren&apos;t having any rain this second, we&apos;ve got some forecast for today.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop1c.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from RainDrop&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;When I discovered the site, I did some digging and discovered they had an API: &lt;a href=&quot;https://api.raindrop.farm/docs&quot;&gt;https://api.raindrop.farm/docs&lt;/a&gt;. This API gives you &lt;em&gt;incredibly&lt;/em&gt; detailed information about rainfall (and snow) and can even return historical data.&lt;/p&gt;
-        &lt;p&gt;Given an API key passed in an &lt;code&gt;Authorization&lt;/code&gt; header, this gets the current precipitation for my location:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;https://api.raindrop.farm/v1/precipitation/current?lat=30.216667&amp;amp;lon=-92.033333
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Which returns (as of 11:34 AM, and I just heard thunder):&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &amp;quot;lat&amp;quot;: 30.216667,
-        &amp;quot;lon&amp;quot;: -92.033333,
-        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T16:30:00Z&amp;quot;,
-        &amp;quot;precipitationIntensity&amp;quot;: 0.0
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Ok - slight delay here - I just got out of a meeting, and the rain is here:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &amp;quot;lat&amp;quot;: 30.216667,
-        &amp;quot;lon&amp;quot;: -92.033333,
-        &amp;quot;timestamp&amp;quot;: &amp;quot;2026-06-01T17:06:00Z&amp;quot;,
-        &amp;quot;precipitationIntensity&amp;quot;: 1.2999999523162842
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That value is in millimeters per hour so it looks like just a trickle, so nothing to worry about. Of course, what if it &lt;em&gt;was&lt;/em&gt; something to worry about? I thought - why not automate checking for this using my go to platform lately, &lt;a href=&quot;https://www.val.town/&quot;&gt;Val Town&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Alright, so the app I had in mind was fairly simple:&lt;/p&gt;
-        &lt;p&gt;Every X minutes, use the RainDrop API to check the rain intensity and if it is over a certain threshold, send an alert my way.&lt;/p&gt;
-        &lt;p&gt;My RainDrop API access had pretty high usage limits (120 a minute) that were above what made sense to realistically check. On the other hand, my free tier level at Val Town capped me at one execution per fifteen minutes.&lt;/p&gt;
-        &lt;p&gt;To be honest, once every fifteen minutes seemed perfectly reasonable, but keep in mind that both RainDrop and Val Town would support much higher frequencies if necessary.&lt;/p&gt;
-        &lt;p&gt;Given the above, I created a new val and set the trigger to Cron, set to every 15 minutes:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop2.png&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot from Val Town showing the Cron settings&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;I then created an environment variable for my RainDrop key. With that in place, the entire &amp;quot;early warning flood system&amp;quot; (that&apos;s what I&apos;ll call it when doing interviews for my next job) is one file:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
-        
-        /**
-        * Converts speed from millimeters per hour to inches per hour.
-        * @param {number} mmPerHour - Speed in millimeters per hour.
-        * @returns {number} Speed in inches per hour.
-        */
-        function mmPerHourToInchesPerHour(mmPerHour) {
-        return mmPerHour / 25.4;
-        }
-        
-        function dtFormat(timestamp) {
-        const date = new Date(timestamp);
-        
-        const options = {
-        weekday: &amp;quot;long&amp;quot;,
-        year: &amp;quot;numeric&amp;quot;,
-        month: &amp;quot;long&amp;quot;,
-        day: &amp;quot;numeric&amp;quot;,
-        hour: &amp;quot;2-digit&amp;quot;,
-        minute: &amp;quot;2-digit&amp;quot;,
-        timeZoneName: &amp;quot;short&amp;quot;,
-        };
-        
-        // Create the formatter (e.g., for US English)
-        const formatter = new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, options);
-        
-        return formatter.format(date);
-        }
-        
-        export default async function (interval: Interval) {
-        // Lafayette, LA
-        const lat = &amp;quot;30.216667&amp;quot;;
-        const lng = &amp;quot;-92.033333&amp;quot;;
-        
-        // The threshold value is inches of rain per hour - any value &amp;gt;= will trigger a warning
-        const threshold = 0.5;
-        
-        let key = Deno.env.get(&amp;quot;API_KEY&amp;quot;);
-        let precipReq = await fetch(
-        `https://api.raindrop.farm/v1/precipitation/current?lat=${lat}&amp;amp;lon=${lng}`,
-        {
-        headers: {
-        &amp;quot;Authorization&amp;quot;: key,
-        },
-        },
-        );
-        
-        let precip = await precipReq.json();
-        let rainInches = mmPerHourToInchesPerHour(precip.precipitationIntensity);
-        console.log(&amp;quot;rainInches&amp;quot;, rainInches);
-        console.log(precip);
-        
-        if (rainInches &amp;gt;= threshold) {
-        let html = `
-        &amp;lt;h2&amp;gt;Heavy Rain Alert&amp;lt;/h2&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        As of ${
-        dtFormat(precip.timestamp)
-        }, we have detected ${rainInches.toFixed(2)} inches of rain per hour.
-        &amp;lt;/p&amp;gt;
-        `;
-        
-        await email({
-        subject: &amp;quot;Rain Alert&amp;quot;,
-        html,
-        });
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;On top of my script are two utility functions with the interesting one being the simple wrapper to convert RainDrop&apos;s values to inches.&lt;/p&gt;
-        &lt;p&gt;After that, I hit the API, check against a threshold (currently set to half an inch), and if it matches, I fire off an email. As a reminder, I&apos;m using Val Town&apos;s built in &amp;quot;mail the owner&amp;quot; feature. I could also use a proper email API to have more control over the delivery, but this works well for now.&lt;/p&gt;
-        &lt;p&gt;And of course, as soon as I built this there were no events, which is &lt;em&gt;good&lt;/em&gt; I suppose, but I did a quick tweak to force it to email and here&apos;s an example. Not terribly thrilling with 0 inches:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/raindrop3.png&quot; loading=&quot;lazy&quot; alt=&quot;Email example&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;If you want to play with this, you can fork the val here: https://www.val.town/x/raymondcamden/raindropAlert. And of course if you do, let me know!&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@r_shayesrehpour?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;reza shayestehpour&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/grayscale-photography-of-raindrops-Nw_D8v79PM4?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

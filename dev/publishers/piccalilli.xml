@@ -4,7 +4,315 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Tue, 30 Jun 2026 17:31:51 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 01 Jul 2026 18:01:56 GMT</lastBuildDate>
+    <item>
+      <title>Personal website redesign project post: Loading AT protocol posts data</title>
+      <link>https://piccalil.li/projects/personal-site/6/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/6/?ref=main-rss-feed</guid>
+      <pubDate>Wed, 01 Jul 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;We&apos;re picking up some good momentum, so let&apos;s keep the flow going. After &lt;a href=&quot;https://piccalil.li/projects/personal-site/4/&quot;&gt;integrating WordPress to power the blog section&lt;/a&gt;, it&apos;s now time to integrate a new feature of this website: AT Protocol posts.&lt;/p&gt;
+        &lt;p&gt;I &lt;em&gt;could&lt;/em&gt; go all in at this point and integrate posts, comments, interactions and comments on blog posts, but I&apos;m not in the business of doing that until I &lt;em&gt;fully understand what I&apos;m doing&lt;/em&gt;. Throwing code at the wall to see what sticks is a one way high speed train to technical debt city.&lt;/p&gt;
+        &lt;p&gt;If there ever is a time to experiment, it &lt;em&gt;is&lt;/em&gt; on your personal site. I&apos;m just trying to eradicate as much tech debt as possible in this project.&lt;/p&gt;
+        &lt;p&gt;What I&apos;m doing instead is what I outlined in planning, specifically where I worked out &lt;a href=&quot;https://piccalil.li/projects/personal-site/2/#work-out-the-core-features&quot;&gt;each iteration&lt;/a&gt;. Here it is as a reminder:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-core-features.jpg&quot; alt=&quot;An Obsidian markdown file called &amp;quot;core features and iterations.&amp;quot; It lists a development roadmap across four iterations, including tasks like &amp;quot;basic shell version of the site,&amp;quot; &amp;quot;look and feel design,&amp;quot; &amp;quot;AT protocol integration,&amp;quot; and &amp;quot;last.fm integration.&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;As per that planning, I&apos;m still in &lt;strong&gt;iteration one&lt;/strong&gt;, which means this phase of AT protocol integration is going to be a basic rendering of my AT protocol posts.&lt;/p&gt;
+        &lt;p&gt;I say AT protocol and not &lt;em&gt;Bluesky&lt;/em&gt; posts because it&apos;s worth remembering that Bluesky is the microblogging &lt;em&gt;app&lt;/em&gt; built on the protocol. My data (posts) is outside of that platform, on my Personal Data Server (PDS). Right now, at the time of writing, that PDS is on Bluesky&apos;s infrastructure, but I &lt;em&gt;will&lt;/em&gt; definitely be moving that to something I own, for sure.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Rendering the posts&lt;/h2&gt;
+        &lt;p&gt;In order to do this, I need create a new file in my &lt;code&gt;data&lt;/code&gt; package — just like I did for the WordPress posts — and lean into the AT Protocol API, using their &lt;a href=&quot;https://npmx.dev/package/@atproto/api&quot;&gt;official package&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the file in whole. I&apos;ll break down the important bits:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { AtpAgent, RichText } from &apos;@atproto/api&apos;;
+        import { getCache, setCache } from &apos;./memoryCache&apos;;
+        
+        const agent = new AtpAgent({
+        service: &apos;https://bsky.social&apos;,
+        });
+        
+        export async function fetchAllATPosts() {
+        const targetHandle = &apos;bell.bz&apos;;
+        const cacheKey = &apos;atPosts&apos;;
+        const cacheTimeout = 3600; // 3600 seconds is 1 hour
+        const cached = getCache(cacheKey);
+        
+        if (cached) {
+        return cached;
+        }
+        
+        // Authentication is required
+        await agent.login({
+        identifier: targetHandle,
+        password: process.env.BLUESKY_APP_PASSWORD,
+        });
+        
+        let allPosts = [];
+        let cursor = undefined;
+        
+        try {
+        while (true) {
+        // Fetch this cursor from the feed of items
+        const response = await agent.getAuthorFeed({
+        actor: targetHandle,
+        cursor: cursor,
+        limit: 100, // Max limit per cursor
+        
+        // For now, I&apos;m just doing root level posts. Maybe as this   evolves I&apos;ll bring in replies too.
+        filter: &apos;posts_no_replies&apos;,
+        });
+        
+        // Loop each item but filter out reposts and quote posts
+        for (const item of response.data.feed.filter(
+        (x) =&amp;gt;
+        !(
+        x?.reason?.$type === &apos;app.bsky.feed.defs#reasonRepost&apos; ||
+        x.post.embed?.$type === &apos;app.bsky.embed.record#view&apos; ||
+        x.post.embed?.$type === &apos;app.bsky.embed.recordWithMedia#view&apos;
+        )
+        )) {
+        const post = item.post;
+        const parser = new RichText({ text: post.record.text || &apos;&apos; });
+        
+        await parser.detectFacets(agent);
+        
+        let postMarkdown = &apos;&apos;;
+        const externalEmbed = post.embed?.external || post.record.embed?.external;
+        
+        for (const segment of parser.segments()) {
+        if (segment.isLink()) {
+        let uri = segment.link?.uri;
+        let linkText = segment.text;
+        
+        // Check if this link matches the external embed link
+        // We compare URIs (or check if the embed exists) to get the full version
+        if (
+        externalEmbed &amp;amp;&amp;amp;
+        (uri?.includes(&apos;..&apos;) ||
+        (externalEmbed &amp;amp;&amp;amp; (uri?.includes(&apos;…&apos;) || uri === externalEmbed.uri)))
+        ) {
+        uri = externalEmbed.uri;
+        linkText = externalEmbed.uri;
+        }
+        
+        postMarkdown += `[${linkText}](${uri})`;
+        } else if (segment.isMention()) {
+        postMarkdown += `[${segment.text}](https://bsky.app/profile/${segment.text.replace(&apos;@&apos;, &apos;&apos;)})`;
+        } else {
+        postMarkdown += segment.text;
+        }
+        }
+        
+        // Create a sensible return object type
+        const postData = {
+        uri: post.uri,
+        cid: post.cid,
+        content: postMarkdown,
+        date: post.record.createdAt,
+        likes: post.likeCount,
+        reposts: (post.repostCount || 0) + (post.quoteCount || 0),
+        replies: post.replyCount,
+        media: [],
+        };
+        
+        if (post.embed) {
+        
+        // If there are images, add to the return object
+        if (post.embed.$type === &apos;app.bsky.embed.images#view&apos;) {
+        postData.media = post.embed.images.map((img) =&amp;gt; ({
+        type: &apos;image&apos;,
+        src: img.fullsize,
+        alt: img.alt,
+        thumb: img.thumb,
+        }));
+        }
+        
+        // If there are open graph images, surface those
+        else if (post.embed.$type === &apos;app.bsky.embed.external#view&apos;) {
+        postData.media.push({
+        type: &apos;external&apos;,
+        uri: post.embed.external.uri,
+        title: post.embed.external.title,
+        description: post.embed.external.description,
+        thumb: post.embed.external.thumb,
+        });
+        }
+        
+        // If there are videos, add to the return object
+        else if (post.embed.$type === &apos;app.bsky.embed.video#view&apos;) {
+        postData.media.push({
+        type: &apos;video&apos;,
+        playlist: post.embed.playlist, // HLS stream (.m3u8)
+        thumbnail: post.embed.thumbnail,
+        cid: post.embed.cid,
+        });
+        }
+        }
+        
+        allPosts.push(postData);
+        }
+        
+        // Set the next cursor and break the loop if we&apos;re at the end
+        cursor = response.data.cursor;
+        if (!cursor) break;
+        }
+        
+        // Cache so it doesn&apos;t take forever to work on this locally
+        setCache(cacheKey, allPosts, cacheTimeout);
+        return allPosts;
+        } catch (error) {
+        console.error(&apos;Error fetching feed:&apos;, error);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        
+        You may well recoil in *horror* at this code initially — I sure did initially while learning this stuff — but don&apos;t worry, I&apos;ll step us through it. 
+        &lt;p&gt;If you want to copy some code to use yourself, use this block and ignore the blocks in the breakdown.
+        &lt;/p&gt;
+        &lt;p&gt;That’s a &lt;em&gt;lot&lt;/em&gt; of code in one block. Let&apos;s break it down into chunks.&lt;/p&gt;
+        &lt;h3&gt;The breakdown&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;import { AtpAgent, RichText } from &apos;@atproto/api&apos;;
+        import { getCache, setCache } from &apos;./memoryCache&apos;;
+        
+        const agent = new AtpAgent({
+        service: &apos;https://bsky.social&apos;,
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The first thing we do is set up dependencies: the agent (not one of &lt;em&gt;those&lt;/em&gt; ones) which interfaces with the protocol for us and rich text capabilities that are used to tidy up content. The &lt;code&gt;memoryCache&lt;/code&gt; parts are the &lt;a href=&quot;https://piccalil.li/projects/personal-site/4/#lets-add-a-web-page&quot;&gt;same as when I integrated the WordPress content&lt;/a&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const targetHandle = &apos;bell.bz&apos;;
+        const cacheKey = &apos;atPosts&apos;;
+        const cacheTimeout = 3600; // 3600 seconds is 1 hour
+        const cached = getCache(cacheKey);
+        
+        if (cached) {
+        return cached;
+        }
+        
+        // Authentication is required
+        await agent.login({
+        identifier: targetHandle,
+        password: process.env.BLUESKY_APP_PASSWORD,
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here, I&apos;m setting the target handle, the key for our memory cache and how long I want data to be cached for. I opted for an hour because I tend to work in short cycles when coding.&lt;/p&gt;
+        &lt;p&gt;Next up, I attempt to load data from cache &lt;em&gt;first&lt;/em&gt;, then check it. If there is data in cache, I can return it and move on. If not, the first thing to do is to get the agent to log in.&lt;/p&gt;
+        &lt;p&gt;For the next part, we&apos;re going to be &lt;em&gt;within&lt;/em&gt; the &lt;code&gt;while&lt;/code&gt; loop.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const response = await agent.getAuthorFeed({
+        actor: targetHandle,
+        cursor: cursor,
+        limit: 100, // Max limit per cursor
+        
+        // For now, I&apos;m just doing root level posts. Maybe as this evolves I&apos;ll
+        // bring in replies too.
+        filter: &apos;posts_no_replies&apos;,
+        });
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Notice how I leave comments even for &lt;em&gt;myself&lt;/em&gt;? I can look back on this in the future and immediately be up to speed&lt;/p&gt;
+        &lt;p&gt;I have posted &lt;em&gt;a lot&lt;/em&gt; on Bluesky so right off the bat, I need to use cursors to paginate over multiple chunks of posts. That&apos;s fine, because I&apos;m keeping a track of it with the &lt;code&gt;cursor&lt;/code&gt; variable. Eventually that &lt;code&gt;cursor&lt;/code&gt; will be null, which in turn will break the &lt;code&gt;while&lt;/code&gt; loop. Lovely stuff.&lt;/p&gt;
+        &lt;p&gt;The only other bit to touch on is I&apos;m getting only top level posts, not my replies. I&apos;m not much of a &lt;em&gt;reply guy&lt;/em&gt;, but I still don&apos;t want out of context posts on the feed because it&apos;s just &lt;em&gt;noise&lt;/em&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;for (const item of response.data.feed.filter(
+        (x) =&amp;gt;
+        !(
+        x?.reason?.$type === &apos;app.bsky.feed.defs#reasonRepost&apos; ||
+        x.post.embed?.$type === &apos;app.bsky.embed.record#view&apos; ||
+        x.post.embed?.$type === &apos;app.bsky.embed.recordWithMedia#view&apos;
+        )
+        )) {
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The data returned, for each page of data, has a &lt;code&gt;feed&lt;/code&gt; array that I can now loop over. I do another pass at filtering here. Each line deals with:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Reposts, which are classified as posts and I don&apos;t want posts &lt;em&gt;I&lt;/em&gt; haven&apos;t written showing up in the feed&lt;/li&gt;
+        &lt;li&gt;Quote posts, which I don&apos;t want to deal with &lt;em&gt;yet&lt;/em&gt;&lt;/li&gt;
+        &lt;li&gt;Quote posts: same as #2, but with media by the &lt;em&gt;quoter&lt;/em&gt;&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;pre&gt;&lt;code&gt;const post = item.post;
+        const parser = new RichText({ text: post.record.text || &apos;&apos; });
+        
+        await parser.detectFacets(agent);
+        
+        let postMarkdown = &apos;&apos;;
+        const externalEmbed = post.embed?.external || post.record.embed?.external;
+        
+        for (const segment of parser.segments()) {
+        if (segment.isLink()) {
+        let uri = segment.link?.uri;
+        let linkText = segment.text;
+        
+        // Check if this link matches the external embed link
+        // We compare URIs (or check if the embed exists) to get the full version
+        if (
+        externalEmbed &amp;amp;&amp;amp;
+        (uri?.includes(&apos;..&apos;) ||
+        (externalEmbed &amp;amp;&amp;amp; (uri?.includes(&apos;…&apos;) || uri === externalEmbed.uri)))
+        ) {
+        uri = externalEmbed.uri;
+        linkText = externalEmbed.uri;
+        }
+        
+        postMarkdown += `[${linkText}](${uri})`;
+        } else if (segment.isMention()) {
+        postMarkdown += `[${segment.text}](https://bsky.app/profile/${segment.text.replace(&apos;@&apos;, &apos;&apos;)})`;
+        } else {
+        postMarkdown += segment.text;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;The aim of the game at this point is to generate a front-end friendly string of markdown that my existing infrastructure can deal with. In order to do that, I need to break down the &lt;code&gt;post.record.text&lt;/code&gt; with the &lt;code&gt;RichText&lt;/code&gt; utility, supplied by the &lt;code&gt;@atproto/api&lt;/code&gt; package.&lt;/p&gt;
+        &lt;p&gt;I can now loop over each segment of content and determine exactly what it &lt;em&gt;is&lt;/em&gt;. For example, I check first to see if there&apos;s an &lt;code&gt;externalEmbed&lt;/code&gt; — AKA a link — and build a markdown link string accordingly. If it&apos;s a mention, I create a nice link to that user&apos;s profile and finally if it&apos;s neither of those, I append raw text value to the markdown string.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const postData = {
+        uri: post.uri,
+        cid: post.cid,
+        content: postMarkdown,
+        date: post.record.createdAt,
+        likes: post.likeCount,
+        reposts: (post.repostCount || 0) + (post.quoteCount || 0),
+        replies: post.replyCount,
+        media: [],
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The most self explaining chunk of code here: I&apos;m creating a nice flat return object structure that matches the front-end components.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;if (post.embed) {
+        // If there are images, add to the return object
+        if (post.embed.$type === &apos;app.bsky.embed.images#view&apos;) {
+        postData.media = post.embed.images.map((img) =&amp;gt; ({
+        type: &apos;image&apos;,
+        src: img.fullsize,
+        alt: img.alt,
+        thumb: img.thumb,
+        }));
+        }
+        
+        // If there are open graph images, surface those
+        else if (post.embed.$type === &apos;app.bsky.embed.external#view&apos;) {
+        postData.media.push({
+        type: &apos;external&apos;,
+        uri: post.embed.external.uri,
+        title: post.embed.external.title,
+        description: post.embed.external.description,
+        thumb: post.embed.external.thumb,
+        });
+        }
+        
+        // If there are videos, add to the return object
+        else if (post.embed.$type === &apos;app.bsky.embed.video#view&apos;) {
+        postData.media.push({
+        type: &apos;video&apos;,
+        playlist: post.embed.playlist, // HLS stream (.m3u8)
+        thumbnail: post.embed.thumbnail,
+        cid: post.embed.cid,
+        });
+        }
+        }
+        
+        allPosts.push(postData);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The next time I add something to these checks, I&apos;ll refactor this to be a &lt;code&gt;switch&lt;/code&gt; statement. For now, I will live my life.&lt;/p&gt;
+        &lt;p&gt;Now, the last bit of &lt;em&gt;data massaging&lt;/em&gt; is left for this iteration. I&apos;m checking over a couple of cases to render images or video depending on what embed content I&apos;ve got to work with. Again, this is all about creating flat (as possible) structures for the front-end components to consume.&lt;/p&gt;
+        &lt;p&gt;After all of that, I push that post into the higher level array, which we&apos;ll cache and return.&lt;/p&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;That&apos;s the data sorted, so the next thing to do is wire it up to the website itself. I&apos;ll tackle that in the next one!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #188</title>
       <link>https://piccalil.li/the-index/188/?ref=main-rss-feed</link>
@@ -302,33 +610,6 @@
         &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-186&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/debugbear-b.jpeg&quot; alt=&quot;The DebugBear showing core web vitals, location metrics and page metrics.&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;How fast is your website?&lt;/strong&gt;&lt;/p&gt;
         &lt;p&gt;The free DebugBear website speed test provides an in-depth technical report on your page speed. You can also see how your Core Web Vitals have changed over time, based on Google’s Chrome User Experience Report.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-186&quot;&gt;Test Your Website Speed&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #185</title>
-      <link>https://piccalil.li/the-index/185/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/185/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 05 Jun 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://eyeball.rory.codes/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;eyeball&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Incredibly addictive game. Best to use a mouse/trackpad than a touch device to give yourself a chance too!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://dollarslice.nyc/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Dollar Slice Surf Report, New York City&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A cool project by Scott Jehl as, &lt;a href=&quot;https://scottjehl.com/posts/dollar-slice/&quot;&gt;using pen, pencil, Procreate and Figma&lt;/a&gt; as a much needed antidote to the slop era.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://ffconf.org/feeds/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Speaker feeds&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;FFconf have a &lt;em&gt;huge&lt;/em&gt; library of previous talks and speakers. Now, you can discover their RSS feeds and follow them. Handy!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://letsgetcreative.today/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Let&apos;s get creative&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Folks love it when we share indexes of &lt;em&gt;cool stuff&lt;/em&gt;, so here&apos;s another!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://bluecorridors.org/explore/species?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Protecting Blue Corridors&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Some absolutely delightful design and data visualisation work here.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/styling-tables-the-modern-css-way/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Styling Tables the Modern CSS Way&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://lowmess.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-185&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/debugbear-a.jpeg&quot; alt=&quot;The DebugBear showing core web vitals, location metrics and page metrics.&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Identify and fix web performance issues with DebugBear.&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Is your website slower than it should be? DebugBear provides in-depth web performance insights based on synthetic tests and real user monitoring.&lt;/p&gt;
-        &lt;p&gt;Detect pages with critical issues, get in-depth technical reports to identify solutions, and measure how performance impacts conversion rates.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-185&quot;&gt;Start Optimizing Your Website&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
