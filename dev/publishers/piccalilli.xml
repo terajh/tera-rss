@@ -4,7 +4,154 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 01 Jul 2026 18:01:56 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 02 Jul 2026 17:16:52 GMT</lastBuildDate>
+    <item>
+      <title>Personal website redesign project post: Rendering AT protocol posts on my /feed</title>
+      <link>https://piccalil.li/projects/personal-site/7/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/7/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 02 Jul 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m again, going to be doing a lot of the same sort of work I did for the WordPress integration, but as this is the first iteration of the AT protocol, it&apos;s going to be a lot simpler than that.&lt;/p&gt;
+        &lt;p&gt;Just like with the WordPress integration, I used Astro&apos;s pagination capabilities to build a paginated &quot;feed&quot; of posts, to satisfy the &quot;Basic rendering of my AT protocol posts&quot; part of the &lt;a href=&quot;https://piccalil.li/projects/personal-site/2/#work-out-the-core-features&quot;&gt;core features I outlined at the beginning of this series&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-core-features.jpg&quot; alt=&quot;An Obsidian markdown file called &amp;quot;core features and iterations.&amp;quot; It lists a development roadmap across four iterations, including tasks like &amp;quot;basic shell version of the site,&amp;quot; &amp;quot;look and feel design,&amp;quot; &amp;quot;AT protocol integration,&amp;quot; and &amp;quot;last.fm integration.&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Let&apos;s get stuck into that bit first. I created a &lt;code&gt;pages/feed/[...page].astro&lt;/code&gt; file and filled it with the following:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import { fetchAllATPosts } from &apos;@repo/data/atPosts&apos;;
+        
+        import PageLayout from &apos;src/layouts/PageLayout.astro&apos;;
+        import Pagination from &apos;@repo/ui/Pagination&apos;;
+        import ATPostsRegion from &apos;@repo/ui/ATPostsRegion&apos;;
+        
+        export async function getStaticPaths({ paginate }) {
+        const posts = await fetchAllATPosts();
+        return paginate(posts, { pageSize: 20 });
+        }
+        
+        const { page } = Astro.props;
+        ---
+        
+        &amp;lt;PageLayout title=&quot;Feed&quot; summary=&quot;&quot; socialImage=&quot;&quot; allowRobots={true}&amp;gt;
+        &amp;lt;ATPostsRegion posts={page.data} /&amp;gt;
+        &amp;lt;Pagination previous={page.url.prev} next={page.url.next} /&amp;gt;
+        &amp;lt;/PageLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;m getting all the posts with the functionality written in the &lt;a href=&quot;https://piccalil.li/projects/personal-site/6&quot;&gt;last article&lt;/a&gt;, limiting them to 20 per page and then instructing Astro what pages need building with &lt;code&gt;getStaticPaths()&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;From there and for each page, I&apos;ve got a &lt;code&gt;page&lt;/code&gt; prop, which just like with the WordPress integration, I&apos;m feeding to the &lt;code&gt;&amp;lt;Pagination&amp;gt;&lt;/code&gt; component. I&apos;m also feeding that data to the &lt;code&gt;&amp;lt;ATPostsRegion&amp;gt;&lt;/code&gt; which I&apos;ll break down next.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;The AT posts region&lt;/h2&gt;
+        &lt;p&gt;I didn&apos;t break down the &lt;code&gt;&amp;lt;PostsRegion&amp;gt;&lt;/code&gt; in the WordPress section of this series because it is literally just a list of links, but this one is &lt;em&gt;slightly&lt;/em&gt; different, but albeit &lt;em&gt;simple&lt;/em&gt;. We are in the early days of this rebuild after all!&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        const { posts } = Astro.props;
+        
+        import ATPost from &apos;@repo/ui/ATPost&apos;;
+        ---
+        
+        &amp;lt;div class=&quot;at-posts-region region&quot;&amp;gt;
+        &amp;lt;h1 class=&quot;visually-hidden&quot;&amp;gt;Feed&amp;lt;/h1&amp;gt;
+        &amp;lt;div class=&quot;wrapper flow&quot;&amp;gt;
+        &amp;lt;p&amp;gt;ℹ️ Posts from my &amp;lt;a href=&quot;https://bsky.app/profile/bell.bz&quot;&amp;gt;Bluesky profile&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;ul class=&quot;at-posts-region__list&quot; role=&quot;list&quot;&amp;gt;
+        {
+        posts.map((post) =&amp;gt; (
+        &amp;lt;li class=&quot;flow&quot;&amp;gt;
+        &amp;lt;ATPost post={post} /&amp;gt;
+        &amp;lt;/li&amp;gt;
+        ))
+        }
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The main reason I wanted to tackle this region was because of that visually hidden &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;. First here&apos;s the page, at the time of writing.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/bell-dot-bz-feed-page.jpg&quot; alt=&quot;My feed page, looking very basic, showing posts in chronological order&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;I didn&apos;t want a big ol&apos; heading on this page (at least initially), but I &lt;em&gt;do&lt;/em&gt; need a top level heading, for assistive tech users, so my &lt;a href=&quot;https://piccalil.li/blog/visually-hidden/&quot;&gt;ever-useful CSS utility&lt;/a&gt; helps a tonne here.&lt;/p&gt;
+        &lt;p&gt;The rest of this file is pretty self explanatory, so let&apos;s dig into the component that renders each post.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import {
+        formatDate,
+        convertATPrototocalURIToBlueskyURL,
+        } from &apos;@repo/utils/helpers&apos;;
+        
+        import MarkdownText from &apos;@repo/ui/MarkdownText&apos;;
+        
+        const { post } = Astro.props;
+        ---
+        
+        &amp;lt;div class=&quot;at-post flow&quot;&amp;gt;
+        &amp;lt;MarkdownText content={post.content} className=&quot;flow&quot; /&amp;gt;
+        {
+        post.media.length
+        ? post.media.map((media) =&amp;gt; (
+        &amp;lt;&amp;gt;
+        {media.type === &apos;image&apos; &amp;amp;&amp;amp; &amp;lt;img src={media.src} alt={media.alt} /&amp;gt;}
+        
+        {/* Like images, but this is specifically an open graph image */}
+        {media.type === &apos;external&apos; &amp;amp;&amp;amp; media.thumb &amp;amp;&amp;amp; (
+        &amp;lt;p&amp;gt;
+        &amp;lt;a href={media.uri}&amp;gt;
+        &amp;lt;img src={media.thumb} alt={media.title} /&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &amp;lt;/p&amp;gt;
+        )}
+        
+        {media.type === &apos;video&apos; &amp;amp;&amp;amp; (
+        &amp;lt;video width=&quot;352&quot; height=&quot;198&quot; controls poster={media.thumbnail}&amp;gt;
+        &amp;lt;source src={media.playlist} type=&quot;application/x-mpegURL&quot; /&amp;gt;
+        &amp;lt;/video&amp;gt;
+        )}
+        &amp;lt;/&amp;gt;
+        ))
+        : null
+        }
+        
+        &amp;lt;p class=&quot;at-post__meta&quot;&amp;gt;
+        &amp;lt;time datetime={post.date}&amp;gt;{formatDate(post.date, true)}&amp;lt;/time&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;dl class=&quot;at-post__stats cluster&quot;&amp;gt;
+        &amp;lt;dt&amp;gt;Likes&amp;lt;/dt&amp;gt;
+        &amp;lt;dd&amp;gt;{post.likes}&amp;lt;/dd&amp;gt;
+        &amp;lt;dt&amp;gt;Reposts&amp;lt;/dt&amp;gt;
+        &amp;lt;dd&amp;gt;{post.reposts}&amp;lt;/dd&amp;gt;
+        &amp;lt;dt&amp;gt;Replies&amp;lt;/dt&amp;gt;
+        &amp;lt;dd&amp;gt;{post.replies}&amp;lt;/dd&amp;gt;
+        &amp;lt;/dl&amp;gt;
+        
+        &amp;lt;p class=&quot;at-post__original-link&quot;&amp;gt;
+        &amp;lt;a href={convertATPrototocalURIToBlueskyURL(post.uri)}&amp;gt;Original&amp;lt;/a&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The first thing I do here is render the markdown text, generated in the &lt;a href=&quot;https://piccalil.li/projects/personal-site/6&quot;&gt;last article&lt;/a&gt;, with my existing component. With the easy part done, I swiftly move on to looping over the &lt;code&gt;post.media&lt;/code&gt; array and rendering appropriate markdown per embed type.&lt;/p&gt;
+        &lt;p&gt;Following that, the post&apos;s date is rendered with the &lt;code&gt;&amp;lt;time&amp;gt;&lt;/code&gt; element with like, repost and reply count rightly using a description list (&lt;code&gt;&amp;lt;dl&amp;gt;&lt;/code&gt;) element to articulate the data appropriately.&lt;/p&gt;
+        &lt;p&gt;The last part is a link out to Bluesky, which I&apos;ll bring in to show you:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+        * Converts an AT Protocol URI to a Bluesky Web URL
+        * @param {string} atUri - The at:// uri (e.g., at://did:plc.../app.bsky.feed.post/...)
+        * @returns {string} The formatted bsky.app URL
+        */
+        export function convertATPrototocalURIToBlueskyURL(uri) {
+        // Pattern: at://(DID)/(COLLECTION)/(RKEY)
+        const regex = /^at:\/\/(did:[^/]+)\/app\.bsky\.feed\.post\/([^/]+)$/;
+        const match = uri.match(regex);
+        
+        if (!match) {
+        return &apos;Invalid AT Protocol post URI&apos;;
+        }
+        
+        // Matches are in order because of array destructuring, so we use `_` to capture the un-needed part
+        const [_, did, rkey] = match;
+        return `https://bsky.app/profile/${did}/post/${rkey}`;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The aim of the game with this utility is to first match the parts of an AT protocol URI, then use those parts to return a web URL. Because every record in your Personal Data Server (PDS) has a &lt;code&gt;DID&lt;/code&gt; (user ID) and &lt;code&gt;rkey&lt;/code&gt;, it&apos;s a case of applying those URL parts and Bluesky does the rest. Handy.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;That&apos;s it! The AT protocol stuff looks incredibly complicated on the surface, but once you understand how PDS records work, it&apos;s a really elegant, straightforward system.&lt;/p&gt;
+        &lt;p&gt;There will be a full AT protocol focused iteration of this website, once I&apos;ve designed and implemented the new UI, so this stuff serves as a basic basis to build on. Hopefully it&apos;ll make the idea of implementing the AT protocol on &lt;em&gt;your&lt;/em&gt; website more appealing too.&lt;/p&gt;
+        &lt;p&gt;With AT protocol done, let&apos;s move on to my favourite part: the music collection, next.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Personal website redesign project post: Loading AT protocol posts data</title>
       <link>https://piccalil.li/projects/personal-site/6/?ref=main-rss-feed</link>
@@ -584,32 +731,6 @@
         &lt;p&gt;DebugBear real user monitoring tells you how fast your website is for your visitors and where you need to optimize.&lt;/p&gt;
         &lt;p&gt;Get in-depth diagnostics across Google’s Core Web Vitals metrics. For example, you can see what page elements and scripts are responsible for slow user interactions.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-187&quot;&gt;Learn More&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #186</title>
-      <link>https://piccalil.li/the-index/186/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/186/?ref=main-rss-feed</guid>
-      <pubDate>Mon, 15 Jun 2026 00:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://henry.codes/writing/it-doesnt-matter-if-it-works/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;It doesn’t matter if it works&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;An extremely good and important read.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://joshcollinsworth.com/blog/productivity?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;LLMs and performative productivity&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A rather detailed post that links out to some really interesting studies too.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://thoughtbot.com/blog/when-to-use-and-not-use-css-shorthand-properties?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;When to use (and not use) CSS shorthand properties&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As I see it, &lt;code&gt;margin&lt;/code&gt;, &lt;code&gt;padding&lt;/code&gt; and &lt;code&gt;border&lt;/code&gt; are safe as houses but there is evil out there, such as the &lt;code&gt;flex&lt;/code&gt; shorthand.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://blog.jim-nielsen.com/2026/good-at-things/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Being “good” at things&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Just a thoroughly delightful read, as per usual from Jim.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://www.gamefile.news/p/panic-mail-arco-despelote-time-flies-thank-goodness-teeth?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The amazing mail sent to a video game publisher&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;An interesting look behind the curtain that will make you smile.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/my-favourite-3-lines-of-css/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;My favourite 3 lines of CSS&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://bsky.app/profile/bell.bz/post/3mntwiiu2dk2q&quot;&gt;wanna see a glow up?&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-186&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/debugbear-b.jpeg&quot; alt=&quot;The DebugBear showing core web vitals, location metrics and page metrics.&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;How fast is your website?&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;The free DebugBear website speed test provides an in-depth technical report on your page speed. You can also see how your Core Web Vitals have changed over time, based on Google’s Chrome User Experience Report.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://piccalilli.link/debugbear-ti-186&quot;&gt;Test Your Website Speed&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
