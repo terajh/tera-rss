@@ -4,14 +4,188 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 02 Jul 2026 17:16:48 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 03 Jul 2026 17:08:46 GMT</lastBuildDate>
+    <item>
+      <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
+      <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
+      <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
+        &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;
+        I would argue that, despite using correct semantic HTML, the &quot;custom&quot; radio buttons are inaccessible.
+        &lt;/p&gt;
+        &lt;p&gt;
+        If you&apos;re a sighted keyboard user, how will you know how to interact with the radios, because they look nothing like traditional controls?
+        &lt;/p&gt;
+        &lt;p&gt;
+        Radio selection is usually made with ARROW keys. There&apos;s nothing to visually suggest this.
+        &lt;/p&gt;
+        &lt;p&gt;
+        Users may become frustrated because they&apos;re trying to use TAB key instead to access the 2nd radio.
+        &lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This all made sense to me, so I turned to &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt; for help. The first thing I did was download the CodePen assets locally. I knew my agent in Cursor could work with the remote URL, but as far as I know, could not edit my CodePen for me, and I wanted to give the agent the ability to edit locally so I could test and confirm.&lt;/p&gt;
+        &lt;p&gt;With the files in place locally, I started with this prompt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;I built this demo to showcase how to have a &apos;custom&apos; block of HTML that
+        could be selected and used in a form. I did an online check for
+        accessibility and while it reported a few issues, none seemed to
+        imply to the form concept that I was testing, the customized 
+        radio blocks. I blogged about this demo here. https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css. 
+        
+        When I shared this online, a user sent this feedback:
+        
+        &amp;quot;I would argue that, despite using correct semantic HTML,
+        the &amp;quot;custom&amp;quot; radio buttons are inaccessible.
+        
+        If you&apos;re a sighted keyboard user, how will you know 
+        how to interact with the radios, because they look
+        nothing like traditional controls?
+        
+        Radio selection is usually made with ARROW keys. There&apos;s
+        nothing to visually suggest this.
+        
+        Users may become frustrated because they&apos;re trying to use
+        TAB key instead to access the 2nd radio.&amp;quot;
+        
+        Given this feedback, what do you think, and what can we do to 
+        improve the demo?
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The response from this was pretty stellar, and I think a lot better than if I had simply said &amp;quot;work on accessibility&amp;quot;. By bringing in Kevin&apos;s details, I think it really helped focus the agent&apos;s work when looking at my code.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the response, and it&apos;s pretty extensive, you would be fine scrolling down to the Summary:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        The feedback is fair, and it points at a real gap — not broken semantics, but missing **keyboard affordance** and **visible focus**.
+        &lt;h2 id=&quot;my-take&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#my-take&quot;&gt;My take&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Your HTML foundation is sound. Real &lt;code&gt;&amp;lt;input type=&amp;quot;radio&amp;quot;&amp;gt;&lt;/code&gt; elements inside &lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt; wrappers is the right pattern: screen readers get a proper radio group, arrow keys work natively, and form submission behaves correctly. An automated checker can pass that and still miss the sighted keyboard-user experience.&lt;/p&gt;
+        &lt;p&gt;The reviewer is describing that gap. Custom cards that look like clickable tiles don’t read as “radio group” to someone tabbing through the form. That’s an &lt;strong&gt;operability&lt;/strong&gt; and &lt;strong&gt;perceivability&lt;/strong&gt; problem, not a semantic one.&lt;/p&gt;
+        &lt;h2 id=&quot;what-actually-happens-for-keyboard-users&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-actually-happens-for-keyboard-users&quot;&gt;What actually happens for keyboard users&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Native radio groups behave like this:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;Tab&lt;/strong&gt; moves into the group (to the selected radio, or the first one if nothing is selected).&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Tab again&lt;/strong&gt; skips the other radios and goes to the next control (Submit).&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Arrow keys&lt;/strong&gt; move between options in the group.&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;That Tab behavior is correct per the spec, but your demo gives users almost no signal for it. The radios are hidden with zero size and no opacity:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-1:6:style.css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There’s also no &lt;code&gt;:focus&lt;/code&gt; or &lt;code&gt;:focus-within&lt;/code&gt; styling on the cards. A sighted keyboard user can land on Option 1, press Tab expecting Option 2, jump straight to Submit, and never see which card had focus. Arrow keys may work, but nothing suggests they should try them.&lt;/p&gt;
+        &lt;p&gt;So: &lt;strong&gt;technically functional, practically confusing&lt;/strong&gt; for that audience.&lt;/p&gt;
+        &lt;h2 id=&quot;what-to-improve-(still-no-js)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-to-improve-(still-no-js)&quot;&gt;What to improve (still no JS)&lt;/a&gt;&lt;/h2&gt;
+        &lt;h3 id=&quot;1.-visible-focus-on-the-card-(%3Afocus-within)-%E2%80%94-highest-impact&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#1.-visible-focus-on-the-card-(%3Afocus-within)-%E2%80%94-highest-impact&quot;&gt;1. Visible focus on the card (&lt;code&gt;:focus-within&lt;/code&gt;) — highest impact&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;When the hidden radio inside a label has focus, style the whole card:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card:focus-within {
+        outline: 3px solid #005fcc;
+        outline-offset: 2px;
+        }
+        
+        .custom-card:focus-within:not(:has(input:checked)) {
+        border-color: #005fcc;
+        box-shadow: 0 0 0 3px rgba(0, 95, 204, 0.25);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This alone fixes “I tabbed here and have no idea where I am.”&lt;/p&gt;
+        &lt;h3 id=&quot;2.-group-label-with-%3Cfieldset%3E-and-%3Clegend%3E&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#2.-group-label-with-%3Cfieldset%3E-and-%3Clegend%3E&quot;&gt;2. Group label with &lt;code&gt;&amp;lt;fieldset&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;legend&amp;gt;&lt;/code&gt;&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Wrap the options so the group has a name and context:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;fieldset&amp;gt;
+        &amp;lt;legend&amp;gt;Choose a cat&amp;lt;/legend&amp;gt;
+        &amp;lt;!-- your custom-card labels --&amp;gt;
+        &amp;lt;/fieldset&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Screen readers announce the group; sighted users get a clear heading for the choice block.&lt;/p&gt;
+        &lt;h3 id=&quot;3.-short-keyboard-hint-(visible-text)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#3.-short-keyboard-hint-(visible-text)&quot;&gt;3. Short keyboard hint (visible text)&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;One line above or below the cards:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Use &lt;strong&gt;Tab&lt;/strong&gt; to reach this choice, then &lt;strong&gt;arrow keys&lt;/strong&gt; to switch options.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;You shouldn’t rely on this alone, but it sets expectations for the non-obvious Tab vs. arrow behavior. &lt;code&gt;aria-describedby&lt;/code&gt; can tie it to the group for assistive tech.&lt;/p&gt;
+        &lt;h3 id=&quot;4.-a-small-%E2%80%9Csingle-choice%E2%80%9D-visual-cue&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#4.-a-small-%E2%80%9Csingle-choice%E2%80%9D-visual-cue&quot;&gt;4. A small “single choice” visual cue&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;You don’t need to restore default radio chrome. A corner circle, checkmark when selected, or “Selected” badge helps users map cards to “pick one of several.” Selection state is only a blue background today, which is weaker for color vision and for understanding control type.&lt;/p&gt;
+        &lt;h3 id=&quot;5.-prefer-a-proper-visually-hidden-pattern-over-width%3A-0%3B-height%3A-0&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#5.-prefer-a-proper-visually-hidden-pattern-over-width%3A-0%3B-height%3A-0&quot;&gt;5. Prefer a proper visually-hidden pattern over &lt;code&gt;width: 0; height: 0&lt;/code&gt;&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Clip-based hiding keeps inputs reliably focusable and is a well-known pattern:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Pair that with &lt;code&gt;:focus-within&lt;/code&gt; on the label so focus is always visible on the card, not on a 1×1 pixel.&lt;/p&gt;
+        &lt;h3 id=&quot;6.-don%E2%80%99t-fight-native-tab-behavior&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#6.-don%E2%80%99t-fight-native-tab-behavior&quot;&gt;6. Don’t fight native Tab behavior&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Making each card a separate tab stop (e.g. &lt;code&gt;tabindex=&amp;quot;0&amp;quot;&lt;/code&gt; on labels) would &lt;strong&gt;break&lt;/strong&gt; expected radio keyboard behavior. Keep native radios; improve focus visibility and set expectations instead.&lt;/p&gt;
+        &lt;h2 id=&quot;what-you-can-say-in-the-blog&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-you-can-say-in-the-blog&quot;&gt;What you can say in the blog&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Something like:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;The pattern uses real radio inputs for semantics and form behavior. Custom styling hides the native control, so we add &lt;code&gt;:focus-within&lt;/code&gt; on each card, group the options in a &lt;code&gt;fieldset&lt;/code&gt;, and include a brief keyboard hint. Arrow keys switch options; Tab moves to the next field — standard radio behavior that’s easy to miss when the UI looks like generic cards.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That shows you’re addressing operability, not just checkbox-audit semantics.&lt;/p&gt;
+        &lt;h2 id=&quot;summary&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#summary&quot;&gt;Summary&lt;/a&gt;&lt;/h2&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Concern&lt;/th&gt;
+        &lt;th&gt;Valid?&lt;/th&gt;
+        &lt;th&gt;Fix&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Doesn’t look like radios&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;Focus ring, optional radio/check indicator&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Arrow keys not suggested&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;Hint text + fieldset/legend&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Tab doesn’t reach 2nd option&lt;/td&gt;
+        &lt;td&gt;Partially — that’s correct radio behavior&lt;/td&gt;
+        &lt;td&gt;Explain it; don’t change tab order&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Semantics wrong&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;Keep current HTML pattern&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;I’d treat this as “good foundation, needs keyboard UX polish,” not “start over.” The changes are mostly CSS and a bit of markup — still no JavaScript.&lt;/p&gt;
+        &lt;p&gt;If you want, I can apply these updates directly in &lt;code&gt;index.html&lt;/code&gt; and &lt;code&gt;style.css&lt;/code&gt; so the demo matches what you’d recommend in a follow-up post.
+        &lt;/script&gt;
+        &lt;/zero-md&gt;&lt;/p&gt;
+        &lt;p&gt;I went ahead and gave Cursor permission to edit and update my files, and while I&apos;m keeping the original CodePen as is, I pushed up the new files to Netlify: &lt;a href=&quot;https://formselectionblock.netlify.app/&quot;&gt;https://formselectionblock.netlify.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;The keyboard navigation is improved and the text helps too. I passed this by Kevin; he agreed with the updates, so going forward when I use this UX on my sites, I&apos;ll work with this version. Let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
       <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
       <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
-        &lt;p&gt;I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
         &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
         &lt;p&gt;
         &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css1.png&quot; loading=&quot;lazy&quot; alt=&quot;Form Sample&quot; class=&quot;imgborder imgcenter&quot;&gt;
@@ -125,7 +299,7 @@
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -381,7 +555,7 @@
       <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
       <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
       <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
         &lt;p&gt;Of course there is.&lt;/p&gt;
@@ -555,7 +729,7 @@
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -980,7 +1154,7 @@
       <title>Links For You (6/21/26)</title>
       <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
       <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
         &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
@@ -1043,7 +1217,7 @@
       <title>Building a Form Handling Service in Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
         &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
@@ -1227,7 +1401,7 @@
       <title>Creating a Dynamic Favicon with Cloudinary</title>
       <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
       <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
         &lt;p&gt;
@@ -1329,7 +1503,7 @@
       <title>Testing Diffbot&apos;s Web Search API</title>
       <link>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</link>
       <guid>https://www.raymondcamden.com/2026/06/11/testing-diffbots-web-search-api</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;It&apos;s hard to believe I first experimented with &lt;a href=&quot;https://www.diffbot.com/&quot;&gt;Diffbot&lt;/a&gt; nearly five years ago. You can see that first post up on the Adobe Medium account - &lt;a href=&quot;https://medium.com/adobetech/natural-language-processing-adobe-pdf-extract-and-deep-pdf-intelligence-31ae07139b66&quot;&gt;Natural Language Processing, Adobe PDF Extract, and Deep PDF Intelligence&lt;/a&gt;. Since then I&apos;ve tested out various APIs and features from them and was lucky enough to connect with them recently about a new initiative, a &lt;a href=&quot;https://docs.diffbot.com/reference/web-search-get&quot;&gt;web search API&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;There&apos;s multiple examples of this out in the wild already, but most just scrape/hack against Google. Google &lt;em&gt;had&lt;/em&gt; an API, the Custom Search JSON API (I even &lt;a href=&quot;https://www.raymondcamden.com/2020/03/22/implementing-google-custom-search-engines-json-api-in-the-jamstack&quot;&gt;covered it&lt;/a&gt; back when folks still talked about the JAMStack) but the API is now deprecated and officially turning off January 1, 2027.&lt;/p&gt;
@@ -1389,7 +1563,7 @@
       <title>Can GenAI help you win in Vegas? (2026)</title>
       <link>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</link>
       <guid>https://www.raymondcamden.com/2026/06/07/can-genai-help-you-win-in-vegas-2026</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
+      <pubDate>Fri, 03 Jul 2026 16:30:38 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;No! Thanks for reading. Still here? Cool. So &lt;em&gt;way&lt;/em&gt; back in 2023, I built a little demo that I thought was kinda cool. Early in 2023 I had used Alpine.js and the excellent &lt;a href=&quot;https://deckofcardsapi.com/&quot;&gt;Deck API&lt;/a&gt; to build a simple web-based Blackjack game: &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;Creating a Blackjack Game with Alpine.js and the Deck of Cards API&lt;/a&gt;. I then took &lt;em&gt;that&lt;/em&gt; demo and connected to Google&apos;s GenAI API, which back then was named Palm: &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;Can GenAI help you win in Vegas?&lt;/a&gt;. It&apos;s been a few years and I thought I&apos;d take a stab at it again, this time making use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;. Technically I&apos;d have much better luck using a bleeding edge Gemini model via a serverless function, and I may still take a stab at that later, but I thought I&apos;d see how well the Prompt API worked.&lt;/p&gt;
         &lt;p&gt;I won&apos;t go into all the details on how the game is built, for that, check out the &lt;a href=&quot;https://www.raymondcamden.com/2023/07/04/creating-a-blackjack-game-with-alpinejs-and-the-deck-of-cards-api&quot;&gt;original post&lt;/a&gt;. Also, I won&apos;t go over again the UI/UX of AI prompting, which I covered in the &lt;a href=&quot;https://www.raymondcamden.com/2023/11/09/can-genai-help-you-win-in-vegas&quot;&gt;last post&lt;/a&gt;. All I did was add a button: &amp;quot;Ask for Help!&amp;quot;, which kicks off the process and then uses a JavaScript &lt;code&gt;alert&lt;/code&gt; to provide feedback. That&apos;s not awesome but I&apos;m fine with that. Ok, I lie, it&apos;s Sunday, I&apos;ve got nothing but laundry to do - so I&apos;ll replace it with a native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; instead!&lt;/p&gt;
@@ -1527,200 +1701,6 @@
         on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
         &lt;/p&gt;
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>AI versus a Grue</title>
-      <link>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</link>
-      <guid>https://www.raymondcamden.com/2026/06/02/ai-versus-a-grue</guid>
-      <pubDate>Thu, 02 Jul 2026 16:55:38 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&amp;quot;It is pitch dark. You are likely to be eaten by a grue.&amp;quot; If you recognize that quote, congrats, you probably need to see your doctor about pain in your back. (Ok, pain everywhere.) For those of us of a certain age, or folks who like classic games, the Infocom series was a tremendous source of entertainment. Using plain text commands to navigate your environment, players had to use their minds to figure out puzzles and mazes in order to win the game. The IF (Interactive Fiction) community is still strong and of course, I&apos;ve spoken before about my time playing and coding on MUDs, so with that in mind, I thought I&apos;d try tackling something that I assumed probably wouldn&apos;t work well - seeing if Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;built-in AI&lt;/a&gt; could handle playing Zork 1, the most famous of Infocom&apos;s library. The short answer is... not so well. But honestly, it was kind of fun to try so I figured I&apos;d share the results.&lt;/p&gt;
-        &lt;h2 id=&quot;getting-zork&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-zork&quot;&gt;Getting Zork&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Before I could even begin trying to test AI&apos;s ability to play a 50 year old game (almost 50, Zork 1 launched in 1977), I first needed to find a JavaScript implementation. This turned out to be a bit tricky.&lt;/p&gt;
-        &lt;p&gt;I quickly found &lt;a href=&quot;https://github.com/curiousdannii/ifvms.js&quot;&gt;ifvms.js&lt;/a&gt;, an interactive fiction virtual machine library, but it was tailored to running at the command line. Also, there was little to no documentation on how to make use of the library. The repo mentions another repo, &lt;a href=&quot;https://github.com/curiousdannii/parchment&quot;&gt;parchment&lt;/a&gt; which lets you play games on the web, but I struggled to find documentation there as well, or documentation specific to my use case.&lt;/p&gt;
-        &lt;p&gt;To help, I went to Claude, and had it load &lt;code&gt;ifvms.js&lt;/code&gt; and create a &apos;stubbed&apos; version that I could use via calls like so:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// all of this loads Zork 1...
-        const res = await fetch(&apos;zork1.b64.txt&apos;);
-        const b64 = await res.text();
-        
-        const binary = atob(b64.trim());
-        const arrayBuffer = new ArrayBuffer(binary.length);
-        const view = new Uint8Array(arrayBuffer);
-        for (let i = 0; i &amp;lt; binary.length; i++) {
-        view[i] = binary.charCodeAt(i);
-        }
-        
-        engine = new ZorkEngine();
-        engine.load(arrayBuffer);
-        
-        // and then later:
-        let gameResponse = engine.getOutput(); // last thing the game did
-        
-        // send a command
-        let lastResponse = engine.send(command);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That source file above mentioned in the first line comes from an online source. Zork itself is open source (&lt;a href=&quot;https://github.com/historicalsource/zork1&quot;&gt;https://github.com/historicalsource/zork1&lt;/a&gt;), but I forget where I got my copy of the source. It&apos;s not a text file, I renamed it to that when initially attempting to build my demo on CodePen. I believe it was pure binary I converted to base64 and then renamed.&lt;/p&gt;
-        &lt;h2 id=&quot;building-the-game&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-the-game&quot;&gt;Building the Game&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;So with Claude helping me build the version of &lt;code&gt;ifvms&lt;/code&gt; I could use interactively, I then had to whip up a quick UI and point Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt;, which as of Chrome 148 is GA to everyone. (Well, everyone on Chrome.)&lt;/p&gt;
-        &lt;p&gt;My UI was just a giant text area where I&apos;d stream the output from the game and Chrome&apos;s inputs. All of that code is kinda basic, so I&apos;ll focus on the prompt aspect. Here&apos;s how I create my session:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;$session = await LanguageModel.create({
-        initialPrompts:[
-        { 
-        role: &apos;system&apos;, 
-        content: 
-        `
-        You are playing the classic text adventure game Zork. You will be given the current game output, and you will 
-        respond with a single command to play the game. You will not explain your command, just give the command. 
-        
-        Remember to keep your commands concise and to the point, as if you were playing the game yourself. Do not include 
-        any extra text or explanations.
-        
-        Zork is a text-based adventure game where you explore a mysterious underground world filled with treasures, puzzles, 
-        and dangers. Your goal is to navigate through the various locations, solve puzzles, and collect treasures 
-        while avoiding traps and monsters.
-        
-        Here are some examples of commands you might use in Zork:
-        - &amp;quot;go north&amp;quot;
-        - &amp;quot;take lamp&amp;quot;
-        - &amp;quot;open mailbox&amp;quot;
-        - &amp;quot;look around&amp;quot;
-        - &amp;quot;inventory&amp;quot;
-        
-        Do your best to play the game effectively and efficiently, making smart choices based on the current game output.
-        
-        Try not to keep returning to the same location repeatedly, as that can lead to getting stuck in loops. Instead, 
-        explore new areas and try different actions to progress through the game. Remember that you can travel in all directions.
-        `
-        }
-        ],		
-        monitor(m) {
-        m.addEventListener(&amp;quot;downloadprogress&amp;quot;, e =&amp;gt; {
-        console.log(`Downloaded ${e.loaded * 100}%`);
-        if(e.loaded === 0 || e.loaded === 1) {
-        $output.innerHTML = &apos;&apos;;
-        return;
-        }
-        $output.innerHTML = `Downloading AI model, currently at ${Math.floor(e.loaded * 100)}%`;
-        });
-        }		
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;As you can see, a majority of this is the big prompt. I iterated over this multiple times to help guide Chrome to effectively solve the game. (Which to be clear, it never did.)&lt;/p&gt;
-        &lt;p&gt;Outside of that, the main loop of the game is this heartbeat function:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function gameHeartBeat() {
-        
-        console.log(&apos;in hb&apos;);
-        let gameResponse = engine.getOutput();
-        if(!gameResponse) gameResponse = lastResponse;
-        
-        if(gameResponse) {
-        $gameoutput.value += gameResponse + &apos;\n&apos;;
-        $gameoutput.scrollTop = $gameoutput.scrollHeight;
-        
-        let command = await $session.prompt(gameResponse);
-        lastResponse = engine.send(command);
-        
-        $gameoutput.value += `&amp;gt; ${command}\n`;
-        $gameoutput.scrollTop = $gameoutput.scrollHeight;
-        
-        console.log(&apos;Resp&apos;,command);
-        setTimeout(gameHeartBeat, 1000 * 2);
-        }
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The variable &lt;code&gt;$gameoutput&lt;/code&gt; is just a DOM pointer to the &lt;code&gt;textarea&lt;/code&gt; used to render the game.&lt;/p&gt;
-        &lt;p&gt;Before going any further, I&apos;ll note a huge issue with my code and that&apos;s the lack of session management. Chrome absolutely provides you a way to monitor that usage and re-init the session when it is nearly filled. I didn&apos;t bother with that because I was being lazy when I built this.&lt;/p&gt;
-        &lt;p&gt;I&apos;d also argue that we could help Chrome&apos;s model quite a bit by keeping track of a list of rooms it has already visited to help it remember and not loop over the same place. My prompt tries to do that, but I could also help it out myself.&lt;/p&gt;
-        &lt;p&gt;All in all - this was a quick implementation and the results were... well what you would expect with a lightweight model and me just hacking quickly on it. ;)&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a transcript from a test I just did.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;ZORK I: The Great Underground Empire
-        Infocom interactive fiction - a fantasy story
-        Copyright (c) 1981, 1982, 1983, 1984, 1985, 1986 Infocom, Inc. All rights reserved.
-        ZORK is a registered trademark of Infocom, Inc.
-        Release 119 / Serial number 880429
-        
-        West of House
-        You are standing in an open field west of a white house, with a boarded front door.
-        There is a small mailbox here.
-        
-        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 0
-        &amp;gt; examine mailbox
-        The small mailbox is closed.
-        
-        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 1
-        &amp;gt; open mailbox
-        Opening the small mailbox reveals a leaflet.
-        
-        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 2
-        &amp;gt; read leaflet
-        (Taken)
-        &amp;quot;WELCOME TO ZORK!
-        
-        ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!&amp;quot;
-        
-        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 3
-        &amp;gt; look around
-        West of House
-        You are standing in an open field west of a white house, with a boarded front door.
-        There is a small mailbox here.
-        
-        &amp;gt;                                                                                 West of HouseScore: 0  Turns: 4
-        &amp;gt; go north
-        North of House
-        You are facing the north side of a white house. There is no door here, and all the windows are boarded up. To the north a narrow path winds through the trees.
-        
-        &amp;gt;                                                                                 North of HouseScore: 0  Turns: 5
-        &amp;gt; go north
-        Forest Path
-        This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.
-        
-        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 6
-        &amp;gt; examine tree
-        There&apos;s nothing special about the tree.
-        
-        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 7
-        &amp;gt; go north
-        Clearing
-        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
-        On the ground is a pile of leaves.
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 8
-        &amp;gt; take leaves
-        In disturbing the pile of leaves, a grating is revealed.
-        Taken.
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 9
-        &amp;gt; open grating
-        The grating is locked.
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 10
-        &amp;gt; look around
-        Clearing
-        You are in a clearing, with a forest surrounding you on all sides. A path leads south.
-        There is a grating securely fastened into the ground.
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 11
-        &amp;gt; go south
-        Forest Path
-        
-        &amp;gt;                                                                                 Forest PathScore: 0  Turns: 12
-        &amp;gt; go north
-        Clearing
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 13
-        &amp;gt; examine leaves
-        There&apos;s nothing special about the pile of leaves.
-        
-        &amp;gt;                                                                                 ClearingScore: 0  Turns: 14
-        &amp;gt; go south
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In my tests, it never seems to get much further in the game than the outer area, but certainly tries hard, so I guess I&apos;ll give it a gold star for that.&lt;/p&gt;
-        &lt;p&gt;If you want to try this yourself, you can point Chrome at &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/chrome_zork/&quot;&gt;https://cfjedimaster.github.io/webdemos/chrome_zork/&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;If you want to peruse the code yourself, you can check it out here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/chrome_zork&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Now that I&apos;ve got a bit more time on my hands (ahem), I may try hacking on this a bit more, but it was certainly fun to see it in action.&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@sortino?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Joshua Sortino&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/photo-of-light-towards-inside-of-cave-rAqzj79GUmA?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
