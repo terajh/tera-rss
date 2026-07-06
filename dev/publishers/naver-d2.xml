@@ -4,12 +4,183 @@
     <title>dev RSS - 네이버 D2</title>
     <link>https://d2.naver.com</link>
     <description>네이버 D2 RSS 피드</description>
-    <lastBuildDate>Sun, 05 Jul 2026 16:29:28 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jul 2026 18:06:32 GMT</lastBuildDate>
+    <item>
+      <title>[AI 해커톤 후기] 코드와 문서만 읽은 LLM은 어떻게 사람과 같은 팀을 1위로 골랐을까</title>
+      <link>https://d2.naver.com/helloworld/2541696</link>
+      <guid>https://d2.naver.com/helloworld/2541696</guid>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;2026년 봄, 네이버는 개발 직군 중심으로 열리던 Engineering Day를 모든 직군이 함께하는 &apos;모두의 Engineering Day&apos;로 넓혔습니다. 행사의 마지막 순서는 AI 해커톤이었습니다. 목표는 단순히 AI를 써보는 것이 아니라, 사람이 하던 반복 업무를 AI로 줄이고 그 과정에서 &apos;AI native로 일해 보는 경험&apos;을 만드는 것이었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;실제 업무 문제를 겪는 현업 담당자(problem holder)가 세 가지 문제를 냈고, 문제를 푸는 사람(solver)은 직군 제한 없이 네 명씩 팀을 이뤘습니다. 모두 25개 팀, 100여 명이 현장에서 문제와 매칭되었습니다. 각 팀은 바로 사용할 수 있는 수준의 최소 기능 제품(minimum viable product, MVP)을 하루 안에 만들어야 했습니다. 주제는 신규 서비스가 아니라 사람이 손으로 처리하던 반복 업무를 줄이는 사내 문제로 좁혔습니다.&lt;/p&gt;
+        
+        &lt;p&gt;행사를 준비하면서 마지막까지 남은 고민은 평가였습니다. 25팀의 제출물을 짧은 시간 안에 보고, 문제별 상위 팀을 공정하게 가려야 했습니다. 모든 코드를 실행해 볼 수 있다면 가장 좋았겠지만 시간이 부족했고, 제출된 코드와 문서를 일관된 기준으로 빠르게 읽을 방법이 필요했습니다. 마침 LLM의 성능이 좋아지면서 LLM을 평가자로 활용하는 방식(LLM as a judge)이 외부에서도 활발히 시도되고 있었습니다. 공통 문제를 두고 여러 팀이 경쟁하는 이번 행사에도 적용해 볼 만하다고 판단했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;이 글은 코드와 문서만 읽는 평가를 어떻게 설계했는지, 그 결과가 사람의 평가와 얼마나 일치했는지, 평가를 반복해도 비슷한 결과가 나오는지를 정리한 기록입니다. 다만 평가 대상은 세 문제, 25팀, 100여 명이 하루 만에 만든 MVP였습니다. 실제 서비스 코드처럼 방대하고 복잡한 환경에 이 방식을 그대로 적용하기는 어렵지만, &apos;LLM이 코드와 문서만 읽고도 사람과 비슷한 판단을 내릴 수 있는지&apos;를 가늠해 볼 수 있었습니다.&lt;/p&gt;
+        
+        &lt;h2&gt; 세 개의 문제와 평가 단계 &lt;/h2&gt;
+        
+        &lt;p&gt;세 개의 문제는 다음과 같습니다.&lt;/p&gt;
+        
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;문제 A(출자·투자 현황 관리)&lt;/strong&gt;: 수기 엑셀로 취합하던 출자·투자 지분 현황을 입력하고 검증할 수 있는 플랫폼으로 전환&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;문제 B(영수증 경비 정산)&lt;/strong&gt;: 영수증을 일일이 모아 처리하던 정산을 사내 메신저 봇으로 자동화&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;문제 C(업무 시간 관리)&lt;/strong&gt;: 흩어진 업무 소스를 모아 하루 일정을 만들고 실제 쓴 시간까지 돌아보는 어시스턴트 구현&lt;/li&gt;
+        &lt;/ul&gt;
+        
+        &lt;p&gt;심사는 1차와 2차로 나눴습니다. 1차는 문제별 후보군을 좁히는 예선이었고, 2차는 최종 시상을 정하는 본선이었습니다. 1차 안에는 두 트랙이 있었습니다. LLM 평가단은 문제당 상위 2팀을 점수와 근거로 추렸고, 문제 출제자는 본인 문제에서 꼭 살리고 싶은 1팀을 SUPER(슈퍼패스)로 본선에 올렸습니다.&lt;/p&gt;
+        
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th colspan=&quot;2&quot;&gt;단계&lt;/th&gt;&lt;th&gt;평가 주체&lt;/th&gt;&lt;th&gt;결과&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td rowspan=&quot;2&quot;&gt;1차&lt;/td&gt;&lt;td&gt;트랙 A — LLM 자동 평가&lt;/td&gt;&lt;td&gt;LLM 평가단&lt;/td&gt;&lt;td&gt;문제당 상위 2팀 선발&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;트랙 B — SUPER(슈퍼패스)&lt;/td&gt;&lt;td&gt;문제 출제자&lt;/td&gt;&lt;td&gt;본인 문제에서 1팀 구제&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;2차&lt;/td&gt;&lt;td&gt;사내 AI 커뮤니티 30% + 출제자 30% + 참가자 40%&lt;/td&gt;&lt;td&gt;최종 수상자 결정&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+        
+        LLM 평가는 사내에서 제공하는 코딩 에이전트로 진행했습니다. 평가 절차와 루브릭(채점 기준표)을 하나의 &apos;스킬&apos;로 정의하고, 에이전트가 그 스킬에 따라 코드와 문서를 읽게 했습니다. 사내에는 Claude Code와 Codex가 제공되었는데, 두 에이전트의 결과를 얻고 맞춰 볼 시간이 부족했습니다. 그래서 이번 LLM 평가는 Codex 하나로 진행했습니다.  
+        &lt;br/&gt;&lt;br/&gt;
+        
+        &lt;h2&gt; 평가 기준은 &apos;일을 얼마나 줄였는가&apos; &lt;/h2&gt;
+        
+        이 평가가 던진 질문은 하나, &apos;실제로 사용자의 일을 얼마나 줄여줬는가&apos;였습니다. 단순히 AI나 기술을 사용했다는 사실은 중요하지 않았습니다.
+        
+        같은 기능이라도 어디까지 이어지는지에 따라 점수가 달라졌습니다. 예를 들어 RAG(문서를 검색해 답을 보강하는 기법)가 정책을 찾아줘도 그 답이 경비 분류나 한도 판단으로 이어지지 않으면 검색을 돕는 데 그칩니다. 업무 화면으로 이동시키기만 하고 입력은 사람에게 맡기는 브라우저 확장 프로그램도 마찬가지입니다. 반대로 화면 입력을 대신 채우고, 실제 저장·상신(결재 요청)에 필요한 데이터를 만들고, 실패했을 때 다시 처리하는 흐름까지 구현했다면 사용자의 일을 대신했다고 볼 수 있습니다. 정적 대시보드도 정해진 상황만 보여주는지, 실제 수집 결과를 계속 반영하는지에 따라 다르게 평가했습니다. 그래서 발표 자료의 설명보다는 입력을 받고, 판단하고, 결과를 만드는 흐름이 실제 코드 안에서 이어지는지를 봤습니다.
+        
+        기준을 납득 가능하게 만드는 것만으로는 충분하지 않았습니다. 문제당 상위 2팀을 가려야 했기 때문에, 비슷하게 좋아 보이는 팀들 사이에서도 차이가 드러나야 했습니다. 그래서 기능 완성도(functionality) 40점, 기술·구현(technical) 20점, 차별성·문제해결(differentiation) 20점, 문서·제출자료(documentation) 20점의 네 가지 평가 축을 정했습니다. 발표 자료만 보면 비슷해 보이는 팀도 코드에서 확인되는 구현 범위, 예외 처리, 업무 흐름의 연결 정도를 기준으로 보면 차이가 났습니다.
+        &lt;br/&gt;&lt;br/&gt;
+        
+        &lt;h2&gt; 평가 시스템의 동작 &lt;/h2&gt;
+        
+        평가 파이프라인은 단순했습니다. 각 팀의 저장소 주소, 커밋, 제출물 경로를 고정한 매니페스트를 준비하면 에이전트가 코드와 문서를 읽고 점수와 한 줄 평을 생성했습니다. 사람이 개입한 곳은 매니페스트를 준비하는 사전 단계와 결과 공개 시점을 정하는 단계뿐이었습니다.&lt;br/&gt;&lt;br/&gt;
+        
+        &lt;img src=&quot;/content/images/2026/07/eval-pipeline.png&quot; alt=&quot;eval-pipeline&quot; /&gt;
+        &lt;br/&gt;  
+        가장 신경 쓴 부분은 공정성이었습니다. 화면을 직접 실행하지 않고 코드와 문서만으로 구현 수준을 판단해야 했기 때문에, 참가자와 운영자가 납득할 수 있는 기준이 필요했습니다. 발표 자료에는 완성됐다고 적혀 있어도 코드로 확인되지 않으면 구현 완료로 보지 않았습니다. TODO로 남은 기능, 틀만 있고 동작하지 않는 코드, 발표 자료에만 있는 기능도 마찬가지였습니다. 다만 같은 이유로 감점을 반복하지는 않고, 구현된 만큼만 점수를 주고 확인되지 않은 부분은 점수를 주지 않았습니다.
+        
+        채점은 팀별로 분리했습니다. 팀별 채점 에이전트(team-evaluator)는 매니페스트에서 팀명, 문제, 커밋, 저장소, 제출물 경로를 확인한 뒤 문제별 루브릭에 따라 코드와 문서를 읽었습니다. 점수만 남기면 이후 조율과 검수가 어려우므로 내부 JSON에는 점수, 강점, 근거, 판단 리스크를 함께 남겼습니다.
+        
+        세 문제는 동일한 네 가지 평가 축을 사용했지만, 문제별 스킬에서 중점적으로 본 부분은 달랐습니다.&lt;br/&gt;&lt;br/&gt;
+        
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;문제&lt;/th&gt;&lt;th&gt;중점적으로 본 부분&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;문제 A(출자·투자 현황 관리)&lt;/td&gt;&lt;td&gt;수기 엑셀 기반 출자 현황을 기준 데이터(master DB)로 옮기는 입력, 검증, 불일치 발견·수정 경로&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;문제 B(영수증 경비 정산)&lt;/td&gt;&lt;td&gt;영수증 인식부터 카드 매칭, 분류, 한도 확인, 임시 저장까지 이어지는 경비 처리 흐름&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;문제 C(업무 시간 관리)&lt;/td&gt;&lt;td&gt;흩어진 업무 소스를 모아 하루 일정으로 바꾸는 핵심 흐름, 실제 연동, 상태 관리, 문서 근거&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+        
+        예를 들어 문제 B에서는 단순 OCR 데모와 실제 경비 처리 자동화를 나눠 보는 기준을 촘촘하게 뒀습니다. 영수증을 읽는 데서 끝나는지, 카드 매칭, 분류, 한도 확인, 예외 회복, 임시 저장까지 업무 흐름이 이어지는지를 따로 확인했습니다.
+        
+        채점이 끝나면 문제별 취합 에이전트(topic-lead)가 같은 문제의 팀별 결과를 모았습니다. 이 단계에서는 새 점수를 만들지는 않고, 개별 채점 결과의 점수, 근거, 위험을 같은 문제 안에서 비교하고 점수 스케일과 상위권 후보가 갈리는 지점을 확인했습니다.
+        
+        평가를 조율할 때는 책임을 나누는 데 신경을 썼습니다. 팀별 채점, 문제 내 조율, 한 줄 평 작성을 한 컨텍스트에 몰아넣으면 앞선 팀의 인상이나 문장의 톤이 다음 판단에 섞일 수 있고 평가 집중도가 떨어질 수도 있습니다. 그래서 채점 에이전트는 한 팀만 보고, 취합 에이전트는 같은 문제의 결과만 모으고, 한 줄 평은 작성(copywriter)과 검수(reviewer) 에이전트로 분리했습니다. 운영 관점에서는 네 가지 공통 평가 축을 먼저 고정했다는 점도 도움이 됐습니다. 문제별 세부 루브릭은 달라도 같은 평가 축을 공유했기 때문에 결과를 하나의 파이프라인으로 모으기 쉬웠습니다.
+        &lt;br/&gt;&lt;br/&gt;
+        
+        &lt;h2&gt; 사람의 판단과 만난 지점 &lt;/h2&gt;
+        
+        LLM 평가는 문제당 상위 2팀을 뽑는 1차 관문이었습니다. 따라서 공식 우승팀이 LLM 후보군 안에 들어왔다는 사실만으로는 큰 의미를 부여하기 어렵습니다. 더 흥미로웠던 지점은 문제 A와 문제 B에서 서로 다른 세 판단이 같은 팀을 가리켰다는 점입니다. LLM은 8~9개 팀(문제 A는 9개 팀, 문제 B와 C는 각 8개 팀) 중 해당 팀을 1위로 평가했습니다. 문제 출제자도 같은 팀을 SUPER로 골랐고, 최종 심사에서 사람들이 고른 우승 팀도 같았습니다.&lt;br/&gt;&lt;br/&gt;
+        
+        &lt;img src=&quot;/content/images/2026/07/image-2026-6-5_15-52-18.png&quot; alt=&quot;image-2026-6-5_15-52-18&quot; /&gt;
+        
+        &lt;img src=&quot;/content/images/2026/07/-----------2026-07-06-------10-32-09.png&quot; alt=&quot;image-2026-6-5_15-52-31&quot; /&gt;
+        
+        &lt;br/&gt;  
+        &lt;table&gt;  
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;문제&lt;/th&gt;
+        &lt;th&gt;LLM 1위&lt;/th&gt;
+        &lt;th&gt;SUPER&lt;/th&gt;
+        &lt;th&gt;최종 1위&lt;/th&gt;
+        &lt;th&gt;일치&lt;/th&gt;
+        &lt;th&gt;상위권 양상&lt;/th&gt;
+        &lt;th&gt;우수한 지점&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 A (출자·투자 현황 관리)&lt;/td&gt;
+        &lt;td&gt;팀 NStake&lt;/td&gt;
+        &lt;td&gt;팀 NStake&lt;/td&gt;
+        &lt;td&gt;팀 NStake&lt;/td&gt;
+        &lt;td&gt;일치&lt;/td&gt;
+        &lt;td&gt;1~3위 초접전&lt;/td&gt;
+        &lt;td&gt;기능 완성도&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 B (영수증 경비 정산)&lt;/td&gt;
+        &lt;td&gt;팀 youngsoo&lt;/td&gt;
+        &lt;td&gt;팀 youngsoo&lt;/td&gt;
+        &lt;td&gt;팀 youngsoo&lt;/td&gt;
+        &lt;td&gt;일치&lt;/td&gt;
+        &lt;td&gt;1위가 비교적 뚜렷&lt;/td&gt;
+        &lt;td&gt;차별성, 문제 해결&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 C (업무 시간 관리)&lt;/td&gt;
+        &lt;td&gt;팀 daylog&lt;/td&gt;
+        &lt;td&gt;팀 TeamNaver_Assistant&lt;/td&gt;
+        &lt;td&gt;팀 timamanager&lt;/td&gt;
+        &lt;td&gt;불일치&lt;/td&gt;
+        &lt;td&gt;1~3위 접전&lt;/td&gt;
+        &lt;td&gt;문서, 제출 자료&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        
+        &lt;p&gt;문제 A는 상위권 점수 차가 거의 없는 초접전이었습니다. 눈에 띄는 것은 LLM 평가에서 접전 구간의 맨 앞에 놓인 팀이 출제자의 SUPER 선택과 같았다는 사실입니다. 팀 NStake를 고른 SUPER 선택도 실제 사용 가능성과 동작 완성도를 중요시한 결과라면, 두 평가는 같은 축에 무게를 둔 셈입니다.&lt;/p&gt;
+        
+        &lt;p&gt;문제 B에서는 팀 youngsoo가 차별성과 문제 해결에서 비교적 뚜렷하게 앞섰습니다. 이 문제의 스킬은 사내 메신저 봇(WORKS Bot), OCR, 예외 회복, 한도 확인, 사내 경비 시스템(neon-ess), 상신 안전성 같은 경계를 자세히 봤습니다. 루브릭이 영수증을 읽기만 하는 수준과 실제 경비 처리를 자동화하는 수준을 나눠 보도록 설계돼 있었기 때문에, 차별성이 코드 근거로 확인되는 팀을 찾아낼 수 있었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;문제 C에서는 LLM 평가, SUPER, 최종 심사가 서로 다른 팀을 가리켰습니다. 당일 결과만 보면 문서와 제출 자료 근거가 확실한 팀 daylog가 LLM 평가에서 앞섰고, 공식 우승 팀 timamanager는 실제 동작 완성도에서 강했습니다. 특정 팀이 맞고 틀렸다는 뜻은 아닙니다. 문제 C처럼 상위권 점수 차가 작을 때는 한 번의 평가 총점만으로 1위를 단정하기 어렵다는 사실을 알 수 있었습니다.&lt;/p&gt;
+        
+        &lt;h2&gt; 반복 평가와 안정성 &lt;/h2&gt;
+        
+        &lt;p&gt;문제 C의 불일치를 보고 나니 한 가지를 더 확인하고 싶었습니다. 같은 제출물을 LLM이 다시 채점하면 비슷한 결과가 나올까, 아니면 실행할 때마다 전혀 다른 결과가 나올까 하는 것이었습니다. 해커톤이 끝난 뒤 각 문제를 5회씩 다시 평가해 봤습니다. 점수 자체는 예상보다 흔들렸지만, 상위권을 유지하는 팀은 비교적 안정적이었습니다.&lt;/p&gt;
+        
+        &lt;p&gt;반복 평가에서 1위가 나온 횟수는 다음과 같았습니다.&lt;/p&gt;
+        
+        &lt;table&gt;  
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;문제&lt;/th&gt;
+        &lt;th&gt;5회 중 1위 횟수&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 A&lt;/td&gt;
+        &lt;td&gt;팀 NStake 4회, 팀 team22 1회&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 B&lt;/td&gt;
+        &lt;td&gt;팀 youngsoo 5회&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;문제 C&lt;/td&gt;
+        &lt;td&gt;팀 timamanager 4회, 팀 Sherpa 1회&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        
+        &lt;p&gt;여기서 보고 싶었던 것은 문제별 순위를 다시 매기는 것이 아니라, 반복 평가에서도 상위권을 유지하는 팀에는 어떤 공통점이 있는가였습니다.&lt;/p&gt;
+        
+        &lt;p&gt;팀 NStake는 출자 현황 입력부터 기준 데이터 대조와 불일치 수정까지 이어졌습니다. 팀 youngsoo는 영수증 인식부터 카드 매칭, 분류, 임시 저장과 상신까지 이어졌습니다. 팀 timamanager는 업무 소스 수집부터 일정 생성, 상태 갱신, 퇴근 리뷰까지 이어졌습니다. 세부 구현은 달랐지만 점수를 만든 이유는 비슷했습니다. 입력부터 판단, 결과 생성까지 이어지는 문제 해결 흐름이 코드에서 보였다는 것입니다.&lt;/p&gt;
+        
+        &lt;p&gt;반대로 점수가 크게 흔들린 제출물은 기술이 부족했기 때문은 아니었습니다. 그 기술이 실제 업무를 어디까지 대신하는지가 애매한 경우가 많았습니다.&lt;/p&gt;
+        
+        &lt;p&gt;그래서 문제 C처럼 점수 차가 작은 경우에는 평가 한 번의 총점뿐 아니라 같은 평가가 반복해서 유지되는지도 함께 봐야 한다고 느꼈습니다. 반복해도 같은 팀이 상위에 남는다면, 그 평가는 운이 아니라 기준에 따라 어느 정도 일관되게 작동했다고 볼 수 있습니다.&lt;/p&gt;
+        
+        &lt;h2&gt; 회고 &lt;/h2&gt;
+        
+        &lt;p&gt;평가를 맡은 팀이 해커톤 뒤 잠깐 모여 회고했을 때 가장 아쉬워했던 점은 당일에 정해진 시간 안에 결과를 내야 하기 때문에 반복 평균을 사용하지 못했다는 것입니다. 다음에는 가능한 범위에서 평가를 병렬로 3~5회 반복하고, 평균 점수와 함께 반복 평가에서도 순위가 유지되는지를 보려고 합니다.&lt;/p&gt;
+        
+        &lt;p&gt;실제 실행 검증까지 가지 못한 것도 한계였지만, 모든 제출물을 직접 실행해 보는 것이 다음 과제라고 생각하지는 않습니다. 낯선 저장소를 안정적으로 실행하는 일에는 평가와는 또 다른 어려움이 있고, 사후 반복 평가에서 확인했듯, 코드와 문서만 읽어도 실제 업무 흐름이 잘 이어진 팀은 반복해서 상위권에 남았기 때문입니다.&lt;/p&gt;
+        
+        &lt;p&gt;반면, 다음에도 공통 평가 축을 먼저 정하고 문제별 세부 루브릭으로 구체화하는 방식은 유지하려고 합니다. 문제별 루브릭이 달라도 같은 평가 축을 공유했기 때문에 결과를 한 방향으로 모을 수 있었습니다.&lt;/p&gt;
+        
+        &lt;h2&gt; 마치며 &lt;/h2&gt;
+        
+        &lt;p&gt;이번 평가에서 가장 분명하게 확인한 것은, 채점 기준이 충분히 구체적이면 코드와 문서만 읽은 LLM도 사람의 판단에 가까운 결론에 도달할 수 있다는 점이었습니다. LLM은 단순히 기능 구현 여부만 보는 것이 아니라, 실제 문제를 해결하는 흐름이 코드 안에서 처음부터 끝까지 이어지는지까지 확인했습니다.&lt;/p&gt;
+        
+        &lt;p&gt;명확한 루브릭과 평가 범위가 있다면, 더 복잡한 코드에서도 제품이 의도한 업무 흐름을 갖추었는지 점검하는 보조 평가로 LLM 평가를 활용할 수 있겠다는 아이디어를 얻었습니다. 작은 코드베이스에서 본 가능성이지만, 이번 해커톤에서 여러 팀의 코드를 같은 기준으로 살펴보고, 그 판단을 사람의 평가와 나란히 비교해 본 덕분에, 그 가능성을 작게나마 실제 사례로 확인할 수 있었습니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>AI 에이전트 회사 차리기: 설립부터 어디서든 동기화까지</title>
       <link>https://d2.naver.com/helloworld/3897377</link>
       <guid>https://d2.naver.com/helloworld/3897377</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -57,7 +228,7 @@
       <title>End to End 유저 모니터링 RUM 으로 한방에 해결!!</title>
       <link>https://d2.naver.com/helloworld/9227131</link>
       <guid>https://d2.naver.com/helloworld/9227131</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -102,7 +273,7 @@
       <title>Kelos - 쿠버네티스 네이티브 자율 코딩 에이전트 프레임워크</title>
       <link>https://d2.naver.com/helloworld/3015479</link>
       <guid>https://d2.naver.com/helloworld/3015479</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -145,7 +316,7 @@
       <title>SNOW의 Automatic Sharding 도입기</title>
       <link>https://d2.naver.com/helloworld/4394359</link>
       <guid>https://d2.naver.com/helloworld/4394359</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -190,7 +361,7 @@
       <title>사람과 AI Agent를 위한 통합 Context Provider 구축</title>
       <link>https://d2.naver.com/helloworld/7056385</link>
       <guid>https://d2.naver.com/helloworld/7056385</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -232,7 +403,7 @@
       <title>스펙만 바꾸면 프롬프트가 따라옵니다 - 답변 생성 모델 자동화 파이프라인</title>
       <link>https://d2.naver.com/helloworld/2852215</link>
       <guid>https://d2.naver.com/helloworld/2852215</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -272,7 +443,7 @@
       <title>도구에서 동료로 — AI 에이전트 자율 성장 프레임워크</title>
       <link>https://d2.naver.com/helloworld/4399330</link>
       <guid>https://d2.naver.com/helloworld/4399330</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -320,7 +491,7 @@
       <title>SaaS 대체하기: AI와 함께한 광고SDK 에러 모니터링 시스템 구축기</title>
       <link>https://d2.naver.com/helloworld/8319114</link>
       <guid>https://d2.naver.com/helloworld/8319114</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -366,7 +537,7 @@
       <title>AI 에이전트를 위한 Playwright E2E 테스트 하네스 구축하기</title>
       <link>https://d2.naver.com/helloworld/6811215</link>
       <guid>https://d2.naver.com/helloworld/6811215</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -413,7 +584,7 @@
       <title>MLXP : Kubernetes LLM Serving  최적화 기술 도입기</title>
       <link>https://d2.naver.com/helloworld/1059238</link>
       <guid>https://d2.naver.com/helloworld/1059238</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -458,7 +629,7 @@
       <title>Android 앱의 의도치 않은 변경 방지하기</title>
       <link>https://d2.naver.com/helloworld/3431313</link>
       <guid>https://d2.naver.com/helloworld/3431313</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -501,7 +672,7 @@
       <title>안드로이드 빌드 대기 시간 없애기</title>
       <link>https://d2.naver.com/helloworld/4372269</link>
       <guid>https://d2.naver.com/helloworld/4372269</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -548,7 +719,7 @@
       <title>AI국민비서: 공공 특화 에이전트 구축하기</title>
       <link>https://d2.naver.com/helloworld/6647064</link>
       <guid>https://d2.naver.com/helloworld/6647064</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -595,7 +766,7 @@
       <title>FE News 26년 6월 소식을 전해드립니다.</title>
       <link>https://d2.naver.com/news/7161766</link>
       <guid>https://d2.naver.com/news/7161766</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -651,7 +822,7 @@
       <title>비개발자가 한 달 동안 풀스택으로 개발하면서 배운 것</title>
       <link>https://d2.naver.com/helloworld/0107009</link>
       <guid>https://d2.naver.com/helloworld/0107009</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER Engineering Day 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -702,7 +873,7 @@
       <title>Inside VictoriaMetrics</title>
       <link>https://d2.naver.com/helloworld/9290861</link>
       <guid>https://d2.naver.com/helloworld/9290861</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER ENGINEERING DAY 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -748,7 +919,7 @@
       <title>AI 에이전트가 코드를 실험하고 개선하는 법</title>
       <link>https://d2.naver.com/helloworld/8061804</link>
       <guid>https://d2.naver.com/helloworld/8061804</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;네이버 사내 기술 교류 행사인 NAVER Engineering Day 2026(5월)에서 발표되었던 세션을 공개합니다.&lt;br/&gt; &lt;/p&gt;
         
@@ -809,7 +980,7 @@
       <title>모두의 NAVER Engineering Day! D2에서 이어집니다.</title>
       <link>https://d2.naver.com/news/0766161</link>
       <guid>https://d2.naver.com/news/0766161</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;매년 봄과 가을, 네이버 엔지니어들은 Engineering Day를 통해 서로의 기술과 경험을 나눕니다.&lt;br/&gt; 한해동안 200개가 넘는 기술 세션이 공유되며, 실무 개발 경험과 신기술 도입시 유용하게 활용될 수 있는 팁을 교환하고 함께 성장하는 자리로 이어져 왔습니다.&lt;/p&gt;
         
@@ -849,7 +1020,7 @@
       <title>FE News 26년 5월 소식을 전해드립니다.</title>
       <link>https://d2.naver.com/news/4911787</link>
       <guid>https://d2.naver.com/news/4911787</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
+      <pubDate>Mon, 06 Jul 2026 17:40:57 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;img src=https://d2.naver.com/content/images/2023/07/-----------2023-07-06------4-16-49.png&gt;&lt;/p&gt;
         
@@ -884,187 +1055,6 @@
         &lt;p&gt;매월 첫째 주 수요일, 월 1회 발행 되고 있으니 많은 관심 부탁드립니다.&lt;br/&gt;
         &lt;a href=&quot;https://fenews.substack.com/embed&quot;&gt;▷ 구독하기&lt;/a&gt;&lt;/p&gt;
         &lt;/blockquote&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>비개발자의 AI 협업 도전기 — 생산성 측정하려다 서버까지 띄운 9일</title>
-      <link>https://d2.naver.com/helloworld/2017402</link>
-      <guid>https://d2.naver.com/helloworld/2017402</guid>
-      <pubDate>Sun, 05 Jul 2026 16:04:44 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&quot;조직이 잘하고 있는지 어떻게 알 수 있을까?&quot; 이 질문에서 출발해 사내 가이드 문서와 AI를 붙들고 직접 측정 도구를 완성하기까지 9일이 걸렸습니다. 그 과정을 기록으로 남깁니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;사내 생산성 측정에 관한 고민&lt;/h2&gt;
-        
-        &lt;p&gt;기술 PM으로 일하면서 조직과 프로젝트의 생산성을 어떻게 측정할지는 늘 풀리지 않는 과제였습니다. 스프린트를 원활하게 진행하는 것 같아도 막상 이를 수치로 보여달라고 하면 난감했습니다. 속도가 빨라지는지, 병목이 어디서 발생하는지, 지난 분기보다 나아지고 있는지 감각적으로는 알 수 있었지만 데이터로 명확히 설명하기는 어려웠습니다.&lt;/p&gt;
-        
-        &lt;p&gt;사내에는 이미 &apos;DevOps board&apos;라는 시스템이 있어 배포 빈도와 리드타임을 포함한 DORA 지표를 제공하고 있습니다. 소프트웨어 딜리버리 흐름을 측정한다는 점에서 제가 찾던 도구에 가까웠습니다. 다만 저는 분석 지표와 상황에 맞추어 조금 더 세분화된 데이터를 들여다보고 싶었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;그래서 먼저 Jira 대시보드를 만들어 리치 필터(rich filter)로 데이터를 추출해 보았습니다. 이슈 완료 수, 스프린트 완료율, 컴포넌트별 작업량 등 여러 수치가 모였지만, 수집한 숫자만으로는 조직의 작업 속도를 한눈에 파악하기 어려웠습니다. 작업이 어디서 얼마나 걸리는지도 보이지 않았습니다. Jira는 업무를 관리하는 도구일 뿐 소프트웨어 딜리버리 흐름 전체를 측정하는 도구는 아니기 때문입니다.&lt;/p&gt;
-        
-        &lt;p&gt;결국 특정 컴포넌트 기준의 분류, 팀 고유의 이슈 타입 정의, 팀 내 업무 흐름을 세밀하게 들여다볼 수 있는 맞춤형 도구가 필요했습니다. 기존 DevOps board를 대체하려는 것이 아니라, 팀의 상황에 맞추어 데이터를 직접 구성해 보고 싶었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;문제는 제가 이를 직접 구현할 기술적 역량이 부족하다는 점이었습니다. 개발자에게 부탁하기에는 작업 규모가 작았고, 백로그에 등록하더라도 언제 진행될지 기약할 수 없었습니다. 그래서 AI의 도움을 받아 직접 만들어 보기로 했습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;1html&quot;&gt;1단계: HTML 파일 하나로 가설 검증&lt;/h2&gt;
-        
-        &lt;p&gt;처음에는 배포, 서버, 인증 과정을 모두 생략하고 HTML 파일 하나로 가볍게 시작했습니다. 브라우저에서 Jira 변경 기록(changelog) CSV 파일을 파싱해 바로 시각화하는 구조였습니다.&lt;/p&gt;
-        
-        &lt;p&gt;AI에게 전달한 첫 프롬프트에는 현재 상황과 맥락을 최대한 자세히 담았습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;Jira 이슈별 changelog CSV에는 &apos;Issue Key&apos;, &apos;Status&apos;, &apos;Created&apos; 칼럼이 있어.
-        
-        각 이슈가 &apos;In Progress&apos;로 처음 전환된 시각과 &apos;Done&apos;으로 전환된 시각의 차이를 일(day) 단위로 계산하고 싶어. 팀별, 이슈 타입별로 집계해서 주차별 트렌드를 보여주는 웹 대시보드를 만들고 싶은데,
-        
-        구조는 이해하지만 직접 구현은 못 해.
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이 프롬프트에는 데이터 형식, 원하는 결과물, 그리고 저의 기술적 한계가 모두 들어가 있습니다.&lt;/p&gt;
-        
-        &lt;p&gt;AI는 곧바로 코드를 작성하는 대신 발생할 수 있는 예외 상황(edge case)을 먼저 짚어 주었습니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;이슈가 In Progress → Backlog → In Progress로 다시 이동했다가 Done이 되는 경우, 리드타임 기산점을 첫 번째 In Progress로 할지 마지막으로 할지 정의가 필요해요. Done 이후 재오픈 케이스는요?
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;이 질문을 받기 전까지는 저 역시 이러한 예외 상황을 생각하지 못했습니다. 실제로 확인해 보니 데이터에 해당 사례가 적지 않게 포함되어 있었습니다. 결국 AI와 대화하는 과정 자체가 요구사항 정의 세션이 된 셈입니다.&lt;/p&gt;
-        
-        &lt;p&gt;물론 초기에는 버그도 있었습니다. Jira CSV의 타임스탬프가 UTC 기준이라 KST로 변환해 날짜를 계산해야 했고, 내보내기 설정에 따라 이슈 타입 필드명이 달라지는 문제도 있었습니다. 이럴 때는 문제를 말로 설명하기보다 실제 CSV 헤더와 샘플 데이터 일부를 AI에게 그대로 보여주는 편이 훨씬 효과적이었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이렇게 해서 대시보드 화면에 리드타임 수치가 나타났습니다. 하지만 그 숫자를 보면서 새로운 의문이 생겼습니다. &lt;strong&gt;이 수치가 좋은 편인지 나쁜 편인지는 어떻게 알 수 있을까요?&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;2dora&quot;&gt;2단계: DORA 지표를 통한 기준 마련&lt;/h2&gt;
-        
-        &lt;p&gt;리드타임을 측정하는 것과 그 수치의 의미를 파악하는 것은 별개의 문제였습니다. 그래서 소프트웨어 딜리버리 성과를 측정하는 프레임워크인 DORA 지표를 참고했습니다. DORA 지표는 수많은 팀과 프로젝트의 데이터를 분석해 도출한 네 가지 핵심 지표로 구성됩니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;배포 빈도&lt;/li&gt;
-        &lt;li&gt;변경 리드타임&lt;/li&gt;
-        &lt;li&gt;변경 실패율&lt;/li&gt;
-        &lt;li&gt;서비스 복구 시간&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;여러 연구를 통해 이 네 가지 지표가 팀의 딜리버리 역량을 가장 잘 설명한다는 사실이 검증되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;제가 측정한 Jira 리드타임은 이 중 &apos;변경 리드타임&apos;에 해당했습니다. 작업 시작부터 실제 배포까지 걸리는 시간입니다. 나머지 지표를 확인하려면 추가 데이터가 필요했습니다. 배포 빈도는 배포 이벤트 로그에서, 변경 실패율과 복구 시간은 PR(Pull Request) 및 이슈 데이터에서 얻을 수 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;결국 Jira 데이터만으로는 전체 딜리버리 흐름의 절반만 볼 수 있었습니다. 나머지 절반을 채우려면 사내 GitHub 데이터를 연동해야 했습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;3ai&quot;&gt;3단계: AI를 활용한 서버 구축과 가이드 문서&lt;/h2&gt;
-        
-        &lt;p&gt;GitHub API를 주기적으로 호출하고 이를 Jira 데이터와 결합하려면 단순한 브라우저용 HTML 환경으로는 부족했습니다. 별도의 서버가 필요해진 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;사실 이 시점에서 진행을 포기할까 고민도 했습니다. Dockerfile을 한 번도 작성해 본 적 없는 비개발자가 컨테이너 기반 배포를 직접 해낼 수 있을지 확신이 서지 않았기 때문입니다.&lt;/p&gt;
-        
-        &lt;p&gt;일단 사내 공통 컨테이너 플랫폼인 &apos;n3r&apos;의 가이드 문서부터 찾아보았습니다. 하지만 낯선 용어가 많아 문서 첫 페이지부터 막막했습니다. 그래서 접근 방식을 바꿨습니다. 가이드 문서를 혼자 끙끙대며 읽는 대신, 그 내용을 AI에게 전달하고 함께 해석해 나가기 시작한 것입니다.&lt;/p&gt;
-        
-        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;이 가이드에 이렇게 나와 있는데, 파이썬 FastAPI 앱에 적용하면 Dockerfile을 어떻게 써야 해? [가이드 해당 섹션 붙여넣기]
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        &lt;p&gt;&lt;strong&gt;가이드 문서에는 사내 환경과 표준 규칙이 담겨 있습니다. AI는 그 내용을 제 상황에 맞게 구체화해 주었습니다.&lt;/strong&gt; 둘 중 어느 한쪽만으로는 해결이 어려웠지만, 가이드 문서와 AI를 교차로 활용함으로써 무사히 서버를 띄울 수 있었습니다.&lt;/p&gt;
-        
-        &lt;h2 id=&quot;4&quot;&gt;4단계: 스케줄러 설정과 데이터 누락 문제 해결&lt;/h2&gt;
-        
-        &lt;p&gt;서버를 구축했다고 해서 데이터가 저절로 모이는 것은 아닙니다. Jira와 GitHub API를 주기적으로 호출해 줄 스케줄러가 필요했습니다. 다행히 사내에는 이미 Self-Hosted Runner 환경과 관련 설정 가이드 문서가 마련되어 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;돌이켜보면 9일 중 가장 많은 시간을 이 구간에서 소요했습니다. Runner 환경 변수 설정, 인증 토큰 발급, API 페이지네이션(pagination) 처리 등 예상치 못한 문제가 꼬리를 물고 나타났기 때문입니다.&lt;/p&gt;
-        
-        &lt;p&gt;그중에서도 가장 애를 먹었던 부분은 API 페이지네이션이었습니다. 조회할 이슈가 1,000개를 넘어가면 API 응답이 중간에 잘리는데, 초기에 AI가 작성한 코드에는 이 예외 처리가 누락되어 있었습니다. 오류 메시지조차 없이 데이터만 조용히 누락되고 있었고, 나중에 직접 숫자를 대조하며 검증하다가 우연히 발견했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;이 과정을 거치며 제가 AI에게 질문하는 방식도 달라졌습니다. 초반에는 &quot;이거 어떻게 해요?&quot;에 가까웠다면, 나중에는 가이드 내용, 현재 설정 파일, 오류 메시지를 함께 붙여 &quot;이 값을 내 상황에 어떻게 적용하면 돼?&quot;라고 물었습니다. &lt;strong&gt;상황과 맥락을 자세히 전달할수록 AI의 답변은 훨씬 정확해졌습니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;5&quot;&gt;5단계: 사내 스토리지 연동과 사람의 역할&lt;/h2&gt;
-        
-        &lt;p&gt;수집한 데이터를 저장하고 필요할 때 화면에 제공하려면 스토리지가 필요했습니다. 사내에서 제공하는 Redis 기반 스토리지인 nBase-ARC를 활용하기로 하고 관련 가이드 문서를 참고했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;AI는 보편적인 Redis 사용법은 훌륭하게 알려 주었습니다. 하지만 사내의 특수한 네트워크 정책, 고유한 TTL 설정 방식, 접근 권한 신청 프로세스 같은 내부 정보는 알지 못했습니다. 이런 부분에서는 사내 가이드 문서와 사내 AI 기반 문의 채널 ASK가 도움이 되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;strong&gt;널리 공개된 기술 스택을 다룰 때 AI는 탁월한 조력자입니다. 하지만 사내 특화 환경, 내부 정책, 조직 고유의 관행은 AI가 파악할 수 없는 영역입니다. 이 영역은 결국 사람이, 문서가, 동료가 채워야 합니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;완성된 대시보드의 효과&lt;/h2&gt;
-        
-        &lt;p&gt;이제 Jira와 GitHub 데이터는 매일 자동으로 수집됩니다. 대시보드에 접속하면 조직과 프로젝트의 전반적인 딜리버리 흐름을 한눈에 확인하고 다음과 같은 것들을 쉽게 파악할 수 있습니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;리드타임이 유독 길어지는 구간&lt;/li&gt;
-        &lt;li&gt;특정 이슈 타입에서 반복되는 병목 현상&lt;/li&gt;
-        &lt;li&gt;스프린트 후반부에 배포 이벤트가 몰리는 패턴&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;&apos;요즘 왠지 개발 속도가 느려진 것 같다&apos;는 막연한 느낌을 이제는 데이터를 근거로 설명할 수 있게 되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;물론 이 대시보드가 완벽한 측정 도구는 아닙니다. DORA 지표를 온전히 구현한 것도 아닙니다. 하지만 측정 도구가 아예 없었을 때와 비교하면 확실한 차이가 있습니다. &lt;strong&gt;가장 큰 변화는 조직 회고 시간의 논의 수준이 달라졌다는 점입니다. 막연한 감이 아니라 실제 데이터를 보면서 이야기하게 되었습니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;프로젝트를 진행하며 배운 점&lt;/h2&gt;
-        
-        &lt;h3 id=&quot;ai&quot;&gt;기획의 재발견: AI는 마법사가 아니라 정밀한 조각가다&lt;/h3&gt;
-        
-        &lt;p&gt;AI는 사용자가 원하는 바를 구현하는 데 탁월한 능력을 보여줍니다. 하지만 그 전제는 사용자 스스로 &apos;무엇을 원하는지&apos;를 명확히 알고 있어야 한다는 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;작업을 하면서 특히 효과적이라고 느낀 소통 방식은 다음 세 가지였습니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;실제 데이터를 예시로 보여주기&lt;/li&gt;
-        &lt;li&gt;발생 가능한 예외 상황을 미리 정의하기&lt;/li&gt;
-        &lt;li&gt;기대한 결과와 실제 결과의 차이를 명확히 짚어 주기&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;이 세 가지 요건이 충족될 때 AI는 가장 정확한 결과물을 내놓았습니다. 결국 &lt;strong&gt;기획이란 필요한 기능을 나열하는 작업이 아니라, AI가 올바르게 이해하고 작업할 수 있도록 꼼꼼한 설계도를 그리는 과정이었습니다. 얼마나 명확하고 구체적으로 지시하느냐가 최종 결과물의 품질을 결정&lt;/strong&gt;했습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;ai&quot;&gt;인프라의 벽: 가이드와 AI, 둘 다 필요했다&lt;/h3&gt;
-        
-        &lt;p&gt;서버를 구축하는 과정에서는 사내 가이드 문서와 AI를 함께 활용해야 했습니다. 가이드 문서는 사내 환경을 정확히 설명해 주었지만 제 프로젝트 상황에 딱 맞는 답을 주지는 못했습니다. 반대로 AI는 기술적 원리를 잘 설명해 주었지만 사내 환경의 특수성은 알지 못했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;따라서 이 둘을 교차해서 쓰는 것이 가장 효율적이었습니다. 가이드 문서의 내용을 AI에게 알려 주고 그 의미를 함께 해석하는 방식입니다. 가이드 문서가 &apos;무엇을&apos; 해야 하는지 알려주면, AI가 &apos;어떻게&apos; 해야 하는지 구체화했습니다.&lt;/p&gt;
-        
-        &lt;p&gt;&lt;strong&gt;새로운 아이디어의 실현은 도구의 발전에서 비롯되지만, 그것이 지속 가능하게 유지하는 힘은 안정적인 인프라에서 나옵니다. 그리고 비개발자조차 그 인프라에 접근해 활용할 수 있도록 길을 열어 주는 것은 결국 잘 작성된 가이드 문서입니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h3 id=&quot;ai&quot;&gt;토큰의 무게: AI는 공짜가 아니다&lt;/h3&gt;
-        
-        &lt;p&gt;AI를 활용하면서 토큰(비용)이 유독 많이 소모되는 구간이 있었습니다. 대체로 다음과 같은 상황이었습니다.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;AI가 매번 코드 전체를 새로 읽게 했던 초반&lt;/li&gt;
-        &lt;li&gt;대화 맥락을 정리하지 않고 질문을 무분별하게 이어 갔던 중반&lt;/li&gt;
-        &lt;li&gt;분석 탭에서 AI API를 3번 순차 호출하던 구조&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;해법은 &apos;역할 분리&apos;였습니다. 데이터 파싱이나 집계 같은 단순 계산은 JavaScript 코드가 직접 처리하도록 하고, AI에게는 최종적으로 요약된 수치만 전달해 의미 해석을 맡기는 구조로 바꿨습니다. 그러자 토큰 사용량이 눈에 띄게 줄었고 응답 속도도 훨씬 빨라졌습니다.&lt;/p&gt;
-        
-        &lt;p&gt;어떤 기능을 구현하기 전에는 &quot;&lt;strong&gt;이 작업을 반드시 AI가 처리해야 하는가?&lt;/strong&gt;&quot;를 먼저 자문해 볼 필요가 있습니다. 명확한 규칙으로 처리할 수 있는 작업은 코드로 해결하고, AI는 문맥 판단이나 해석이 필요한 영역에만 제한적으로 활용하는 편이 효율적입니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;ai&quot;&gt;AI의 한계: 오류가 없다고 올바른 것은 아니다&lt;/h3&gt;
-        
-        &lt;p&gt;가장 많은 시간을 낭비하게 만든 것은 역설적이게도 AI가 확신에 차서 작성해 준 코드였습니다. 앞서 언급한 API 페이지네이션 코드는 겉보기에는 아무런 오류 없이 매끄럽게 동작했습니다. 하지만 이슈가 1,000개를 넘어가는 순간부터 데이터가 시스템 내부에서 조용히 누락되고 있었습니다. 출력된 수치를 꼼꼼히 검증해 보지 않았다면 끝까지 몰랐을 문제였습니다.&lt;/p&gt;
-        
-        &lt;p&gt;따라서 &lt;strong&gt;AI가 만들어 준 코드는 오류 없이 실행되는지 확인하는 선에서 그쳐서는 안 됩니다. 도출된 결과가 실제로 정확한지 정합성을 검증하는 단계가 반드시 필요합니다.&lt;/strong&gt; 샘플 데이터로 직접 계산한 값과 AI의 결과물을 대조해 보는 과정은 번거롭지만 생략할 수 없습니다.&lt;/p&gt;
-        
-        &lt;h3 id=&quot;&quot;&gt;생태계의 제언: &apos;데이터 민주주의&apos;를 위한 조건&lt;/h3&gt;
-        
-        &lt;p&gt;비개발자인 제가 이 프로젝트를 무사히 마칠 수 있었던 것은 AI의 능력 덕분만은 아니었습니다. 든든한 사내 가이드 문서가 뒷받침되었기에 가능한 일이었습니다. 가이드 문서가 없었다면 아무리 훌륭한 AI라도 사내 환경에 맞는 결과물을 만들어내기 어려웠을 것입니다.&lt;/p&gt;
-        
-        &lt;p&gt;회사에는 방대한 데이터와 훌륭한 인프라가 있습니다. 하지만 권한은 열려 있어도 이를 실제로 활용할 수 있는 사람은 극소수인, 이른바 &apos;접근은 가능하지만 접근할 수 있는 사람은 없는&apos; 상태에 머무는 경우가 많습니다.&lt;/p&gt;
-        
-        &lt;p&gt;API 사용 가이드를 조금 더 체계적으로 다듬고, 자주 쓰이는 템플릿 코드를 사내에 공유하고, 보안 가이드라인을 명확히 제시해 주는 것만으로도 수많은 사내 맞춤형 도구가 새롭게 만들어질 수 있습니다. &lt;strong&gt;비개발자가 AI와 협업해 가치 있는 무언가를 만들어 내는 진정한 전제 조건은 결국 &apos;친절하고 정확한 가이드 문서&apos;입니다. AI는 사용자가 그 가이드를 조금 더 쉽게 소화하고 자기 상황에 적용할 수 있도록 돕는 훌륭한 조력자일 뿐입니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;h2 id=&quot;&quot;&gt;마치며&lt;/h2&gt;
-        
-        &lt;p&gt;불과 9일 전의 저는 스스로 서버를 구축할 수 있을 거라고는 생각도 못 했습니다. 그런데 결국 Dockerfile을 작성하고, 컨테이너를 빌드해 배포하고, API를 주기적으로 호출하는 스케줄러를 구성했으며, Redis에 데이터를 읽고 쓰는 경험까지 했습니다. 코드는 대부분 AI가 작성해 주었지만, &apos;무엇을 만들 것인지&apos;, &apos;어떤 구조로 설계할 것인지&apos;, &apos;최종 결과물이 올바른지&apos;를 판단하는 몫은 온전히 제게 있었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;대시보드의 숫자를 보며 종종 생각합니다. &apos;우리 조직과 프로젝트는 잘 나아가고 있나?&apos; 예전에는 막연했던 그 질문에, 이제는 데이터를 근거로 조금은 명확한 답을 할 수 있게 되었습니다.&lt;/p&gt;
-        
-        &lt;p&gt;동료에게서 &quot;이거 어떻게 만드셨어요?&quot;라는 질문을 받을 때마다 저는 이렇게 답하곤 합니다.&lt;/p&gt;
-        
-        &lt;p&gt;&quot;AI한테 말로 시켰어요. 그런데 뭘 시킬지는 제가 알아야 했어요.&quot;&lt;/p&gt;
-        
-        &lt;p&gt;이 글을 통해 전하고 싶은 메시지는 단 하나입니다. &lt;strong&gt;AI를 잘 활용하는 조직은 성능 좋은 AI 도구를 선별하는 데 그치지 않고, AI가 역량을 제대로 발휘할 수 있는 밑바탕 환경을 먼저 탄탄하게 갖춘 조직입니다.&lt;/strong&gt;&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;데이터를 같은 기준으로 관리하려는 조직적 합의&lt;/li&gt;
-        &lt;li&gt;누구나 안전하게 접근하여 실험할 수 있는 열린 인프라&lt;/li&gt;
-        &lt;li&gt;비개발자도 천천히 따라갈 수 있도록 작성된 가이드 문서&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;p&gt;이 세 가지가 바로 AI 시대에 필요한 인프라입니다.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
