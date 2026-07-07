@@ -4,12 +4,338 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 06 Jul 2026 18:06:31 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2026 17:36:33 GMT</lastBuildDate>
+    <item>
+      <title>Asking Cursor to Review My Blog for Performance</title>
+      <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
+      <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
+        &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
+        &lt;p&gt;In Eleventy, when converting my Markdown into HTML, it also applies the Liquid template syntax to Markdown which means my blog posts can actually be dynamic, at build time anyway. This impacts how fast the site builds in ways I can completely forget about down the road.&lt;/p&gt;
+        &lt;p&gt;This is why I let Cursor look over the entire code base instead of ignoring my Markdown (&lt;a href=&quot;https://cursor.com/docs/reference/ignore-file&quot;&gt;Cursor docs on ignore files&lt;/a&gt;), and I&apos;m glad I did. I&apos;ll share the complete report at the end of this post, but let me talk about the highlights.&lt;/p&gt;
+        &lt;h2 id=&quot;rss-parsing-and-a-dead-mastodon-server&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#rss-parsing-and-a-dead-mastodon-server&quot;&gt;RSS Parsing and a dead Mastodon server&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The biggest fix Cursor discovered concerned code I had to work with, and render, Mastodon posts. I&apos;ve got a shortcode that given a server and username will find the last post via the RSS feed generated for the account. I use another shortcode that renders the post into HTML.&lt;/p&gt;
+        &lt;p&gt;Cursor discovered I had multiple calls out to &lt;code&gt;botsin.space&lt;/code&gt;, a Mastodon server that was built to target bots and unfortunately had to be shut down. I had multiple blog posts trying to get content from that server. The code, which made use &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;rss-parser&lt;/a&gt;, would get a quick failure but was keeping an HTTP socket open until it timed out, roughly 70 seconds later.&lt;/p&gt;
+        &lt;p&gt;To be clear, the &apos;bug&apos; here was in my implementation, not the RSS library. The fix was pretty simple. Going from:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import Parser from &apos;rss-parser&apos;;
+        
+        const parser = new Parser();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;To:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import https from &apos;https&apos;;
+        import Parser from &apos;rss-parser&apos;;
+        
+        const parser = new Parser({
+        requestOptions: {
+        timeout: 5000,
+        agent: new https.Agent({ keepAlive: false }),
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This alone helped, but I also found instances in my Markdown where I was calling out to botsin.space and replaced it with mastodon.social (where I moved my bots).&lt;/p&gt;
+        &lt;h2 id=&quot;trying-to-be-ai-friendly-had-an-unintended-consequence&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#trying-to-be-ai-friendly-had-an-unintended-consequence&quot;&gt;Trying to be AI friendly had an unintended consequence&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;A few months back I made a change to my blog to be more AI friendly. That involved two steps:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;For every post, I now have a copy of the Markdown version. So for example, this &lt;a href=&quot;https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor&quot;&gt;https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor&lt;/a&gt; goes to HTML, and you can go to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor/index.md&quot;&gt;https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor/index.md&lt;/a&gt; for the Markdown&lt;/li&gt;
+        &lt;li&gt;I used a Netlify Edge serverless function to sniff for a content request that prefers plain text or Markdown, what an AI agent would send, and redirects to that automatically. You can see that code here: &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/netlify/edge-functions/content-negotiation.ts&quot;&gt;https://github.com/cfjedimaster/raymondcamden2023/blob/main/netlify/edge-functions/content-negotiation.ts&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;To enable the Markdown copy, my &lt;code&gt;eleventy.config.js&lt;/code&gt; uses an event handler for builds:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;eleventyConfig.on(&amp;quot;eleventy.after&amp;quot;, async ({ dir }) =&amp;gt; {
+        const inputDir = dir.input;   
+        const outputDir = dir.output; 
+        
+        // blog posts only
+        const mdFiles = glob.sync(&amp;quot;posts/**/*.md&amp;quot;, {
+        cwd: inputDir,
+        ignore: [&amp;quot;node_modules/**&amp;quot;],
+        });
+        
+        for (const file of mdFiles) {
+        const srcPath = path.join(inputDir, file);
+        /*
+        My input file looks like so:
+        src/posts/2026/03/04/2026-03-04-dyanimically-adjusting-image-text-for-contrast.md
+        I need to save to
+        
+        outputdir/2026/03/04/dynamically etc
+        */
+        let newFile = file.replace(&apos;posts&apos;, &apos;&apos;);
+        newFile = newFile.replace(/[0-9]{4}-[0-9]{2}-[0-9]{2}-/,&apos;&apos;);
+        newFile = newFile.replace(&apos;.md&apos;,&apos;/index.md&apos;);
+        
+        const destPath = path.join(outputDir, newFile);
+        
+        
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+        fs.copyFileSync(srcPath, destPath);
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The important bit is the glob. When I run my blog locally, I have an &lt;code&gt;.eleventyignore&lt;/code&gt; file which ignores blog posts from 2003 to 2024 or so, basically 90% of my blog posts (I &lt;a href=&quot;/stats&quot;&gt;blogged a lot more&lt;/a&gt; in the old days). However, my glob wasn&apos;t using that and every change resulted in 6k+ files being copied. Locally that meant every change I made while writing a post would take about 3 seconds to process. That&apos;s not bad in theory, but I tend to write, check the HTML, edit, etc, quickly, and I absolutely noticed times when I&apos;d have to reload again because I reloaded too quickly the first time.&lt;/p&gt;
+        &lt;p&gt;For the fix, I went back to Cursor and simply asked for help and the response was perfect:&lt;/p&gt;
+        &lt;div class=&quot;callout&quot;&gt;The simplest fix is to stop globbing and copy only posts Eleventy actually built. The eleventy.after event gives you a results array of everything Eleventy processed, which already respects all ignore sources.&lt;/div&gt;
+        &lt;p&gt;I missed this in Eleventy&apos;s &lt;a href=&quot;https://www.11ty.dev/docs/events/#eleventy-after&quot;&gt;docs on the event&lt;/a&gt; that&apos;s 100% on me. I let Cursor update the code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;eleventyConfig.on(&amp;quot;eleventy.after&amp;quot;, async ({ directories, results }) =&amp;gt; {
+        const inputDir = directories.input;
+        const outputDir = directories.output;
+        
+        // Only copy posts Eleventy actually built (respects .eleventyignore)
+        const postResults = results.filter((r) =&amp;gt; {
+        const rel = path.relative(inputDir, r.inputPath);
+        return rel.startsWith(`posts${path.sep}`) &amp;amp;&amp;amp; rel.endsWith(&apos;.md&apos;);
+        });
+        
+        // rest of event...
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2 id=&quot;bypassing-api-calls-locally&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#bypassing-api-calls-locally&quot;&gt;Bypassing API calls locally&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;One last thing it suggested that I implemented involved my &lt;code&gt;_data&lt;/code&gt; files. These files use remote APIs to fetch data for my site, most of which you can see on my &lt;a href=&quot;/now&quot;&gt;Now&lt;/a&gt; page. I had code to look for a local run, or a lack of an environment variable for a key. My code though was a bit of a hack, like looking for &lt;code&gt;/home/ray&lt;/code&gt;, and that failed on new machines where my local username didn&apos;t match. It didn&apos;t dramatically impact my builds, but Cursor pointing this out made me build a nicer solution - which was just to look for an environment variable instead, one I include in my npm scripts now:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;&amp;quot;dev2&amp;quot;: &amp;quot;SKIP_REMOTE_DATA=1 eleventy --serve --quiet&amp;quot;,
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;(The use of &apos;dev2&apos; is another story and related to a bug in the Netlify CLI.)&lt;/p&gt;
+        &lt;h2 id=&quot;wrap-up&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#wrap-up&quot;&gt;Wrap Up&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, I work at Cursor, I&apos;m biased, but of course other tools could create similar results. I&apos;m just impressed by how &lt;em&gt;deep&lt;/em&gt; Cursor looked into my code and found things that I never would have realized. As I write this and save, I&apos;m seeing build times of 0.33 seconds or so, which is freaking great. My &amp;quot;full&amp;quot; builds aren&apos;t necessarily faster, but that&apos;s fine. (Netlify and Eleventy both perform incredibly well with a typical site build of less than four minutes.)&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the complete initial report Cursor created.&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;site_performance_recommendations.md
+        Open File
+        View Rendered&lt;/p&gt;
+        &lt;h1 id=&quot;site-performance-recommendations&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#site-performance-recommendations&quot;&gt;Site Performance Recommendations&lt;/a&gt;&lt;/h1&gt;
+        &lt;p&gt;Analysis of the &lt;code&gt;raymondcamden2023&lt;/code&gt; Eleventy build (June 30, 2026).&lt;/p&gt;
+        &lt;h2 id=&quot;summary&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#summary&quot;&gt;Summary&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Local builds report &lt;strong&gt;~4–5 seconds&lt;/strong&gt; of actual Eleventy work, but the full process takes &lt;strong&gt;~72 seconds&lt;/strong&gt;. Most of that gap is not template rendering — it is the Node process waiting on open I/O handles after Eleventy finishes.&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Metric&lt;/th&gt;
+        &lt;th&gt;Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Active posts built (2023+)&lt;/td&gt;
+        &lt;td&gt;~463&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Total markdown files on disk&lt;/td&gt;
+        &lt;td&gt;6,784&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Files written per build&lt;/td&gt;
+        &lt;td&gt;~571&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Files in &lt;code&gt;_site&lt;/code&gt; (including markdown copies)&lt;/td&gt;
+        &lt;td&gt;~13,785&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Eleventy-reported build time&lt;/td&gt;
+        &lt;td&gt;~4–5s&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Actual wall-clock build time&lt;/td&gt;
+        &lt;td&gt;~72s&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;1.-biggest-win%3A-fix-the-~67s-post-build-hang&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#1.-biggest-win%3A-fix-the-~67s-post-build-hang&quot;&gt;1. Biggest Win: Fix the ~67s Post-Build Hang&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;After Eleventy prints &lt;code&gt;Wrote 571 files&lt;/code&gt;, the Node process sits idle for about &lt;strong&gt;67 more seconds&lt;/strong&gt; before exiting. Profiling shows it waiting in the event loop on open I/O handles.&lt;/p&gt;
+        &lt;h3 id=&quot;root-cause&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#root-cause&quot;&gt;Root cause&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;The &lt;code&gt;lasttoot&lt;/code&gt; shortcode in &lt;code&gt;config/shortcodes/index.js&lt;/code&gt; uses &lt;code&gt;rss-parser&lt;/code&gt; without disabling HTTP keep-alive. A failing fetch to &lt;code&gt;botsin.space&lt;/code&gt; (visible in build logs) leaves a socket open until it times out (~70s).&lt;/p&gt;
+        &lt;p&gt;This post still runs the shortcode at build time:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;src/posts/2023/03/17/2023-03-17-another-week-another-mastodon-bot-random-album-cover.md
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-liquid&quot;&gt;{% capture &amp;quot;lasttoot_rac&amp;quot; %}
+        {% lasttoot &amp;quot;botsin.space&amp;quot;, &amp;quot;randomalbumcover&amp;quot; %}
+        {% endcapture %}
+        
+        {% stoot &amp;quot;botsin.space&amp;quot;, lasttoot_rac %}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3 id=&quot;verification&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#verification&quot;&gt;Verification&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A single failed &lt;code&gt;botsin.space&lt;/code&gt; RSS fetch via &lt;code&gt;rss-parser&lt;/code&gt; fails in ~0.8s, but the process does not exit for ~71s.&lt;/li&gt;
+        &lt;li&gt;Adding &lt;code&gt;keepAlive: false&lt;/code&gt; drops total time to &lt;strong&gt;under 1 second&lt;/strong&gt;.&lt;/li&gt;
+        &lt;li&gt;Successful fetches to other hosts (e.g. Letterboxd) exit in ~0.3s with no hang.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;recommended-fix&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#recommended-fix&quot;&gt;Recommended fix&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Update &lt;code&gt;lasttoot&lt;/code&gt; (and the &lt;code&gt;_data&lt;/code&gt; RSS files) to disable keep-alive:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import https from &apos;https&apos;;
+        import Parser from &apos;rss-parser&apos;;
+        
+        const parser = new Parser({
+        requestOptions: {
+        timeout: 5000,
+        agent: new https.Agent({ keepAlive: false }),
+        },
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Alternatively, migrate &lt;code&gt;lasttoot&lt;/code&gt; to &lt;code&gt;@11ty/eleventy-fetch&lt;/code&gt; (as &lt;code&gt;stoot&lt;/code&gt; already does in &lt;code&gt;config/shortcodes/stoot.js&lt;/code&gt;).&lt;/p&gt;
+        &lt;h3 id=&quot;expected-impact&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#expected-impact&quot;&gt;Expected impact&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Full builds should drop from &lt;strong&gt;~72s to ~5s&lt;/strong&gt; locally, with similar improvement on Netlify.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;2.-high-impact%3A-stop-copying-6%2C784-markdown-files-after-every-build&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#2.-high-impact%3A-stop-copying-6%2C784-markdown-files-after-every-build&quot;&gt;2. High Impact: Stop Copying 6,784 Markdown Files After Every Build&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The &lt;code&gt;eleventy.after&lt;/code&gt; hook in &lt;code&gt;eleventy.config.js&lt;/code&gt; copies &lt;strong&gt;all&lt;/strong&gt; posts to &lt;code&gt;_site&lt;/code&gt;, including years ignored by &lt;code&gt;.eleventyignore&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;eleventyConfig.on(&amp;quot;eleventy.after&amp;quot;, async ({ dir }) =&amp;gt; {
+        const mdFiles = glob.sync(&amp;quot;posts/**/*.md&amp;quot;, {
+        cwd: inputDir,
+        ignore: [&amp;quot;node_modules/**&amp;quot;],
+        });
+        
+        for (const file of mdFiles) {
+        // ... copies every file ...
+        fs.copyFileSync(srcPath, destPath);
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;6,784&lt;/strong&gt; markdown files exist on disk&lt;/li&gt;
+        &lt;li&gt;Only &lt;strong&gt;~463&lt;/strong&gt; are actively built (2023+)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;.eleventyignore&lt;/code&gt; excludes 2000–2022 but the after-hook ignores that&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;_site&lt;/code&gt; grows to &lt;strong&gt;~13,785&lt;/strong&gt; files because of this&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;recommended-fix-1&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#recommended-fix-1&quot;&gt;Recommended fix&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Respect the same ignore rules as &lt;code&gt;.eleventyignore&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;Only copy files Eleventy actually built&lt;/li&gt;
+        &lt;li&gt;Or move archived posts out of &lt;code&gt;src/posts/&lt;/code&gt; entirely&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;expected-impact-1&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#expected-impact-1&quot;&gt;Expected impact&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;~1s saved on the copy loop itself&lt;/li&gt;
+        &lt;li&gt;Much faster deploy uploads&lt;/li&gt;
+        &lt;li&gt;Smaller &lt;code&gt;_site&lt;/code&gt; output&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;3.-medium-impact%3A-expensive-templates&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#3.-medium-impact%3A-expensive-templates&quot;&gt;3. Medium Impact: Expensive Templates&lt;/a&gt;&lt;/h2&gt;
+        &lt;h3 id=&quot;%2Fall-page-%E2%80%94-o(years-%C3%97-posts)-loop&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#%2Fall-page-%E2%80%94-o(years-%C3%97-posts)-loop&quot;&gt;&lt;code&gt;/all&lt;/code&gt; page — O(years × posts) loop&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;File: &lt;code&gt;src/misc/all.liquid&lt;/code&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-liquid&quot;&gt;{% for year in (firstYear..thisYear) reversed %}
+        {% for post in posts %}
+        {% if postYear == year %}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This nested loop iterates all posts for every year. A prior benchmark noted &lt;strong&gt;~3.6s+&lt;/strong&gt; for this page alone.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Pre-group posts by year in a collection or JS data file and iterate once.&lt;/p&gt;
+        &lt;h3 id=&quot;algolia_full.liquid-%E2%80%94-all-posts%2C-full-content&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#algolia_full.liquid-%E2%80%94-all-posts%2C-full-content&quot;&gt;&lt;code&gt;algolia_full.liquid&lt;/code&gt; — all posts, full content&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;File: &lt;code&gt;src/misc/algolia_full.liquid&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;Runs &lt;code&gt;templateContent | algExcerpt&lt;/code&gt; across every post in one JSON file. The regex work on full rendered HTML adds up across ~463 posts.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Generate this only in CI/deploy, or only when search index content changes. (&lt;code&gt;algolia_new.liquid&lt;/code&gt; already limits to 5 posts for deploy hooks.)&lt;/p&gt;
+        &lt;h3 id=&quot;tag-pagination-generates-many-pages&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#tag-pagination-generates-many-pages&quot;&gt;Tag pagination generates many pages&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Files: &lt;code&gt;src/tags.liquid&lt;/code&gt;, &lt;code&gt;src/tag_feeds.liquid&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;Both paginate over &lt;strong&gt;all collections&lt;/strong&gt; (not just tags), generating two pages per collection entry.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Fix:&lt;/strong&gt; Use an explicit tag list instead of &lt;code&gt;collections&lt;/code&gt; as pagination data.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;4.-medium-impact%3A-build-time-network-calls&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#4.-medium-impact%3A-build-time-network-calls&quot;&gt;4. Medium Impact: Build-Time Network Calls&lt;/a&gt;&lt;/h2&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Source&lt;/th&gt;
+        &lt;th&gt;Issue&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;src/_data/medium.js&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;RSS fetch every build&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;src/_data/letterboxd_films.js&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;RSS fetch every build&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;src/_data/hardcover_books.js&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;GraphQL fetch when &lt;code&gt;HARDCOVER_BOOKS&lt;/code&gt; env var is set&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;lasttoot&lt;/code&gt; / &lt;code&gt;stoot&lt;/code&gt; in ~4 posts&lt;/td&gt;
+        &lt;td&gt;Mastodon API/RSS at build time&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;h3 id=&quot;notes&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#notes&quot;&gt;Notes&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;untappd_beers.js&lt;/code&gt; already short-circuits locally when &lt;code&gt;ELEVENTY_ROOT&lt;/code&gt; includes &lt;code&gt;/raymondcamden2023&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;medium.js&lt;/code&gt; and &lt;code&gt;letterboxd_films.js&lt;/code&gt; only skip on &lt;code&gt;/home/ray&lt;/code&gt; — inconsistent with local dev on other paths&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;/bots&lt;/code&gt; page (&lt;code&gt;src/misc/bots.md&lt;/code&gt;) already loads toots &lt;strong&gt;client-side&lt;/strong&gt;; build-time &lt;code&gt;stoot&lt;/code&gt;/&lt;code&gt;lasttoot&lt;/code&gt; embeds in old posts may not be worth the complexity&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;recommended-fix-2&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#recommended-fix-2&quot;&gt;Recommended fix&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Add a consistent &lt;code&gt;SKIP_REMOTE_DATA&lt;/code&gt; env flag (or broaden the local path short-circuit)&lt;/li&gt;
+        &lt;li&gt;Use &lt;code&gt;@11ty/eleventy-fetch&lt;/code&gt; with disk cache for all remote data&lt;/li&gt;
+        &lt;li&gt;Consider replacing build-time Mastodon embeds with static IDs or client-side loading&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;5.-lower-impact-%2F-polish&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#5.-lower-impact-%2F-polish&quot;&gt;5. Lower Impact / Polish&lt;/a&gt;&lt;/h2&gt;
+        &lt;h3 id=&quot;htmlmin-transform-in-ci&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#htmlmin-transform-in-ci&quot;&gt;&lt;code&gt;htmlmin&lt;/code&gt; transform in CI&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;In &lt;code&gt;eleventy.config.js&lt;/code&gt;, HTML minification runs on every &lt;code&gt;.html&lt;/code&gt; file when &lt;code&gt;process.env.CI&lt;/code&gt; is set. Netlify gzip/brotli may make this redundant.&lt;/p&gt;
+        &lt;h3 id=&quot;eleventy-incremental-mode&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#eleventy-incremental-mode&quot;&gt;Eleventy incremental mode&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Use &lt;code&gt;eleventy --incremental&lt;/code&gt; during dev when editing a single post.&lt;/p&gt;
+        &lt;h3 id=&quot;netlify-build-cache&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#netlify-build-cache&quot;&gt;Netlify build cache&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Cache &lt;code&gt;node_modules&lt;/code&gt; and &lt;code&gt;.cache/eleventy-fetch-*&lt;/code&gt; between deploys (Eleventy Fetch cache already exists under &lt;code&gt;.cache/&lt;/code&gt;).&lt;/p&gt;
+        &lt;h3 id=&quot;comment-includes&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#comment-includes&quot;&gt;Comment includes&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;5,111 legacy comment &lt;code&gt;.inc&lt;/code&gt; files under &lt;code&gt;src/_includes/comments/&lt;/code&gt;. The &lt;code&gt;hasAnyComments&lt;/code&gt; / &lt;code&gt;commentInclude&lt;/code&gt; shortcodes do sync &lt;code&gt;fs.existsSync&lt;/code&gt; on every post via &lt;code&gt;src/_includes/mydisqus.liquid&lt;/code&gt;. Minor cost, but could precompute a Set at build start.&lt;/p&gt;
+        &lt;h3 id=&quot;%40rknightuk%2Feleventy-plugin-post-graph&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#%40rknightuk%2Feleventy-plugin-post-graph&quot;&gt;&lt;code&gt;@rknightuk/eleventy-plugin-post-graph&lt;/code&gt;&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Bundles its own Eleventy 2.x copy — housekeeping item, not a major speed issue. Only used on &lt;code&gt;src/misc/postgraph.md&lt;/code&gt;.&lt;/p&gt;
+        &lt;h3 id=&quot;archived-posts-on-disk&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#archived-posts-on-disk&quot;&gt;Archived posts on disk&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;6,784 markdown files remain in &lt;code&gt;src/posts/&lt;/code&gt; even though 2000–2022 are in &lt;code&gt;.eleventyignore&lt;/code&gt;. Moving archives out of the input tree reduces repo noise and glob scan scope.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;suggested-priority&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#suggested-priority&quot;&gt;Suggested Priority&lt;/a&gt;&lt;/h2&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;Fix &lt;code&gt;lasttoot&lt;/code&gt; / &lt;code&gt;rss-parser&lt;/code&gt; keep-alive&lt;/strong&gt; (~67s saved — do this first)&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Limit the &lt;code&gt;eleventy.after&lt;/code&gt; markdown copy&lt;/strong&gt; to active posts only&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Optimize &lt;code&gt;/all&lt;/code&gt; and &lt;code&gt;algolia_full.liquid&lt;/code&gt;&lt;/strong&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Add a consistent skip flag&lt;/strong&gt; for remote &lt;code&gt;_data&lt;/code&gt; fetches in dev&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Enable incremental builds + Netlify caching&lt;/strong&gt;&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;posts-still-using-build-time-mastodon-shortcodes&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#posts-still-using-build-time-mastodon-shortcodes&quot;&gt;Posts Still Using Build-Time Mastodon Shortcodes&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;These active (2023+) posts invoke &lt;code&gt;stoot&lt;/code&gt; and/or &lt;code&gt;lasttoot&lt;/code&gt; at build time:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;src/posts/2024/10/23/2024-10-23-getting-and-displaying-a-mostodon-post-in-client-side-javascript.md&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;src/posts/2023/08/14/2023-08-14-building-a-mastodon-bot-with-cloudflare-workers.md&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;src/posts/2023/03/17/2023-03-17-another-week-another-mastodon-bot-random-album-cover.md&lt;/code&gt; (includes failing &lt;code&gt;lasttoot&lt;/code&gt; to botsin.space)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;src/posts/2023/02/17/2023-02-17-links-for-you.md&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;src/posts/2023/02/15/2023-02-15-building-a-mastodon-bot-listing-page-in-eleventy.md&lt;/code&gt; (examples in &lt;code&gt;{% raw %}&lt;/code&gt; blocks; not executed)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;current-stack-(for-context)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#current-stack-(for-context)&quot;&gt;Current Stack (for context)&lt;/a&gt;&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Site generator:&lt;/strong&gt; Eleventy (11ty) v3&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Hosting:&lt;/strong&gt; Netlify&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Content:&lt;/strong&gt; Markdown posts under &lt;code&gt;src/posts/&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Templates:&lt;/strong&gt; Liquid, EJS, Nunjucks&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Output:&lt;/strong&gt; Static HTML in &lt;code&gt;_site/&lt;/code&gt;&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@tschannik?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Yannik Zimmermann&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-that-is-walking-across-a-street-aT432COAiFs?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -23,7 +349,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -62,7 +388,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -236,7 +562,7 @@
       <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
       <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
       <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
         &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
@@ -352,7 +678,7 @@
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -608,7 +934,7 @@
       <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
       <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
       <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
         &lt;p&gt;Of course there is.&lt;/p&gt;
@@ -782,7 +1108,7 @@
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -1207,7 +1533,7 @@
       <title>Links For You (6/21/26)</title>
       <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
       <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
         &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
@@ -1270,7 +1596,7 @@
       <title>Building a Form Handling Service in Val Town</title>
       <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
       <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
+      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
         &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
@@ -1448,108 +1774,6 @@
         &lt;li&gt;For validation, I&apos;d do that all in the client, and by that I mean HTML first and then JavaScript.&lt;/li&gt;
         &lt;/ul&gt;
         &lt;p&gt;And finally, Val Town&apos;s had an AI assistant for a while, but I never bothered with it till this demo, and damn was it useful. Not only did it help me with parsing the form object, it also reminded me of various aspects of the Request object that for the life of me I struggle to remember. It was a great companion. I will say on the free tier it doesn&apos;t take long to hit the limit, but I &lt;em&gt;was&lt;/em&gt; able to get all the help I needed before I maxed it out. (I did get to a warning though.) Val Town&apos;s got a lot of good reasons to consider paying for it, and this is just one more. (I don&apos;t have a job and I just build dumb demos, so that&apos;s my excuse. ;)&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Creating a Dynamic Favicon with Cloudinary</title>
-      <link>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</link>
-      <guid>https://www.raymondcamden.com/2026/06/16/creating-a-dynamic-favicon-with-cloudinary</guid>
-      <pubDate>Mon, 06 Jul 2026 17:47:59 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Ok, chalk this up to something I may never actually use in production, but I was curious how well the browser would handle changing the favicon of a tab on the fly, and combining that with &lt;a href=&quot;https://cloudinary.com&quot;&gt;Cloudinary&lt;/a&gt; to dynamically modify the source. The inspiration for this was something simple - Google Calendar&apos;s favicon is unique per day, so for example, right now I see this:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/fav1.png&quot; loading=&quot;lazy&quot; alt=&quot;Google Calendar favicon&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;As there is - at most - 31 days in a month - my assumption is that they simply generated all 31 at some point and in their code serving up the web page, they select the right one. To be honest, it&apos;s subtle and I don&apos;t always notice it, but it&apos;s a nice effect. I decided to take a look at how I&apos;d implement this in Cloudinary with JavaScript.&lt;/p&gt;
-        &lt;h2 id=&quot;the-icon&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-icon&quot;&gt;The Icon&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;For my icon, I grabbed this nice cat icon from Flaticon: &lt;a href=&quot;https://www.flaticon.com/free-icon/cat_8564642&quot;&gt;https://www.flaticon.com/free-icon/cat_8564642&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Nice and simple, and not a bad choice for an icon.&lt;/p&gt;
-        &lt;p&gt;This was originally a png, which you can use for a favicon, but I used Cloudinary&apos;s URL transformations to both resize it and turn it into an ICO (I added a linebreak to the URL to help it wrap):&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/ 
-        fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The size is handled in &lt;code&gt;c_fit,w_32&lt;/code&gt;, setting it to 32 pixels wide while &lt;code&gt;f_ico&lt;/code&gt; changes the format to ICO.&lt;/p&gt;
-        &lt;h2 id=&quot;adding-text&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-text&quot;&gt;Adding Text&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Cloudinary&apos;s transformations support adding text layers to the image, so the next thing I tried was adding that to the icon:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;https://res.cloudinary.com/raymondcamden/image/
-        fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/
-        https://static.raymondcamden.com/images/2026/06/cat.png
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In the URL above, the portion beginning &lt;code&gt;l_text&lt;/code&gt; is where I define my font, size, styling, position and finally, the actual number. I also added an opacity to the icon to make the text stand out. You can see that here, &lt;code&gt;o_33&lt;/code&gt;, where 33 is the percent and was based on me just playing around until I felt the text was most clear.&lt;/p&gt;
-        &lt;p&gt;You can see it here:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:1/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat icon&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;This worked well with 99 as well, but at most I think 2 characters is all you would want to fit in there.&lt;/p&gt;
-        &lt;h2 id=&quot;putting-it-together&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-it-together&quot;&gt;Putting it Together&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Alright, so for my fancy demo, I started off with a bit of HTML and a hard-coded favicon pointing to my cat:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
-        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
-        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
-        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;./style.css&amp;quot;&amp;gt;
-        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
-        &amp;lt;link id=&amp;quot;favicon&amp;quot; rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/x-icon&amp;quot; href=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32/f_ico/https://static.raymondcamden.com/images/2026/06/cat.png&amp;quot;&amp;gt;
-        &amp;lt;title&amp;gt;Pen&amp;lt;/title&amp;gt;
-        &amp;lt;/head&amp;gt;
-        &amp;lt;body&amp;gt;
-        
-        &amp;lt;h2&amp;gt;Dynamic Favicon via Cloudinary&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;
-        This demo shows how to dynamically create a favicon
-        via Cloudinary. It uses a source image that&apos;s resized and converted to ICO, but then can also support dynamic text (well, a small amount) written to the icon.
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;button id=&amp;quot;addBtn&amp;quot;&amp;gt;Click me to increase the #&amp;lt;/button&amp;gt;
-        &amp;lt;button id=&amp;quot;resetBtn&amp;quot;&amp;gt;Click me to reset the #&amp;lt;/button&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;script src=&amp;quot;./script.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note I&apos;ve got two buttons. Each time you click the add button, I&apos;m going to update the favicon with a number, while the reset button simply resets to the default.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s the JavaScript:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Number used in the favicon
-        let NUMBER = 0;
-        
-        document.addEventListener(&apos;DOMContentLoaded&apos;, async () =&amp;gt; {
-        
-        const $favico = document.querySelector(&apos;#favicon&apos;);
-        const defaultIco = $favico.href;
-        
-        document.querySelector(&apos;#addBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
-        NUMBER++
-        setIco();
-        });
-        
-        document.querySelector(&apos;#resetBtn&apos;).addEventListener(&apos;click&apos;, () =&amp;gt; {
-        NUMBER = 0;
-        setIco();
-        });
-        
-        const setIco = () =&amp;gt; {
-        if(NUMBER &amp;gt; 0) {
-        $favico.href = `https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_32,o_33/f_ico/l_text:Arial_28_bold_center:${NUMBER}/fl_layer_apply/https://static.raymondcamden.com/images/2026/06/cat.png`;
-        } else {
-        $favico.href = defaultIco;
-        }
-        };
-        
-        }, false);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I grab a pointer to the favicon link in my HTML and copy out the default href value. Then I simply use two event handlers to handle each button. One increases the number, one resets it to 0. The last bit, &lt;code&gt;setIco&lt;/code&gt;, just changes the href value.&lt;/p&gt;
-        &lt;p&gt;You can test this yourself here: &lt;a href=&quot;https://giving-flower-sunfish.codepen.app&quot;&gt;https://giving-flower-sunfish.codepen.app&lt;/a&gt;. In my testing with Chrome, it worked well. I saw the favicon update within about a second of clicking. YMMV of course. I just tested in Firefox and it worked just fine as well.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve embedded the CodePen below, but of course you will need to run the deployed version to see it in action. Enjoy!&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;dark&quot; data-height=&quot;500&quot; data-pen-title=&quot;Untitled&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRNago&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ed120-9ee6-7141-af43-13ae7c7cc8f1&quot;&gt;
-        Untitled&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
