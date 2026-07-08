@@ -4,12 +4,266 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 07 Jul 2026 17:36:33 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jul 2026 17:15:54 GMT</lastBuildDate>
+    <item>
+      <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
+      <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
+      <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
+        &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
+        &lt;h2 id=&quot;what&apos;s-a-skill-again%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-skill-again%3F&quot;&gt;What&apos;s a skill again?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;At the simplest level, a skill simply gives direction to an AI agent on how to perform a task. It also describes itself in such a way that your AI agent knows when to invoke the skill. This is done in a simple Markdown file that can, and probably should, be checked into your repo.&lt;/p&gt;
+        &lt;p&gt;So for example, if I had a skill related to checking the health of my cat, my AI agent should be smart enough to recognize when it should use the skill based on my prompt. So for example:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;I&apos;m worried about Donut&apos;s health, anything I can do?&lt;/li&gt;
+        &lt;li&gt;Sir Fluffalot is doing fine, but what steps can I do to ensure she&apos;s healthy?&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;That&apos;s a pretty quick summary but you get the idea. Where the benefit comes in is helping document and describe a process that you need to run again and again, or a process your organization/team/herd of cats needs to standardize on and wants to be consistent.&lt;/p&gt;
+        &lt;h2 id=&quot;turning-my-performance-review-into-a-skill&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#turning-my-performance-review-into-a-skill&quot;&gt;Turning my performance review into a skill&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;When I first did my performance review, I kept the prompt pretty simple. I did this on another machine so I don&apos;t have it in front of me, but I believe it was literally as simple as:&lt;/p&gt;
+        &lt;blockquote&gt;
+        Review this site and tell me of any performance improvements you can find.
+        &lt;/blockquote&gt;
+        &lt;p&gt;That generated the review I shared in my &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;last post&lt;/a&gt; and guided my development.&lt;/p&gt;
+        &lt;p&gt;Cursor provides a few ways to make skills:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Since it&apos;s just a Markdown file, you can just make a file, old school like we did in the old days.&lt;/li&gt;
+        &lt;li&gt;Cursor has a skill to make skills: &lt;code&gt;/create-skill i need a skill to help with cat care&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;You can also just ask Cursor to do this in a prompt.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The last option is what I did, asking Cursor to make a skill like my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/.agents/skills/prepublish/SKILL.md&quot;&gt;&lt;code&gt;prepublish&lt;/code&gt;&lt;/a&gt; one.&lt;/p&gt;
+        &lt;p&gt;Cursor responded with:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;Created a &lt;strong&gt;&lt;code&gt;precheck&lt;/code&gt;&lt;/strong&gt; skill as the engine-code counterpart to &lt;code&gt;prepublish&lt;/code&gt;. It lives in both skill directories, same as your blog skill:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;.claude/skills/precheck/SKILL.md&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;.agents/skills/precheck/SKILL.md&lt;/code&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 id=&quot;how-to-use-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-to-use-it&quot;&gt;How to use it&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before committing engine changes, run:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/precheck
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Or ask something like “review my engine changes before I commit.”&lt;/p&gt;
+        &lt;h2 id=&quot;what-it-does&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-it-does&quot;&gt;What it does&lt;/a&gt;&lt;/h2&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;Finds scope&lt;/strong&gt; — Uses &lt;code&gt;git diff&lt;/code&gt; / &lt;code&gt;git status&lt;/code&gt; and filters to engine paths (&lt;code&gt;eleventy.config.js&lt;/code&gt;, &lt;code&gt;config/&lt;/code&gt;, &lt;code&gt;src/_data/&lt;/code&gt;, &lt;code&gt;netlify/&lt;/code&gt;, &lt;code&gt;scripts/&lt;/code&gt;, Algolia/search templates, client JS). Ignores &lt;code&gt;src/posts/&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Smoke test&lt;/strong&gt; — Runs &lt;code&gt;SKIP_REMOTE_DATA=1 npx eleventy&lt;/code&gt; when config, data, or search templates changed.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Reviews&lt;/strong&gt; — Groups findings as Critical / Warning / Note, focused on build breaks, deploy/runtime issues, performance (collection loops, async shortcodes, caching), and Algolia/search compatibility.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Applies fixes only on request&lt;/strong&gt; — Same handoff pattern as &lt;code&gt;prepublish&lt;/code&gt;; you commit when ready.&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;h2 id=&quot;your-workflow&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#your-workflow&quot;&gt;Your workflow&lt;/a&gt;&lt;/h2&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Change type&lt;/th&gt;
+        &lt;th&gt;Skill&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;New blog post&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/prepublish&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Eleventy, Netlify, JS/TS engine&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/precheck&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;No hooks involved — you invoke it manually when you want it.&lt;/p&gt;
+        &lt;p&gt;If you want the description tuned so it auto-suggests itself when you say “commit my eleventy changes,” I can adjust the frontmatter trigger phrases.&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;A note on the last paragraph of the response. I had started my conversation with Cursor initially thinking I was going to automate it with a hook, but changed my mind. That&apos;s why it&apos;s mentioned here. The last bit &amp;quot;frontmatter trigger phrases&amp;quot; goes back to what I said earlier - a skill is both a guide on how to do something as well as a description of when it should be run.&lt;/p&gt;
+        &lt;p&gt;The result was pretty astounding I think, specifically in how Cursor recognized the &amp;quot;engine&amp;quot; parts of my blog versus the &amp;quot;content&amp;quot; bits. It did this well in the one off so I&apos;m not surprised, but I love having the various parts spelled out specifically in the skill itself. Like yesterday, I&apos;ll share the entire skill at the end, but let me talk a bit about what it did when I tried running it.&lt;/p&gt;
+        &lt;h2 id=&quot;running-the-skill&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#running-the-skill&quot;&gt;Running the Skill&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;When I ran the skill, I didn&apos;t expect it to find anything as my last commit was just a blog post. Cursor responded as such mentioning there was nothing staged. It noted two files that were dirty but not important:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;&lt;strong&gt;Precheck result: nothing in scope to review.&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;Your working tree has two changes, neither in the engine paths this skill covers:&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;File&lt;/th&gt;
+        &lt;th&gt;Status&lt;/th&gt;
+        &lt;th&gt;In scope?&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;package-lock.json&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;modified&lt;/td&gt;
+        &lt;td&gt;No — lockfile only; syncs &lt;code&gt;@netlify/edge-functions&lt;/code&gt; already in &lt;code&gt;package.json&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;src/test.liquid&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;untracked&lt;/td&gt;
+        &lt;td&gt;No — scratch page (moon-phase font test), not engine/build code&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;No staged changes. No diffs under &lt;code&gt;eleventy.config.js&lt;/code&gt;, &lt;code&gt;config/&lt;/code&gt;, &lt;code&gt;src/_data/&lt;/code&gt;, &lt;code&gt;netlify/&lt;/code&gt;, &lt;code&gt;scripts/&lt;/code&gt;, search/feed templates, client JS, or deploy config.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Stopping here&lt;/strong&gt; per the skill workflow.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;p&gt;If you meant something else:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Recent commits&lt;/strong&gt; (e.g. &lt;code&gt;1117ccc2 perf changes&lt;/code&gt;) — say “precheck the last N commits” and I’ll review those engine diffs.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Before you commit&lt;/strong&gt; &lt;code&gt;package-lock.json&lt;/code&gt; — worth committing alongside the existing &lt;code&gt;package.json&lt;/code&gt; dep so installs stay reproducible; no code review needed.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;&lt;code&gt;src/test.liquid&lt;/code&gt;&lt;/strong&gt; — looks like a local experiment; don’t commit unless you want it published.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Want me to review a specific commit or branch instead?&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;I asked it to review the last two and it also noticed they didn&apos;t have anything relevant either - but what got me excited was that it went ahead and looked at one more and noted relevant changes there. Here&apos;s how that response ended:&lt;/p&gt;
+        &lt;blockquote&gt;
+        Want me to precheck 1117ccc2 (or 1117ccc2 + 06626459 together)? That is where the meaningful review would be.
+        &lt;/blockquote&gt;
+        &lt;p&gt;As I mentioned, I didn&apos;t do &lt;em&gt;everything&lt;/em&gt; in the initial performance check, so I figured, why not, and I approved this scan. It noted two places I had used &lt;code&gt;rss-parser&lt;/code&gt; and not yet added the timeout change so I went ahead and let Cursor make those changes as well.&lt;/p&gt;
+        &lt;h2 id=&quot;the-skill&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-skill&quot;&gt;The Skill&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Here&apos;s the &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/.agents/skills/prepublish/SKILL.md&quot;&gt;skill&lt;/a&gt; created by Cursor. Let me know what you think! Also, check out Cursor&apos;s &lt;a href=&quot;https://cursor.com/docs/skills&quot;&gt;docs on Skills&lt;/a&gt; - it&apos;s not just specific to Cursor and is a great reference in general.&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;hr&gt;
+        &lt;p&gt;name: precheck&lt;/p&gt;
+        &lt;p&gt;description: Review engine and infrastructure changes before commit. Use when the user runs /precheck, asks to review site engine code, or wants a pre-commit check on JavaScript/TypeScript, Eleventy config, Netlify functions, or build tooling — not blog posts.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h1 id=&quot;precheck-engine-review&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#precheck-engine-review&quot;&gt;Precheck engine review&lt;/a&gt;&lt;/h1&gt;
+        &lt;p&gt;Run this before committing changes to the site&apos;s core engine — Eleventy config, build filters, data fetchers, Netlify functions, search/indexing, or client JS that affects builds or performance. Blog posts in &lt;code&gt;src/posts/&lt;/code&gt; are out of scope; use &lt;code&gt;prepublish&lt;/code&gt; for those.&lt;/p&gt;
+        &lt;h2 id=&quot;step-1-%E2%80%94-find-the-changes&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-1-%E2%80%94-find-the-changes&quot;&gt;Step 1 — Find the changes&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Use git to determine what changed:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;git status --short
+        git diff
+        git diff --cached
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Filter to engine-relevant paths only:&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Area&lt;/th&gt;
+        &lt;th&gt;Paths&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Eleventy entry&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;eleventy.config.js&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Engine modules&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;config/**/*.js&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Build-time data&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;src/_data/*.js&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Netlify runtime&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;netlify/functions/**&lt;/code&gt;, &lt;code&gt;netlify/edge-functions/**&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Maintenance scripts&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;scripts/**&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Search / feeds&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;src/misc/algolia_*.liquid&lt;/code&gt;, &lt;code&gt;src/search.liquid&lt;/code&gt;, &lt;code&gt;src/feed*.liquid&lt;/code&gt;, &lt;code&gt;src/sitemap.njk&lt;/code&gt;, &lt;code&gt;src/llms.liquid&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Client JS&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;src/assets/js/**&lt;/code&gt;, &lt;code&gt;src/assets/service-worker.js&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Deploy config&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;netlify.toml&lt;/code&gt;, &lt;code&gt;src/_redirects&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;&lt;strong&gt;Exclude:&lt;/strong&gt; &lt;code&gt;src/posts/**&lt;/code&gt;, static pages (&lt;code&gt;about.md&lt;/code&gt;, &lt;code&gt;speaking.md&lt;/code&gt;, etc.), images/CSS unless they affect build behavior, &lt;code&gt;_site/&lt;/code&gt;, &lt;code&gt;node_modules/&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;If nothing in scope changed, say so and stop. If both engine files and blog posts changed, review only the engine files unless the user asks otherwise.&lt;/p&gt;
+        &lt;p&gt;Confirm in one line which files you are reviewing before proceeding.&lt;/p&gt;
+        &lt;h2 id=&quot;step-2-%E2%80%94-build-smoke-test&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-2-%E2%80%94-build-smoke-test&quot;&gt;Step 2 — Build smoke test&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;If any of these changed — &lt;code&gt;eleventy.config.js&lt;/code&gt;, &lt;code&gt;config/**&lt;/code&gt;, &lt;code&gt;src/_data/**&lt;/code&gt;, search/feed templates — run a local build:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;SKIP_REMOTE_DATA=1 npx eleventy
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Report success or paste the error. If the change is limited to &lt;code&gt;netlify/functions/**&lt;/code&gt;, &lt;code&gt;scripts/**&lt;/code&gt;, or client JS with no template/config impact, skip the build and note why.&lt;/p&gt;
+        &lt;p&gt;Do not auto-fix build failures. Diagnose and report.&lt;/p&gt;
+        &lt;h2 id=&quot;step-3-%E2%80%94-code-review&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-3-%E2%80%94-code-review&quot;&gt;Step 3 — Code review&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Read every changed in-scope file. Review for:&lt;/p&gt;
+        &lt;h3 id=&quot;build-breaks&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#build-breaks&quot;&gt;Build breaks&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Broken imports, mixed ESM/CJS (&lt;code&gt;scripts/rebuildalgolia.js&lt;/code&gt; is CommonJS; the rest is ESM)&lt;/li&gt;
+        &lt;li&gt;Collection mutations in &lt;code&gt;getPosts&lt;/code&gt; / &lt;code&gt;categories&lt;/code&gt; — permalink and &lt;code&gt;outputPath&lt;/code&gt; changes affect every post&lt;/li&gt;
+        &lt;li&gt;New &lt;code&gt;_data&lt;/code&gt; files that ignore &lt;code&gt;SKIP_REMOTE_DATA=1&lt;/code&gt; (local dev must not require live API keys)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;eleventy.after&lt;/code&gt; markdown copy hook — path bugs silently skip posts for content negotiation&lt;/li&gt;
+        &lt;li&gt;Algolia JSON shape in &lt;code&gt;src/misc/algolia_*.liquid&lt;/code&gt; — must stay compatible with &lt;code&gt;deploy-succeeded&lt;/code&gt; partial reindex and &lt;code&gt;scripts/rebuildalgolia.js&lt;/code&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;runtime-%2F-deploy-breaks&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#runtime-%2F-deploy-breaks&quot;&gt;Runtime / deploy breaks&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Netlify functions: missing env vars, timeout risk, uncached Algolia calls&lt;/li&gt;
+        &lt;li&gt;Edge function &lt;code&gt;content-negotiation.ts&lt;/code&gt; — must not break HTML serving for normal browsers&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;deploy-succeeded&lt;/code&gt; — partial Algolia update logic; a bad filter can leave the index stale&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;performance&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#performance&quot;&gt;Performance&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Work added inside &lt;code&gt;getPosts&lt;/code&gt; or other per-post loops (runs on every build)&lt;/li&gt;
+        &lt;li&gt;New async shortcodes or &lt;code&gt;_data&lt;/code&gt; fetchers without caching (&lt;code&gt;@11ty/eleventy-fetch&lt;/code&gt; pattern in &lt;code&gt;stoot.js&lt;/code&gt;)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;cssmin&lt;/code&gt; filter global cache — stale output if inputs change without cache invalidation&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;htmlmin&lt;/code&gt; transform — CI-only; errors are swallowed; new HTML patterns may minify badly&lt;/li&gt;
+        &lt;li&gt;Client JS: blocking scripts, large bundles, service-worker cache busting&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;correctness-and-safety&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#correctness-and-safety&quot;&gt;Correctness and safety&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Secrets or API keys hardcoded instead of env vars&lt;/li&gt;
+        &lt;li&gt;Error handling that fails open vs fails closed (especially fetchers returning &lt;code&gt;[]&lt;/code&gt; on error)&lt;/li&gt;
+        &lt;li&gt;Redirect or header changes in &lt;code&gt;netlify.toml&lt;/code&gt; / &lt;code&gt;src/_redirects&lt;/code&gt; with unintended side effects&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;strong&gt;Do NOT&lt;/strong&gt; nitpick style, naming, or formatting unless it risks a real bug. This site has no linter; focus on things that break builds, deploys, search, or page performance.&lt;/p&gt;
+        &lt;p&gt;Present findings grouped by severity:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;strong&gt;Critical&lt;/strong&gt; — will break build, deploy, or search; must fix before commit&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Warning&lt;/strong&gt; — likely problem under load, in CI, or at runtime&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt; — worth knowing, optional improvement&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Each item: one or two sentences, file path, and line number when possible. Do not rewrite code — point at the issue and let the user decide.&lt;/p&gt;
+        &lt;h2 id=&quot;step-4-%E2%80%94-apply-changes&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-4-%E2%80%94-apply-changes&quot;&gt;Step 4 — Apply changes&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ask which suggestions to act on. Apply only what is confirmed. Then stop — the user handles the actual commit/push.&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/zero-md&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -335,7 +589,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -349,7 +603,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -388,7 +642,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -562,7 +816,7 @@
       <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
       <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
       <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
         &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
@@ -678,7 +932,7 @@
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -934,7 +1188,7 @@
       <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
       <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
       <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
         &lt;p&gt;Of course there is.&lt;/p&gt;
@@ -1108,7 +1362,7 @@
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -1533,7 +1787,7 @@
       <title>Links For You (6/21/26)</title>
       <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
       <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
+      <pubDate>Wed, 08 Jul 2026 16:35:42 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
         &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
@@ -1590,190 +1844,6 @@
         &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;&lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/dreaded.png&quot; loading=&quot;lazy&quot; alt=&quot;The Dreaded cover&quot; class=&quot;imgborder imgcenter&quot;&gt;&lt;/a&gt;
         &lt;/p&gt;
         &lt;p&gt;Tyler&apos;s shared some of his works for me in the past so as soon as this one became available, I went ahead and purchased a copy for myself. Grab your &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;copy&lt;/a&gt; today - available on Kindle, paper and hardback.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building a Form Handling Service in Val Town</title>
-      <link>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</link>
-      <guid>https://www.raymondcamden.com/2026/06/19/building-a-form-handling-service-in-val-town</guid>
-      <pubDate>Tue, 07 Jul 2026 17:18:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Many years ago, I made the switch from building primarily app-server backed sites (using Node, ColdFusion, PHP, etc) to fully static sites using tools like Jekyll, Hugo, and Eleventy. For the most part, it was a great shift in how I build, but there were a few things I had to figure out in that new world - one of them was simple form handling. While I could have used serverless just fine, it felt like overkill. Luckily, there were a few services out there that catered to this need. You would simply use a unique action for your form and that service would handle collecting the form data, emailing it to you, and redirecting the user back to the site.&lt;/p&gt;
-        &lt;p&gt;A great example of this, and one I used in the past, is &lt;a href=&quot;https://formspree.io/&quot;&gt;Formspree&lt;/a&gt;. You can see an example right on their home page:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- random form on your site --&amp;gt;
-        &amp;lt;form action=&amp;quot;https://formspree.io/f/{form_id}&amp;quot; method=&amp;quot;post&amp;quot;&amp;gt;
-        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Your Email&amp;lt;/label&amp;gt;
-        &amp;lt;input name=&amp;quot;Email&amp;quot; id=&amp;quot;email&amp;quot; type=&amp;quot;email&amp;quot;&amp;gt;
-        &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Submit&amp;lt;/button&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Emailing isn&apos;t the only option for processing the result of course. Formspree&apos;s home page lists a bunch of integrations you can use, like Airtable and Google Sheets. Another feature of these services is that various form fields will trigger different behaviors. For example, I can use a hidden form field to set where the form should redirect to after submission. Or, if there is a field named &lt;code&gt;email&lt;/code&gt;, when the form data is sent to the site owner, set the reply value to that value.&lt;/p&gt;
-        &lt;p&gt;So with that in mind, a few days ago, the Val Town folks &lt;a href=&quot;https://blog.val.town/talk-of-the-town-june-2026&quot;&gt;blogged&lt;/a&gt; about various examples in the community (I had a few included too!). In that blog, they shared this post:&lt;/p&gt;
-        &lt;blockquote class=&quot;bluesky-embed&quot; data-bluesky-uri=&quot;at://did:plc:thuylqmisypnmekwzfgymm3z/app.bsky.feed.post/3moaamfpx4u27&quot; data-bluesky-cid=&quot;bafyreiba65vlw52hti437sou5yvsrclt6jzgovgqbzj6xyutp7kfdirbxa&quot; data-bluesky-embed-color-mode=&quot;system&quot;&gt;&lt;p lang=&quot;en&quot;&gt;I run my forms now via a free val.town instance, very easy to setup with ai and no lock in&lt;/p&gt;&amp;mdash; meta (&lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z?ref_src=embed&quot;&gt;@metaend.eth.xyz&lt;/a&gt;) &lt;a href=&quot;https://bsky.app/profile/did:plc:thuylqmisypnmekwzfgymm3z/post/3moaamfpx4u27?ref_src=embed&quot;&gt;June 14, 2026 at 2:27 AM&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://embed.bsky.app/static/embed.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;That clicked with me - &lt;em&gt;of course&lt;/em&gt; Val Town would be a great solution for handling form posts - and I wondered - could we build a &lt;em&gt;generic&lt;/em&gt; service such that any form could use it?&lt;/p&gt;
-        &lt;p&gt;I came up with the following requirements:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;First and foremost - the implementation should respond to regular form posts. In other words, I didn&apos;t want to build an API that would require JavaScript code in the form. Instead I wanted to follow the lead of services like Formspree and let you simply point your &apos;vanilla&apos; form to a specific URL.&lt;/li&gt;
-        &lt;li&gt;The form should allow me to specify who gets the result. That&apos;s a huge security issue of course, so my service will have a white list of allowed email addresses.&lt;/li&gt;
-        &lt;li&gt;The form should allow me to specify where to redirect after submission. Like the above, this could be a security issue, so my service will have a white list of URLs that allow for partial matching, so you can allow foo.com for example and any redirect &lt;em&gt;under&lt;/em&gt; that would work.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;So far so good? Alright, let&apos;s look at the implementation.&lt;/p&gt;
-        &lt;h2 id=&quot;show-me-the-code!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code!&quot;&gt;Show me the code!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;ll link to the Val itself when done, but here&apos;s the entirety of the code, tied to a HTTP trigger so it can actually be used in forms:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { email } from &amp;quot;https://esm.town/v/std/email&amp;quot;;
-        
-        /*
-        We are only allowed to send to one of these.
-        */
-        const SAFE_EMAILS_TO = [
-        &amp;quot;raymondcamden@gmail.com&amp;quot;,
-        &amp;quot;rcamden@gmail.com&amp;quot;,
-        ];
-        
-        /*
-        A URL that is matched against redirects - the redirect must match the domain, well anything _after_ the input
-        */
-        const SAFE_REDIRECT_TO = [
-        &amp;quot;https://boring-morning-yak.codepen.app&amp;quot;,
-        ];
-        
-        /*
-        The &apos;special keys&apos; don&apos;t need to be in the form email.
-        */
-        const SPECIAL_KEYS = [&amp;quot;_send&amp;quot;, &amp;quot;_redirect&amp;quot;, &amp;quot;_formname&amp;quot;];
-        
-        /*
-        Every form must have a _send and _redirect field. Later we may add more validations.
-        Like validating _redirect. Duh.
-        */
-        function verifyForm(f) {
-        console.log(&amp;quot;verifyForm&amp;quot;, f.get(&amp;quot;_send&amp;quot;), f.get(&amp;quot;_redirect&amp;quot;));
-        
-        if (!f.get(&amp;quot;_send&amp;quot;) || f.get(&amp;quot;_send&amp;quot;).length === 0) return false;
-        if (!f.get(&amp;quot;_redirect&amp;quot;) || f.get(&amp;quot;_redirect&amp;quot;).length === 0) return false;
-        
-        // ensure the email is ok
-        if(SAFE_EMAILS_TO.indexOf(f.get(&amp;quot;_send&amp;quot;)) === -1) return false;
-        
-        //now ensure _redirect matches against at least one
-        let validRedirect = false;
-        const redirect = f.get(&amp;quot;_redirect&amp;quot;).toLowerCase();
-        
-        SAFE_REDIRECT_TO.forEach((u) =&amp;gt; {
-        u = u.toLowerCase();
-        if (redirect.startsWith(u)) validRedirect = true;
-        });
-        
-        return validRedirect;
-        }
-        
-        /*
-        As there are multiple things that can go wrong, here&apos;s the general
-        error handler. As this is meant for Form POSTs, its ok to give a simple response.
-        */
-        function returnError() {
-        return new Response(
-        &amp;quot;&amp;lt;!doctype html&amp;gt;&amp;lt;meta charset=utf-8&amp;gt;&amp;lt;title&amp;gt;500&amp;lt;/title&amp;gt;&amp;lt;h1&amp;gt;500 — Server Error&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Sorry, something broke on our end.&amp;lt;/p&amp;gt;&amp;quot;,
-        { status: 500, headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;text/html; charset=utf-8&amp;quot; } },
-        );
-        }
-        
-        export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
-        let formData;
-        const obj: Record&amp;lt;string, string&amp;gt; = {};
-        
-        try {
-        formData = await req.formData();
-        console.log(&amp;quot;fd&amp;quot;, formData);
-        } catch (_e) {
-        return returnError();
-        }
-        
-        if (!verifyForm(formData)) return returnError();
-        
-        const redirect = formData.get(&amp;quot;_redirect&amp;quot;);
-        
-        let formName = &amp;quot;&amp;quot;;
-        /*
-        One special field is _formname. If we have it, we include it
-        in the subject + email
-        */
-        
-        if (formData.get(&amp;quot;_formname&amp;quot;)) {
-        formName = formData.get(&amp;quot;_formname&amp;quot;);
-        } else {
-        formName = `Form at ${req.headers.get(&amp;quot;referer&amp;quot;) ?? &amp;quot;unknown&amp;quot;}`;
-        }
-        
-        const subject = `Form submission: ${formName}`;
-        
-        for (const key of new Set(formData.keys())) {
-        obj[key] = formData.getAll(key).map(String).join(&amp;quot;, &amp;quot;);
-        }
-        
-        let html = `
-        &amp;lt;h2&amp;gt;Form Submission - ${formName}&amp;lt;/h2&amp;gt; 
-        &amp;lt;table&amp;gt;
-        `;
-        
-        for (const [key, value] of Object.entries(obj)) {
-        console.log(key, value);
-        if (SPECIAL_KEYS.indexOf(key) === -1) {
-        html += `
-        &amp;lt;tr&amp;gt;&amp;lt;td style=&amp;quot;min-width:300px&amp;quot;&amp;gt;${key}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;${value}&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
-        `;
-        }
-        }
-        
-        html += `
-        &amp;lt;/table&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        Form submitted at ${new Intl.DateTimeFormat(&amp;quot;en-US&amp;quot;, { dateStyle: &amp;quot;short&amp;quot;, timeStyle: &amp;quot;short&amp;quot;, timeZone: &amp;quot;America/Chicago&amp;quot; }).format(new Date())}.
-        &amp;lt;/p&amp;gt;
-        `;
-        
-        console.log(html);
-        
-        const emailOptions = {
-        // to: &amp;quot;someone_else@example.com&amp;quot;, this would be formData.get(&apos;_email&apos;)
-        html,
-        subject,
-        };
-        
-        if (obj[&amp;quot;email&amp;quot;]) emailOptions.replyTo = obj[&amp;quot;email&amp;quot;];
-        
-        await email(emailOptions);
-        
-        return new Response(null, {
-        status: 303,
-        headers: { Location: redirect },
-        });
-        
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Up on top, you can see the various security variables I use to ensure the service can&apos;t be abused. I&apos;ve got a list of emails that can receive the form data and a list of URLs where the user can be redirected. Again, the URLs are partially matched so you can do anything as long as it matches at the beginning.&lt;/p&gt;
-        &lt;p&gt;The next variable, &lt;code&gt;SPECIAL_KEYS&lt;/code&gt;, is just used to filter out the &apos;meta&apos; values for my service and not include them in the email. This just reduces the noise for the reader.&lt;/p&gt;
-        &lt;p&gt;The &lt;code&gt;verifyForm&lt;/code&gt; handles checking our two required form fields. &lt;code&gt;_send&lt;/code&gt; sets the recipient of the form data and &lt;code&gt;_redirect&lt;/code&gt; handles where to go when done. For both, they have to exist, and then I check for valid values against the two variables defined on top of the script.&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;returnError&lt;/code&gt; is just a utility function to render an error. This can happen if the form didn&apos;t have the required, or correct values, or if there is an error reading the form data. I use a simple 500 error but I could imagine redirecting to an error page on the calling site instead.&lt;/p&gt;
-        &lt;p&gt;Finally - the core default function does the real work. I get my form data, verify it, and then create an email. I&apos;ve got code that looks for a hidden form field, &lt;code&gt;_formname&lt;/code&gt;, which lets you give a nice label to the email.&lt;/p&gt;
-        &lt;p&gt;The only real tricky part here is handling multi-value form fields, like checkboxes for example. The &lt;code&gt;for&lt;/code&gt; loop over &lt;code&gt;formData.keys()&lt;/code&gt; handles this and I&apos;ve got Val Town&apos;s AI service to thank for the help here. I had an idea of how I was going to handle this, but the AI service suggested the code you see and honestly it was much better than what I would have written. More on the AI stuff in a second.&lt;/p&gt;
-        &lt;p&gt;The last bit is just the email. Now, in a &amp;quot;real&amp;quot; implementation of this, I&apos;d use an email service instead of Val&apos;s built-in service, but it works well enough for this demo. You can see the &lt;a href=&quot;https://docs.val.town/reference/std/email/&quot;&gt;docs&lt;/a&gt; for their service to understand exactly what it can and cannot do, but the big thing for this demo is that I&apos;m on the free tier so I can&apos;t specify the &apos;to&apos; value. Note that I look for &lt;code&gt;email&lt;/code&gt; in the form and if set, use that as the &lt;code&gt;replyTo&lt;/code&gt; value. I call that out in my code so just note if you fork my Val and use it yourself, change this if you are on the paid tier. Or switch to an email service. You get the idea.&lt;/p&gt;
-        &lt;h2 id=&quot;the-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-demo&quot;&gt;The Demo&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, finally, I built a simple CodePen form to show this in action: &lt;a href=&quot;https://boring-morning-yak.codepen.app/&quot;&gt;https://boring-morning-yak.codepen.app/&lt;/a&gt;. On this page you will see three forms. The first one is intentionally bad and results in a 500. The next two should work and will email me so - thanks for that. ;)&lt;/p&gt;
-        &lt;p&gt;Here&apos;s an example of the email sent out:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/form1.png&quot; loading=&quot;lazy&quot; alt=&quot;Sample form result&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;h2 id=&quot;final-thoughts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#final-thoughts&quot;&gt;Final Thoughts&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, before I ramble on a bit, you can find my val here: &lt;a href=&quot;https://www.val.town/x/raymondcamden/form-bouncer&quot;&gt;https://www.val.town/x/raymondcamden/form-bouncer&lt;/a&gt;. If you use it, let me know! Now for some things to consider.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;My form does not handle file attachments. It &lt;em&gt;could&lt;/em&gt;, but you would need something a bit more complex for that. Val Town has blob support so you could store it there, but I&apos;d probably consider a private S3/R2 bucket instead. You could generate a link and include it in the email. You would have to also build something to handle removing old files from the bucket eventually. You would also want to sanity check the file types and sizes. Doable - but more work than I wanted to for this demo.&lt;/li&gt;
-        &lt;li&gt;For form fields that can be null, like checkboxes and radio elements, they don&apos;t show up in the email at all. I could imagine a few ways around that. You could use a hidden form field to specify things like that. Maybe: &lt;code&gt;&amp;lt;input name=&amp;quot;_nullField&amp;quot; value=&amp;quot;favoritemovie,favoritefoods&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;. The code would notice if one of these items isn&apos;t present and then render it in the email at least so it&apos;s clear the value was blank.&lt;/li&gt;
-        &lt;li&gt;Another idea I had would be specifying &apos;friendly&apos; labels for form fields. So example, my favorite movie comes out as &lt;code&gt;favoriteMovie: Star Wars&lt;/code&gt;. If the idea here is to make &amp;quot;human readable&amp;quot; form results, I could see perhaps supporting something like this: &lt;code&gt;&amp;lt;input name=&amp;quot;_favoriteMovie_label&amp;quot; value=&amp;quot;Favorite Movie&amp;quot; type=&amp;quot;hidden&amp;quot;&amp;gt;&lt;/code&gt;.&lt;/li&gt;
-        &lt;li&gt;For validation, I&apos;d do that all in the client, and by that I mean HTML first and then JavaScript.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;And finally, Val Town&apos;s had an AI assistant for a while, but I never bothered with it till this demo, and damn was it useful. Not only did it help me with parsing the form object, it also reminded me of various aspects of the Request object that for the life of me I struggle to remember. It was a great companion. I will say on the free tier it doesn&apos;t take long to hit the limit, but I &lt;em&gt;was&lt;/em&gt; able to get all the help I needed before I maxed it out. (I did get to a warning though.) Val Town&apos;s got a lot of good reasons to consider paying for it, and this is just one more. (I don&apos;t have a job and I just build dumb demos, so that&apos;s my excuse. ;)&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
