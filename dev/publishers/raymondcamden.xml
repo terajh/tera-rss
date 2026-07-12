@@ -4,12 +4,189 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sat, 11 Jul 2026 16:18:16 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 12 Jul 2026 16:25:53 GMT</lastBuildDate>
+    <item>
+      <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
+      <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
+      <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
+        &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Chuck, forgive me, I&apos;m going to do a horrible job summarizing your entire company into a few sentences. &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt; provides search as a service. You create an index (or multiple) that represent what you want to search, whether it be textual content (like this blog) or ecommerce products (perhaps Dungeon Crawler Carl merch). Via multiple ways, you populate this index and keep it up to date (when you create/edit/delete content locally, you make a corresponding edit to your index).&lt;/p&gt;
+        &lt;p&gt;Once the index is created (and tuned, you can do a &lt;em&gt;lot&lt;/em&gt; to tune how your index works), you can then search it. My &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; is just one simple example, but it&apos;s one JavaScript library and a few lines of code.&lt;/p&gt;
+        &lt;p&gt;That&apos;s basically it. Well no, there&apos;s a &lt;em&gt;lot&lt;/em&gt; more, but at least for my implementation here, that&apos;s basically it.&lt;/p&gt;
+        &lt;h2 id=&quot;second---what&apos;s-mcp%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#second---what&apos;s-mcp%3F&quot;&gt;Second - what&apos;s MCP?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;MCP boils down to &amp;quot;if a person is needing to do some kind of action, an MCP server can tell the AI agent, hey, I handle that, just hand it off to me!&amp;quot; At Webflow, for example (sorry, you lay me off you don&apos;t get links), the MCP server handled API calls to your Webflow site and integrated with Cursor, Claude, and other agents. If you asked something like, &amp;quot;What Webflow sites do I have&amp;quot;, because the Webflow MCP server was added to your agent, and authenticated, it could handle doing the appropriate API calls and returning it such that your agent could document the result.&lt;/p&gt;
+        &lt;p&gt;For a documentation site, an MCP server can help you use free form questions about the docs and get responses in your AI agent.&lt;/p&gt;
+        &lt;h2 id=&quot;third---ok%2C-now-what%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#third---ok%2C-now-what%3F&quot;&gt;Third - Ok, now what?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;To enable it in Algolia, you log in to your dashboard and select the appropriate application (an application can have one or more indexes), and then click Generate AI in the navigation. In the sub nav, you&apos;ll have a section titled &amp;quot;MCP Servers / Public&amp;quot;, and then in that UI, just click the &amp;quot;Create Public MCP Server&amp;quot; button.&lt;/p&gt;
+        &lt;p&gt;On that UI, you can select what indexes and tools to enable. I&apos;ve only got one &amp;quot;real&amp;quot; index, so I picked that and gave my server an incredibly useful and informative name:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/07/alg1.png&quot; loading=&quot;lazy&quot; alt=&quot;Algolia MCP Settings&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;On the next page, you can select which tools you want enabled. I picked everything, but I&apos;m not using the Recommendation product so I probably should turn that off.&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/07/alg2.png&quot; loading=&quot;lazy&quot; alt=&quot;Algolia MCP Settings - Tool selection&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The end result is the URL to your MCP server. Mine is https://0FJBPN4K5D.algolia.net/mcp/1/vMOWpYc9RK6FuHnWxZcoyg/mcp. At this point, you follow your &amp;quot;usual procedure&amp;quot; on adding MCP to your tools. I tested in a few, including Cursor of course.&lt;/p&gt;
+        &lt;h2 id=&quot;actually-using-it...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#actually-using-it...&quot;&gt;Actually using it...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Two big use cases come to mind for this:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Externally, this creates a &lt;em&gt;very&lt;/em&gt; powerful way for users to interact with your documentation. Most documentation for technical products already include this, including &lt;a href=&quot;https://www.algolia.com/doc&quot;&gt;Algolia&apos;s docs&lt;/a&gt; of course. But the target user here is your audience.&lt;/li&gt;
+        &lt;li&gt;Internally, this could be very powerful. As a content writer, I can already use the existing Algolia search as a quick way to see, &amp;quot;did I blog about X&amp;quot;, but with my MCP server, I can ask deeper questions, and even use it to help create &lt;em&gt;new&lt;/em&gt; content.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I did some testing related to both of these scenarios, not terribly deep, but enough to be pretty impressed.&lt;/p&gt;
+        &lt;p&gt;In &lt;code&gt;agy&lt;/code&gt;, the Antigravity CLI (Google Gemini&apos;s models), I asked:&lt;/p&gt;
+        &lt;blockquote&gt;
+        search Ray&apos;s mcp server for his opinion on React
+        &lt;/blockquote&gt;
+        &lt;p&gt;And the response was near perfect:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        margin-bottom: 30px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;Based on the search results from Ray&apos;s MCP server (which indexes his blog posts), Raymond Camden&apos;s view of React has transitioned from passive avoidance to active experimentation, and finally to deliberate
+        exclusion.&lt;/p&gt;
+        &lt;p&gt;Here is a summary of Ray&apos;s opinion on React:&lt;/p&gt;
+        &lt;h3 id=&quot;1.-historical-apprehension-%26-vue%2Falpine-preference-(pre-2025)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#1.-historical-apprehension-%26-vue%2Falpine-preference-(pre-2025)&quot;&gt;1. Historical Apprehension &amp;amp; Vue/Alpine Preference (Pre-2025)&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;• Early Thoughts (2015): Ray attended a React session by Brian Holt at Fluent Conf in 2015. While he noted that writing ES6 classes with React felt &amp;quot;pretty freaking cool,&amp;quot; he did not end up adopting it.
+        • &amp;quot;Not for Me&amp;quot; (2023): In a September 2023 post, Ray shared Josh Collinsworth&apos;s article &amp;quot;Things you forgot (or never knew) because of React&amp;quot;, commenting that React had always felt like a &amp;quot;good framework
+        that&apos;s not for me&amp;quot;. He preferred Vue.js for full web apps and later Alpine.js for lightweight interactivity.&lt;/p&gt;
+        &lt;h3 id=&quot;2.-the-%22let&apos;s-learn-react%22-experiment-(march%E2%80%93may-2025)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#2.-the-%22let&apos;s-learn-react%22-experiment-(march%E2%80%93may-2025)&quot;&gt;2. The &amp;quot;Let&apos;s Learn React&amp;quot; Experiment (March–May 2025)&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;• Giving it a &amp;quot;Fair Shake&amp;quot; (March 2025): Ray attempted to learn the framework during his Code Break livestream series, in a session titled &amp;quot;I Don&apos;t like React. Let&apos;s Learn React!&amp;quot; He clarified: &amp;quot;To be clear,
+        it isn&apos;t that I dislike React, it&apos;s just that every time I&apos;ve looked at the code, it just didn&apos;t gel with me.&amp;quot;
+        • The Struggle and Ditching (May 2025): The learning process proved to be &amp;quot;painful&amp;quot; and did not go well. By May 2025, Ray decided to stop, stating: &amp;quot;I&apos;m ditching any further exploration of React for now, but
+        instead turning my attention to something I think is really fun - building desktop apps.&amp;quot;&lt;/p&gt;
+        &lt;h3 id=&quot;3.-banning-react-%26-%22vanilla-ftw%22-(late-2025)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#3.-banning-react-%26-%22vanilla-ftw%22-(late-2025)&quot;&gt;3. Banning React &amp;amp; &amp;quot;Vanilla FTW&amp;quot; (Late 2025)&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;• Running Joke with AI (July–September 2025): Ray began specifically instructing AI coding tools to avoid React altogether: &amp;quot;We are only using HTML, CSS, and JavaScript. No libraries. No React. No Preact.
+        Don&apos;t even say the word React. Just vanilla JavaScript.&amp;quot; He noted that AI assistants &amp;quot;really, really, really want&amp;quot; to use React, prompting him to actively decline it.
+        • My Tech Stack (December 2025): In his &amp;quot;My Tech Stack (2025)&amp;quot; post, Ray summarized: &amp;quot;Vanilla JavaScript FTW! I&apos;ll still go to Alpine.js for more complex needs, but I don&apos;t use Vue anymore and I definitely
+        don&apos;t use React if I can help it.&amp;quot;&lt;/p&gt;
+        &lt;h3 id=&quot;summary-conclusion&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#summary-conclusion&quot;&gt;Summary Conclusion&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Ray&apos;s ultimate opinion is that React is a popular and powerful framework but is not for him. He values simplicity, lightweight payloads, and vanilla web standards, preferring to build with Vanilla
+        JavaScript, Alpine.js, Eleventy, and Astro.&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;&amp;quot;deliberate exclusion&amp;quot; is the name of my Goth band.&lt;/p&gt;
+        &lt;p&gt;In Cursor, I added the MCP server via the app settings and took the approach of the content creator. I asked:&lt;/p&gt;
+        &lt;blockquote&gt;
+        using Ray&apos;s MCP server, what do you recommend for a new blog post?
+        &lt;/blockquote&gt;
+        &lt;p&gt;And here&apos;s what Cursor and my MCP server came back with:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        margin-bottom: 30px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;Based on Ray&apos;s MCP server search data, here are my top recommendations for his next blog post — ranked by how naturally they follow what he&apos;s already writing.&lt;/p&gt;
+        &lt;h2 id=&quot;1.-%22automating-blog-reviews-with-cursor-hooks%22-(strongest-pick)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#1.-%22automating-blog-reviews-with-cursor-hooks%22-(strongest-pick)&quot;&gt;1. &lt;strong&gt;&amp;quot;Automating Blog Reviews with Cursor Hooks&amp;quot;&lt;/strong&gt; (strongest pick)&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;This is the most obvious sequel. In &lt;a href=&quot;https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill&quot;&gt;Turning my Cursor Performance Work into a Repeatable Skill&lt;/a&gt;, he explicitly says he &lt;em&gt;plans to look into automations with Cursor later&lt;/em&gt; and that he initially considered hooks before choosing manual skills.&lt;/p&gt;
+        &lt;p&gt;A post that walks through:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;When hooks beat skills (and vice versa)&lt;/li&gt;
+        &lt;li&gt;Wiring &lt;code&gt;/precheck&lt;/code&gt; or performance review to run on commit/save&lt;/li&gt;
+        &lt;li&gt;What he learned from the manual-first approach&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;…would close a loop he&apos;s already teed up across his last three posts.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;2.-%22i-built-an-mcp-server-for-my-blog%22&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#2.-%22i-built-an-mcp-server-for-my-blog%22&quot;&gt;2. &lt;strong&gt;&amp;quot;I Built an MCP Server for My Blog&amp;quot;&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;This fits his current arc and hasn&apos;t been written yet. He&apos;s covered Algolia extensively (&lt;a href=&quot;https://www.raymondcamden.com/2024/05/27/adding-recommendations-to-my-blog-with-algolia&quot;&gt;Adding Recommendations&lt;/a&gt;, &lt;a href=&quot;https://www.raymondcamden.com/2023/07/12/using-pdfs-with-algolia-and-adobe-pdf-extract-api&quot;&gt;PDF search&lt;/a&gt;, &lt;a href=&quot;https://www.raymondcamden.com/2025/09/15/integrating-algolia-with-boxlang&quot;&gt;BoxLang integration&lt;/a&gt;), and he&apos;s now at Cursor helping with AI adoption.&lt;/p&gt;
+        &lt;p&gt;A post on exposing his blog index via MCP would be timely and meta — especially showing real queries like &amp;quot;what should I write next?&amp;quot; or &amp;quot;what has Ray covered on Eleventy?&amp;quot; He could even note that trending recommendations aren&apos;t configured yet (the MCP server&apos;s &lt;code&gt;trending-items&lt;/code&gt; and &lt;code&gt;trending-facets&lt;/code&gt; models return index errors), which sets up a natural follow-up.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;3.-%22my-complete-cursor-skills-workflow-for-blogging%22&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#3.-%22my-complete-cursor-skills-workflow-for-blogging%22&quot;&gt;3. &lt;strong&gt;&amp;quot;My Complete Cursor Skills Workflow for Blogging&amp;quot;&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;He&apos;s building a small skill ecosystem:&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Change type&lt;/th&gt;
+        &lt;th&gt;Skill&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;New blog post&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/prepublish&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Eleventy / Netlify / engine&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/precheck&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Performance review&lt;/td&gt;
+        &lt;td&gt;web-perf skill&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;A single &amp;quot;here&apos;s my full workflow&amp;quot; post would tie together &lt;code&gt;/prepublish&lt;/code&gt;, &lt;code&gt;/precheck&lt;/code&gt;, and the performance skill into one narrative. That&apos;s very aligned with his new role and gives readers a concrete adoption story, not just feature demos.&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;4.-%22making-my-blog-ai-friendly-(and-what-it-cost-me)%22&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#4.-%22making-my-blog-ai-friendly-(and-what-it-cost-me)%22&quot;&gt;4. &lt;strong&gt;&amp;quot;Making My Blog AI-Friendly (and What It Cost Me)&amp;quot;&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;His &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;performance review post&lt;/a&gt; already touches this — Markdown copies, content-negotiation edge function, unintended build-time cost from globbing 6k+ files. A dedicated post could go deeper:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Why he added &lt;code&gt;.md&lt;/code&gt; endpoints and content negotiation&lt;/li&gt;
+        &lt;li&gt;The performance tradeoffs Cursor found&lt;/li&gt;
+        &lt;li&gt;How MCP/search fits into the &amp;quot;AI can read my blog&amp;quot; story&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;5.-practical-follow-ups-on-recent-threads&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#5.-practical-follow-ups-on-recent-threads&quot;&gt;5. &lt;strong&gt;Practical follow-ups on recent threads&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Thread&lt;/th&gt;
+        &lt;th&gt;Idea&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;CSS accessibility series&lt;/td&gt;
+        &lt;td&gt;Part 3: keyboard testing with real screen readers, or applying the pattern to checkboxes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much&quot;&gt;Use AI to not use AI&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;When to reach for AI vs. write it yourself — a decision framework&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;https://www.raymondcamden.com/2026/07/05/links-for-you-7526&quot;&gt;Links For You (7/5/26)&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Another links roundup (~2 week cadence; he&apos;s due around now)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;Transformers.js (mentioned Jul 2025)&lt;/td&gt;
+        &lt;td&gt;Eleventy build-time related posts without Algolia API calls&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;hr&gt;
+        &lt;h2 id=&quot;my-pick&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#my-pick&quot;&gt;My pick&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;#1 (Cursor Hooks)&lt;/strong&gt; if he wants to continue the Cursor-on-my-blog series.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;#2 (MCP Server)&lt;/strong&gt; if he wants something fresh that showcases his new role and ties together Algolia + AI tooling in one post readers can actually try.&lt;/p&gt;
+        &lt;p&gt;Both build directly on what the MCP index shows as his hottest recent topics: &lt;strong&gt;generative AI&lt;/strong&gt;, &lt;strong&gt;Eleventy&lt;/strong&gt;, and &lt;strong&gt;Cursor workflows&lt;/strong&gt;.&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;In case you just skimmed, it literally suggested, as the second suggestion, the blog post I&apos;m right now. Great minds, right?&lt;/p&gt;
+        &lt;h2 id=&quot;tldr&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#tldr&quot;&gt;TLDR&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;You can add an MCP server to Algolia indexes in 5 minutes. Actually less than that - it took me longer to remember what 2FA app I used with their dashboard.&lt;/p&gt;
+        &lt;p&gt;Oh, and like most of Algolia&apos;s products, this falls into their &lt;a href=&quot;https://www.algolia.com/pricing&quot;&gt;Build&lt;/a&gt; tier which is free up to a certain amount of usage, which I&apos;ve never hit. I&apos;ve told Chuck before they are too damn generous with their free tier and thankfully they&apos;ve ignored me.&lt;/p&gt;
+        &lt;p&gt;Let me know what you think - are you using this? Are you using Algolia at all? Leave me a comment below as I&apos;d love to hear from some folks who may already be using this.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -41,6 +218,7 @@
         &lt;style&gt;
         .markdown-body {
         padding: 20px;
+        margin-bottom: 30px;
         }
         &lt;/style&gt;
         &lt;/template&gt;
@@ -95,6 +273,7 @@
         &lt;style&gt;
         .markdown-body {
         padding: 20px;
+        margin-bottom: 30px;
         }
         &lt;/style&gt;
         &lt;/template&gt;
@@ -147,6 +326,7 @@
         &lt;style&gt;
         .markdown-body {
         padding: 20px;
+        margin-bottom: 30px;
         }
         &lt;/style&gt;
         &lt;/template&gt;
@@ -263,7 +443,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -357,6 +537,7 @@
         &lt;style&gt;
         .markdown-body {
         padding: 20px;
+        margin-bottom: 30px;
         }
         &lt;/style&gt;
         &lt;/template&gt;
@@ -589,7 +770,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -603,7 +784,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -642,7 +823,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -816,7 +997,7 @@
       <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
       <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
       <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
         &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
@@ -932,7 +1113,7 @@
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -1188,7 +1369,7 @@
       <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
       <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
       <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
         &lt;p&gt;Of course there is.&lt;/p&gt;
@@ -1362,7 +1543,7 @@
       <title>Use AI to not use AI (as much)</title>
       <link>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</link>
       <guid>https://www.raymondcamden.com/2026/06/22/use-ai-to-not-use-ai-as-much</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
+      <pubDate>Sun, 12 Jul 2026 16:03:44 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This squarely falls into the &amp;quot;everyone probably knows this but it didn&apos;t click with me right away&amp;quot; category so please feel free to laugh at my ignorance, but it&apos;s something I realized over the past few months, and as I just used this technique this morning, I figured I&apos;d share it on the blog. The idea is simple - it&apos;s trivial to ask a Gen AI tool to do something for you - and depending on the ask, may work great. But what I realized a few months back, especially in regards to having AI parse data, is that you can also use the opportunity to generate a tool (like a Python or Node script) so you don&apos;t need to return to the AI tool again. This becomes especially useful if you want to slightly tweak the output over time or gradually add more features.&lt;/p&gt;
         &lt;p&gt;For my example today, it was a GitHub alert. Last month I got a few emails about Actions storage usage and it repeated this month:&lt;/p&gt;
@@ -1781,69 +1962,6 @@
         &lt;p&gt;The &apos;culprit&apos; was &lt;code&gt;testing-boxlang-desktop&lt;/code&gt; which as I said, was just for testing, so easy to delete. Honestly, &lt;code&gt;tweetback&lt;/code&gt; surprised me. This is a repo I created as an export from Twitter and apparently it&apos;s got a lot of media. I didn&apos;t delete it - but may do so in the future.&lt;/p&gt;
         &lt;p&gt;Anyway, let me know what you think and if this could be helpful to you!&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@simonkadula?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Simon Kadula&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-factory-filled-with-lots-of-orange-machines-8gr6bObQLOI?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (6/21/26)</title>
-      <link>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</link>
-      <guid>https://www.raymondcamden.com/2026/06/21/links-for-you-62126</guid>
-      <pubDate>Sat, 11 Jul 2026 16:02:12 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Greetings and salutations, readers. It&apos;s been a few weeks since I shared one of these, mostly due to the job search being somewhat exhausting, but I&apos;ve got a backup of links so it&apos;s time to get back in the habit. And of course, it&apos;s Father&apos;s Day and I want to wish all the dads out there (myself included) a very happy father&apos;s day. This weekend I got to officiate my first wedding (for my brother-in-law and his fiance) so my plan today is to do... nothing. Enjoy your links!&lt;/p&gt;
-        &lt;h2 id=&quot;mastodon-and-translation-with-chrome-ai&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#mastodon-and-translation-with-chrome-ai&quot;&gt;Mastodon and Translation with Chrome AI&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;First up is a presentation by Thomas Steiner demonstrating Chrome built-in AI APIs doing language detection and translation for Mastodon. I&apos;m a pretty big fan of those APIs (my last presentation was on them!) so I enjoyed this quite a bit. Thomas has been a &lt;em&gt;big&lt;/em&gt; help with my demos and posts on these APIs and is a scary smart dev.&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;-l2BUUdBDS8&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/-l2BUUdBDS8/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=-l2BUUdBDS8&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
-        &lt;h2 id=&quot;datatype---text-into-charts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#datatype---text-into-charts&quot;&gt;Datatype - Text into Charts&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Next is &lt;a href=&quot;https://franktisellano.github.io/datatype/&quot;&gt;Datatype&lt;/a&gt;, a font that creates charts. Seriously. For example:&lt;/p&gt;
-        &lt;style&gt;
-        @font-face {
-        font-family: &apos;Datatype&apos;;
-        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
-        font-weight: 100 900;      /* Variable weight axis */
-        font-stretch: 0% 100%;     /* Variable width axis */
-        font-display: swap;
-        }
-        
-        .chart {
-        font-family: &apos;Datatype&apos;, monospace;
-        }
-        &lt;/style&gt;
-        &lt;p&gt;Sales &lt;span class=&quot;chart&quot;&gt;{l:20,45,60,55,80,95}&lt;/span&gt; are up this quarter.&lt;/p&gt;
-        &lt;p&gt;And this was driven by CSS and text:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;style&amp;gt;
-        @font-face {
-        font-family: &apos;Datatype&apos;;
-        src: url(&apos;https://static.raymondcamden.com/fonts/Datatype-Regular.woff2&apos;) format(&apos;woff2&apos;);
-        font-weight: 100 900;      /* Variable weight axis */
-        font-stretch: 0% 100%;     /* Variable width axis */
-        font-display: swap;
-        }
-        
-        .chart {
-        font-family: &apos;Datatype&apos;, monospace;
-        }
-        &amp;lt;/style&amp;gt;
-        
-        &amp;lt;span class=&amp;quot;chart&amp;quot;&amp;gt;{l:20,45,60,55,80,95}&amp;lt;/span&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;It supports bar charts, sparklines, and pie charts. As it&apos;s just text, in theory it would be easy to animate and make it &apos;live&apos; with just a bit of JavaScript.&lt;/p&gt;
-        &lt;h2 id=&quot;you-don&apos;t-know-html-lists&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#you-don&apos;t-know-html-lists&quot;&gt;You Don&apos;t Know HTML Lists&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Finally there&apos;s a spectacular deep dive into HTML lists by Frank Taylor, &lt;a href=&quot;https://blog.frankmtaylor.com/2026/05/13/you-dont-know-html-lists/&quot;&gt;You don&apos;t know HTML lists&lt;/a&gt;. You know this is going to be a great article with a sentence like this in the intro:&lt;/p&gt;
-        &lt;p&gt;&amp;quot;We&apos;re skipping over the MDN and W3Schools introductory pages and instead we&apos;re going into the kind of stuff you discover after accidentally taking your cousin&apos;s Ritalin right before you open up the W3C specs.&amp;quot;&lt;/p&gt;
-        &lt;p&gt;I knew maybe... half of this? Maybe a bit more? Either way, it&apos;s a damn good investigation into a part of HTML you may not know even got that complex.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Looking for your next read? Are you mostly through your current book and getting a bit of anxiety over whether or not you&apos;ll have your next read as soon as you finish? Good news, you&apos;re in luck. I&apos;ve spoken about Scott Stroz in the past (and linked to some of his cool blogs too), he&apos;s one of my oldest, and best friends. He&apos;s a father as well to two incredible kids, one of which just released his first novel, &amp;quot;The Dreaded.&amp;quot;&lt;/p&gt;
-        &lt;p&gt;
-        &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;&lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/dreaded.png&quot; loading=&quot;lazy&quot; alt=&quot;The Dreaded cover&quot; class=&quot;imgborder imgcenter&quot;&gt;&lt;/a&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Tyler&apos;s shared some of his works for me in the past so as soon as this one became available, I went ahead and purchased a copy for myself. Grab your &lt;a href=&quot;https://www.amazon.com/dp/B0H623KMN7/ref=mp_s_a_1_1&quot;&gt;copy&lt;/a&gt; today - available on Kindle, paper and hardback.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
