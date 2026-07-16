@@ -4,7 +4,224 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 15 Jul 2026 16:45:19 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 16 Jul 2026 17:04:40 GMT</lastBuildDate>
+    <item>
+      <title>Use cases for aria-expanded</title>
+      <link>https://piccalil.li/blog/use-cases-for-aria-expanded/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/use-cases-for-aria-expanded/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 16 Jul 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Communication can be difficult. Not only when we humans try to communicate with one another, but also in web development.&lt;/p&gt;
+        &lt;p&gt;While it is easy for sighted people with full mental and motor abilities to click a button with a mouse to display more information, users of Assistive Technology (AT) may have a completely different experience with the same action.&lt;/p&gt;
+        &lt;p&gt;The information an expandable button conveys to AT depends heavily on the context. This context also dictates which ARIA attributes should (or should not) be used. Often, the patterns are very similar in their functionality and interpretation and can be interpreted differently by me than by you.&lt;/p&gt;
+        &lt;p&gt;When I conduct accessibility audits, I usually can’t avoid having to check an element that has the &lt;code&gt;aria-expanded&lt;/code&gt; attribute. One of the challenges I faced was determining what kind of pattern this was, whether &lt;code&gt;aria-expanded&lt;/code&gt; was appropriate here, or if it could even be replaced by a native HTML element.&lt;/p&gt;
+        &lt;p&gt;This article is intended to help you more easily determine whether &lt;code&gt;aria-expanded&lt;/code&gt; has been used correctly or not. It’s not about how to implement every pattern discussed here in a production environment! However, in each section, I’ve included additional links so you can dive deeper into the topic.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;In the following, I will refer to the &lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/&quot;&gt;&lt;em&gt;ARIA Authoring Practices Guide&lt;/em&gt; (APG)&lt;/a&gt;. It is important to note that the implementations presented there should be understood as proof-of-concept and &lt;em&gt;not&lt;/em&gt; ready-to-use accessible patterns! In &lt;a href=&quot;https://adrianroselli.com/2019/02/uncanny-a11y.html#APG&quot;&gt;&lt;em&gt;Uncanny A11y&lt;/em&gt;&lt;/a&gt;, Adrian Roselli explains in detail why you should be cautious to use these patterns (without testing them thoroughly).&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;The two categories&lt;/h2&gt;
+        &lt;p&gt;As I understand it, collapsible widgets can be divided into two categories: collapsible sections and collapsible interactive elements.&lt;/p&gt;
+        &lt;p&gt;These two categories include patterns that are sometimes very similar, but not identical. In addition, there are patterns that can also reveal and hide content, but these do not require the &lt;code&gt;aria-expanded&lt;/code&gt; attribute.&lt;/p&gt;
+        &lt;h2&gt;Collapsible sections&lt;/h2&gt;
+        &lt;p&gt;This category contains two patterns: Accordion and disclosure widget. The former is based on the latter, so let’s take a closer look at the disclosure widget first.&lt;/p&gt;
+        &lt;h3&gt;Disclosure widget&lt;/h3&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;button
+        aria-controls=&quot;content&quot;
+        aria-expanded=&quot;false&quot;
+        type=&quot;button&quot;
+        &amp;gt;
+        Show more
+        &amp;lt;/button&amp;gt;
+        &amp;lt;div id=&quot;content&quot; &amp;gt;
+        &amp;lt;p&amp;gt;I am hidden no more!&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is a basic disclosure widget that requires JavaScript to dynamically change &lt;code&gt;aria-expanded&lt;/code&gt; from &lt;code&gt;true&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt; and to add keyboard support.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;aria-controls&lt;/code&gt; serves as optional support here to establish a direct link between the button and the content. For more information on implementation, see Adrian Roselli’s article &lt;a href=&quot;https://adrianroselli.com/2020/05/disclosure-widgets.html&quot;&gt;&lt;em&gt;Disclosure Widgets&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;However, if that is all it needs to do, it is recommended to use the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details&quot;&gt;&lt;code&gt;&amp;lt;details&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;summary&amp;gt;&lt;/code&gt;&lt;/a&gt; elements. These two native HTML elements work in all major browsers and are also recognised by AT.&lt;/p&gt;
+        &lt;h3&gt;Accordion&lt;/h3&gt;
+        &lt;p&gt;The accordion pattern is more complex because it combines multiple disclosure widgets. Here, too, &lt;code&gt;aria-expanded&lt;/code&gt; is required to communicate the current state to assistive technologies.&lt;/p&gt;
+        &lt;p&gt;There is also often the “exclusive accordion,” which only allows one disclosure widget to be open at a time and closes the others. Not only has Eric Eggert expressed legitimate doubts about this in his article &lt;em&gt;&lt;a href=&quot;https://yatil.net/blog/exclusive-accordions&quot;&gt;Exclusive accordions exclude&lt;/a&gt;&lt;/em&gt;, but Steven Hoober also explains in &lt;a href=&quot;https://www.uxmatters.com/mt/archives/2020/05/designing-for-progressive-disclosure.php&quot;&gt;&lt;em&gt;Designing for Progressive Disclosure&lt;/em&gt;&lt;/a&gt; why this is a user-hostile pattern.&lt;/p&gt;
+        &lt;p&gt;If you still need to build one, it’s recommended to try out Alexander Lehner’s solution in &lt;a href=&quot;https://www.oidaisdes.org/blog/lets-play-accordion/&quot;&gt;&lt;em&gt;Let’s Play Accordion with the HTML details element&lt;/em&gt;&lt;/a&gt;. Alternatively, Heydon Pickering also has a suggestion on how &lt;a href=&quot;https://inclusive-components.design/collapsible-sections/&quot;&gt;collapsible sections&lt;/a&gt; could be implemented.&lt;/p&gt;
+        &lt;h2&gt;Collapsible interactive elements&lt;/h2&gt;
+        &lt;p&gt;A collapsible section can also contain interactive elements such as links, but this pattern is most often used to hide large amounts of text in order to save vertical space. You can read about why this can be user-hostile in the linked articles from the previous section.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;While it is technically possible to nest interactive elements within one another, this should be avoided due to potential accessibility issues. Links within the body text of a disclosure widget are perfectly fine. However, you should avoid placing complex interactive patterns within the disclosure widget. For an introduction to this issue, see the article &lt;a href=&quot;https://adrianroselli.com/2016/12/be-wary-of-nesting-roles.html&quot;&gt;&lt;em&gt;Be Wary of Nesting Roles&lt;/em&gt;&lt;/a&gt; by Adrian Roselli.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;I was able to identify four patterns for collapsible interactive elements that would require &lt;code&gt;aria-expanded&lt;/code&gt;: menus, navigation, tree views and combo box.&lt;/p&gt;
+        &lt;h3&gt;Navigation&lt;/h3&gt;
+        &lt;p&gt;Perhaps because menus and navigation behave so similar, they are often confused with one another. That’s why, in my article &lt;a href=&quot;https://www.stevefrenzel.dev/posts/menu-and-navigation-the-difference/&quot;&gt;&lt;em&gt;Menu and Navigation: The Difference&lt;/em&gt;&lt;/a&gt;, I explain how to tell them apart. What they do have in common, however, is that when the content becomes extensive, so-called &lt;a href=&quot;https://www.w3.org/WAI/tutorials/menus/flyout/&quot;&gt;fly-out menus&lt;/a&gt; are used to show and hide content:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;nav aria-labelledby=&quot;main-nav&quot;&amp;gt;
+        &amp;lt;span hidden id=&quot;main-nav&quot;&amp;gt;Main&amp;lt;/span&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Home&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Shop&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li class=&quot;has-submenu&quot;&amp;gt;
+        &amp;lt;a href=&quot;…&quot; aria-expanded=&quot;false&quot;&amp;gt;
+        Space Bears
+        &amp;lt;/a&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Space Bear 6&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Space Bear 6 Plus&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Mars Cars&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&quot;…&quot;&amp;gt;Contact&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/nav&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In this slightly altered W3C example of a navigation we can see &lt;a href=&quot;https://piccalil.li/blog/its-about-time-i-tried-to-explain-what-progressive-enhancement-actually-is/&quot;&gt;progressive enhancement&lt;/a&gt; in action:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;If CSS and JavaScript fail to load, this navigation would still work because semantic HTML was used and none of the list items are hidden.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-expanded&lt;/code&gt; indicates that the submenu is currently collapsed.&lt;/li&gt;
+        &lt;li&gt;No additional ARIA is needed to describe the relationships between the list items and their respective parent lists, as this is communicated by the semantic HTML elements &lt;code&gt;&amp;lt;ul&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;li&amp;gt;&lt;/code&gt;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;There is currently no native solution for this pattern that works entirely without JavaScript. However, the proposed &lt;a href=&quot;https://www.stevefrenzel.dev/posts/my-thoughts-on-the-focusgroup-attribute-proposal/&quot;&gt;&lt;code&gt;focusgroup&lt;/code&gt; attribute&lt;/a&gt; might eventually fill this gap.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;There is another element related to this pattern that requires the &lt;code&gt;aria-expanded&lt;/code&gt; attribute: the so-called hamburger button!&lt;/p&gt;
+        &lt;h3&gt;Menu&lt;/h3&gt;
+        &lt;p&gt;It is very important here to distinguish whether this button is intended to reveal a navigation bar or a menu. If it is a navigation bar, &lt;code&gt;aria-expanded&lt;/code&gt; is sufficient. If it is a menu, &lt;a href=&quot;https://w3c.github.io/aria/#aria-haspopup&quot;&gt;&lt;code&gt;aria-haspopup&lt;/code&gt;&lt;/a&gt; is also required!&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;button
+        aria-controls=&quot;menu&quot;
+        aria-haspopup=&quot;true&quot;
+        aria-expanded=&quot;false&quot;
+        id=&quot;menu-button&quot;
+        type=&quot;button&quot;
+        &amp;gt;
+        Menu
+        &amp;lt;/button&amp;gt;
+        &amp;lt;ul
+        aria-activedescendant=&quot;mi1&quot;
+        aria-labelledby=&quot;menu-button&quot;
+        id=&quot;menu&quot;
+        role=&quot;menu&quot;
+        tabindex=&quot;-1&quot;
+        &amp;gt;
+        &amp;lt;li id=&quot;mi1&quot; role=&quot;menuitem&quot;&amp;gt;Action 1&amp;lt;/li&amp;gt;
+        &amp;lt;li id=&quot;mi2&quot; role=&quot;menuitem&quot;&amp;gt;Action 2&amp;lt;/li&amp;gt;
+        &amp;lt;li id=&quot;mi3&quot; role=&quot;menuitem&quot;&amp;gt;Action 3&amp;lt;/li&amp;gt;
+        &amp;lt;li id=&quot;mi4&quot; role=&quot;menuitem&quot;&amp;gt;Action 4&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Depending on the scope of the menu, the following ARIA roles may also be necessary:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;aria-labelledby&lt;/code&gt; or &lt;code&gt;aria-label&lt;/code&gt;: If a menubar has a visible label, the element with role &lt;code&gt;menu&lt;/code&gt; or &lt;code&gt;menubar&lt;/code&gt; needs to have one of these attributes set to a value that refers to the labelling element.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-activedescendant&lt;/code&gt;: Indicates the relationship between the selected menu item and the parent element in which it is located.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-checked&lt;/code&gt;: If it is possible to select multiple menu items, the corresponding value must be &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-controls&lt;/code&gt;: Establishes a programmatic relationship between the respective menu button and the contained menu items. As mentioned earlier, browser support is sparse, and this feature should be considered more of a nice-to-have.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;A very good guide to creating progressively enhanced menus is Heydon’s article &lt;a href=&quot;https://inclusive-components.design/menus-menu-buttons/&quot;&gt;&lt;em&gt;Menus &amp;amp; Menu Buttons&lt;/em&gt;&lt;/a&gt;. The APG explainer for the &lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/&quot;&gt;&lt;em&gt;Menu Button Pattern&lt;/em&gt;&lt;/a&gt; is a good place to start if you want to get an overview of the necessary ARIA roles.&lt;/p&gt;
+        &lt;h3&gt;Tree view&lt;/h3&gt;
+        &lt;p&gt;APG distinguishes between two patterns here that are essentially the same but can vary greatly in complexity depending on the implementation:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/treeview/&quot;&gt;Tree view&lt;/a&gt;: “A tree view widget presents a hierarchical list.”&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/&quot;&gt;Tree grid&lt;/a&gt;: “A tree grid widget presents a hierarchical data grid consisting of tabular information that is editable or interactive.”&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In both cases, the &lt;code&gt;aria-expanded&lt;/code&gt; attribute is required for the interactive element, which can show or hide additional elements. Here, too, other ARIA roles may be necessary depending on the implementation. This simplified example shows a possible HTML structure. It would also need a significant amount of CSS and JavaScript to convey visual information, as well as information communicated to AT:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;ul role=&quot;tree&quot; aria-labelledby=&quot;tree-label&quot;&amp;gt;
+        &amp;lt;span hidden id=&quot;tree-label&quot;&amp;gt;Menu&amp;lt;/span&amp;gt;
+        &amp;lt;li
+        aria-expanded=&quot;false&quot;
+        aria-level=&quot;1&quot;
+        aria-posinset=&quot;1&quot;
+        aria-selected=&quot;false&quot;
+        aria-setsize=&quot;2&quot;
+        role=&quot;treeitem&quot;
+        &amp;gt;
+        &amp;lt;ul role=&quot;group&quot;&amp;gt;
+        &amp;lt;li
+        aria-level=&quot;2&quot;
+        aria-posinset=&quot;1&quot;
+        aria-selected=&quot;false&quot;
+        aria-setsize=&quot;2&quot;
+        role=&quot;treeitem&quot;
+        &amp;gt;
+        Content 1
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li
+        aria-level=&quot;2&quot;
+        aria-posinset=&quot;2&quot;
+        aria-selected=&quot;false&quot;
+        aria-setsize=&quot;2&quot;
+        role=&quot;treeitem&quot;
+        &amp;gt;
+        Content 2
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#aria-multiselectable&quot;&gt;&lt;code&gt;aria-multiselectable&lt;/code&gt;&lt;/a&gt;: Necessary if more than one node can be selected.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-selected&lt;/code&gt; or &lt;code&gt;aria-checked&lt;/code&gt;: One of the two is required if more than one node can be selected.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;aria-labelledby&lt;/code&gt; or &lt;code&gt;aria-label&lt;/code&gt;: The element with role &lt;code&gt;tree&lt;/code&gt; has either a visible label referenced by &lt;code&gt;aria-labelledby&lt;/code&gt; or a value specified for &lt;code&gt;aria-label&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#aria-orientation&quot;&gt;&lt;code&gt;aria-orientation&lt;/code&gt;&lt;/a&gt;: If the &lt;code&gt;tree&lt;/code&gt; element is horizontally oriented, it has the value &lt;code&gt;aria-orientation=&quot;horizontal&quot;&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#aria-level&quot;&gt;&lt;code&gt;aria-level&lt;/code&gt;&lt;/a&gt;, &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#aria-setsize&quot;&gt;&lt;code&gt;aria-setsize&lt;/code&gt;&lt;/a&gt; and &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#aria-posinset&quot;&gt;&lt;code&gt;aria-posinset&lt;/code&gt;&lt;/a&gt;: These might be necessary, if “the complete set of available nodes is not present in the DOM due to dynamic loading as the user moves focus in or scrolls the tree”.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;tabindex&lt;/code&gt;: Depending on your implementation, you might need to implement a &lt;a href=&quot;https://webaim.org/techniques/keyboard/tabindex#zero-negative-one&quot;&gt;roving &lt;code&gt;tabindex&lt;/code&gt;&lt;/a&gt;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;If you need a starting point for creating one of these components, check out &lt;a href=&quot;https://blog.pope.tech/2023/07/06/create-an-accessible-tree-view-widget-using-aria/&quot;&gt;&lt;em&gt;Create an accessible tree view widget using ARIA&lt;/em&gt;&lt;/a&gt; by Pope Tech.&lt;/p&gt;
+        &lt;h3&gt;Combo box&lt;/h3&gt;
+        &lt;p&gt;&lt;a href=&quot;https://nerdy.dev/nice-select&quot;&gt;The native &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; element can now be styled freely&lt;/a&gt; and also offers keyboard support, as well as robust accessibility support by default, so there should be no need to build this element yourself.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;label for=&quot;pet-select&quot;&amp;gt;Choose a pet:&amp;lt;/label&amp;gt;
+        
+        &amp;lt;select id=&quot;pet-select&quot; name=&quot;pets&quot;&amp;gt;
+        &amp;lt;option value=&quot;&quot;&amp;gt;Please choose an option:&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;dog&quot;&amp;gt;Dog&amp;lt;/option&amp;gt;
+        &amp;lt;option value=&quot;cat&quot;&amp;gt;Cat&amp;lt;/option&amp;gt;
+        &amp;lt;/select&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If it is necessary after all, the &lt;code&gt;aria-expanded&lt;/code&gt; attribute is required here as well. In addition, &lt;code&gt;aria-haspopup&lt;/code&gt;, &lt;code&gt;aria-activedescendant&lt;/code&gt;, and &lt;code&gt;aria-selected&lt;/code&gt; may also be necessary, depending on the implementation. Furthermore, &lt;code&gt;aria-autocomplete&lt;/code&gt; and &lt;code&gt;aria-labelledby&lt;/code&gt; or &lt;code&gt;aria-label&lt;/code&gt; may also be required.&lt;/p&gt;
+        &lt;p&gt;Make sure to give the &lt;a href=&quot;https://w3c.github.io/aria/#combobox&quot;&gt;specs of&lt;/a&gt; &lt;a href=&quot;https://www.w3.org/TR/wai-aria-1.2/#combobox&quot;&gt;&lt;code&gt;combobox&lt;/code&gt;&lt;/a&gt; &lt;a href=&quot;https://w3c.github.io/aria/#combobox&quot;&gt;role&lt;/a&gt; a good read before building it. Although, why go through all that trouble when the web platform provides an element that can already do all of this? 🤗&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Similar but different&lt;/h2&gt;
+        &lt;p&gt;The following patterns can also reveal content at the touch of a button. However, this isn&apos;t so much a “fold-out” as it is a “pop-up”! Instead of using &lt;code&gt;aria-expanded&lt;/code&gt; to communicate the state of an interactive element, you would rather use &lt;code&gt;aria-haspopup&lt;/code&gt; oder &lt;code&gt;aria-modal&lt;/code&gt;.&lt;/p&gt;
+        &lt;h3&gt;Dialog (Modal)&lt;/h3&gt;
+        &lt;p&gt;&lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/&quot;&gt;According to APG, the dialog pattern requires the &lt;code&gt;aria-modal&lt;/code&gt; attribute&lt;/a&gt;, but let me stop you right there. &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog&quot;&gt;The native &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt; element&lt;/a&gt; has had solid browser support for quite some time and is supported by assistive technologies. In addition, we now have &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Invoker_Commands_API&quot;&gt;invoker commands&lt;/a&gt; at our disposal, which means you &lt;em&gt;could&lt;/em&gt; implement this pattern without using any JavaScript! &lt;a href=&quot;https://www.scottohara.me/blog/2023/01/26/use-the-dialog-element.html&quot;&gt;Use the dialog element (reasonably)&lt;/a&gt; to save time and frustration and to keep your users happy.&lt;/p&gt;
+        &lt;p&gt;In this example, we’re using invoker commands. If you want to play it safe, you could also add a fallback using JavaScript, in case invoker commands are not supported yet in the browser of your choice.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;button command=&quot;show-modal&quot; commandfor=&quot;my-dialog&quot;&amp;gt;
+        Open dialog
+        &amp;lt;/button&amp;gt;
+        
+        &amp;lt;dialog id=&quot;my-dialog&quot;&amp;gt;
+        &amp;lt;h2&amp;gt;Progressive enhancement&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;This dialog uses no JavaScript!&amp;lt;/p&amp;gt;
+        &amp;lt;button commandfor=&quot;my-dialog&quot; command=&quot;close&quot;&amp;gt;
+        Close
+        &amp;lt;/button&amp;gt;
+        &amp;lt;/dialog&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h3&gt;Tabbed interfaces&lt;/h3&gt;
+        &lt;p&gt;Unfortunately, there is no native, JavaScript-free solution for this pattern yet, so you’ll either have to build it yourself using &lt;code&gt;aria-haspopup&lt;/code&gt; or use a ready-made solution from a third-party provider.&lt;/p&gt;
+        &lt;p&gt;Personally, I prefer the first option so you know what’s going on under the hood. A good starting point for this is &lt;a href=&quot;https://inclusive-components.design/tabbed-interfaces/&quot;&gt;&lt;em&gt;Tabbed Interfaces&lt;/em&gt;&lt;/a&gt; by Heydon Pickering.&lt;/p&gt;
+        &lt;p&gt;Additionally (&lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/tabs/&quot;&gt;according to the APG&lt;/a&gt;), other ARIA roles such as &lt;code&gt;aria-controls&lt;/code&gt;, &lt;code&gt;aria-selected&lt;/code&gt;, &lt;code&gt;aria-orientation&lt;/code&gt;, &lt;code&gt;aria-label&lt;/code&gt;, or &lt;code&gt;aria-labelledby&lt;/code&gt; may be added, depending on how you implement it.&lt;/p&gt;
+        &lt;h3&gt;Tooltip&lt;/h3&gt;
+        &lt;p&gt;This pattern is an interesting case, as there is &lt;a href=&quot;https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/&quot;&gt;no specific example of it in the APG&lt;/a&gt;. Nevertheless, Heydon has taken on the challenge here as well and explains in &lt;a href=&quot;https://inclusive-components.design/tooltips-toggletips/&quot;&gt;&lt;em&gt;Tooltips &amp;amp; Toggletips&lt;/em&gt;&lt;/a&gt; how to create an accessible tooltip on your own.&lt;/p&gt;
+        &lt;p&gt;Alternatively, you could experiment with how the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Popover_API&quot;&gt;Popover API&lt;/a&gt; and invoker commands work together with AT to implement this pattern natively and without JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;button command=&quot;toggle-popover&quot; commandfor=&quot;info&quot;&amp;gt;
+        What is two-factor authentication?
+        &amp;lt;/button&amp;gt;
+        
+        &amp;lt;div id=&quot;info&quot; popover=&quot;auto&quot; role=&quot;tooltip&quot;&amp;gt;
+        Two-factor authentication adds a second verification step (like a code
+        from your phone) when you log in.
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Once again, we need very little to get a lot done! Let’s break down what’s happening here:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;command=&quot;toggle-popover&quot;&lt;/code&gt;: The Popover API provides to show or hide a popover, aka toggling it.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;commandfor=&quot;info&quot;&lt;/code&gt;: Here we’re using the Popover API to target the element with &lt;code&gt;id=&quot;info&quot;&lt;/code&gt; in order to connect the button with this particular element.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;popover=&quot;auto&quot;&lt;/code&gt;: This enables the so-called “light-dismiss”, meaning that clicking outside of the tooltip or pressing &lt;kbd&gt;ESC&lt;/kbd&gt; will close it.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;role=&quot;tooltip&quot;&lt;/code&gt;: Without explicitly specifying the role, it would have a role of “group”.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;Originally, this article was supposed to be about expandable buttons. Then I realised it would make more sense to write specifically about the ARIA role &lt;code&gt;aria-expanded&lt;/code&gt;. After further research, I discovered that this attribute is no longer absolutely necessary for some patterns because the web platform has evolved significantly in recent years!&lt;/p&gt;
+        &lt;p&gt;Thanks to native solutions like &lt;code&gt;&amp;lt;detail&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;summary&amp;gt;&lt;/code&gt;, and &lt;code&gt;&amp;lt;dialog&amp;gt;&lt;/code&gt;, as well as the Popover and Invoker Commands API, it’s possible to implement many of the patterns discussed here with minimal effort and even without JavaScript.&lt;/p&gt;
+        &lt;p&gt;Nevertheless, it’s very important that not only these native (and in some cases very new) solutions are thoroughly tested with assistive technology, but also those you’ve created yourself.&lt;/p&gt;
+        &lt;p&gt;It’s even more important to note that the APG patterns are not suitable for production use but should be understood solely as illustrations of how to use various ARIA roles. That’s why I’ve added an alternative example to each pattern presented, in which it was implemented with progressive enhancement in mind.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #190</title>
       <link>https://piccalil.li/the-index/190/?ref=main-rss-feed</link>
@@ -729,314 +946,6 @@
         &lt;p&gt;That&apos;s it! The AT protocol stuff looks incredibly complicated on the surface, but once you understand how PDS records work, it&apos;s a really elegant, straightforward system.&lt;/p&gt;
         &lt;p&gt;There will be a full AT protocol focused iteration of this website, once I&apos;ve designed and implemented the new UI, so this stuff serves as a basic basis to build on. Hopefully it&apos;ll make the idea of implementing the AT protocol on &lt;em&gt;your&lt;/em&gt; website more appealing too.&lt;/p&gt;
         &lt;p&gt;With AT protocol done, let&apos;s move on to my favourite part: the music collection, next.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Personal website redesign project post: Loading AT protocol posts data</title>
-      <link>https://piccalil.li/projects/personal-site/6/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/projects/personal-site/6/?ref=main-rss-feed</guid>
-      <pubDate>Wed, 01 Jul 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;We&apos;re picking up some good momentum, so let&apos;s keep the flow going. After &lt;a href=&quot;https://piccalil.li/projects/personal-site/4/&quot;&gt;integrating WordPress to power the blog section&lt;/a&gt;, it&apos;s now time to integrate a new feature of this website: AT Protocol posts.&lt;/p&gt;
-        &lt;p&gt;I &lt;em&gt;could&lt;/em&gt; go all in at this point and integrate posts, comments, interactions and comments on blog posts, but I&apos;m not in the business of doing that until I &lt;em&gt;fully understand what I&apos;m doing&lt;/em&gt;. Throwing code at the wall to see what sticks is a one way high speed train to technical debt city.&lt;/p&gt;
-        &lt;p&gt;If there ever is a time to experiment, it &lt;em&gt;is&lt;/em&gt; on your personal site. I&apos;m just trying to eradicate as much tech debt as possible in this project.&lt;/p&gt;
-        &lt;p&gt;What I&apos;m doing instead is what I outlined in planning, specifically where I worked out &lt;a href=&quot;https://piccalil.li/projects/personal-site/2/#work-out-the-core-features&quot;&gt;each iteration&lt;/a&gt;. Here it is as a reminder:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-core-features.jpg&quot; alt=&quot;An Obsidian markdown file called &amp;quot;core features and iterations.&amp;quot; It lists a development roadmap across four iterations, including tasks like &amp;quot;basic shell version of the site,&amp;quot; &amp;quot;look and feel design,&amp;quot; &amp;quot;AT protocol integration,&amp;quot; and &amp;quot;last.fm integration.&amp;quot;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;As per that planning, I&apos;m still in &lt;strong&gt;iteration one&lt;/strong&gt;, which means this phase of AT protocol integration is going to be a basic rendering of my AT protocol posts.&lt;/p&gt;
-        &lt;p&gt;I say AT protocol and not &lt;em&gt;Bluesky&lt;/em&gt; posts because it&apos;s worth remembering that Bluesky is the microblogging &lt;em&gt;app&lt;/em&gt; built on the protocol. My data (posts) is outside of that platform, on my Personal Data Server (PDS). Right now, at the time of writing, that PDS is on Bluesky&apos;s infrastructure, but I &lt;em&gt;will&lt;/em&gt; definitely be moving that to something I own, for sure.&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;h2&gt;Rendering the posts&lt;/h2&gt;
-        &lt;p&gt;In order to do this, I need create a new file in my &lt;code&gt;data&lt;/code&gt; package — just like I did for the WordPress posts — and lean into the AT Protocol API, using their &lt;a href=&quot;https://npmx.dev/package/@atproto/api&quot;&gt;official package&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s the file in whole. I&apos;ll break down the important bits:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;import { AtpAgent, RichText } from &apos;@atproto/api&apos;;
-        import { getCache, setCache } from &apos;./memoryCache&apos;;
-        
-        const agent = new AtpAgent({
-        service: &apos;https://bsky.social&apos;,
-        });
-        
-        export async function fetchAllATPosts() {
-        const targetHandle = &apos;bell.bz&apos;;
-        const cacheKey = &apos;atPosts&apos;;
-        const cacheTimeout = 3600; // 3600 seconds is 1 hour
-        const cached = getCache(cacheKey);
-        
-        if (cached) {
-        return cached;
-        }
-        
-        // Authentication is required
-        await agent.login({
-        identifier: targetHandle,
-        password: process.env.BLUESKY_APP_PASSWORD,
-        });
-        
-        let allPosts = [];
-        let cursor = undefined;
-        
-        try {
-        while (true) {
-        // Fetch this cursor from the feed of items
-        const response = await agent.getAuthorFeed({
-        actor: targetHandle,
-        cursor: cursor,
-        limit: 100, // Max limit per cursor
-        
-        // For now, I&apos;m just doing root level posts. Maybe as this   evolves I&apos;ll bring in replies too.
-        filter: &apos;posts_no_replies&apos;,
-        });
-        
-        // Loop each item but filter out reposts and quote posts
-        for (const item of response.data.feed.filter(
-        (x) =&amp;gt;
-        !(
-        x?.reason?.$type === &apos;app.bsky.feed.defs#reasonRepost&apos; ||
-        x.post.embed?.$type === &apos;app.bsky.embed.record#view&apos; ||
-        x.post.embed?.$type === &apos;app.bsky.embed.recordWithMedia#view&apos;
-        )
-        )) {
-        const post = item.post;
-        const parser = new RichText({ text: post.record.text || &apos;&apos; });
-        
-        await parser.detectFacets(agent);
-        
-        let postMarkdown = &apos;&apos;;
-        const externalEmbed = post.embed?.external || post.record.embed?.external;
-        
-        for (const segment of parser.segments()) {
-        if (segment.isLink()) {
-        let uri = segment.link?.uri;
-        let linkText = segment.text;
-        
-        // Check if this link matches the external embed link
-        // We compare URIs (or check if the embed exists) to get the full version
-        if (
-        externalEmbed &amp;amp;&amp;amp;
-        (uri?.includes(&apos;..&apos;) ||
-        (externalEmbed &amp;amp;&amp;amp; (uri?.includes(&apos;…&apos;) || uri === externalEmbed.uri)))
-        ) {
-        uri = externalEmbed.uri;
-        linkText = externalEmbed.uri;
-        }
-        
-        postMarkdown += `[${linkText}](${uri})`;
-        } else if (segment.isMention()) {
-        postMarkdown += `[${segment.text}](https://bsky.app/profile/${segment.text.replace(&apos;@&apos;, &apos;&apos;)})`;
-        } else {
-        postMarkdown += segment.text;
-        }
-        }
-        
-        // Create a sensible return object type
-        const postData = {
-        uri: post.uri,
-        cid: post.cid,
-        content: postMarkdown,
-        date: post.record.createdAt,
-        likes: post.likeCount,
-        reposts: (post.repostCount || 0) + (post.quoteCount || 0),
-        replies: post.replyCount,
-        media: [],
-        };
-        
-        if (post.embed) {
-        
-        // If there are images, add to the return object
-        if (post.embed.$type === &apos;app.bsky.embed.images#view&apos;) {
-        postData.media = post.embed.images.map((img) =&amp;gt; ({
-        type: &apos;image&apos;,
-        src: img.fullsize,
-        alt: img.alt,
-        thumb: img.thumb,
-        }));
-        }
-        
-        // If there are open graph images, surface those
-        else if (post.embed.$type === &apos;app.bsky.embed.external#view&apos;) {
-        postData.media.push({
-        type: &apos;external&apos;,
-        uri: post.embed.external.uri,
-        title: post.embed.external.title,
-        description: post.embed.external.description,
-        thumb: post.embed.external.thumb,
-        });
-        }
-        
-        // If there are videos, add to the return object
-        else if (post.embed.$type === &apos;app.bsky.embed.video#view&apos;) {
-        postData.media.push({
-        type: &apos;video&apos;,
-        playlist: post.embed.playlist, // HLS stream (.m3u8)
-        thumbnail: post.embed.thumbnail,
-        cid: post.embed.cid,
-        });
-        }
-        }
-        
-        allPosts.push(postData);
-        }
-        
-        // Set the next cursor and break the loop if we&apos;re at the end
-        cursor = response.data.cursor;
-        if (!cursor) break;
-        }
-        
-        // Cache so it doesn&apos;t take forever to work on this locally
-        setCache(cacheKey, allPosts, cacheTimeout);
-        return allPosts;
-        } catch (error) {
-        console.error(&apos;Error fetching feed:&apos;, error);
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        
-        You may well recoil in *horror* at this code initially — I sure did initially while learning this stuff — but don&apos;t worry, I&apos;ll step us through it. 
-        &lt;p&gt;If you want to copy some code to use yourself, use this block and ignore the blocks in the breakdown.
-        &lt;/p&gt;
-        &lt;p&gt;That’s a &lt;em&gt;lot&lt;/em&gt; of code in one block. Let&apos;s break it down into chunks.&lt;/p&gt;
-        &lt;h3&gt;The breakdown&lt;/h3&gt;
-        &lt;pre&gt;&lt;code&gt;import { AtpAgent, RichText } from &apos;@atproto/api&apos;;
-        import { getCache, setCache } from &apos;./memoryCache&apos;;
-        
-        const agent = new AtpAgent({
-        service: &apos;https://bsky.social&apos;,
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The first thing we do is set up dependencies: the agent (not one of &lt;em&gt;those&lt;/em&gt; ones) which interfaces with the protocol for us and rich text capabilities that are used to tidy up content. The &lt;code&gt;memoryCache&lt;/code&gt; parts are the &lt;a href=&quot;https://piccalil.li/projects/personal-site/4/#lets-add-a-web-page&quot;&gt;same as when I integrated the WordPress content&lt;/a&gt;.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;const targetHandle = &apos;bell.bz&apos;;
-        const cacheKey = &apos;atPosts&apos;;
-        const cacheTimeout = 3600; // 3600 seconds is 1 hour
-        const cached = getCache(cacheKey);
-        
-        if (cached) {
-        return cached;
-        }
-        
-        // Authentication is required
-        await agent.login({
-        identifier: targetHandle,
-        password: process.env.BLUESKY_APP_PASSWORD,
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here, I&apos;m setting the target handle, the key for our memory cache and how long I want data to be cached for. I opted for an hour because I tend to work in short cycles when coding.&lt;/p&gt;
-        &lt;p&gt;Next up, I attempt to load data from cache &lt;em&gt;first&lt;/em&gt;, then check it. If there is data in cache, I can return it and move on. If not, the first thing to do is to get the agent to log in.&lt;/p&gt;
-        &lt;p&gt;For the next part, we&apos;re going to be &lt;em&gt;within&lt;/em&gt; the &lt;code&gt;while&lt;/code&gt; loop.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;const response = await agent.getAuthorFeed({
-        actor: targetHandle,
-        cursor: cursor,
-        limit: 100, // Max limit per cursor
-        
-        // For now, I&apos;m just doing root level posts. Maybe as this evolves I&apos;ll
-        // bring in replies too.
-        filter: &apos;posts_no_replies&apos;,
-        });
-        
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Notice how I leave comments even for &lt;em&gt;myself&lt;/em&gt;? I can look back on this in the future and immediately be up to speed&lt;/p&gt;
-        &lt;p&gt;I have posted &lt;em&gt;a lot&lt;/em&gt; on Bluesky so right off the bat, I need to use cursors to paginate over multiple chunks of posts. That&apos;s fine, because I&apos;m keeping a track of it with the &lt;code&gt;cursor&lt;/code&gt; variable. Eventually that &lt;code&gt;cursor&lt;/code&gt; will be null, which in turn will break the &lt;code&gt;while&lt;/code&gt; loop. Lovely stuff.&lt;/p&gt;
-        &lt;p&gt;The only other bit to touch on is I&apos;m getting only top level posts, not my replies. I&apos;m not much of a &lt;em&gt;reply guy&lt;/em&gt;, but I still don&apos;t want out of context posts on the feed because it&apos;s just &lt;em&gt;noise&lt;/em&gt;.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;for (const item of response.data.feed.filter(
-        (x) =&amp;gt;
-        !(
-        x?.reason?.$type === &apos;app.bsky.feed.defs#reasonRepost&apos; ||
-        x.post.embed?.$type === &apos;app.bsky.embed.record#view&apos; ||
-        x.post.embed?.$type === &apos;app.bsky.embed.recordWithMedia#view&apos;
-        )
-        )) {
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The data returned, for each page of data, has a &lt;code&gt;feed&lt;/code&gt; array that I can now loop over. I do another pass at filtering here. Each line deals with:&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;Reposts, which are classified as posts and I don&apos;t want posts &lt;em&gt;I&lt;/em&gt; haven&apos;t written showing up in the feed&lt;/li&gt;
-        &lt;li&gt;Quote posts, which I don&apos;t want to deal with &lt;em&gt;yet&lt;/em&gt;&lt;/li&gt;
-        &lt;li&gt;Quote posts: same as #2, but with media by the &lt;em&gt;quoter&lt;/em&gt;&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;pre&gt;&lt;code&gt;const post = item.post;
-        const parser = new RichText({ text: post.record.text || &apos;&apos; });
-        
-        await parser.detectFacets(agent);
-        
-        let postMarkdown = &apos;&apos;;
-        const externalEmbed = post.embed?.external || post.record.embed?.external;
-        
-        for (const segment of parser.segments()) {
-        if (segment.isLink()) {
-        let uri = segment.link?.uri;
-        let linkText = segment.text;
-        
-        // Check if this link matches the external embed link
-        // We compare URIs (or check if the embed exists) to get the full version
-        if (
-        externalEmbed &amp;amp;&amp;amp;
-        (uri?.includes(&apos;..&apos;) ||
-        (externalEmbed &amp;amp;&amp;amp; (uri?.includes(&apos;…&apos;) || uri === externalEmbed.uri)))
-        ) {
-        uri = externalEmbed.uri;
-        linkText = externalEmbed.uri;
-        }
-        
-        postMarkdown += `[${linkText}](${uri})`;
-        } else if (segment.isMention()) {
-        postMarkdown += `[${segment.text}](https://bsky.app/profile/${segment.text.replace(&apos;@&apos;, &apos;&apos;)})`;
-        } else {
-        postMarkdown += segment.text;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;p&gt;The aim of the game at this point is to generate a front-end friendly string of markdown that my existing infrastructure can deal with. In order to do that, I need to break down the &lt;code&gt;post.record.text&lt;/code&gt; with the &lt;code&gt;RichText&lt;/code&gt; utility, supplied by the &lt;code&gt;@atproto/api&lt;/code&gt; package.&lt;/p&gt;
-        &lt;p&gt;I can now loop over each segment of content and determine exactly what it &lt;em&gt;is&lt;/em&gt;. For example, I check first to see if there&apos;s an &lt;code&gt;externalEmbed&lt;/code&gt; — AKA a link — and build a markdown link string accordingly. If it&apos;s a mention, I create a nice link to that user&apos;s profile and finally if it&apos;s neither of those, I append raw text value to the markdown string.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;const postData = {
-        uri: post.uri,
-        cid: post.cid,
-        content: postMarkdown,
-        date: post.record.createdAt,
-        likes: post.likeCount,
-        reposts: (post.repostCount || 0) + (post.quoteCount || 0),
-        replies: post.replyCount,
-        media: [],
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The most self explaining chunk of code here: I&apos;m creating a nice flat return object structure that matches the front-end components.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;if (post.embed) {
-        // If there are images, add to the return object
-        if (post.embed.$type === &apos;app.bsky.embed.images#view&apos;) {
-        postData.media = post.embed.images.map((img) =&amp;gt; ({
-        type: &apos;image&apos;,
-        src: img.fullsize,
-        alt: img.alt,
-        thumb: img.thumb,
-        }));
-        }
-        
-        // If there are open graph images, surface those
-        else if (post.embed.$type === &apos;app.bsky.embed.external#view&apos;) {
-        postData.media.push({
-        type: &apos;external&apos;,
-        uri: post.embed.external.uri,
-        title: post.embed.external.title,
-        description: post.embed.external.description,
-        thumb: post.embed.external.thumb,
-        });
-        }
-        
-        // If there are videos, add to the return object
-        else if (post.embed.$type === &apos;app.bsky.embed.video#view&apos;) {
-        postData.media.push({
-        type: &apos;video&apos;,
-        playlist: post.embed.playlist, // HLS stream (.m3u8)
-        thumbnail: post.embed.thumbnail,
-        cid: post.embed.cid,
-        });
-        }
-        }
-        
-        allPosts.push(postData);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The next time I add something to these checks, I&apos;ll refactor this to be a &lt;code&gt;switch&lt;/code&gt; statement. For now, I will live my life.&lt;/p&gt;
-        &lt;p&gt;Now, the last bit of &lt;em&gt;data massaging&lt;/em&gt; is left for this iteration. I&apos;m checking over a couple of cases to render images or video depending on what embed content I&apos;ve got to work with. Again, this is all about creating flat (as possible) structures for the front-end components to consume.&lt;/p&gt;
-        &lt;p&gt;After all of that, I push that post into the higher level array, which we&apos;ll cache and return.&lt;/p&gt;
-        &lt;h2&gt;Wrapping up&lt;/h2&gt;
-        &lt;p&gt;That&apos;s the data sorted, so the next thing to do is wire it up to the website itself. I&apos;ll tackle that in the next one!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
