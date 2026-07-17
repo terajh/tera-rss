@@ -4,20 +4,126 @@
     <title>dev RSS - Jonathan Snook</title>
     <link>https://snook.ca/</link>
     <description>Jonathan Snook RSS 피드</description>
-    <lastBuildDate>Thu, 16 Jul 2026 17:04:53 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 17 Jul 2026 16:37:55 GMT</lastBuildDate>
+    <item>
+      <title>A Few of The CSS Tidbits I Put in The Site</title>
+      <link>https://snook.ca/everything/a-few-css-tidbits/</link>
+      <guid>https://snook.ca/everything/a-few-css-tidbits/</guid>
+      <pubDate>Fri, 17 Jul 2026 16:17:33 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;When I was building this site, I was keeping it lean but perhaps a bit messy. It’s not a big complex site and I didn’t need to write CSS to maintain a big complex site. As such, I even wondered if I’d stick to any kind of naming convention.&lt;/p&gt;
+        &lt;p&gt;Old habits are hard to break and I found anytime I tried to get away with just element selectors for something, it was clunky as I continued to iterate. Sure enough, the more I worked on the site, the more I moved back to my modular ways. But ultimately, that’s neither here nor there. For a site like mine—written and maintained by one person—what kind of naming convention I use is nearly irrelevant. (I say nearly because I don’t want to be obtuse just for the sake of it!)&lt;/p&gt;
+        &lt;p&gt;With my projects over the last few years, I’ve used a few different newer CSS features and have enjoyed what they can do. Here’s a few of the things I put into this site...&lt;/p&gt;
+        &lt;h2&gt;Clamp&lt;/h2&gt;
+        &lt;p&gt;I originally used &lt;code&gt;clamp&lt;/code&gt; on &lt;a href=&quot;https://nook.snook.ca&quot;&gt;The Snook Nook&lt;/a&gt; for the site title at the top of the page. I wanted it to feel balanced regardless of screen width. I adjust both the font size and letter spacing in this case, so that the title always looked proportional.&lt;/p&gt;
+        &lt;p&gt;For Snook.ca, I wanted something that was big and bold on a large screen but wouldn’t fill up an entire phone screen. Again, clamp came in clutch.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;font-size: clamp(2em, 4vw, 4em)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Clamp takes three values: the minimum, the preferred value, and the maximum. In this case, I wanted the font-size to be related to the screen width, which is where the &lt;code&gt;vw&lt;/code&gt; units come in. The largest I wanted to go was 4em. This was eye-balled. There’s no special math here. Likewise, 2em still seemed reasonable on the bottom end and looked good for me.&lt;/p&gt;
+        &lt;h2&gt;Balanced Headings&lt;/h2&gt;
+        &lt;p&gt;I remember reading about this awhile back and it was a nice little thing to add to the site: &lt;code&gt;text-wrap: balance&lt;/code&gt;. I just have it on the page title to avoid orphaned words and make them look a little more, well, balanced.&lt;/p&gt;
+        &lt;p&gt;On the old site, I never loved how my headings looked over multiple lines because of the pencil lines I had on headings. As a result, I kept the titles shorter, on purpose. With this version, I wanted to get more creative with page titles, going longer if I needed to without it looking weird.&lt;/p&gt;
+        &lt;h2&gt;Grid&lt;/h2&gt;
+        &lt;p&gt;When Grid first came out, I was using it for larger, dynamic layouts like the restaurant grid on my &lt;a href=&quot;https://fifty.snook.ca&quot;&gt;Fifty&lt;/a&gt; site. Now, I find myself also using it for smaller elements. The article meta is a great example of this.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/article-meta.webp&quot; alt=&quot;The article meta showing section title and article date&quot;&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.meta {
+        display: grid;
+        justify-items: center;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Boom. All the items are center aligned and stacked. I probably would&apos;ve defaulted to trying to use &lt;code&gt;display: flex&lt;/code&gt; here but that would&apos;ve required an extra declaration to adjust the &lt;code&gt;flex-direction&lt;/code&gt; to column. (And using &lt;code&gt;align-items&lt;/code&gt; instead of &lt;code&gt;justify-items&lt;/code&gt;.)&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.meta-before:before {
+        content: &amp;quot;&amp;quot;;
+        display:block;
+        width:50px;
+        padding-bottom: 5px;
+        border-top: 2px solid var(--green);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The horizontal line is a pseudo-element that gets added into the grid stack before everything else. That border declaration leads me to the next thing.&lt;/p&gt;
+        &lt;h2&gt;CSS Custom Properties&lt;/h2&gt;
+        &lt;p&gt;The CSS isn’t large or anything but it was nice to use custom properties for easy colour management. I declared them on the root element. I could’ve probably just declared this on the &lt;code&gt;html&lt;/code&gt; element itself just as easily.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;:root {
+        --yellow: #FFCA00;
+        --green: #668800;
+        --white: #EFEFE6;
+        --black: #3C3C3C;
+        color-scheme: light dark;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Again, I didn’t need multiple levels of abstraction. I just wanted something that made it easier to remember these hex codes and spit them out where I need them.&lt;/p&gt;
+        &lt;h2&gt;Dark Mode&lt;/h2&gt;
+        &lt;p&gt;That last line in the previous example declares that my design supports light and dark mode and lets me use the &lt;code&gt;light-dark&lt;/code&gt; function to easily declare colour options like this declaration for the body text.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;color: light-dark(var(--black), var(--white));
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2&gt;Link Underlines&lt;/h2&gt;
+        &lt;p&gt;I’ve always just either toggled underlines on hover or toggled text colour. I don’t know when all the &lt;code&gt;text-decoration&lt;/code&gt; options were added but I liked being able to do so.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;a { 
+        color: currentcolor; 
+        text-decoration-thickness:2px; 
+        text-decoration-color: var(--green); 
+        }
+        a:hover { text-decoration-color: var(--yellow); }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I was able to adjust the thickness and then change the colour on hover. I haven’t used the ol’ LVHA format in years but I might come back to it to give more useful visual clues for visited and active links.&lt;/p&gt;
+        &lt;p&gt;The link colour just picks up whatever the &lt;code&gt;light-dark&lt;/code&gt; colour is currently set.&lt;/p&gt;
+        &lt;h2&gt;CSS has come a long way&lt;/h2&gt;
+        &lt;p&gt;I was really delighted by how easy it was to use all of these features and not have to be too concerned about cross browser issues. Looking through &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web&quot;&gt;MDN&lt;/a&gt; was fun to discover what features I had missed over the years and could now implement reliably. &lt;a href=&quot;https://caniuse.com&quot;&gt;Can I Use&lt;/a&gt; also continues to be a fantastic resource for verifying browser support.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Font Choices</title>
       <link>https://snook.ca/everything/font-choices/</link>
       <guid>https://snook.ca/everything/font-choices/</guid>
-      <pubDate>Thu, 16 Jul 2026 16:22:48 GMT</pubDate>
-      <content:encoded>The new design has been up for a week and I am already making a big (but small) change.</content:encoded>
+      <pubDate>Fri, 17 Jul 2026 16:17:33 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A week ago, I had launched this site using QuatroSlab for page titles and Google’s Slabo for body copy. For those that have been around awhile and are familiar with SMACSS, you might recognize QuatroSlab from that site. I like the font and started off with it to see how I’d feel about it on the this new design. Then I chose Slabo as a font that I felt paired well with it.&lt;/p&gt;
+        &lt;p&gt;For the most part, I was fine with it but after finally getting a blog post written and posted under the new design, I was feeling less than thrilled with my choices.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/font-choices-2.webp&quot; alt=&quot;The font choices before.&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;Over yesterday and today, I decided to do some research on fonts and came across &lt;a href=&quot;https://pangrampangram.com&quot;&gt;Pangram Pangram Foundry&lt;/a&gt;. They have some delectable fonts that make me want to do some interesting designs with them. This led me to Fragment. I looked through all the variants and Fragment Text felt just right for the body copy. It felt softer and rounder and more open and friendly than Slabo.&lt;/p&gt;
+        &lt;p&gt;My only complaint is that I want some of the discretionary ligatures in the list of standard ligatures like the Th and ft. The rest of them are too much flourish for body copy. I enabled the ligatures for headings, at least, where some flourish is warranted.&lt;/p&gt;
+        &lt;p&gt;For page headings, though, I wanted something bolder. This is where Pangram Pangram’s Pangaia comes in. I like the slightly retro-modern funky feel that this font brings to the table.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/font-choices-1.webp&quot; alt=&quot;The font choices after.&quot;&gt;&lt;/p&gt;
+        &lt;h2&gt;The CSS&lt;/h2&gt;
+        &lt;p&gt;From a technical perspective, this is the first time I’ve taken advantage of OpenType feature capabilities and I found it confusing as I couldn’t find a good explanation of what &lt;code&gt;liga&lt;/code&gt; or &lt;code&gt;dlig&lt;/code&gt; or &lt;code&gt;ss03&lt;/code&gt; mean or how to know whether a font even supports these.&lt;/p&gt;
+        &lt;p&gt;I’ve learned that you can turn these on or off via CSS’s &lt;code&gt;font-feature-settings&lt;/code&gt; property.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;font-feature-settings: &amp;quot;ss02&amp;quot;, &amp;quot;ss03&amp;quot;, &amp;quot;ss04&amp;quot;, &amp;quot;dlig&amp;quot;, &amp;quot;zero&amp;quot;, &amp;quot;onum&amp;quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Declaring the value turns them on. You can alternatively, specifically declare them on or off using the words on or off or the numbers 1 or 0. The following would enable features ss02, ss03, zero, and onum; it would disable ss04 and dlig.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;font-feature-settings: &amp;quot;ss02&amp;quot; on, &amp;quot;ss03&amp;quot; 1, &amp;quot;ss04&amp;quot; off, &amp;quot;dlig&amp;quot; 0, &amp;quot;zero&amp;quot;, &amp;quot;onum&amp;quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The question then became about how to figure out which of these features exist in a particular font. For this, I used &lt;a href=&quot;https://fontdrop.info&quot;&gt;FontDrop!&lt;/a&gt;. It will show you what features are available and what those features look like for that font. FontDrop! is all client-side, too, which is nice. I didn’t want to be uploading files that aren’t mine to someone’s server.&lt;/p&gt;
+        &lt;h2&gt;Up Next&lt;/h2&gt;
+        &lt;p&gt;I suspect I will end up tweaking which of these features are on or off as I add more content to the site and decide what works well for a given scenario.&lt;/p&gt;
+      </content:encoded>
     </item>
     <item>
       <title>The End and The Beginning</title>
       <link>https://snook.ca/everything/the-end/</link>
       <guid>https://snook.ca/everything/the-end/</guid>
-      <pubDate>Thu, 16 Jul 2026 16:22:48 GMT</pubDate>
-      <content:encoded>Snook.ca v10 and all of its tips, tricks, and bookmarks, has reached an end. In its place is something new and more personal.</content:encoded>
+      <pubDate>Fri, 17 Jul 2026 16:17:33 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Welcome to the beginning. The end happened months ago but like many endings, sometimes they take awhile.&lt;/p&gt;
+        &lt;h2&gt;The End&lt;/h2&gt;
+        &lt;p&gt;Snook.ca has, for the better part of the last 25 years, been mostly a professional outlet for me. What started out as “Technical Articles” turned into “a collection of tips, tricks, and bookmarks on web development” to just “Tips, Tricks, and Bookmarks on Web Development.” Stepping away from full time web design and development, I found myself writing more personal posts and changed the tagline to “Life and Times of a Web Developer” about a year ago or so to reflect that change.&lt;/p&gt;
+        &lt;p&gt;On top of that, the design for the site had only changed marginally over the last 17 years. It was time for something new. I initially had some grand plans to push the limits of CSS or use some bleeding edge features as a way of stretching my dev skills that had gone somewhat dormant since the start of the pandemic. Instead, as I played with the design, I became more enamoured with simplicity—a better reflection of my personal life. (Ultimately, I also knew that if I made it too complex, I’d create roadblocks to wanting to work on the site.)&lt;/p&gt;
+        &lt;p&gt;To start something fresh and new, I thought it best to put a bow on the old stuff and tuck it away. All of those old posts were and are aptly named &lt;a href=&quot;https://snook.ca/archives/&quot;&gt;Archives&lt;/a&gt;. It’s similar to how &lt;a href=&quot;https://jasonsantamaria.com&quot;&gt;Jason Santa Maria&lt;/a&gt; or &lt;a href=&quot;https://v7.robweychert.com&quot;&gt;Rob Weychert&lt;/a&gt; have their site versioning: the content and design are set in stone. Everything as of April 2026 was converted into static pages, no longer powered by CakePHP.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/v11-launch-1.webp&quot; alt=&quot;Version 10: Archives&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;The time between April and now has been spent cleaning up a bunch of the cruft that had built up over the years. It also included working on a new site design that I’d be happy enough to launch with and then continue to iterate on after it has gone live.&lt;/p&gt;
+        &lt;h2&gt;The Beginning&lt;/h2&gt;
+        &lt;p&gt;That’s technically where we are now. This is the inaugural post of the new site. If you’re reading this via RSS, that means the redirects are working. The journal is now called &lt;em&gt;Everything and Nothing&lt;/em&gt;. It might be self evident but it’s because the journal is about everything and nothing. There are no categories like there were before. (Although I had all but removed the categories from the previous version. The URL was the only tell left.)&lt;/p&gt;
+        &lt;p&gt;The design is a continued evolution of what came before. The “bookmark” in the header is now in tatters. The paper background and pencil lines are gone, leaving just a solid colour. The wavy lines are gone. The simple palette is still the same colours as before: the cream, the grey, and the green haven’t changed. I was able to finally get a dark mode added to the site, which is just the cream and the grey swapped. There&apos;s that simplicity again.&lt;/p&gt;
+        &lt;p&gt;I also played with scroll-based animations using &lt;code&gt;view-timeline&lt;/code&gt;. If you’re in Firefox, you can enable them in your settings. If not, the site works fine either way. Chrome and Safari support them. There’s some &lt;code&gt;grid&lt;/code&gt;, &lt;code&gt;@support&lt;/code&gt;, &lt;code&gt;clamp&lt;/code&gt; and custom properties. Nothing ground breaking.&lt;/p&gt;
+        &lt;p&gt;I decided not to have a main navigation. Mostly because it’s not necessary. Simplicity, yet again. My theory is that anybody who gets dropped into the middle of the site will go to the home page, if they go anywhere else at all.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/v11-launch-2.webp&quot; alt=&quot;Version 11: Simplicity&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;Under the hood, I’m now using 11ty. I’ve used it for a few other projects and I like its approach. I’m familiar with it and I knew it would do what I needed it to do for this.&lt;/p&gt;
+        &lt;h2&gt;Evolution&lt;/h2&gt;
+        &lt;p&gt;This design is an evolution and it will continue to evolve. This just marks the beginning. Or is it the end it’s marking? Or is it neither since this is just an evolution? Like a moth turning into a butterfly? &lt;em&gt;gags&lt;/em&gt; How cliché.&lt;/p&gt;
+        &lt;p&gt;Whatever it is, the site marches on. For those of you who consume via RSS and never click through, you’ll not see any different. The post frequency will continue to ebb and flow.&lt;/p&gt;
+        &lt;p&gt;I’ve thought about consolidating things like the Photos and whisky reviews into the main site, allowing an easier way to weave all the pieces together, playing with themes built off the base design. That might happen.&lt;/p&gt;
+        &lt;p&gt;Similar to the previous design that slowly changed over the years, this design, too, will slowly change as I add and remove and shift elements. This site is my playground, after all. As others have described their own sites, it’s my worry stone, my prayer beads. It provides me a place to practice my craft of design, development, and writing.&lt;/p&gt;
+        &lt;p&gt;Importantly, it continues to provide a space outside of the algorithm, for myself and for others.&lt;/p&gt;
+      </content:encoded>
     </item>
   </channel>
 </rss>
