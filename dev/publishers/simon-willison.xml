@@ -4,7 +4,89 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sat, 18 Jul 2026 16:43:46 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 19 Jul 2026 16:22:40 GMT</lastBuildDate>
+    <item>
+      <title>AI Mania Is Eviscerating Global Decision-Making</title>
+      <link>https://simonwillison.net/2026/Jul/19/ai-mania/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/19/ai-mania/#atom-everything</guid>
+      <pubDate>Sun, 19 Jul 2026 05:06:21 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://ludic.mataroa.blog/blog/ai-mania-is-eviscerating-global-decision-making/&quot;&gt;AI Mania Is Eviscerating Global Decision-Making&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Here&apos;s an entertaining perspective from Nik Suresh on the AI mania that is overwhelming the large companies that he consults with. It&apos;s crammed with spicy anecdotes from anonymous sources.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;In one extreme case, I have seen an executive confess that they had never even used ChatGPT or any AI tool in their life, immediately after producing a technical strategy for an organisation with $2B+ in revenue which was entirely centered around AI.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Here&apos;s a report from an engineer at a company with a token leaderboard:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Checking out a parallel copy of our Go repository and telling the AI to rewrite the whole thing in Zig while I work on something else just so I can keep my job.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I particularly enjoyed this conversation with a skeptical executive at an over-enthusiastic company:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;I asked &lt;em&gt;why&lt;/em&gt; this was being repeated without opposition. Was it just sales fluff?&lt;/p&gt;
+        &lt;p&gt;The answer was a lot more interesting. It was &lt;em&gt;partially&lt;/em&gt; ridiculous sales material being delivered to an easily excitable audience, but this was not the dominant factor constraining honesty. Executives at their &lt;em&gt;customers&lt;/em&gt; were saying absurd things about achieving 100x productivity, and this meant that if any executive at the &lt;em&gt;vendor&lt;/em&gt; said that these gains were not plausible, it would undermine the credibility of the customer’s executive, be perceived as an attack (or heresy), and possibly result in an enterprise contract cancellation. And getting enterprise contracts cancelled because you wanted to opine on something that doesn’t really matter to your organisation’s mission is a great way to get fired.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=48964185&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Claude Code uses Bun written in Rust now</title>
+      <link>https://simonwillison.net/2026/Jul/19/claude-code-in-bun-in-rust/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/19/claude-code-in-bun-in-rust/#atom-everything</guid>
+      <pubDate>Sun, 19 Jul 2026 03:54:09 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;In &lt;a href=&quot;https://bun.com/blog/bun-in-rust&quot;&gt;Rewriting Bun in Rust&lt;/a&gt; Jarred Sumner made the following claim:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Claude Code v2.1.181 (released June 17th) and later use the Rust port of Bun. Startup got 10% faster on Linux but otherwise, barely anyone noticed. Boring is good.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I decided to have a poke at my own Claude Code installation to see if I could find evidence that it was using Bun written in Rust.&lt;/p&gt;
+        &lt;p&gt;I found these two commands convincing:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;strings ~/.local/bin/claude | grep -m1 &apos;Bun v1&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For me this outputs &lt;code&gt;Bun v1.4.0 (macOS arm64)&lt;/code&gt;. The most recent release of &lt;a href=&quot;https://github.com/oven-sh/bun/releases&quot;&gt;Bun on GitHub&lt;/a&gt; is currently &lt;a href=&quot;https://github.com/oven-sh/bun/releases/tag/bun-v1.3.14&quot;&gt;v1.3.14&lt;/a&gt; from May 12th, so that v1.4.0 version number in Claude supports them shipping a preview of a not-yet-released Bun version.&lt;/p&gt;
+        &lt;p&gt;(&lt;strong&gt;Update&lt;/strong&gt;: The Rust version &lt;em&gt;has&lt;/em&gt; been released as &lt;a href=&quot;https://bun.com/docs/installation#canary-builds&quot;&gt;Bun canary&lt;/a&gt; - running &lt;code&gt;bun upgrade --canary&lt;/code&gt; will install &lt;a href=&quot;https://github.com/oven-sh/bun/releases/tag/canary&quot;&gt;this release&lt;/a&gt;.)&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;strings ~/.local/bin/claude | grep -Eo &apos;src/[[:alnum:]_./-]+\.rs&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This outputs a list of &lt;a href=&quot;https://gist.github.com/simonw/c92fb0f67b114ac26e3b95a09ddccfdc&quot;&gt;563 filenames&lt;/a&gt;, starting with these:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;src/runtime/bake/dev_server/mod.rs
+        src/runtime/bake/production.rs
+        src/bundler/bundle_v2.rs
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It looks like Bun in Rust is indeed being run in production across millions of different devices. Like Jarred said, &quot;Boring is good&quot;.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: Here&apos;s a neat trick &lt;a href=&quot;https://twitter.com/ajanraj25/status/2078825794701242697&quot;&gt;from Ajan Raj&lt;/a&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;cat &amp;gt; /tmp/bun-version.ts &amp;lt;&amp;lt;&apos;EOF&apos;
+        console.log(&quot;embedded bun:&quot;, Bun.version);
+        process.exit(0);
+        EOF
+        BUN_OPTIONS=&quot;--preload=/tmp/bun-version.ts&quot; claude --version
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This outputs &lt;code&gt;1.4.0&lt;/code&gt; for me.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://github.com/oven-sh/bun/commit/b18bf6d1d0a92238f240bfd125f0e3b3461b9243#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519&quot;&gt;the commit from May 17th&lt;/a&gt; that updated the version in &lt;code&gt;package.json&lt;/code&gt; to 1.4.0. That version hasn&apos;t been changed since then, but also hasn&apos;t yet made it into a tagged release outside of &lt;code&gt;canary&lt;/code&gt;.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/bun&quot;&gt;bun&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/rust&quot;&gt;rust&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jarred-sumner&quot;&gt;jarred-sumner&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>SQLite Query Explainer</title>
+      <link>https://simonwillison.net/2026/Jul/18/sqlite-query-explainer/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/18/sqlite-query-explainer/#atom-everything</guid>
+      <pubDate>Sat, 18 Jul 2026 17:19:10 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/sqlite-query-explainer&quot;&gt;SQLite Query Explainer&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Julia Evan&apos;s, in &lt;a href=&quot;https://jvns.ca/blog/2026/07/17/learning-about-running-sqlite/&quot;&gt;Learning a few things about running SQLite&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Maybe one day I’ll learn to read a query plan.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Big same.... which inspired me to &lt;a href=&quot;https://github.com/simonw/tools/pull/299#issue-4919268017&quot;&gt;have Fable build&lt;/a&gt; this interactive explain tool, which runs SQLite in Python in Pyodide in Web Assembly in the browser and adds a layer of explanation to the results of both EXPLAIN and EXPLAIN QUERY PLAN.&lt;/p&gt;
+        &lt;p&gt;Approach with caution, since I don&apos;t know enough about SQLite query plans to verify the results myself, but it seems cromulent enough to me.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/sql&quot;&gt;sql&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/julia-evans&quot;&gt;julia-evans&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pyodide&quot;&gt;pyodide&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos-fable&quot;&gt;claude-mythos-fable&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Claude make Fable 5 permanent</title>
       <link>https://simonwillison.net/2026/Jul/18/claude-make-fable-5-permanent/#atom-everything</link>
@@ -669,72 +751,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-release-notes&quot;&gt;annotated-release-notes&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Nilay Patel</title>
-      <link>https://simonwillison.net/2026/Jul/10/nilay-patel/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/10/nilay-patel/#atom-everything</guid>
-      <pubDate>Fri, 10 Jul 2026 17:05:26 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://youtu.be/v4vkwUf4AMw?t=2427&quot;&gt;&lt;p&gt;The reality is to make augmented reality glasses, you need to put a camera next to your eyes that is continuously recording everything you see and processing that to put information over it.&lt;/p&gt;
-        &lt;p&gt;There is not another way around it. And there&apos;s certainly not a chip that can fit in the stem of a glasses that is both powerful enough and power miserly enough to do that in real time.&lt;/p&gt;
-        &lt;p&gt;You have to send that data to a cloud. You gotta do it. [...] Or you can build something the size of a Vision Pro with a battery pack that lives somewhere else. Those are the current choices in this world.&lt;/p&gt;
-        &lt;p&gt;And it means if you want to build the product that everyone thinks is the next thing, you are going to have to invade people&apos;s privacy.&lt;/p&gt;
-        &lt;p&gt;And maybe you shouldn&apos;t. Like, there&apos;s an incredible argument for, nope, you shouldn&apos;t do that. Nope, the trade-offs required to make this product are so high at a societal level that we should stop it.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://youtu.be/v4vkwUf4AMw?t=2427&quot;&gt;Nilay Patel&lt;/a&gt;, The Vergecast&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/augmented-reality&quot;&gt;augmented-reality&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/nilay-patel&quot;&gt;nilay-patel&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/privacy&quot;&gt;privacy&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting OpenAI</title>
-      <link>https://simonwillison.net/2026/Jul/10/openai/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/10/openai/#atom-everything</guid>
-      <pubDate>Fri, 10 Jul 2026 01:05:57 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex&quot;&gt;&lt;p&gt;[...] Work on web and mobile runs in the cloud. Work in the desktop app can also use local files and desktop apps with your permission. At launch, cloud Work conversations do not appear in desktop Work; desktop Work threads and local files remain on that computer.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex&quot;&gt;OpenAI&lt;/a&gt;, trying (unsuccessfully) to clarify ChatGPT Work&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/chatgpt&quot;&gt;chatgpt&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The new GPT-5.6 family: Luna, Terra, Sol</title>
-      <link>https://simonwillison.net/2026/Jul/9/gpt-5-6/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/9/gpt-5-6/#atom-everything</guid>
-      <pubDate>Thu, 09 Jul 2026 19:46:38 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;OpenAI&apos;s latest flagship model &lt;a href=&quot;https://openai.com/index/gpt-5-6/&quot;&gt;hit general availability this morning&lt;/a&gt;, and comes in three sizes: Luna, Terra, and Sol (from smallest to largest).&lt;/p&gt;
-        &lt;p&gt;The new models are priced per 1M input/output tokens as Luna $1/$6, Terra $2.50/$15, Sol $5/$30. For comparison, the Claude Opus series are $5/$25 and the Claude Fable 5 is $10/$50, but price-per-million tokens doesn&apos;t tell us much now that the number of reasoning tokens can differ so much between models for the same task.&lt;/p&gt;
-        
-        &lt;p&gt;All three models have a February 16th 2026 knowledge cutoff, a million token context window, and 128,000 maximum output tokens.&lt;/p&gt;
-        
-        &lt;p&gt;OpenAI&apos;s biggest benchmark claim concerns long-running agentic performance, with one benchmark showing all three models outperforming Claude Fable 5:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;We trained GPT-5.6 to get more useful work from every token. On &lt;a href=&quot;https://agents-last-exam.org/&quot;&gt;Agents’ Last Exam&lt;/a&gt;, an evaluation of long-running professional workflows across 55 fields, GPT-5.6 Sol sets a new high of 53.6, eclipsing Claude Fable 5 (adaptive reasoning) by 13.1 points. Even at medium reasoning, it beats Fable 5 by 11.4 points at roughly one-quarter the estimated cost. That efficiency extends to smaller models, which are essential to making intelligence more abundant and affordable: GPT-5.6 Terra and GPT-5.6 Luna outperform Fable 5 at around one-sixteenth the cost.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Amusingly, one self-reported benchmark that Fable 5 crushed the GPT-5.6 family on was SWE-Bench Pro, where Fable 5 got 80% compared to GPT-5.6 Sol getting 64.6%. This may help explain why OpenAI chose to publish &lt;a href=&quot;https://openai.com/index/separating-signal-from-noise-coding-evaluations/&quot;&gt;this article yesterday&lt;/a&gt; specifically calling out SWE-Bench Pro for problems they found while auditing that benchmark:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;In light of these results, we estimate that ~30% of SWE-bench Pro tasks are broken, and advise that model developers carefully examine results&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I&apos;ve had some early access to GPT-5.6 Sol - it&apos;s definitely very competent, though so far it hasn&apos;t struck me as better than Fable at the kind of complex coding tasks I&apos;ve been using with Anthropic&apos;s model.&lt;/p&gt;
-        &lt;p&gt;As usual, the &lt;a href=&quot;https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6&quot;&gt;model guidance for using GPT-5.6&lt;/a&gt; has the most interesting details. There are a bunch of new API features that I need to explore (and probably add support for in &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt;), including:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;a href=&quot;https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling&quot;&gt;Programmatic Tool Calling&lt;/a&gt; allows the models to &quot;compose and run JavaScript that orchestrates tool calls&quot; - which sounds to me like it could help bridge the gap between MCPs and full terminal sessions that can compose CLI utilities in useful ways. Also reminiscent of the &lt;a href=&quot;https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool#dynamic-filtering&quot;&gt;dynamic filtering&lt;/a&gt; mechanism Anthropic added to their web search tool, which allows code execution against web results as part of a single model turn.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;a href=&quot;https://developers.openai.com/api/docs/guides/tools-multi-agent&quot;&gt;Multi-agent&lt;/a&gt; lets the model &quot;spin up subagents for parallel, focused work&quot; - the sub-agent pattern now baked into the core API.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;a href=&quot;https://developers.openai.com/api/docs/guides/prompt-caching#prompt-cache-breakpoints&quot;&gt;Prompt cache breakpoints&lt;/a&gt; brings the Claude model of prompt caching to OpenAI, letting you be explicit about where the cache breakpoints are rather than relying on the API to detect them automatically. Personally I much prefer automatic detection (still supported by OpenAI), but presumably there are optimization cost savings to be had here if you put the work in.&lt;/li&gt;
-        &lt;li&gt;You can now set &lt;a href=&quot;https://developers.openai.com/api/docs/guides/images-vision#choose-an-image-detail-level&quot;&gt;detail: original&lt;/a&gt; on image requests to avoid resizing the image at all before it is processed.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://static.simonwillison.net/static/2026/gpt-5.6-pelicans.html&quot;&gt;a full page with 18 different pelicans&lt;/a&gt; - for reasoning efforts none, low, medium, high, xhigh, and max across the three different models. It also lists their token and calculated costs - the least expensive was gpt-5.6-luna at effort none for 0.71 cents, the most expensive was gpt-5.6-sol at max reasoning level for 48.55 cents.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/gpt-5.6-pelicans.webp&quot; alt=&quot;A grid of nine pelicans riding bicycles, of varying quality&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;In further pelican news, if you jump to 17:50 in &lt;a href=&quot;https://www.youtube.com/live/Wq45rvPGNHs?t=1070s&quot;&gt;their livestream from this morning&lt;/a&gt; you&apos;ll see OpenAI&apos;s own demo of 3D pelicans riding a tricycle, a bicycle, a pony, and another pelican!&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/pelican-riding-a-pelican.jpg&quot; alt=&quot;Frame from a livestream showing a 3D model of a pelican riding another pelican&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-tool-use&quot;&gt;llm-tool-use&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt-5&quot;&gt;gpt-5&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

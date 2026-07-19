@@ -4,12 +4,43 @@
     <title>dev RSS - Jonathan Snook</title>
     <link>https://snook.ca/</link>
     <description>Jonathan Snook RSS 피드</description>
-    <lastBuildDate>Sat, 18 Jul 2026 16:43:44 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 19 Jul 2026 16:22:38 GMT</lastBuildDate>
+    <item>
+      <title>I Added Syntax Highlighting Using the 11ty PrismJS Plugin</title>
+      <link>https://snook.ca/everything/syntax-highlighting/</link>
+      <guid>https://snook.ca/everything/syntax-highlighting/</guid>
+      <pubDate>Sun, 19 Jul 2026 15:59:59 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;One thing I like about 11ty is that common tasks for development oriented blogs are easily handled and syntax highlighting is no exception.&lt;/p&gt;
+        &lt;p&gt;I installed the &lt;a href=&quot;https://www.11ty.dev/docs/plugins/syntaxhighlight/&quot;&gt;Syntax Highlighting Plugin&lt;/a&gt; just like the documentation asked me to. Then, I had to modify my code blocks in my blog post Markdown files to indicate what language they were. Thankfully, I had only written two articles so far that contained code blocks. Nothing so far deviates from what the documentation says.&lt;/p&gt;
+        &lt;p&gt;When I started considering the compile process, however, I had a few considerations.&lt;/p&gt;
+        &lt;h2&gt;Only using the CSS when there was code on the page&lt;/h2&gt;
+        &lt;p&gt;The first thing to note is that I inline my CSS. My thinking is that most users visiting my site aren’t likely to have my CSS file cached—either because they’re on my site for the first time or because it has been long enough since they visited my site and the file has expired.&lt;/p&gt;
+        &lt;p&gt;Currently, I only have two templates: my universal template and my blog post template. I inline additional CSS in my blog post template that isn’t needed anywhere else on the site. As such, the first thing I did was add the PrismJS theme to my template and see how it looked. No surprise, it looked great.&lt;/p&gt;
+        &lt;p&gt;But what if I have no code on the page? Why am I loading the CSS for every blog post? Easy enough. I added a yaml parameter of &lt;code&gt;hascode: true&lt;/code&gt;. And then I check for that parameter in my template.&lt;/p&gt;
+        &lt;pre class=&quot;language-njk&quot;&gt;&lt;code class=&quot;language-njk&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;{%&lt;/span&gt; &lt;span class=&quot;token tag keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token variable&quot;&gt;hascode&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;token operator&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token variable&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;token variable&quot;&gt;rel&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;stylesheet&quot;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;token variable&quot;&gt;endif&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That was nice. But as I mentioned, why am I creating an HTTP request when I usually inline my CSS? No problem. A simple copy/paste and that was done.&lt;/p&gt;
+        &lt;h2&gt;Light and Dark Mode&lt;/h2&gt;
+        &lt;p&gt;Initially, because the themes are relatively small, I thought about finding a theme that worked for light mode and one for dark mode, wrapping them in &lt;code&gt;prefers-color-scheme&lt;/code&gt;. But that still seemed excessive. I found the &lt;a href=&quot;https://github.com/PrismJS/prism-themes/blob/master/themes/prism-duotone-light.css&quot;&gt;Duotone Light&lt;/a&gt; theme that I thought looked best for my light mode and then realized that much of it still worked in dark mode if I gave it a couple tweaks.&lt;/p&gt;
+        &lt;p&gt;The first tweak was to use the &lt;code&gt;light-dark&lt;/code&gt; declaration I had already had on my &lt;code&gt;pre&lt;/code&gt; tags when I launched:&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;light-dark&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;#FFFFFF50&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; #00000050&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I double-checked and noticed that the selector colour didn’t work in dark mode. So, instead of just trying to find a colour that would work, I decided to use a CSS colour function to solve the problem.&lt;/p&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;light-dark&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;#2d2006&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;hsl&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;from #2d2006 h s &lt;span class=&quot;token function&quot;&gt;calc&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;l + 80&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This uses the &lt;code&gt;hsl&lt;/code&gt; function to shift the luminosity of the colour from the light mode version.&lt;/p&gt;
+        &lt;p&gt;This is a bit of overkill as I could just take the rendered colour and put that in place of the function but sometimes it’s just fun to try new things.&lt;/p&gt;
+        &lt;h2&gt;Pretty&lt;/h2&gt;
+        &lt;p&gt;I really like how the code blocks look now, although I don’t love that there’s no indication that the code has overflowed the container if you have scrollbars turned off by default—which most people do these days. Once we get &lt;code&gt;scroll-state&lt;/code&gt; container queries supported across all major browsers, maybe I’ll deal with it then.&lt;/p&gt;
+        
+        &lt;hr&gt;&lt;small&gt;Have something to say? &lt;a href=&quot;mailto:snookca@snk.ms&quot;&gt;Tell me about it.&lt;/a&gt;&lt;/small&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>A Few of The CSS Tidbits I Put in The Site</title>
       <link>https://snook.ca/everything/a-few-css-tidbits/</link>
       <guid>https://snook.ca/everything/a-few-css-tidbits/</guid>
-      <pubDate>Sat, 18 Jul 2026 16:00:37 GMT</pubDate>
+      <pubDate>Sun, 19 Jul 2026 15:59:59 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;When I was building this site, I was keeping it lean but perhaps a bit messy. It’s not a big complex site and I didn’t need to write CSS to maintain a big complex site. As such, I even wondered if I’d stick to any kind of naming convention.&lt;/p&gt;
         &lt;p&gt;Old habits are hard to break and I found anytime I tried to get away with just element selectors for something, it was clunky as I continued to iterate. Sure enough, the more I worked on the site, the more I moved back to my modular ways. But ultimately, that’s neither here nor there. For a site like mine—written and maintained by one person—what kind of naming convention I use is nearly irrelevant. (I say nearly because I don’t want to be obtuse just for the sake of it!)&lt;/p&gt;
@@ -17,8 +48,7 @@
         &lt;h2&gt;Clamp&lt;/h2&gt;
         &lt;p&gt;I originally used &lt;code&gt;clamp&lt;/code&gt; on &lt;a href=&quot;https://nook.snook.ca&quot;&gt;The Snook Nook&lt;/a&gt; for the site title at the top of the page. I wanted it to feel balanced regardless of screen width. I adjust both the font size and letter spacing in this case, so that the title always looked proportional.&lt;/p&gt;
         &lt;p&gt;For Snook.ca, I wanted something that was big and bold on a large screen but wouldn’t fill up an entire phone screen. Again, clamp came in clutch.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;font-size: clamp(2em, 4vw, 4em)
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;font-size&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;clamp&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;2em&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 4vw&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; 4em&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Clamp takes three values: the minimum, the preferred value, and the maximum. In this case, I wanted the font-size to be related to the screen width, which is where the &lt;code&gt;vw&lt;/code&gt; units come in. The largest I wanted to go was 4em. This was eye-balled. There’s no special math here. Likewise, 2em still seemed reasonable on the bottom end and looked good for me.&lt;/p&gt;
         &lt;h2&gt;Balanced Headings&lt;/h2&gt;
         &lt;p&gt;I remember reading about this awhile back and it was a nice little thing to add to the site: &lt;code&gt;text-wrap: balance&lt;/code&gt;. I just have it on the page title to avoid orphaned words and make them look a little more, well, balanced.&lt;/p&gt;
@@ -26,45 +56,40 @@
         &lt;h2&gt;Grid&lt;/h2&gt;
         &lt;p&gt;When Grid first came out, I was using it for larger, dynamic layouts like the restaurant grid on my &lt;a href=&quot;https://fifty.snook.ca&quot;&gt;Fifty&lt;/a&gt; site. Now, I find myself also using it for smaller elements. The article meta is a great example of this.&lt;/p&gt;
         &lt;p&gt;&lt;img src=&quot;https://img.snook.ca/article-meta.webp&quot; alt=&quot;The article meta showing section title and article date&quot;&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;.meta {
-        display: grid;
-        justify-items: center;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;.meta&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; grid&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;justify-items&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; center&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Boom. All the items are center aligned and stacked. I probably would&apos;ve defaulted to trying to use &lt;code&gt;display: flex&lt;/code&gt; here but that would&apos;ve required an extra declaration to adjust the &lt;code&gt;flex-direction&lt;/code&gt; to column. (And using &lt;code&gt;align-items&lt;/code&gt; instead of &lt;code&gt;justify-items&lt;/code&gt;.)&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;.meta-before:before {
-        content: &amp;quot;&amp;quot;;
-        display:block;
-        width:50px;
-        padding-bottom: 5px;
-        border-top: 2px solid var(--green);
-        }
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;.meta-before:before&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;block&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;50px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;padding-bottom&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 5px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;border-top&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; 2px solid &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--green&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;The horizontal line is a pseudo-element that gets added into the grid stack before everything else. That border declaration leads me to the next thing.&lt;/p&gt;
         &lt;h2&gt;CSS Custom Properties&lt;/h2&gt;
         &lt;p&gt;The CSS isn’t large or anything but it was nice to use custom properties for easy colour management. I declared them on the root element. I could’ve probably just declared this on the &lt;code&gt;html&lt;/code&gt; element itself just as easily.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;:root {
-        --yellow: #FFCA00;
-        --green: #668800;
-        --white: #EFEFE6;
-        --black: #3C3C3C;
-        color-scheme: light dark;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;:root&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--yellow&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; #FFCA00&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--green&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; #668800&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--white&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; #EFEFE6&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;--black&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; #3C3C3C&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;color-scheme&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; light dark&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Again, I didn’t need multiple levels of abstraction. I just wanted something that made it easier to remember these hex codes and spit them out where I need them.&lt;/p&gt;
         &lt;h2&gt;Dark Mode&lt;/h2&gt;
         &lt;p&gt;That last line in the previous example declares that my design supports light and dark mode and lets me use the &lt;code&gt;light-dark&lt;/code&gt; function to easily declare colour options like this declaration for the body text.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;color: light-dark(var(--black), var(--white));
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;light-dark&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--black&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--white&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;h2&gt;Link Underlines&lt;/h2&gt;
         &lt;p&gt;I’ve always just either toggled underlines on hover or toggled text colour. I don’t know when all the &lt;code&gt;text-decoration&lt;/code&gt; options were added but I liked being able to do so.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;a { 
-        color: currentcolor; 
-        text-decoration-thickness:2px; 
-        text-decoration-color: var(--green); 
-        }
-        a:hover { text-decoration-color: var(--yellow); }
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token selector&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; 
+        &lt;span class=&quot;token property&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; currentcolor&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; 
+        &lt;span class=&quot;token property&quot;&gt;text-decoration-thickness&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;2px&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; 
+        &lt;span class=&quot;token property&quot;&gt;text-decoration-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--green&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; 
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;token selector&quot;&gt;a:hover&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;token property&quot;&gt;text-decoration-color&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;--yellow&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;I was able to adjust the thickness and then change the colour on hover. I haven’t used the ol’ LVHA format in years but I might come back to it to give more useful visual clues for visited and active links.&lt;/p&gt;
         &lt;p&gt;The link colour just picks up whatever the &lt;code&gt;light-dark&lt;/code&gt; colour is currently set.&lt;/p&gt;
         &lt;h2&gt;CSS has come a long way&lt;/h2&gt;
@@ -77,7 +102,7 @@
       <title>Font Choices</title>
       <link>https://snook.ca/everything/font-choices/</link>
       <guid>https://snook.ca/everything/font-choices/</guid>
-      <pubDate>Sat, 18 Jul 2026 16:00:37 GMT</pubDate>
+      <pubDate>Sun, 19 Jul 2026 15:59:59 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A week ago, I had launched this site using QuatroSlab for page titles and Google’s Slabo for body copy. For those that have been around awhile and are familiar with SMACSS, you might recognize QuatroSlab from that site. I like the font and started off with it to see how I’d feel about it on the this new design. Then I chose Slabo as a font that I felt paired well with it.&lt;/p&gt;
         &lt;p&gt;For the most part, I was fine with it but after finally getting a blog post written and posted under the new design, I was feeling less than thrilled with my choices.&lt;/p&gt;
@@ -89,11 +114,9 @@
         &lt;h2&gt;The CSS&lt;/h2&gt;
         &lt;p&gt;From a technical perspective, this is the first time I’ve taken advantage of OpenType feature capabilities and I found it confusing as I couldn’t find a good explanation of what &lt;code&gt;liga&lt;/code&gt; or &lt;code&gt;dlig&lt;/code&gt; or &lt;code&gt;ss03&lt;/code&gt; mean or how to know whether a font even supports these.&lt;/p&gt;
         &lt;p&gt;I’ve learned that you can turn these on or off via CSS’s &lt;code&gt;font-feature-settings&lt;/code&gt; property.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;font-feature-settings: &amp;quot;ss02&amp;quot;, &amp;quot;ss03&amp;quot;, &amp;quot;ss04&amp;quot;, &amp;quot;dlig&amp;quot;, &amp;quot;zero&amp;quot;, &amp;quot;onum&amp;quot;;
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;font-feature-settings&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss02&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss03&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss04&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;dlig&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;zero&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;onum&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Declaring the value turns them on. You can alternatively, specifically declare them on or off using the words on or off or the numbers 1 or 0. The following would enable features ss02, ss03, zero, and onum; it would disable ss04 and dlig.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;font-feature-settings: &amp;quot;ss02&amp;quot; on, &amp;quot;ss03&amp;quot; 1, &amp;quot;ss04&amp;quot; off, &amp;quot;dlig&amp;quot; 0, &amp;quot;zero&amp;quot;, &amp;quot;onum&amp;quot;;
-        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-css&quot;&gt;&lt;code class=&quot;language-css&quot;&gt;&lt;span class=&quot;token property&quot;&gt;font-feature-settings&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss02&quot;&lt;/span&gt; on&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss03&quot;&lt;/span&gt; 1&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;ss04&quot;&lt;/span&gt; off&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;dlig&quot;&lt;/span&gt; 0&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;zero&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;onum&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;The question then became about how to figure out which of these features exist in a particular font. For this, I used &lt;a href=&quot;https://fontdrop.info&quot;&gt;FontDrop!&lt;/a&gt;. It will show you what features are available and what those features look like for that font. FontDrop! is all client-side, too, which is nice. I didn’t want to be uploading files that aren’t mine to someone’s server.&lt;/p&gt;
         &lt;h2&gt;Up Next&lt;/h2&gt;
         &lt;p&gt;I suspect I will end up tweaking which of these features are on or off as I add more content to the site and decide what works well for a given scenario.&lt;/p&gt;
@@ -105,7 +128,7 @@
       <title>The End and The Beginning</title>
       <link>https://snook.ca/everything/the-end/</link>
       <guid>https://snook.ca/everything/the-end/</guid>
-      <pubDate>Sat, 18 Jul 2026 16:00:37 GMT</pubDate>
+      <pubDate>Sun, 19 Jul 2026 15:59:59 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Welcome to the beginning. The end happened months ago but like many endings, sometimes they take awhile.&lt;/p&gt;
         &lt;h2&gt;The End&lt;/h2&gt;
