@@ -4,12 +4,198 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Mon, 20 Jul 2026 17:12:40 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jul 2026 16:44:27 GMT</lastBuildDate>
+    <item>
+      <title>Copying HTML Tables as Text, Markdown, and CSV</title>
+      <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
+      <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
+        &lt;p&gt;First, I added a table of course:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;table id=&amp;quot;table1&amp;quot;&amp;gt;
+        &amp;lt;thead&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;DOB&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Gender&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;Breed&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Whiskers&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2019-03-14&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Male&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Maine Coon&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Luna&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2020-07-22&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Siamese&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;!-- bunch more rows --&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Nala&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2022-04-18&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Persian&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Molly&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2022-01-11&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;LaPerm&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;				
+        &amp;lt;/tbody&amp;gt;
+        &amp;lt;/table&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Alright, so to enable this feature, I thought data attributes might be nice. This would let you use it on anything, a button, a link, image, etc. The data attribute would be responsible for pointing to the table (via an id) and specifying a format. Here&apos;s an example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- data-copy defaults to text --&amp;gt;
+        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot;&amp;gt;Copy as Text&amp;lt;/a&amp;gt; ~ 
+        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot; data-copy=&amp;quot;md&amp;quot;&amp;gt;Copy as Markdown&amp;lt;/a&amp;gt; ~
+        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot; data-copy=&amp;quot;csv&amp;quot;&amp;gt;Copy as CSV&amp;lt;/a&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now all I need to do is wire it up to code that looks for &lt;code&gt;data-table&lt;/code&gt; and adds the appropriate handlers. The first part is trivial:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const links = document.querySelectorAll(&apos;*[data-table]&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note that while I named the variable &lt;code&gt;links&lt;/code&gt;, you can still use this with buttons or images.&lt;/p&gt;
+        &lt;p&gt;I loop over each match and first get the table referenced, throwing an error in console if it doesn&apos;t exist:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;links.forEach(l =&amp;gt; {
+        let table = document.querySelector(`#${l.dataset.table}`);
+        if(!table) {
+        console.error(`Unable to connect to table with id ${l.dataset.table}`);
+        return;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Next, I check the type, defaulting to text:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let type = l.dataset.copy || &apos;text&apos;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The final bit is to assign the click handler:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;l.addEventListener(&apos;click&apos;, async e =&amp;gt; {
+        e.preventDefault();
+        console.log(`about to copy table ${table.id} to ${type}`);
+        let data = getRawData(table);
+        let formattedData = formatData(data, type);
+        await navigator.clipboard.writeText(formattedData);
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For each, I get the raw data from the HTML table, convert it to the right format, and then write to the clipboard. (Check out my &lt;a href=&quot;https://master.dev/blog/writing-to-the-clipboard-in-javascript/&quot;&gt;article&lt;/a&gt; on working with the clipboard in JavaScript.)&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;getRawData&lt;/code&gt; just iterates through the table&apos;s DOM creating a 2D array:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getRawData = t =&amp;gt; {
+        let data = [];
+        t.querySelectorAll(&apos;tr&apos;).forEach(r =&amp;gt; {
+        let row = [];
+        r.querySelectorAll(&apos;th, td&apos;).forEach(d =&amp;gt; {
+        row.push(d.innerText);
+        });
+        data.push(row);
+        });
+        return data;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;code&gt;formatData&lt;/code&gt; is a bit more complex and I used AI to help me with each of the main sections. I added support for plain text, Markdown, and CSV:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const formatData = (data,type) =&amp;gt; {
+        let numCols, colWidths, lines, buildRow, buildDivider;
+        
+        switch(type) {
+        case &amp;quot;text&amp;quot;: 
+        
+        numCols = Math.max(...data.map(r =&amp;gt; r.length));
+        // Compute max width for each column
+        colWidths = Array(numCols).fill(0);
+        for (const row of data) {
+        for (let i = 0; i &amp;lt; numCols; i++) {
+        const cell = row[i] !== undefined ? String(row[i]) : &apos;&apos;;
+        colWidths[i] = Math.max(colWidths[i], cell.length);
+        }
+        }
+        
+        buildDivider = () =&amp;gt;
+        &apos;+&apos; + colWidths.map(w =&amp;gt; &apos;-&apos;.repeat(w + 2)).join(&apos;+&apos;) + &apos;+&apos;;
+        
+        buildRow = (row) =&amp;gt;
+        &apos;|&apos; + colWidths.map((w, i) =&amp;gt; {
+        const cell = row[i] !== undefined ? String(row[i]) : &apos;&apos;;
+        return &apos; &apos; + cell.padEnd(w) + &apos; &apos;;
+        }).join(&apos;|&apos;) + &apos;|&apos;;
+        
+        lines = [];
+        lines.push(buildDivider());
+        lines.push(buildRow(data[0])); // treat first row as header
+        lines.push(buildDivider());
+        for (let i = 1; i &amp;lt; data.length; i++) {
+        lines.push(buildRow(data[i]));
+        }
+        lines.push(buildDivider());
+        
+        return lines.join(&apos;\n&apos;);
+        
+        case &amp;quot;md&amp;quot;:
+        case &amp;quot;markdown&amp;quot;: 
+        numCols = Math.max(...data.map(r =&amp;gt; r.length));
+        
+        buildRow = (row) =&amp;gt;
+        &apos;| &apos; + Array.from({ length: numCols }, (_, i) =&amp;gt;
+        row[i] !== undefined ? String(row[i]) : &apos;&apos;
+        ).join(&apos; | &apos;) + &apos; |&apos;;
+        
+        lines = [];
+        lines.push(buildRow(data[0])); // header
+        lines.push(&apos;| &apos; + Array(numCols).fill(&apos;---&apos;).join(&apos; | &apos;) + &apos; |&apos;);
+        for (let i = 1; i &amp;lt; data.length; i++) {
+        lines.push(buildRow(data[i]));
+        }
+        
+        return lines.join(&apos;\n&apos;);
+        
+        case &amp;quot;csv&amp;quot;: 
+        const escapeCell = (value) =&amp;gt; {
+        const str = value !== undefined &amp;amp;&amp;amp; value !== null ? String(value) : &apos;&apos;;
+        // Quote if it contains comma, quote, or newline
+        if (/[&amp;quot;,\n\r]/.test(str)) {
+        return &apos;&amp;quot;&apos; + str.replace(/&amp;quot;/g, &apos;&amp;quot;&amp;quot;&apos;) + &apos;&amp;quot;&apos;;
+        }
+        return str;
+        };
+        
+        return data.map(row =&amp;gt; row.map(escapeCell).join(&apos;,&apos;)).join(&apos;\n&apos;);
+        
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;With my test table (and I&apos;m stripping out a bit here for brevity), here&apos;s the plain text version:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;+----------+------------+--------+----------------------+
+        | Name     | DOB        | Gender | Breed                |
+        +----------+------------+--------+----------------------+
+        | Whiskers | 2019-03-14 | Male   | Maine Coon           |
+        | Luna     | 2020-07-22 | Female | Siamese              |
+        | Oliver   | 2018-11-05 | Male   | British Shorthair    |
+        | Max      | 2019-06-25 | Male   | Sphynx               |
+        | Stella   | 2021-05-04 | Female | American Curl        |
+        | Rocky    | 2018-09-20 | Male   | Burmese              |
+        | Molly    | 2022-01-11 | Female | LaPerm               |
+        +----------+------------+--------+----------------------+
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s the Markdown:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;| Name | DOB | Gender | Breed |
+        | --- | --- | --- | --- |
+        | Whiskers | 2019-03-14 | Male | Maine Coon |
+        | Luna | 2020-07-22 | Female | Siamese |
+        | Oliver | 2018-11-05 | Male | British Shorthair |
+        | Max | 2019-06-25 | Male | Sphynx |
+        | Stella | 2021-05-04 | Female | American Curl |
+        | Rocky | 2018-09-20 | Male | Burmese |
+        | Molly | 2022-01-11 | Female | LaPerm |
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And here&apos;s CSV:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Name,DOB,Gender,Breed
+        Whiskers,2019-03-14,Male,Maine Coon
+        Luna,2020-07-22,Female,Siamese
+        Oliver,2018-11-05,Male,British Shorthair
+        Max,2019-06-25,Male,Sphynx
+        Stella,2021-05-04,Female,American Curl
+        Rocky,2018-09-20,Male,Burmese
+        Molly,2022-01-11,Female,LaPerm
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I wrapped this all up in a function that you could add to your page. After adding it, don&apos;t forget to actually add the links/button/etc to enable it.&lt;/p&gt;
+        &lt;p&gt;There&apos;s two issues with my code that come to mind, and I&apos;d love people to comment in with their ideas. First, both the text and Markdown assume the first row is a header. In theory that might not always be accurate. I could update the code to see if the first cell in the first row is &lt;code&gt;th&lt;/code&gt; versus &lt;code&gt;td&lt;/code&gt;, but that kinda feels like overkill.&lt;/p&gt;
+        &lt;p&gt;The second issue that comes to mind is user feedback. Usually these types of things will provide some kind of visual feedback (&amp;quot;Data copied!&amp;quot;). My code does not. I honestly don&apos;t quite know how I&apos;d do that. Perhaps a data attribute that would replace the text (assuming it&apos;s a link or button) temporarily? I&apos;m not sure.&lt;/p&gt;
+        &lt;p&gt;If you&apos;ve got ideas, leave me a comment below. Here&apos;s the demo:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-pen-title=&quot;Copy Table As (2)&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;xbgJOyP&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f80d2-42ea-7545-83bb-8f112023abce&quot;&gt;
+        Copy Table As (2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (7/18/26)</title>
       <link>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</link>
       <guid>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs. I&apos;m currently at a conference (&lt;a href=&quot;https://www.sqlsatbr.com/&quot;&gt;Day of Data&lt;/a&gt;), but thankfully one just down the road. I&apos;ll be back tonight, and thought I&apos;d take a break between sessions to share some links. I&apos;ll be presenting later today one of my favorite talks, &amp;quot;A Beginner&apos;s Guide to Wrangling Asynchronicity in JavaScript&amp;quot;. I love the talk, but given I&apos;m up against &lt;em&gt;eight&lt;/em&gt; other talks at the same time and I&apos;m not talking AI... well it may be a small personal affair. We shall see.&lt;/p&gt;
         &lt;h2 id=&quot;building-a-blog-with-astro&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-blog-with-astro&quot;&gt;Building a Blog with Astro&lt;/a&gt;&lt;/h2&gt;
@@ -34,7 +220,7 @@
       <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
       <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
       <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
         &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
@@ -211,7 +397,7 @@
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -468,7 +654,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -795,7 +981,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -809,7 +995,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -848,7 +1034,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -1022,7 +1208,7 @@
       <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
       <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
       <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
         &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
@@ -1138,7 +1324,7 @@
       <title>Decoding VINs with an API</title>
       <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
       <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
+      <pubDate>Tue, 21 Jul 2026 16:28:19 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
         &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
@@ -1388,180 +1574,6 @@
         &lt;/p&gt;
         &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@elisasch?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Elisa Schmidt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/cat-on-a-car-during-daytime-C2c4G3by4ZE?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Parsing Arbitrary Dates in Strings with Chrono and a Web Component</title>
-      <link>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</link>
-      <guid>https://www.raymondcamden.com/2026/06/24/parsing-arbitrary-dates-in-strings-with-chrono-and-a-web-component</guid>
-      <pubDate>Mon, 20 Jul 2026 16:29:37 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Yesterday I had an idea for a possible experiment using Chrome&apos;s built-in AI support - looking for &amp;quot;date&amp;quot; references in strings. So for example: &amp;quot;I will have my new job in 12 days&amp;quot;. Could the AI model recognize &amp;quot;12 days&amp;quot; as a date and determine what the actual date is, assuming a reference date of now? I was about to start working on a simple POC when I thought... wait... is there already a JavaScript library for this?&lt;/p&gt;
-        &lt;p&gt;Of course there is.&lt;/p&gt;
-        &lt;p&gt;The aptly named &lt;a href=&quot;https://github.com/wanasit/chrono&quot;&gt;Chrono&lt;/a&gt; library does just that. It can parse a string with one assumed date and return the date, so for example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
-        
-        chrono.parseDate(&apos;An appointment on Sep 12-13&apos;); 
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This returns: &lt;code&gt;Sat Sep 12 2026 12:00:00 GMT-0500 (Central Daylight Time)&lt;/code&gt;. It can also take a string and give you a parsed set of results, so for example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;chrono.parse(&apos;An appointment on Sep 12-13&apos;);
-        /* [{ 
-        index: 18,
-        text: &apos;Sep 12-13&apos;,
-        start: ...
-        }] */
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; method will return one result per matched item, with the result including the original string, lots of info on how it parsed it, and the ability to get the proper date object from it. It can also handle durations and a reference date too, so if your input was, &amp;quot;I will eat sushi tomorrow&amp;quot; and the reference was January 2nd, 2026, it would recognize that tomorrow is January 3rd, 2026.&lt;/p&gt;
-        &lt;p&gt;So, how about a demo? I created a quick CodePen that has a textarea for arbitrary input. You can type anything, and when it finds stuff, it dumps it out below and then follows up that dump with parsed dates. I&apos;ll skip over the HTML (you can see it in the embedded CodePen), but here&apos;s the JavaScript:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
-        
-        const $input = document.querySelector(&apos;#input&apos;);
-        const $output = document.querySelector(&apos;#output&apos;);
-        
-        $input.addEventListener(&apos;input&apos;, () =&amp;gt; {
-        const input = $input.value.trim();
-        $output.innerText = &apos;&apos;;
-        if(input === &apos;&apos;) return;
-        /*
-        temp test to set a reference:
-        let yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        let parsed = chrono.parse(input, yesterday);
-        */
-        let parsed = chrono.parse(input);
-        
-        if(parsed.length) {
-        $output.innerText = JSON.stringify(parsed, null, &apos;\t&apos;) + &apos;\n&apos;;
-        
-        for(const p of parsed) {
-        console.log(p.start.date());
-        $output.innerText += `Parsed date: ${p.start.date()} `;
-        if(p.end) $output.innerText += ` - ${p.end.date()}`;
-        $output.innerText += &apos;\n&apos;;
-        }
-        }
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Basically import the library, note changes in the textarea, and parse. If results are found I do the simple dump as I mentioned. One small oddity with the library is that the initial result does &lt;em&gt;not&lt;/em&gt; actually include the date. You have to run &lt;code&gt;.date()&lt;/code&gt; on the &lt;code&gt;start&lt;/code&gt; and (optional) &lt;code&gt;end&lt;/code&gt; values to get that. Hence that for loop. You can also see, commented out, how easy it is to use a reference date.&lt;/p&gt;
-        &lt;p&gt;Go ahead and test it below.&lt;/p&gt;
-        &lt;p&gt;I will say I found the &apos;duration&apos; support didn&apos;t work terribly well. By that I mean it would find the date reference, but not always the &apos;end&apos;. The sample input, &amp;quot;I have an appointment tomorrow from 10 to 11 AM&amp;quot;, worked fine, but in my tests it was hit or miss. Again though, it got the start every time so that&apos;s something.&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;500&quot; data-pen-title=&quot;chrono test&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;WbROxQm&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9de-fbbf-778f-9e68-7a9a0d44ecc6&quot;&gt;
-        chrono test&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;h2 id=&quot;turning-it-into-a-web-component&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#turning-it-into-a-web-component&quot;&gt;Turning it into a Web Component&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;At this point, I thought it might be cool to build a web component that would:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Use Chrono to find the date strings&lt;/li&gt;
-        &lt;li&gt;Wrap each matched item with a &lt;code&gt;&amp;lt;time&amp;gt;&lt;/code&gt; element, setting &lt;code&gt;datetime&lt;/code&gt; and &lt;code&gt;title&lt;/code&gt; to the parsed date&lt;/li&gt;
-        &lt;li&gt;Use a bit of CSS to highlight the text&lt;/li&gt;
-        &lt;li&gt;Allow for an attribute that lets you specify the date. In my mind, the main use for this is UGC (user generated content), things like comments for example. Comments are made at a point in time which means it should be easy to pass that to the component.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;I named my component &lt;code&gt;time-parse&lt;/code&gt; because I&apos;m incredibly creative. Here&apos;s an example of it in play, both with and without a reference date:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div&amp;gt;
-        &amp;lt;time-parse&amp;gt;
-        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
-        &amp;lt;/time-parse&amp;gt;
-        &amp;lt;/div&amp;gt;
-        
-        &amp;lt;div&amp;gt;
-        &amp;lt;time-parse date=&amp;quot;2026-06-04&amp;quot;&amp;gt;
-        This is an example in the past. I set the date to June 4th. 
-        I&apos;ll be eating tomorrow. Or maybe in 3 hours? I&apos;m not sure.
-        &amp;lt;/time-parse&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the code I used. I&apos;ll talk a bit about my design decisions after:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import * as chrono from &apos;chrono-node&apos;;
-        
-        class TimeParseComponent extends HTMLElement {
-        
-        constructor() {
-        super();
-        }
-        
-        connectedCallback() {
-        
-        // doing an inline style so i dont have to worry about specifying it just for the WC. This feels wrong a bit...
-        const STYLE = &apos;text-decoration: underline;text-decoration-color: #ccc;&apos;;
-        
-        let dateRef = null;
-        
-        // look for date attribute
-        if(this.hasAttribute(&amp;quot;date&amp;quot;)) {
-        console.log(&apos;Date found, using as ref&apos;);
-        dateRef = this.#parseLocalDate(this.getAttribute(&amp;quot;date&amp;quot;));
-        console.log(&apos;dateRef is &apos;, dateRef);
-        }
-        
-        let input = this.innerHTML;
-        const parsed = chrono.parse(input, dateRef);
-        if(!parsed || !parsed.length) return;
-        console.log(`Found ${parsed.length} items to update`);
-        /*
-        For each, find the initial string, and wrap it with:
-        &amp;lt;time datetime=PARSEDTIME title=PARSEDTIME&amp;gt;orig&amp;lt;/time&amp;gt;
-        
-        Go backwards as we are changing the string
-        */
-        for(let x=parsed.length-1; x &amp;gt;= 0; x--) {
-        console.log(parsed[x]);
-        // first get the date, currently not supporting end
-        let date = this.#formatDateTime(parsed[x].start.date());
-        let orig = input.substring(parsed[x].index, parsed[x].index + parsed[x].text.length);
-        // now make the new string
-        let newStr = `
-        &amp;lt;time datetime=&amp;quot;${date}&amp;quot; title=&amp;quot;${date}&amp;quot; style=&amp;quot;${STYLE}&amp;quot;&amp;gt;${orig}&amp;lt;/time&amp;gt;
-        `.trim();
-        //console.log(newStr);
-        
-        input = input.slice(0, parsed[x].index) + newStr + input.slice(parsed[x].index + parsed[x].text.length);
-        }
-        
-        // All done - 
-        console.log(&apos;Final Result&apos;, input);
-        this.innerHTML = input;
-        }
-        
-        #formatDateTime(x) {
-        const pad = (n) =&amp;gt; String(n).padStart(2, &apos;0&apos;);
-        
-        return [
-        x.getFullYear(),
-        pad(x.getMonth() + 1),
-        pad(x.getDate()),
-        ].join(&apos;-&apos;) + &apos; &apos; + [
-        pad(x.getHours()),
-        pad(x.getMinutes()),
-        pad(x.getSeconds()),
-        ].join(&apos;:&apos;);
-        }
-        
-        #parseLocalDate(isoDate) {
-        const [y, m, d] = isoDate.split(&apos;-&apos;).map(Number);
-        return new Date(y, m - 1, d); // local midnight on that date
-        }
-        }
-        
-        if(!customElements.get(&apos;time-parse&apos;)) customElements.define(&apos;time-parse&apos;, TimeParseComponent);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Alright, so ignoring the basic web component setup, you can see the basic flow is:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Look to see if a &lt;code&gt;date&lt;/code&gt; attribute was used, if so, that&apos;s our reference date.&lt;/li&gt;
-        &lt;li&gt;Get the text inside the component and parse it.&lt;/li&gt;
-        &lt;li&gt;For each found result, looping backwards, replace the match with new HTML that uses the &lt;code&gt;time&lt;/code&gt; tag.&lt;/li&gt;
-        &lt;li&gt;Finally, update the inner HTML inside the component.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Up top you&apos;ll notice a &lt;code&gt;STYLE&lt;/code&gt; variable. I went with an inline style for... I don&apos;t know. I just didn&apos;t want to think about the shadow DOM and so forth. I figure with something so small it&apos;s ok. Feel free to fork the pen. ;)&lt;/p&gt;
-        &lt;p&gt;You can try it out below. Also, once again, I love web components.&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;time-parse demo&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;pvRwbwv&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019ef9fa-d6e2-7d49-a140-43a457c7d347&quot;&gt;
-        time-parse demo&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
