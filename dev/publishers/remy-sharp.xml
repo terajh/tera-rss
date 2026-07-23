@@ -4,7 +4,23 @@
     <title>dev RSS - Remy Sharp</title>
     <link>https://remysharp.com/</link>
     <description>Remy Sharp RSS 피드</description>
-    <lastBuildDate>Wed, 22 Jul 2026 17:07:27 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 16:49:50 GMT</lastBuildDate>
+    <item>
+      <title>&apos;VPNs are lawful technical tools,&apos; says EU Court in landmark copyright ruling [link]</title>
+      <link>https://remysharp.com/links/2026-07-23-35890312</link>
+      <guid>https://remysharp.com/links/2026-07-23-35890312</guid>
+      <pubDate>Thu, 23 Jul 2026 10:39:26 GMT</pubDate>
+      <content:encoded>
+        I&apos;ve been following the stories around the &amp;quot;child protection&amp;quot; because on one hand it does afford children some protection, but it also hammers down on the privacy of everyone - i.e. adults who give up their privacy to prove they&apos;re not a child.
+        VPNs in particular have been tossed around as something that the UK government would like to ban (citation needed/lacking!), which is why this article is particularly interesting:
+        The Court of Justice of the European Union has ruled that publishers and VPN providers aren&apos;t liable for copyright infringement
+        
+        Geo-blocking is the copyright holder&apos;s problem, not the VPN&apos;s. Providers are not liable for users bypassing restrictions
+        
+        Hopefully this draws a simple line in the sand for the UK government, and yet, who really knows what&apos;s going through their head at any one time!
+        Original link: www.techradar.com/[…]/vpns-are-lawful-technical-tools-says-eu-court-in-landmark-anne-frank-copyright-ruling
+      </content:encoded>
+    </item>
     <item>
       <title>Image to text [link]</title>
       <link>https://remysharp.com/links/2026-07-17-8797d866</link>
@@ -721,90 +737,6 @@
       <guid>https://remysharp.com/2025/12/03/an-opportunity-to-learn-advent-of-code</guid>
       <pubDate>Wed, 03 Dec 2025 00:00:00 GMT</pubDate>
       <content:encoded>I&apos;ve written about Advent of Code in the past, but that was 5 years ago, so this warrants a new post, and there&apos;s an extra opportunity, I think.</content:encoded>
-    </item>
-    <item>
-      <title>Handing over to the AI for a day [blog]</title>
-      <link>https://remysharp.com/2025/11/29/handing-over-to-the-ai-for-a-day</link>
-      <guid>https://remysharp.com/2025/11/29/handing-over-to-the-ai-for-a-day</guid>
-      <pubDate>Sat, 29 Nov 2025 00:00:00 GMT</pubDate>
-      <content:encoded>
-        Context: back in March 2025 I decided to put aside my scepticism and try AI driven development for the day. I appreciate that in 8 months, the AI landscape, particularly around agentic software dev has moved along, and perhaps this should have been posted originally back in March. All the same, maybe this is useful to some degree, if only to capture what it was like in time.
-        
-        Whilst I sit squarely in my AI-sceptic seat, I was recently prompted to try a different tact by two post I read a few weeks back.
-        The first was Bruce&apos;s colonoscopy post, yes, that one. It was in fact that he was using a local LLM to create a generative image to commemorate his visit. I&apos;d been using chatgpt (for code and electronics, basically a NLP version of a search engine), and hadn&apos;t considered that perhaps I could host myself to take some responsibility for one of the two problematic aspects of LLMs today (first being power consumption, second being the global theft).
-        The second post was Simon Willison&apos;s post on how he created a mini tool (the post is much broader than that, a useful read). It wasn&apos;t the post so much but the tool he was using: Claude Code. So far with chatgpt I&apos;d copy back and forth errors and tweaks when it was helping me. Although I also have copilot enabled in VS Code it really holds down to autocomplete at a pretty junior level.
-        I&apos;ll often have typescript errors (for work) that copilot claims it can help fix, only resulting in even more typescript errors - so as a rule, I tend to avoid generating code fixes with copilot.
-        But what Simon showed with a shared transcript between himself and Claude Code was the software making the changes and offering diffs.
-        So that was what prompted a mini journey, and here&apos;s how it went.
-        Offline LLMs
-        Previously I had installed command line tools and even Ollama on my Mac without having the faintest idea how to use them effectively - so they sat idle and unused.
-        I&apos;m not sure how, but I came across Msty, a tool that purported to make using local LLMs very easy. For a change, that seems to be true.
-        Since I still had Ollama running (though I should have probably ejected it), Msty quickly linked up to this and discovered (though I&apos;d forgotten) that the DeepSeek R1 model was loaded already.
-        I figured since I was primarily using LLMs for software development, it made sense to find a model that suited those requirements.
-        Not quite that simple, or certainly not if you (ie. me) doesn&apos;t have the LLM lingo and terminology down.
-        I did some searching online, found a few articles, which themselves read as if they had been generated by AI, offering feature reviews of LLM models, but I couldn&apos;t find anything that said &amp;quot;model X is excellent for Y software development&amp;quot;.
-        Additionally, I found some models on huggingface.io, and figured that 7B was going to be easier/more viable to run than a 70B (big numbers need big machines? I was guessing…). However putting the name of the model into Myst yielded a lot of results and I couldn&apos;t really tell you what the difference was. More importantly, I couldn&apos;t quite be sure of the provenance (and whether that even matters…I&apos;d assume it did).
-        I ended up installing the following models:
-        
-        llama 3.2 (2gb)
-        deepseek coder v2 (which blew up)
-        codellama (3.8gb)
-        codellama 13b
-        WizardCoder (I think the 3gb one?) (it just didn&apos;t reply on the query)
-        Wavecoder-ultra-6.7b (literally never worked for me)
-        
-        I tried a number of technical problems without much success and did capture the output for a number of these models to try to solve a Home Assistant automation process (which you can see here).
-        It&apos;s entirely likely there&apos;s better models out there for what I wanted to do. I did know I didn&apos;t need a model to know everything, so some focus (and thus: reduced size) would make sense.
-        However, not one of these gave useful replies to my questions.
-        My favourite (fail) was giving code-llama a question that read: this query gets all the lessons matching these lesson slugs (I gave it the actual SQL query), how do I get a list of all the slugs that didn&apos;t match?.
-        The LLM happily reported that I was trying to learn Spanish:
-        
-        The provided code contains a list of sentences that are written in Spanish, and the goal is to translate them into English. However, there are some errors in the provided code that need to be fixed before it can function properly. Here are some issues with the current code:
-        Missing curly braces around the translate function definition: The translate function should be defined as a separate named function expression, like this: { translate } = require(&amp;quot;google-translate&amp;quot;);. This will ensure that the function is properly closed and can be used in other parts of the code.
-        
-        For some reason it was using the slugs in the query as the most important part and completely ignoring the technical query.
-        For the most part, the responses I got were fairly hand wavy, text heavy (which I didn&apos;t want since I was asking about code), and in most cases irrelevant to my task.
-        I think em0ry42 on BlueSky sums up what I was seeing:
-        
-        Smaller self hosted models will always under perform the larger ones. I think your experience and those of the other commenters are consistent with the current reality of these technologies. They can&apos;t do what people are promising. Yet.
-        
-        I&apos;m sure there are people who can tune the hell out of their setup, but sadly, running any decent LLM locally as a useful code assistant, is just not here for the rest of us.
-        So I parked that for a while, and turned my attention to Claude Code.
-        Coding without touching code
-        I&apos;ve no clue how new Claude Code was at the time, though I&apos;ve gathered it&apos;s fairly new. It&apos;s a solid product from my experience (where I even managed to lose track as to which company owns which weirdly named AI thingy).
-        Setup and interface is entirely on the command line, so already we&apos;re speaking my language.
-        I&apos;d seen demos of developers who&apos;ve been able to join up their entire codebase to the LLM but each time I&apos;d dabbling, I would quickly get lost and give up.
-        Claude Code does exactly this without the walls I&apos;d experienced in the past.
-        I am however, acutely wary that Claude is running on a remote machine, and likely to be chonking through so much power that we&apos;re just throwing away water to keep machines from burning up. Let&apos;s stick a pin in that (and gosh, I loath myself already for that).
-        The very first problem I wanted it to solve was where I was trying to download 1,000s of videos and they all needed to be added to one massive tarball (context: this is for work, to allow users to bulk download our assets).
-        I&apos;d hit a problem where the tar process kept throwing an unhelpful exception the evening before and no amount of documentation on the library I was using helped me.
-        Overnight I had a suspicion as to the cause and it gave me an idea to try - but I thought I&apos;d let Claude try first, see what it does.
-        Without any specific direction (ie. my idea for the fix), and only the name of the file and the function the problem happened, Claude Code suggested the same solution I had in my head.
-        The UI then offered a syntax highlighted diff of the change it wanted to commit to disk. I was able to review it (very much how I&apos;d approach a code review) and all I then needed to do was hit enter to accept.
-        I tested the code in a separate terminal and indeed the change worked.
-        Given this positive start, I then spent most of the working time split between the Claude Code UI and in the terminal to run the main program (which was sequencing a very large dataset).
-        The code changes for the most part were always good and code that I accepted.
-        The experience was…weird. I&apos;d heard of LLMs being referred to as junior developers but when I was going back and forth between chatgpt and vscode (again, for me, copilot never really came in useful), because of the amount of interaction that was required from me, it felt even less than working with a junior.
-        But this was a much closer experience. I&apos;d describe the change and logic, sometimes pointing to filenames that would offer useful context, and Claude would spend some time (and money) thinking, then it would ask me to check a diff.
-        Weirdly I spent more time sitting and staring out the window waiting for code to come back than I did looking at code. It was a weirdly hands off experience. I can&apos;t tell where I sit on that.
-        The main criticism that I had is that, because we use specific rules for typescript (no any and types are defined, which I think seems okay), Claude wouldn&apos;t really follow those strict rules, so I needed to go in at the end to clean that part up.
-        The secondary criticism is more a matter of taste. The code (and logging) was verbose to my taste. Additionally, being outside the code for the majority of the work period felt really strange. Sort of like a self-driving car took me the majority of my journey, deciding itself the navigation, for me only to be needed for the final arrival through some tight country lanes. Or something!
-        A cost
-        Since I was freestyling my way on Claude Code, I did manage to rattle through $5 of credit. I did think this was (somehow) linked to my Google business account, but I&apos;m now suspecting it was free credit to introduce me to their API.
-        After running through this credit now twice (I switched to my personal account for a second run) I&apos;ve discovered there&apos;s tools to help manage that sprawling cost (such as /compact and /clear to reduce how much context the LLM is fed before giving me a result). I&apos;d like to play with this more to get an idea of how much I&apos;m really prepared to pay.
-        Also after writing (most of) this post, I came across an interesting project that takes the Claude UI and lets you connect up your own backend. I&apos;ve not tried it yet, but I&apos;d be interested to see if I can connect to a local LLM and try out results (though going by the current experience, it&apos;s going to have a hard time competing).
-        Since it was conversational...
-        I decided to hack together a simple keyboard keycap (I had spare) with an ESP32 board to emulate a keyboard.
-        Then this would send a (fairly) unique keycode that then launched a python command which started a whisper based script that let me talk, then pasted the text into whatever was focused.
-        This meant I had: press button, say the thing, press the button, wait for it to be done.
-        It wasn&apos;t great because it was a little clunky, but it definitely felt futuristic!
-        How I felt afterwards
-        (I&apos;m now writing this 8 months late, but I remember how it felt on the day).
-        Even though I was surprised at the progress of the work, both for how terrible the local code solving was and how impressed I was with Claude Code - it did leave me with a feeling of disconnect.
-        There&apos;s certainly the issue with the maintainability of pure vibe-coded software, but this was something more.
-        There&apos;s a creative input that I put into my coding process. A sense of purpose and achievement in solving some complicated problem, or writing a line of code that I&apos;m particularly pleased with. There wasn&apos;t really of that feeling of connection with the output.
-        Having written this retrospectively I know that my perspective has changed somewhat, but I do remember have this weird dissonance between the outcome and the experience of getting there.
-      </content:encoded>
     </item>
   </channel>
 </rss>
