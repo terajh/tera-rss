@@ -4,384 +4,12 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 23 Jul 2026 16:49:45 GMT</lastBuildDate>
-    <item>
-      <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
-      <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
-      <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
-        &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css1.png&quot; loading=&quot;lazy&quot; alt=&quot;Form Sample&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;See the two regular text fields and the cat selection? If I pick one, it visually updates:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css2.png&quot; alt=&quot;Form sample with selected cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;On submitting the form, there will be something representing the selected value, along with any other form field values as well. In theory, the &amp;quot;thing&amp;quot; you select can be any arbitrary block with the selection look and feel being whatever makes sense for your site.&lt;/p&gt;
-        &lt;p&gt;So given this UX, I was curious how I&apos;d build it myself.&lt;/p&gt;
-        &lt;h2 id=&quot;first-thought---web-components&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-thought---web-components&quot;&gt;First thought - Web Components&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Initially, I thought this would be a great use for web components. Web components can participate in forms (see &lt;a href=&quot;https://www.raymondcamden.com/2023/05/24/adding-form-participation-support-to-web-components&quot;&gt;my post&lt;/a&gt; from... wow, three years ago!) so in theory, I could build something like this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot;&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
-        This is area select 1.
-        &amp;lt;/area-select&amp;gt;
-        
-        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
-        This is area select 2.
-        &amp;lt;/area-select&amp;gt;
-        
-        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In the sample code above, &lt;code&gt;area-select&lt;/code&gt; is a web component which will participate in a form by setting the &lt;code&gt;foo&lt;/code&gt; value to whatever is selected, using the string in &lt;code&gt;value&lt;/code&gt; as the value.&lt;/p&gt;
-        &lt;p&gt;I wrote this out and was about to start hacking away at the code. Because of course JavaScript would be needed for this, right?&lt;/p&gt;
-        &lt;h2 id=&quot;sorry-i-doubted-you-css...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#sorry-i-doubted-you-css...&quot;&gt;Sorry I doubted you CSS...&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Before I started writing JavaScript, I thought - let me Google some more and research this because maybe, just maybe, a pure CSS solution would work?&lt;/p&gt;
-        &lt;p&gt;I&apos;m glad I did.&lt;/p&gt;
-        &lt;p&gt;Turns out - it&apos;s actually relatively simple to achieve this with a bit of CSS. First, let&apos;s consider this version of the HTML:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;https://postman-echo.com/post&amp;quot;&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
-        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;Option 1 - Luna&amp;lt;/h3&amp;gt;
-        &amp;lt;img src=&amp;quot;https://placecats.com/200/250&amp;quot;&amp;gt;
-        &amp;lt;/label&amp;gt;
-        
-        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
-        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;Option 2 - Pig&amp;lt;/h3&amp;gt;
-        &amp;lt;img src=&amp;quot;https://placecats.com/300/200&amp;quot;&amp;gt;
-        &amp;lt;/label&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;My two &amp;quot;custom selectable doohickies&amp;quot; are just &lt;code&gt;label&lt;/code&gt; elements with an internal radio button. After the button I&apos;ve got arbitrary HTML.&lt;/p&gt;
-        &lt;p&gt;Now for the CSS:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-        }
-        
-        /* Style the label container itself as the button */
-        .custom-card {
-        display: inline-block;
-        padding: 12px 24px;
-        border: 2px solid #ccc;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        width: 350px;
-        height: 350px;
-        vertical-align: top;
-        }
-        
-        /* Style change when active */
-        .custom-card:has(input[type=&amp;quot;radio&amp;quot;]:checked) {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This does a few things. It completely hides the radio field, styles the label like a &amp;quot;card&amp;quot; element, and defines the &amp;quot;selected&amp;quot; look to add a blue border and background. It also swaps out the text color to white. Because I&apos;m wrapping everything in a label, the entire block is selectable, and a cursor pointer helps make that clear to the user.&lt;/p&gt;
-        &lt;p&gt;In theory... that&apos;s it. I spent a bit of time tweaking the initial CSS I had found and more could be done of course, but this ended up being simpler than I imagined.&lt;/p&gt;
-        &lt;p&gt;You can play with the full demo here: &lt;a href=&quot;https://capital-wood-marlin.codepen.app/&quot;&gt;https://capital-wood-marlin.codepen.app/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;And here&apos;s the full CodePen:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;600&quot; data-pen-title=&quot;Custom Radio&quot; data-version=&quot;2&quot; data-default-tab=&quot;html,result&quot; data-slug-hash=&quot;xbgXbxd&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f1383-8203-7ff3-ab04-5aa9afa75d18&quot;&gt;
-        Custom Radio&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Decoding VINs with an API</title>
-      <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
-      <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
-        &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A VIN is a vehicle identification number. It&apos;s a standard that &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number&quot;&gt;dates back to 1954&lt;/a&gt; and identifies a particular car by manufacturer, make, model, year, and a heck of a lot more. A VIN is 17 characters avoiding the letters O, I, U, and Q to avoid confusion with some numbers.&lt;/p&gt;
-        &lt;p&gt;You can break down a VIN into various &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number#Components&quot;&gt;components&lt;/a&gt; if you want - but would still need to know various lookup values, for example a manufacturer referred to as &lt;code&gt;1FT&lt;/code&gt; maps to Ford Truck.&lt;/p&gt;
-        &lt;h2 id=&quot;decoding-a-vin-via-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#decoding-a-vin-via-api&quot;&gt;Decoding a VIN via API&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As part of the demo that didn&apos;t quite make it, I needed to decode a VIN value. I had a commercial service in mind but it had a pretty limited free tier (50 calls). Turns out, the &lt;a href=&quot;https://www.nhtsa.gov/&quot;&gt;National Highway Traffic Safety Administration&lt;/a&gt; actually has a bunch of APIs, multiple of which work with VINs.&lt;/p&gt;
-        &lt;p&gt;The &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/&quot;&gt;Vehicle API&lt;/a&gt; is free, with no limits (outside of not being a jerk), and requires no API keys at all.&lt;/p&gt;
-        &lt;p&gt;The one we want is the &lt;code&gt;Decode VIN Extended (flat format)&lt;/code&gt; endpoint. Why &amp;quot;flat format&amp;quot;? The initial API returns information that very much looks like XML translated to JSON, which to be fair, it is, and while the data is all there, it&apos;s a bit ugly. The &lt;code&gt;flat format&lt;/code&gt; makes it look quite a bit nicer.&lt;/p&gt;
-        &lt;p&gt;To use the API, simply include the VIN in the URL and ensure you add &lt;code&gt;?format=json&lt;/code&gt;: &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&quot;&gt;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;This returns:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &amp;quot;Count&amp;quot;: 1,
-        &amp;quot;Message&amp;quot;: &amp;quot;Results returned successfully. NOTE: Any missing decoded values should be interpreted as NHTSA does not have data on the specific variable. Missing value should NOT be interpreted as an indication that a feature or technology is unavailable for a vehicle.&amp;quot;,
-        &amp;quot;SearchCriteria&amp;quot;: &amp;quot;VIN(s): 3VV3B7AXXNM077525&amp;quot;,
-        &amp;quot;Results&amp;quot;: [
-        {
-        &amp;quot;ABS&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;ActiveSafetySysNote&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AdaptiveCruiseControl&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;AdaptiveDrivingBeam&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;AdaptiveHeadlights&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AdditionalErrorText&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AirBagLocCurtain&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
-        &amp;quot;AirBagLocFront&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
-        &amp;quot;AirBagLocKnee&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AirBagLocSeatCushion&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AirBagLocSide&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
-        &amp;quot;AutoReverseSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;AutomaticPedestrianAlertingSound&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;AxleConfiguration&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Axles&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BasePrice&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryA&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryA_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryCells&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryInfo&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryKWh&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryKWh_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryModules&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryPacks&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryV&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BatteryV_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BedLengthIN&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BedType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BlindSpotIntervention&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BlindSpotMon&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;BodyCabType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BodyClass&amp;quot;: &amp;quot;Sport Utility Vehicle [SUV]/Multipurpose Vehicle [MPV]&amp;quot;,
-        &amp;quot;BrakeSystemDesc&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BrakeSystemType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BusFloorConfigType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;BusLength&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;BusType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;CAN_AACN&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;CIB&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;CashForClunkers&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ChargerLevel&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ChargerPowerKW&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;CombinedBrakingSystem&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;CoolingType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;CurbWeightLB&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;CustomMotorcycleType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;DaytimeRunningLight&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;DestinationMarket&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;DisplacementCC&amp;quot;: &amp;quot;2000.0&amp;quot;,
-        &amp;quot;DisplacementCI&amp;quot;: &amp;quot;122.04748818946&amp;quot;,
-        &amp;quot;DisplacementL&amp;quot;: &amp;quot;2.0&amp;quot;,
-        &amp;quot;Doors&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;DriveType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;DriverAssist&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;DynamicBrakeSupport&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;EDR&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ESC&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;EVDriveUnit&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ElectrificationLevel&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EngineConfiguration&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EngineCycles&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EngineCylinders&amp;quot;: &amp;quot;4&amp;quot;,
-        &amp;quot;EngineHP&amp;quot;: &amp;quot;184&amp;quot;,
-        &amp;quot;EngineHP_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EngineKW&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EngineManufacturer&amp;quot;: &amp;quot;Volkswagen&amp;quot;,
-        &amp;quot;EngineModel&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;EntertainmentSystem&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ErrorCode&amp;quot;: &amp;quot;0&amp;quot;,
-        &amp;quot;ErrorText&amp;quot;: &amp;quot;0 - VIN decoded clean. Check Digit (9th position) is correct&amp;quot;,
-        &amp;quot;ForwardCollisionWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;FuelInjectionType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;FuelTankMaterial&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;FuelTankType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;FuelTypePrimary&amp;quot;: &amp;quot;Gasoline&amp;quot;,
-        &amp;quot;FuelTypeSecondary&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;GCWR&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;GCWR_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;GVWR&amp;quot;: &amp;quot;Class 1D: 5,001 - 6,000 lb (2,268 - 2,722 kg)&amp;quot;,
-        &amp;quot;GVWR_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;KeylessIgnition&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;LaneCenteringAssistance&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;LaneDepartureWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;LaneKeepSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;LowerBeamHeadlampLightSource&amp;quot;: &amp;quot;LED&amp;quot;,
-        &amp;quot;Make&amp;quot;: &amp;quot;VOLKSWAGEN&amp;quot;,
-        &amp;quot;MakeID&amp;quot;: &amp;quot;482&amp;quot;,
-        &amp;quot;Manufacturer&amp;quot;: &amp;quot;VOLKSWAGEN DE MEXICO SA DE CV&amp;quot;,
-        &amp;quot;ManufacturerId&amp;quot;: &amp;quot;16478&amp;quot;,
-        &amp;quot;Model&amp;quot;: &amp;quot;Tiguan&amp;quot;,
-        &amp;quot;ModelID&amp;quot;: &amp;quot;8151&amp;quot;,
-        &amp;quot;ModelYear&amp;quot;: &amp;quot;2022&amp;quot;,
-        &amp;quot;MotorcycleChassisType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;MotorcycleSuspensionType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;NCSABodyType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSAMake&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSAMapExcApprovedBy&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSAMapExcApprovedOn&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSAMappingException&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSAModel&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NCSANote&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;NonLandUse&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Note&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;OtherBusInfo&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;OtherEngineInfo&amp;quot;: &amp;quot;Test Group: NVGAJ02.0V3A / Emission Std.: Tier 3 BIN 30 LEV3 SULEV30&amp;quot;,
-        &amp;quot;OtherMotorcycleInfo&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;OtherRestraintSystemInfo&amp;quot;: &amp;quot;Seat Belt: Active-Dr/Pass / Advanced Front Airbags&amp;quot;,
-        &amp;quot;OtherTrailerInfo&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;ParkAssist&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;PedestrianAutomaticEmergencyBraking&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;PlantCity&amp;quot;: &amp;quot;PUEBLA&amp;quot;,
-        &amp;quot;PlantCompanyName&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;PlantCountry&amp;quot;: &amp;quot;MEXICO&amp;quot;,
-        &amp;quot;PlantState&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;PossibleValues&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Pretensioner&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;RearAutomaticEmergencyBraking&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;RearCrossTrafficAlert&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;RearVisibilitySystem&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;SAEAutomationLevel&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;SAEAutomationLevel_to&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;SeatBeltsAll&amp;quot;: &amp;quot;Manual&amp;quot;,
-        &amp;quot;SeatRows&amp;quot;: &amp;quot;2&amp;quot;,
-        &amp;quot;Seats&amp;quot;: &amp;quot;5&amp;quot;,
-        &amp;quot;SemiautomaticHeadlampBeamSwitching&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;Series&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Series2&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;SteeringLocation&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;SuggestedVIN&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;TPMS&amp;quot;: &amp;quot;Indirect&amp;quot;,
-        &amp;quot;TopSpeedMPH&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;TrackWidth&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;TractionControl&amp;quot;: &amp;quot;Standard&amp;quot;,
-        &amp;quot;TrailerBodyType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;TrailerLength&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;TrailerType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
-        &amp;quot;TransmissionSpeeds&amp;quot;: &amp;quot;8&amp;quot;,
-        &amp;quot;TransmissionStyle&amp;quot;: &amp;quot;Automatic&amp;quot;,
-        &amp;quot;Trim&amp;quot;: &amp;quot;SE&amp;quot;,
-        &amp;quot;Trim2&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Turbo&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;VIN&amp;quot;: &amp;quot;3VV3B7AXXNM077525&amp;quot;,
-        &amp;quot;ValveTrainDesign&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;VehicleDescriptor&amp;quot;: &amp;quot;3VV3B7AX*NM&amp;quot;,
-        &amp;quot;VehicleType&amp;quot;: &amp;quot;MULTIPURPOSE PASSENGER VEHICLE (MPV)&amp;quot;,
-        &amp;quot;WheelBaseLong&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;WheelBaseShort&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;WheelBaseType&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;WheelSizeFront&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;WheelSizeRear&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;WheelieMitigation&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Wheels&amp;quot;: &amp;quot;&amp;quot;,
-        &amp;quot;Windows&amp;quot;: &amp;quot;&amp;quot;
-        }
-        ]
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This is, indeed, my car and the data is spot on. If you pass an invalid VIN, the values for &lt;code&gt;ErrorCode&lt;/code&gt; and &lt;code&gt;ErrorText&lt;/code&gt; will include pertinent information. As an example, this &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/999999999993VV3B7AXXNM077525?format=json&quot;&gt;URL&lt;/a&gt; with a messed up VIN gives:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;{ 
-        // All the usual keys
-        &amp;quot;ErrorCode&amp;quot;: &amp;quot;1,7,400&amp;quot;,
-        &amp;quot;ErrorText&amp;quot;: &amp;quot;1 - Check Digit (9th position) does not calculate properly; 7 - Manufacturer is not registered with NHTSA for sale or importation in the U.S. for use on U.S roads; Please contact the manufacturer directly for more information; 400 - Invalid Characters Present&amp;quot;,
-        // more
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note that as I said in the code block, you still get &lt;em&gt;all&lt;/em&gt; the other keys as well, so you need to check for &lt;code&gt;ErrorCode&lt;/code&gt; being &amp;quot;0&amp;quot; (note that it&apos;s a string, not a number) before you can use the data.&lt;/p&gt;
-        &lt;p&gt;But - the API tries its best to decode as much as possible. So for example, if I remove one value from my VIN, I get an error (&amp;quot;6 - Incomplete VIN&amp;quot;), but it still returns the right make and model for my car.&lt;/p&gt;
-        &lt;p&gt;Depending on your particular need, you may not want to treat errors as a boolean state and see what you can get away with.&lt;/p&gt;
-        &lt;h2 id=&quot;putting-a-bow-on-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-a-bow-on-it&quot;&gt;Putting a Bow on It&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Alright, so while this worked, I thought I&apos;d make a quick trip to &lt;a href=&quot;https://val.town&quot;&gt;Val Town&lt;/a&gt; to build a slightly nicer API wrapper for this. My code would do two things:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Return an object with two keys, &lt;code&gt;vehicle&lt;/code&gt; and &lt;code&gt;error&lt;/code&gt;.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;vehicle&lt;/code&gt; is the vehicle information result, just the first one, but with keys lowercased because there&apos;s no need to write more APIs the Microsoft way.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;error&lt;/code&gt; will check if &lt;code&gt;ErrorCode&lt;/code&gt; isn&apos;t &amp;quot;0&amp;quot;, and if so, will be populated with &lt;code&gt;ErrorText&lt;/code&gt;.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;In Val Town, I created a new val with a HTTP trigger. I look for the VIN in the URL, and if it&apos;s there, pass it to the NHTSA&apos;s API and shape the API as I described above. That&apos;s literally it.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
-        const url = new URL(req.url);
-        const vin = url.searchParams.get(&amp;quot;vin&amp;quot;);
-        
-        if (!vin) {
-        return new Response(
-        JSON.stringify({ error: &amp;quot;Missing &apos;vin&apos; query parameter&amp;quot; }),
-        {
-        status: 400,
-        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
-        },
-        );
-        }
-        
-        const vinreq = await fetch(
-        `https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`,
-        );
-        const data = await vinreq.json();
-        
-        const result = {
-        vehicle: lowerCaseKeys(data.Results[0]),
-        error: null,
-        };
-        
-        if (data.Results[0].ErrorCode !== &amp;quot;0&amp;quot;) {
-        result.error = data.Results[0].ErrorText;
-        }
-        
-        return new Response(JSON.stringify(result), {
-        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
-        });
-        }
-        
-        function lowerCaseKeys(obj) {
-        const result = {};
-        for (const key of Object.keys(obj)) {
-        result[key.toLowerCase()] = obj[key];
-        }
-        return result;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This API is up and running at https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run, and you can see the full Val here, &lt;a href=&quot;https://www.val.town/x/raymondcamden/vin-api&quot;&gt;https://www.val.town/x/raymondcamden/vin-api&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;quick-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#quick-demo&quot;&gt;Quick Demo&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I went to &lt;em&gt;another&lt;/em&gt; code hosting service, Code Pen, to create a quick and simple demo. If you open your browser to &lt;a href=&quot;https://new-thunder-treefrog.codepen.app/&quot;&gt;https://new-thunder-treefrog.codepen.app/&lt;/a&gt;, you can enter a VIN, hit the button, and see the result dumped on screen. The entire Val Town integration was just a &lt;code&gt;fetch&lt;/code&gt; call:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let req = await fetch(`https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run/?vin=${vin}`);
-        let result = await req.json();
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the CodePen itself if you want to fork, or run the demo here.&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;VIN API Tester&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;MYJvybX&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f0545-661f-7a5d-9000-89ba9b41fca3&quot;&gt;
-        VIN API Tester&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@elisasch?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Elisa Schmidt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/cat-on-a-car-during-daytime-C2c4G3by4ZE?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
+    <lastBuildDate>Fri, 24 Jul 2026 17:03:05 GMT</lastBuildDate>
     <item>
       <title>Copying HTML Tables as Text, Markdown, and CSV</title>
       <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
       <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
         &lt;p&gt;First, I added a table of course:&lt;/p&gt;
@@ -567,7 +195,7 @@
       <title>Links For You (7/18/26)</title>
       <link>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</link>
       <guid>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs. I&apos;m currently at a conference (&lt;a href=&quot;https://www.sqlsatbr.com/&quot;&gt;Day of Data&lt;/a&gt;), but thankfully one just down the road. I&apos;ll be back tonight, and thought I&apos;d take a break between sessions to share some links. I&apos;ll be presenting later today one of my favorite talks, &amp;quot;A Beginner&apos;s Guide to Wrangling Asynchronicity in JavaScript&amp;quot;. I love the talk, but given I&apos;m up against &lt;em&gt;eight&lt;/em&gt; other talks at the same time and I&apos;m not talking AI... well it may be a small personal affair. We shall see.&lt;/p&gt;
         &lt;h2 id=&quot;building-a-blog-with-astro&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-blog-with-astro&quot;&gt;Building a Blog with Astro&lt;/a&gt;&lt;/h2&gt;
@@ -592,7 +220,7 @@
       <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
       <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
       <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
         &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
@@ -769,7 +397,7 @@
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -1026,7 +654,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -1353,7 +981,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -1367,7 +995,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -1406,7 +1034,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Thu, 23 Jul 2026 16:31:50 GMT</pubDate>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -1574,6 +1202,378 @@
         &lt;/zero-md&gt;&lt;/p&gt;
         &lt;p&gt;I went ahead and gave Cursor permission to edit and update my files, and while I&apos;m keeping the original CodePen as is, I pushed up the new files to Netlify: &lt;a href=&quot;https://formselectionblock.netlify.app/&quot;&gt;https://formselectionblock.netlify.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;The keyboard navigation is improved and the text helps too. I passed this by Kevin; he agreed with the updates, so going forward when I use this UX on my sites, I&apos;ll work with this version. Let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
+      <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
+      <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
+        &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css1.png&quot; loading=&quot;lazy&quot; alt=&quot;Form Sample&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;See the two regular text fields and the cat selection? If I pick one, it visually updates:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css2.png&quot; alt=&quot;Form sample with selected cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;On submitting the form, there will be something representing the selected value, along with any other form field values as well. In theory, the &amp;quot;thing&amp;quot; you select can be any arbitrary block with the selection look and feel being whatever makes sense for your site.&lt;/p&gt;
+        &lt;p&gt;So given this UX, I was curious how I&apos;d build it myself.&lt;/p&gt;
+        &lt;h2 id=&quot;first-thought---web-components&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-thought---web-components&quot;&gt;First thought - Web Components&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Initially, I thought this would be a great use for web components. Web components can participate in forms (see &lt;a href=&quot;https://www.raymondcamden.com/2023/05/24/adding-form-participation-support-to-web-components&quot;&gt;my post&lt;/a&gt; from... wow, three years ago!) so in theory, I could build something like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot;&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
+        This is area select 1.
+        &amp;lt;/area-select&amp;gt;
+        
+        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
+        This is area select 2.
+        &amp;lt;/area-select&amp;gt;
+        
+        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the sample code above, &lt;code&gt;area-select&lt;/code&gt; is a web component which will participate in a form by setting the &lt;code&gt;foo&lt;/code&gt; value to whatever is selected, using the string in &lt;code&gt;value&lt;/code&gt; as the value.&lt;/p&gt;
+        &lt;p&gt;I wrote this out and was about to start hacking away at the code. Because of course JavaScript would be needed for this, right?&lt;/p&gt;
+        &lt;h2 id=&quot;sorry-i-doubted-you-css...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#sorry-i-doubted-you-css...&quot;&gt;Sorry I doubted you CSS...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before I started writing JavaScript, I thought - let me Google some more and research this because maybe, just maybe, a pure CSS solution would work?&lt;/p&gt;
+        &lt;p&gt;I&apos;m glad I did.&lt;/p&gt;
+        &lt;p&gt;Turns out - it&apos;s actually relatively simple to achieve this with a bit of CSS. First, let&apos;s consider this version of the HTML:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;https://postman-echo.com/post&amp;quot;&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
+        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Option 1 - Luna&amp;lt;/h3&amp;gt;
+        &amp;lt;img src=&amp;quot;https://placecats.com/200/250&amp;quot;&amp;gt;
+        &amp;lt;/label&amp;gt;
+        
+        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
+        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
+        &amp;lt;h3&amp;gt;Option 2 - Pig&amp;lt;/h3&amp;gt;
+        &amp;lt;img src=&amp;quot;https://placecats.com/300/200&amp;quot;&amp;gt;
+        &amp;lt;/label&amp;gt;
+        
+        &amp;lt;p&amp;gt;
+        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My two &amp;quot;custom selectable doohickies&amp;quot; are just &lt;code&gt;label&lt;/code&gt; elements with an internal radio button. After the button I&apos;ve got arbitrary HTML.&lt;/p&gt;
+        &lt;p&gt;Now for the CSS:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+        
+        /* Style the label container itself as the button */
+        .custom-card {
+        display: inline-block;
+        padding: 12px 24px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 350px;
+        height: 350px;
+        vertical-align: top;
+        }
+        
+        /* Style change when active */
+        .custom-card:has(input[type=&amp;quot;radio&amp;quot;]:checked) {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This does a few things. It completely hides the radio field, styles the label like a &amp;quot;card&amp;quot; element, and defines the &amp;quot;selected&amp;quot; look to add a blue border and background. It also swaps out the text color to white. Because I&apos;m wrapping everything in a label, the entire block is selectable, and a cursor pointer helps make that clear to the user.&lt;/p&gt;
+        &lt;p&gt;In theory... that&apos;s it. I spent a bit of time tweaking the initial CSS I had found and more could be done of course, but this ended up being simpler than I imagined.&lt;/p&gt;
+        &lt;p&gt;You can play with the full demo here: &lt;a href=&quot;https://capital-wood-marlin.codepen.app/&quot;&gt;https://capital-wood-marlin.codepen.app/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;And here&apos;s the full CodePen:&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-height=&quot;600&quot; data-pen-title=&quot;Custom Radio&quot; data-version=&quot;2&quot; data-default-tab=&quot;html,result&quot; data-slug-hash=&quot;xbgXbxd&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f1383-8203-7ff3-ab04-5aa9afa75d18&quot;&gt;
+        Custom Radio&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Decoding VINs with an API</title>
+      <link>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</link>
+      <guid>https://www.raymondcamden.com/2026/06/26/decoding-vins-with-api</guid>
+      <pubDate>Fri, 24 Jul 2026 16:41:54 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Today&apos;s post took a bit of a pivot. I decided to work on a demo idea I had created way back in March. As I worked on it, I ran into multiple roadblocks, and while that original idea for a demo may still see the light of the day, I figured I&apos;d at least share something that &lt;em&gt;did&lt;/em&gt; work.&lt;/p&gt;
+        &lt;h2 id=&quot;what&apos;s-a-vin%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-a-vin%3F&quot;&gt;What&apos;s a VIN?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;A VIN is a vehicle identification number. It&apos;s a standard that &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number&quot;&gt;dates back to 1954&lt;/a&gt; and identifies a particular car by manufacturer, make, model, year, and a heck of a lot more. A VIN is 17 characters avoiding the letters O, I, U, and Q to avoid confusion with some numbers.&lt;/p&gt;
+        &lt;p&gt;You can break down a VIN into various &lt;a href=&quot;https://en.wikipedia.org/wiki/Vehicle_identification_number#Components&quot;&gt;components&lt;/a&gt; if you want - but would still need to know various lookup values, for example a manufacturer referred to as &lt;code&gt;1FT&lt;/code&gt; maps to Ford Truck.&lt;/p&gt;
+        &lt;h2 id=&quot;decoding-a-vin-via-api&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#decoding-a-vin-via-api&quot;&gt;Decoding a VIN via API&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;As part of the demo that didn&apos;t quite make it, I needed to decode a VIN value. I had a commercial service in mind but it had a pretty limited free tier (50 calls). Turns out, the &lt;a href=&quot;https://www.nhtsa.gov/&quot;&gt;National Highway Traffic Safety Administration&lt;/a&gt; actually has a bunch of APIs, multiple of which work with VINs.&lt;/p&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/&quot;&gt;Vehicle API&lt;/a&gt; is free, with no limits (outside of not being a jerk), and requires no API keys at all.&lt;/p&gt;
+        &lt;p&gt;The one we want is the &lt;code&gt;Decode VIN Extended (flat format)&lt;/code&gt; endpoint. Why &amp;quot;flat format&amp;quot;? The initial API returns information that very much looks like XML translated to JSON, which to be fair, it is, and while the data is all there, it&apos;s a bit ugly. The &lt;code&gt;flat format&lt;/code&gt; makes it look quite a bit nicer.&lt;/p&gt;
+        &lt;p&gt;To use the API, simply include the VIN in the URL and ensure you add &lt;code&gt;?format=json&lt;/code&gt;: &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&quot;&gt;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/3VV3B7AXXNM077525?format=json&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This returns:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;Count&amp;quot;: 1,
+        &amp;quot;Message&amp;quot;: &amp;quot;Results returned successfully. NOTE: Any missing decoded values should be interpreted as NHTSA does not have data on the specific variable. Missing value should NOT be interpreted as an indication that a feature or technology is unavailable for a vehicle.&amp;quot;,
+        &amp;quot;SearchCriteria&amp;quot;: &amp;quot;VIN(s): 3VV3B7AXXNM077525&amp;quot;,
+        &amp;quot;Results&amp;quot;: [
+        {
+        &amp;quot;ABS&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;ActiveSafetySysNote&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AdaptiveCruiseControl&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AdaptiveDrivingBeam&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AdaptiveHeadlights&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AdditionalErrorText&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocCurtain&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AirBagLocFront&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AirBagLocKnee&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocSeatCushion&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AirBagLocSide&amp;quot;: &amp;quot;1st Row (Driver and Passenger)&amp;quot;,
+        &amp;quot;AutoReverseSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;AutomaticPedestrianAlertingSound&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;AxleConfiguration&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Axles&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BasePrice&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryA&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryA_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryCells&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryKWh&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryKWh_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryModules&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryPacks&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryV&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BatteryV_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BedLengthIN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BedType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BlindSpotIntervention&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BlindSpotMon&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;BodyCabType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BodyClass&amp;quot;: &amp;quot;Sport Utility Vehicle [SUV]/Multipurpose Vehicle [MPV]&amp;quot;,
+        &amp;quot;BrakeSystemDesc&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BrakeSystemType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BusFloorConfigType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;BusLength&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;BusType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;CAN_AACN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CIB&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;CashForClunkers&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ChargerLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ChargerPowerKW&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CombinedBrakingSystem&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CoolingType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CurbWeightLB&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;CustomMotorcycleType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;DaytimeRunningLight&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;DestinationMarket&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DisplacementCC&amp;quot;: &amp;quot;2000.0&amp;quot;,
+        &amp;quot;DisplacementCI&amp;quot;: &amp;quot;122.04748818946&amp;quot;,
+        &amp;quot;DisplacementL&amp;quot;: &amp;quot;2.0&amp;quot;,
+        &amp;quot;Doors&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DriveType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DriverAssist&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;DynamicBrakeSupport&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;EDR&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ESC&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;EVDriveUnit&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ElectrificationLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineConfiguration&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineCycles&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineCylinders&amp;quot;: &amp;quot;4&amp;quot;,
+        &amp;quot;EngineHP&amp;quot;: &amp;quot;184&amp;quot;,
+        &amp;quot;EngineHP_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineKW&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EngineManufacturer&amp;quot;: &amp;quot;Volkswagen&amp;quot;,
+        &amp;quot;EngineModel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;EntertainmentSystem&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ErrorCode&amp;quot;: &amp;quot;0&amp;quot;,
+        &amp;quot;ErrorText&amp;quot;: &amp;quot;0 - VIN decoded clean. Check Digit (9th position) is correct&amp;quot;,
+        &amp;quot;ForwardCollisionWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;FuelInjectionType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTankMaterial&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTankType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;FuelTypePrimary&amp;quot;: &amp;quot;Gasoline&amp;quot;,
+        &amp;quot;FuelTypeSecondary&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GCWR&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GCWR_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;GVWR&amp;quot;: &amp;quot;Class 1D: 5,001 - 6,000 lb (2,268 - 2,722 kg)&amp;quot;,
+        &amp;quot;GVWR_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;KeylessIgnition&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LaneCenteringAssistance&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;LaneDepartureWarning&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LaneKeepSystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;LowerBeamHeadlampLightSource&amp;quot;: &amp;quot;LED&amp;quot;,
+        &amp;quot;Make&amp;quot;: &amp;quot;VOLKSWAGEN&amp;quot;,
+        &amp;quot;MakeID&amp;quot;: &amp;quot;482&amp;quot;,
+        &amp;quot;Manufacturer&amp;quot;: &amp;quot;VOLKSWAGEN DE MEXICO SA DE CV&amp;quot;,
+        &amp;quot;ManufacturerId&amp;quot;: &amp;quot;16478&amp;quot;,
+        &amp;quot;Model&amp;quot;: &amp;quot;Tiguan&amp;quot;,
+        &amp;quot;ModelID&amp;quot;: &amp;quot;8151&amp;quot;,
+        &amp;quot;ModelYear&amp;quot;: &amp;quot;2022&amp;quot;,
+        &amp;quot;MotorcycleChassisType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;MotorcycleSuspensionType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;NCSABodyType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMake&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMapExcApprovedBy&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMapExcApprovedOn&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAMappingException&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSAModel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NCSANote&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;NonLandUse&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Note&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherBusInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherEngineInfo&amp;quot;: &amp;quot;Test Group: NVGAJ02.0V3A / Emission Std.: Tier 3 BIN 30 LEV3 SULEV30&amp;quot;,
+        &amp;quot;OtherMotorcycleInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;OtherRestraintSystemInfo&amp;quot;: &amp;quot;Seat Belt: Active-Dr/Pass / Advanced Front Airbags&amp;quot;,
+        &amp;quot;OtherTrailerInfo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;ParkAssist&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PedestrianAutomaticEmergencyBraking&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PlantCity&amp;quot;: &amp;quot;PUEBLA&amp;quot;,
+        &amp;quot;PlantCompanyName&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PlantCountry&amp;quot;: &amp;quot;MEXICO&amp;quot;,
+        &amp;quot;PlantState&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;PossibleValues&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Pretensioner&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;RearAutomaticEmergencyBraking&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;RearCrossTrafficAlert&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;RearVisibilitySystem&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;SAEAutomationLevel&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SAEAutomationLevel_to&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SeatBeltsAll&amp;quot;: &amp;quot;Manual&amp;quot;,
+        &amp;quot;SeatRows&amp;quot;: &amp;quot;2&amp;quot;,
+        &amp;quot;Seats&amp;quot;: &amp;quot;5&amp;quot;,
+        &amp;quot;SemiautomaticHeadlampBeamSwitching&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;Series&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Series2&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SteeringLocation&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;SuggestedVIN&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TPMS&amp;quot;: &amp;quot;Indirect&amp;quot;,
+        &amp;quot;TopSpeedMPH&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TrackWidth&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TractionControl&amp;quot;: &amp;quot;Standard&amp;quot;,
+        &amp;quot;TrailerBodyType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;TrailerLength&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;TrailerType&amp;quot;: &amp;quot;Not Applicable&amp;quot;,
+        &amp;quot;TransmissionSpeeds&amp;quot;: &amp;quot;8&amp;quot;,
+        &amp;quot;TransmissionStyle&amp;quot;: &amp;quot;Automatic&amp;quot;,
+        &amp;quot;Trim&amp;quot;: &amp;quot;SE&amp;quot;,
+        &amp;quot;Trim2&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Turbo&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;VIN&amp;quot;: &amp;quot;3VV3B7AXXNM077525&amp;quot;,
+        &amp;quot;ValveTrainDesign&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;VehicleDescriptor&amp;quot;: &amp;quot;3VV3B7AX*NM&amp;quot;,
+        &amp;quot;VehicleType&amp;quot;: &amp;quot;MULTIPURPOSE PASSENGER VEHICLE (MPV)&amp;quot;,
+        &amp;quot;WheelBaseLong&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelBaseShort&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelBaseType&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelSizeFront&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelSizeRear&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;WheelieMitigation&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Wheels&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;Windows&amp;quot;: &amp;quot;&amp;quot;
+        }
+        ]
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is, indeed, my car and the data is spot on. If you pass an invalid VIN, the values for &lt;code&gt;ErrorCode&lt;/code&gt; and &lt;code&gt;ErrorText&lt;/code&gt; will include pertinent information. As an example, this &lt;a href=&quot;https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/999999999993VV3B7AXXNM077525?format=json&quot;&gt;URL&lt;/a&gt; with a messed up VIN gives:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;{ 
+        // All the usual keys
+        &amp;quot;ErrorCode&amp;quot;: &amp;quot;1,7,400&amp;quot;,
+        &amp;quot;ErrorText&amp;quot;: &amp;quot;1 - Check Digit (9th position) does not calculate properly; 7 - Manufacturer is not registered with NHTSA for sale or importation in the U.S. for use on U.S roads; Please contact the manufacturer directly for more information; 400 - Invalid Characters Present&amp;quot;,
+        // more
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Note that as I said in the code block, you still get &lt;em&gt;all&lt;/em&gt; the other keys as well, so you need to check for &lt;code&gt;ErrorCode&lt;/code&gt; being &amp;quot;0&amp;quot; (note that it&apos;s a string, not a number) before you can use the data.&lt;/p&gt;
+        &lt;p&gt;But - the API tries its best to decode as much as possible. So for example, if I remove one value from my VIN, I get an error (&amp;quot;6 - Incomplete VIN&amp;quot;), but it still returns the right make and model for my car.&lt;/p&gt;
+        &lt;p&gt;Depending on your particular need, you may not want to treat errors as a boolean state and see what you can get away with.&lt;/p&gt;
+        &lt;h2 id=&quot;putting-a-bow-on-it&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#putting-a-bow-on-it&quot;&gt;Putting a Bow on It&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Alright, so while this worked, I thought I&apos;d make a quick trip to &lt;a href=&quot;https://val.town&quot;&gt;Val Town&lt;/a&gt; to build a slightly nicer API wrapper for this. My code would do two things:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Return an object with two keys, &lt;code&gt;vehicle&lt;/code&gt; and &lt;code&gt;error&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;vehicle&lt;/code&gt; is the vehicle information result, just the first one, but with keys lowercased because there&apos;s no need to write more APIs the Microsoft way.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;error&lt;/code&gt; will check if &lt;code&gt;ErrorCode&lt;/code&gt; isn&apos;t &amp;quot;0&amp;quot;, and if so, will be populated with &lt;code&gt;ErrorText&lt;/code&gt;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In Val Town, I created a new val with a HTTP trigger. I look for the VIN in the URL, and if it&apos;s there, pass it to the NHTSA&apos;s API and shape the API as I described above. That&apos;s literally it.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export default async function (req: Request): Promise&amp;lt;Response&amp;gt; {
+        const url = new URL(req.url);
+        const vin = url.searchParams.get(&amp;quot;vin&amp;quot;);
+        
+        if (!vin) {
+        return new Response(
+        JSON.stringify({ error: &amp;quot;Missing &apos;vin&apos; query parameter&amp;quot; }),
+        {
+        status: 400,
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        },
+        );
+        }
+        
+        const vinreq = await fetch(
+        `https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`,
+        );
+        const data = await vinreq.json();
+        
+        const result = {
+        vehicle: lowerCaseKeys(data.Results[0]),
+        error: null,
+        };
+        
+        if (data.Results[0].ErrorCode !== &amp;quot;0&amp;quot;) {
+        result.error = data.Results[0].ErrorText;
+        }
+        
+        return new Response(JSON.stringify(result), {
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        });
+        }
+        
+        function lowerCaseKeys(obj) {
+        const result = {};
+        for (const key of Object.keys(obj)) {
+        result[key.toLowerCase()] = obj[key];
+        }
+        return result;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This API is up and running at https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run, and you can see the full Val here, &lt;a href=&quot;https://www.val.town/x/raymondcamden/vin-api&quot;&gt;https://www.val.town/x/raymondcamden/vin-api&lt;/a&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;quick-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#quick-demo&quot;&gt;Quick Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I went to &lt;em&gt;another&lt;/em&gt; code hosting service, Code Pen, to create a quick and simple demo. If you open your browser to &lt;a href=&quot;https://new-thunder-treefrog.codepen.app/&quot;&gt;https://new-thunder-treefrog.codepen.app/&lt;/a&gt;, you can enter a VIN, hit the button, and see the result dumped on screen. The entire Val Town integration was just a &lt;code&gt;fetch&lt;/code&gt; call:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let req = await fetch(`https://raymondcamden--a5e2f648718311f1ace11607ee4eb77e.web.val.run/?vin=${vin}`);
+        let result = await req.json();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s the CodePen itself if you want to fork, or run the demo here.&lt;/p&gt;
+        &lt;p class=&quot;codepen&quot; data-theme-id=&quot;-2&quot; data-height=&quot;600&quot; data-pen-title=&quot;VIN API Tester&quot; data-preview=&quot;true&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;MYJvybX&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
+        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f0545-661f-7a5d-9000-89ba9b41fca3&quot;&gt;
+        VIN API Tester&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
+        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
+        &lt;/p&gt;
+        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@elisasch?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Elisa Schmidt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/cat-on-a-car-during-daytime-C2c4G3by4ZE?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
