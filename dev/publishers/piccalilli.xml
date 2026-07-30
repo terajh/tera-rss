@@ -4,7 +4,261 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 29 Jul 2026 16:42:02 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 30 Jul 2026 16:47:03 GMT</lastBuildDate>
+    <item>
+      <title>Personal website redesign project post: Getting started with implementing my music collection</title>
+      <link>https://piccalil.li/projects/personal-site/8/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/8/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 30 Jul 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;We&apos;re getting close to the last part of iteration one — the skeletal build of the site.  Good! I&apos;m getting eager to get on with the design work now. For some reason, doing this series (along with being busy in general) has stifled my ability to think &lt;em&gt;creatively&lt;/em&gt; about my site. I guess I need to get all the non-technical stuff published to let my brain fully switch. Brains are weird, man.&lt;/p&gt;
+        &lt;p&gt;Anyway, we&apos;ve got one more bit of content &lt;em&gt;plumbing&lt;/em&gt; to do and in my eyes, this is the most important part of the website: &lt;a href=&quot;https://bell.bz/music-collection/&quot;&gt;the music collection&lt;/a&gt;. I hold an immense amount of pride in the collection I&apos;ve built over the last half a decade or so. As on my old personal site, it takes pride of place in the overall system.&lt;/p&gt;
+        &lt;p&gt;I feel like this part of the website opens up a lot of creative opportunities as time goes on too. I tend to be extremely &lt;em&gt;reserved&lt;/em&gt; with longform prose content because readability is &lt;em&gt;everything&lt;/em&gt;, so with the music collection, I&apos;ll be able to let my hair down a bit. To be able to do that, we need a &lt;em&gt;[points mic to the crowd]&lt;/em&gt; &lt;strong&gt;solid base&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Markdown and front matter&lt;/h2&gt;
+        &lt;p&gt;We&apos;re now on &lt;em&gt;three&lt;/em&gt; different content sources. You might think I&apos;m mad, but let me explain the decision making process for a second. One thing I know to be true is that I won&apos;t keep my blog on WordPress in the long term. It&apos;s a platform that&apos;s served me well over the last &lt;em&gt;[checks notes]&lt;/em&gt; 18 years, but I want to look forward to other technologies.&lt;/p&gt;
+        &lt;p&gt;The technology I&apos;m very keen to keep evolving is the &lt;a href=&quot;https://atproto.com/&quot;&gt;AT protocol&lt;/a&gt;. As I see it, all of my content could be managed by my &lt;a href=&quot;https://piccalil.li/blog/publishing-on-the-atmosphere-with-standardsite/#understanding-the-at-protocol&quot;&gt;Personal Data Server (PDS)&lt;/a&gt;, including the blog &lt;em&gt;and&lt;/em&gt; the music collection. I just think the protocol needs more time and evolution before I look into that, so having content fragmentation for now feels fine. It&apos;s the sort of compromise &lt;a href=&quot;https://set.studio/&quot;&gt;we&lt;/a&gt; make with clients over and over again.&lt;/p&gt;
+        &lt;p&gt;This is &lt;em&gt;why&lt;/em&gt; I&apos;ve chosen markdown and front matter for the music collection. It&apos;s how it&apos;s been powered for a few years now already, so moving content from Eleventy to Astro was a case of replacing &lt;code&gt;date&lt;/code&gt; with &lt;code&gt;pubDate&lt;/code&gt; and job &lt;em&gt;done&lt;/em&gt;. With &lt;a href=&quot;https://docs.astro.build/en/reference/modules/astro-content/&quot;&gt;Astro Content Collections&lt;/a&gt;, getting that data &lt;em&gt;out&lt;/em&gt; and moved to my PDS will be extremely simple with a one-off script. With all that in mind, we&apos;re on a solid foundation.&lt;/p&gt;
+        &lt;h2&gt;Setting up the content collection&lt;/h2&gt;
+        &lt;p&gt;I&apos;m back in the &lt;a href=&quot;https://piccalil.li/projects/personal-site/4/#our-starting-point&quot;&gt;web &quot;app&quot; of the monorepo&lt;/a&gt; at this point and the first thing to do is configure the content collection. In short, I&apos;m letting Astro know that there&apos;s a &lt;code&gt;music-collection&lt;/code&gt; &lt;em&gt;collection&lt;/em&gt;, how that collection should be structured, and where to find the content itself.&lt;/p&gt;
+        &lt;p&gt;Astro, by default, will presume that your content lives in &lt;code&gt;src/content/${collectionSubdirectory}&lt;/code&gt;, so we only need to specify the subdirectory itself:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { z, defineCollection } from &apos;astro:content&apos;;
+        
+        const musicCollection = defineCollection({
+        type: &apos;content&apos;,
+        schema: z.object({
+        title: z.string(),
+        artist: z.string(),
+        cover: z.string(),
+        pubDate: z.date(),
+        formats: z.array(z.string()).optional(),
+        tags: z.array(z.string()),
+        topTenOrder: z.number().optional(),
+        }),
+        });
+        
+        export const collections = {
+        &apos;music-collection&apos;: musicCollection,
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If you&apos;re wondering what the heck &lt;code&gt;z&lt;/code&gt; is, &lt;a href=&quot;https://github.com/colinhacks/zod#what-is-zod&quot;&gt;here is an explainer in the docs&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;That&apos;s it! I now have a collection that I can reference in a template, so let&apos;s start working on that. The first thing that&apos;s needed though is a layout, specifically for the music collection. There&apos;s a couple of reasons for this:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;I want to enable wide-scale, but consistent, UI differences between the music collection and the rest of the site, which will likely need unique layout structures. This will be simpler if every part of the collection is based off a unified base template&lt;/li&gt;
+        &lt;li&gt;I can render a music collection-specific navigation etc. while keeping it contained&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Building out the base layout, components and regions&lt;/h2&gt;
+        &lt;p&gt;The base layout — &lt;code&gt;MusicCollectionLayout.astro&lt;/code&gt; — looks like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import BaseLayout from &apos;./BaseLayout.astro&apos;;
+        const { title, summary, socialImage, allowRobots, items, item } = Astro.props;
+        
+        import MusicItemDetail from &apos;@repo/ui/MusicItemDetail&apos;;
+        import MusicCardsRegion from &apos;@repo/ui/MusicCardsRegion&apos;;
+        import MusicNavigation from &apos;@repo/ui/MusicNavigation&apos;;
+        ---
+        
+        &amp;lt;BaseLayout title={title} summary={summary} socialImage={socialImage} allowRobots={allowRobots}&amp;gt;
+        {!item &amp;amp;&amp;amp; &amp;lt;h1 class=&quot;visually-hidden&quot;&amp;gt;{title}&amp;lt;/h1&amp;gt;}
+        &amp;lt;div class=&quot;music-collection wrapper region&quot;&amp;gt;
+        &amp;lt;div class=&quot;sidebar&quot;&amp;gt;
+        &amp;lt;div class=&quot;flow-space-m&quot;&amp;gt;
+        &amp;lt;MusicNavigation /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div&amp;gt;
+        {item &amp;amp;&amp;amp; &amp;lt;MusicItemDetail item={item} /&amp;gt;}
+        &amp;lt;MusicCardsRegion
+        items={items}
+        heading={item ? `Random items from the collection` : null}
+        /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/BaseLayout&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Pretty straightforward, eh? I&apos;m pulling in a collection of props — which we&apos;ll see in more detail in a moment — that allows this layout to work out the following: &quot;Am I rendering a single item from the collection or a feed of items?&quot;&lt;/p&gt;
+        &lt;p&gt;Those two states determine if we render &lt;code&gt;&amp;lt;MusicItemDetail&amp;gt;&lt;/code&gt;  or not. The music cards are always present, but if there is an &lt;code&gt;item&lt;/code&gt; present, there&apos;s a presumption that they are random items, so the heading is set accordingly.&lt;/p&gt;
+        &lt;p&gt;Yes I know there&apos;s a naming inconsistency there. Be free, embrace it and just know I&apos;ll fix it. It&apos;s all good.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s break down those components and regions while we&apos;re here. First up, the shared navigation.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import { getCollection } from &apos;astro:content&apos;;
+        import Navigation from &apos;@repo/ui/Navigation&apos;;
+        
+        const musicCollectionItems = await getCollection(&apos;music-collection&apos;);
+        
+        const navigationBaseItems = [
+        {
+        text: &apos;All&apos;,
+        url: &apos;/music-collection/&apos;,
+        },
+        {
+        text: &apos;Vinyl&apos;,
+        url: &apos;/music-collection/vinyl/&apos;,
+        },
+        {
+        text: &apos;CD&apos;,
+        url: &apos;/music-collection/cd/&apos;,
+        },
+        {
+        text: &apos;Digital&apos;,
+        url: &apos;/music-collection/digital/&apos;,
+        },
+        {
+        text: &apos;Masterpieces&apos;,
+        url: &apos;/music-collection/masterpieces/&apos;,
+        },
+        {
+        text: &apos;All time top 10&apos;,
+        url: &apos;/music-collection/top-10/&apos;,
+        },
+        {
+        text: &apos;Shuffled&apos;,
+        url: &apos;/music-collection/shuffled/&apos;,
+        },
+        ];
+        
+        const getNavigationItemLabelCount = (text) =&amp;gt; {
+        switch (text) {
+        case &apos;All&apos;:
+        case &apos;Shuffled&apos;:
+        return musicCollectionItems.length;
+        case &apos;Vinyl&apos;:
+        return musicCollectionItems.filter((x) =&amp;gt; x.data.formats.includes(&apos;Vinyl&apos;)).length;
+        case &apos;CD&apos;:
+        return musicCollectionItems.filter((x) =&amp;gt; x.data.formats.includes(&apos;CD&apos;)).length;
+        case &apos;Digital&apos;:
+        return musicCollectionItems.filter((x) =&amp;gt; x.data?.formats.includes(&apos;Digital&apos;)).length;
+        case &apos;Masterpieces&apos;:
+        return musicCollectionItems.filter((x) =&amp;gt; x.data?.tags.includes(&apos;Masterpiece&apos;)).length;
+        case &apos;All time top 10&apos;:
+        return musicCollectionItems.filter((x) =&amp;gt; x.data?.tags.includes(&apos;Top 10&apos;)).length;
+        }
+        };
+        
+        const navigation = navigationBaseItems.map(({ text, url }) =&amp;gt; ({
+        text: `${text} (${getNavigationItemLabelCount(text)})`,
+        url,
+        }));
+        ---
+        
+        &amp;lt;Navigation links={navigation} ariaLabel=&quot;Music&quot; listClass=&quot;flow&quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It&apos;s not pretty! But it works. I&apos;m sure there&apos;s some clever stuff to generate the labels with a count on each one with an array reducer (or whatever), but I&apos;ll take an easy to digest &lt;code&gt;switch&lt;/code&gt; statement &lt;a href=&quot;https://xcancel.com/jaffathecake/status/1213077702300852224&quot;&gt;over a reducer&lt;/a&gt; &lt;em&gt;any day&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;The idea of this component is to have a central place that first defines the navigation structure — static data is fine because I&apos;ll likely never need to change it — and modify each label with a count before passing off to the existing &lt;code&gt;&amp;lt;Navigation&amp;gt;&lt;/code&gt; component. Let&apos;s move on!&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import MusicItemCard from &apos;@repo/ui/MusicItemCard&apos;;
+        
+        const { items, heading } = Astro.props;
+        ---
+        
+        &amp;lt;div class={`music-cards-region flow flow-space-l ${heading ? &apos;region&apos; : &apos;&apos;}`}&amp;gt;
+        {
+        heading &amp;amp;&amp;amp; (
+        &amp;lt;&amp;gt;
+        &amp;lt;hr /&amp;gt;
+        &amp;lt;h2&amp;gt;{heading}&amp;lt;/h2&amp;gt;
+        &amp;lt;/&amp;gt;
+        )
+        }
+        &amp;lt;div&amp;gt;
+        &amp;lt;ul class=&quot;grid&quot; role=&quot;list&quot; data-layout=&quot;thirds&quot;&amp;gt;
+        {
+        items.map((item) =&amp;gt; (
+        &amp;lt;li&amp;gt;
+        &amp;lt;MusicItemCard item={item} /&amp;gt;
+        &amp;lt;/li&amp;gt;
+        ))
+        }
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is &lt;code&gt;&amp;lt;MusicCardsRegion&amp;gt;&lt;/code&gt; in all of its — um — glory, I guess. I&apos;m doing a skeletal build in this iteration, so what else would you expect? The only thing to touch on is that this region has an optional heading. If there is a heading, I&apos;m (for now), sticking a &lt;code&gt;&amp;lt;hr /&amp;gt;&lt;/code&gt; element ahead of it to create a bit of separation, in lieu of an actual UI. I &lt;em&gt;am&lt;/em&gt; doing a bit of visual though: only adding the &lt;code&gt;region&lt;/code&gt; CSS utility if there is a heading, meaning vertical padding will be applied.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s dig into the &lt;code&gt;&amp;lt;MusicItemCard&amp;gt;&lt;/code&gt; component:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        const { item } = Astro.props;
+        ---
+        
+        &amp;lt;div class=&quot;music-item-card text-step-0&quot;&amp;gt;
+        &amp;lt;a href={`/music-collection/${item.slug}/`} class=&quot;flow flow-space-2xs&quot;&amp;gt;
+        &amp;lt;img
+        src={`/images/music-collection/${item.data.cover}`}
+        alt={`${item.data.title} cover`}
+        loading=&quot;lazy&quot;
+        /&amp;gt;
+        &amp;lt;/a&amp;gt;
+        &amp;lt;p&amp;gt;
+        &amp;lt;strong&amp;gt;{item.data.title}&amp;lt;/strong&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;{item.data.artist}&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I think one thing that should be apparent at this point in the series is that I like to work in small, simple pieces. It works &lt;em&gt;exceptionally&lt;/em&gt; well for client work, regardless of complexity, so it&apos;s gonna work very well for my personal site too.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/music-item-cards.jpg&quot; alt=&quot;The music items on my site, in this instance, forming the Vinyl collection&apos;s grid of items&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;This component is the most represented in this music collection section of the website. It&apos;s on every single page! Still, it&apos;s simple and it&apos;ll stay (mostly) that way, even when I build the proper UI.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s do the last region: &lt;code&gt;&amp;lt;MusicItemDetail&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;---
+        import { formatDate, generateSlug } from &apos;@repo/utils/helpers&apos;;
+        
+        import AlbumPlatformLinks from &apos;@repo/ui/AlbumPlatformLinks&apos;;
+        
+        const { item } = Astro.props;
+        ---
+        
+        &amp;lt;div class=&quot;music-item-detail&quot;&amp;gt;
+        &amp;lt;div class=&quot;sidebar&quot;&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;img src={`/images/music-collection/${item.data.cover}`} alt={`${item.data.title} cover`} /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&quot;flow&quot;&amp;gt;
+        &amp;lt;h1&amp;gt;{item.data.title}&amp;lt;/h1&amp;gt;
+        &amp;lt;div class=&quot;flow&quot;&amp;gt;
+        &amp;lt;div class=&quot;overflow&quot;&amp;gt;
+        &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+        {/* Catch this in the build. I was being lazy */}
+        &amp;lt;th width=&quot;30%&quot;&amp;gt;Artist&amp;lt;/th&amp;gt;
+        &amp;lt;td&amp;gt;{item.data.artist}&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Formats&amp;lt;/th&amp;gt;
+        &amp;lt;td&amp;gt;
+        &amp;lt;ul role=&quot;list&quot; class=&quot;cluster&quot;&amp;gt;
+        {
+        item.data.formats.map((format) =&amp;gt; (
+        &amp;lt;li&amp;gt;
+        &amp;lt;a href={`/music-collection/${generateSlug(format)}/`}&amp;gt;{format}&amp;lt;/a&amp;gt;
+        &amp;lt;/li&amp;gt;
+        ))
+        }
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Added on&amp;lt;/th&amp;gt;
+        &amp;lt;td&amp;gt;{formatDate(item.data.pubDate)}&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+        &amp;lt;th&amp;gt;Links&amp;lt;/th&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;AlbumPlatformLinks artist={item.data.artist} album={item.data.title} /&amp;gt;&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;/table&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Do &lt;em&gt;not&lt;/em&gt; come for me about setting table widths. I&apos;ll sort it when I actually build the UI 😅&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Again, this one is quite straightforward. Tabular data is actually a very sound way to render this stuff and I&apos;ll likely keep that. The only part to really touch on here is that for each format, I&apos;m linking out to a page that filters the collection. For example, there&apos;s a filter page, just for vinyl records.&lt;/p&gt;
+        &lt;p&gt;We&apos;ll cover that in later in series. Because this post is getting quite &lt;em&gt;long&lt;/em&gt; now. We&apos;ve covered a lot of the core infrastructure of this section of the website, but there&apos;s considerably more to come.&lt;/p&gt;
+        &lt;p&gt;Next time, we&apos;ll look at a handy little web component I built for rendering links so different streaming and purchasing platforms for each album. It&apos;s a fun one.&lt;/p&gt;
+        &lt;p&gt;See you then!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #191</title>
       <link>https://piccalil.li/the-index/191/?ref=main-rss-feed</link>
@@ -798,35 +1052,6 @@
         
         &lt;p&gt;The &lt;code&gt;Reflect&lt;/code&gt; object gives you some vital future-headache-prevention guardrails, and you should use them, of course — that&apos;s what they&apos;re there for.&lt;/p&gt;
         &lt;p&gt;I won&apos;t tell you to &quot;be careful,&quot; though. Get in there and break stuff; there&apos;s no better way to learn. Besides, nothin&apos; reloading the page can&apos;t fix, right?&lt;/p&gt;&lt;/div&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #189</title>
-      <link>https://piccalil.li/the-index/189/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/189/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 03 Jul 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://dbushell.com/2026/07/03/fixing-full-bleed-css/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Fixing full-bleed CSS&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A rather deep dive into how some of the newer CSS can make this age old pattern even better.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://rachelandrew.co.uk/archives/2026/06/11/wheres-the-holistic-ai-productivity-data/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Where’s the holistic AI productivity data?&lt;/a&gt;&lt;/h2&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;It’s hard to find anything other than anecdata from individuals telling us how AI has made them individually more productive. If AI really was creating measurable improvements in productivity across entire organisations, wouldn’t we be seeing that data?&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;em&gt;[nods]&lt;/em&gt;&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://jakearchibald.com/2026/goldilocks-select-height/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The Goldilocks customizable select height&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Even the new custom &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; capabilities bring headaches, but at least Jake&apos;s got height sorted for you.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://bayeuxgo.live/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Bayeux Go!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This is great fun!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://ditherimage.online/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Dithering tool&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A very handy looking tool that certainly beats a laborious Photoshop process.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/a-guide-to-destructuring-in-javascript/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;A guide to destructuring in JavaScript&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://sallylait.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://courses.oddbird.net/poetic-css/?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/poetic-css.jpg&quot; alt=&quot;Poetic CSS&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Poetic CSS is a new video and text course. Early bird pricing available July 2026.&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Understand CSS as a system with Miriam Suzanne — web developer, teacher, and pioneer of modern CSS — so you can write, review, and maintain web styles with confidence on a timeline and under budget.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://courses.oddbird.net/poetic-css/?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;Register now&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

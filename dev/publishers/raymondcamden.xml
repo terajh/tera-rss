@@ -4,12 +4,296 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Wed, 29 Jul 2026 16:42:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 30 Jul 2026 16:47:01 GMT</lastBuildDate>
+    <item>
+      <title>Updating my Watch Site for Algolia Support</title>
+      <link>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</link>
+      <guid>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</guid>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Alright, so I was supposed to share this a bit quicker, but life, work, etc, kept me busy. I&apos;ve had this particular change up for a few days but I&apos;m just now getting around to blogging about it. What changes?&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Adding Algolia&apos;s MCP to my Cursor environment&lt;/li&gt;
+        &lt;li&gt;Using Algolia&apos;s MCP (what worked, what did not)&lt;/li&gt;
+        &lt;li&gt;Adding Algolia content as a scheduled service with Netlify&lt;/li&gt;
+        &lt;li&gt;Adding a basic search front end to &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Before going on, be sure you&apos;ve read the &lt;a href=&quot;https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches&quot;&gt;last piece&lt;/a&gt; where I talked about agentic development in general, and specifically how I built the site.&lt;/p&gt;
+        &lt;h2 id=&quot;if-you-don&apos;t-have-a-log%2C-did-it-happen%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#if-you-don&apos;t-have-a-log%2C-did-it-happen%3F&quot;&gt;If you don&apos;t have a log, did it happen?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;ve been doing some work with different profiles and my Cursor environment, and in doing so, I lost the chat I had with Cursor about these features. I know it&apos;s there but I think I lost it the transition/testing I&apos;ve been doing. (I &lt;em&gt;did&lt;/em&gt; find the chat actually, but I&apos;ll still probably skip including it directly here.)&lt;/p&gt;
+        &lt;h2 id=&quot;the-plan---in-two-parts&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-plan---in-two-parts&quot;&gt;The Plan - in Two Parts&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I spelled this out above, but it bears repeating. I wanted to add search to my site and wanted to use &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;. Algolia makes use of an index that&apos;s a copy of your site data. For me that&apos;s the RSS feed items from the watch blogs I aggregate. Creating and setting up the index is a one time operation. Populating the index and keeping it up to date is something you do forever. (To be technical, you&apos;ve got a lot of options in that regard. So for example, in a site with &lt;em&gt;millions&lt;/em&gt; of updates you could hold off updating your index until a particular time every day or other time period.) So the first operation was setting up that process.&lt;/p&gt;
+        &lt;p&gt;The second part is much simpler - wiring up the search UI. For that I used my interface here as a guide - a nav search field that loads up a search page with results, and another form there so you can quickly change your search.&lt;/p&gt;
+        &lt;h2 id=&quot;algolia-and-mcp&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#algolia-and-mcp&quot;&gt;Algolia and MCP&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Algolia&apos;s MCP &lt;a href=&quot;https://www.algolia.com/doc/guides/model-context-protocol&quot;&gt;docs&lt;/a&gt; were a bit confusing to me. The first example mentioned is the &amp;quot;Algolia Public MCP&amp;quot; - but this is the &amp;quot;per app&amp;quot; MCP I talked about here: &lt;a href=&quot;https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy&quot;&gt;&amp;quot;TIL - Algolia Makes Creating an MCP Server Stupid Easy&amp;quot;&lt;/a&gt;. In other words, it&apos;s an MCP server for your data.&lt;/p&gt;
+        &lt;p&gt;Instead, you want the &lt;a href=&quot;https://www.algolia.com/doc/guides/model-context-protocol#algolia-productivity-mcp&quot;&gt;Algolia Productivity MCP&lt;/a&gt;, which is what&apos;s used to work with your account at a high level. But - right away you see:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;Read-only index access, with an extended set of tools such as analytics.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;So the MCP server can&apos;t actually make changes to your account, like creating or modifying an index. That&apos;s a bit of a bummer (and I let my buddy at Algolia know this), but it does give you MCP access via your agent so you can do things like list your indexes and perform searches right from your AI harness.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a test I did in Cursor:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/07/amcp.png&quot; loading=&quot;lazy&quot; alt=&quot;Cursor Response&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Pretty standard stuff, but notice both Cursor and Algolia&apos;s MCP gracefully handled the fact that I didn&apos;t specify a particular index for my account. It was smart enough to recognize which index would most likely have &lt;code&gt;rolex&lt;/code&gt; as a term.&lt;/p&gt;
+        &lt;p&gt;One more nit to be aware of. You have to &lt;em&gt;enable&lt;/em&gt; Algolia MCP. This is &lt;a href=&quot;https://www.algolia.com/doc/guides/model-context-protocol/productivity-mcp&quot;&gt;documented&lt;/a&gt;, but given that the URL is standard (not something special per index, it&apos;s for Algolia in general) and given you have to authenticate to use it, it felt weird that I also had to enable it in my account. This is also feedback I shared with my contact at Algolia.&lt;/p&gt;
+        &lt;p&gt;So given I couldn&apos;t use the MCP to &lt;em&gt;create&lt;/em&gt; the index, I just did it myself. By hand. Uphill. In the snow. Both ways. After the 20 to 30 seconds of that work was done, I was ready to start building.&lt;/p&gt;
+        &lt;h2 id=&quot;index-seeding-and-updating&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#index-seeding-and-updating&quot;&gt;Index Seeding and Updating&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;My first choice was a bit difficult. For my blog here, I&apos;ve got a huge amount of content, and keeping Algolia in sync could be a bit complex. I went with an approach that gets recent items and does an upsert to my index using the batch API.&lt;/p&gt;
+        &lt;p&gt;For I Watch Watches, I decided to use the same API, the same upsert, but to pass everything. My spidey-sense tells me this may be problematic later as the aggregator grows, and I&apos;ll probably have to go with a &amp;quot;last 1k&amp;quot; or so filter, but for now it worked.&lt;/p&gt;
+        &lt;p&gt;In Cursor, I described my ask - create a Netlify scheduled function to upsert my data to my Algolia index. Netlify has my Algolia secrets and serverless functions can use it, so I set Cursor to building it out, and it did a great job. In fact, it did it a bit differently than I would.&lt;/p&gt;
+        &lt;p&gt;First, it created a core Algolia module in &lt;code&gt;src/lib/algolia.ts&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { algoliasearch } from &amp;quot;algoliasearch&amp;quot;;
+        import { db } from &amp;quot;../db&amp;quot;;
+        import { feedItems } from &amp;quot;../db/schema&amp;quot;;
+        
+        const BATCH_SIZE = 1000;
+        
+        export type AlgoliaSyncSummary = {
+        total: number;
+        batches: number;
+        indexName: string;
+        };
+        
+        function getAlgoliaConfig() {
+        const appId = process.env.ALGOLIA_APP_ID;
+        const apiKey = process.env.ALGOLIA_SECRET_KEY;
+        const indexName = process.env.ALGOLIA_INDEX;
+        
+        const missing = [
+        !appId &amp;amp;&amp;amp; &amp;quot;ALGOLIA_APP_ID&amp;quot;,
+        !apiKey &amp;amp;&amp;amp; &amp;quot;ALGOLIA_SECRET_KEY&amp;quot;,
+        !indexName &amp;amp;&amp;amp; &amp;quot;ALGOLIA_INDEX&amp;quot;,
+        ].filter(Boolean);
+        
+        if (missing.length &amp;gt; 0) {
+        throw new Error(`Missing required Algolia environment variables: ${missing.join(&amp;quot;, &amp;quot;)}`);
+        }
+        
+        return { appId: appId!, apiKey: apiKey!, indexName: indexName! };
+        }
+        
+        export async function syncFeedItemsToAlgolia(): Promise&amp;lt;AlgoliaSyncSummary&amp;gt; {
+        const { appId, apiKey, indexName } = getAlgoliaConfig();
+        const client = algoliasearch(appId, apiKey);
+        
+        const rows = await db
+        .select({
+        id: feedItems.id,
+        title: feedItems.title,
+        url: feedItems.url,
+        synopsis: feedItems.synopsis,
+        publishedAt: feedItems.publishedAt,
+        })
+        .from(feedItems);
+        
+        const objects = rows.map((row) =&amp;gt; ({
+        objectID: String(row.id),
+        title: row.title,
+        url: row.url,
+        synopsis: row.synopsis,
+        published_at: row.publishedAt ? row.publishedAt.toISOString() : null,
+        }));
+        
+        if (objects.length === 0) {
+        return { total: 0, batches: 0, indexName };
+        }
+        
+        const responses = await client.saveObjects({
+        indexName,
+        objects,
+        batchSize: BATCH_SIZE,
+        });
+        
+        return {
+        total: objects.length,
+        batches: responses.length,
+        indexName,
+        };
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then it built the serverless function which ended up being much smaller with the core logic abstracted.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import type { Config } from &amp;quot;@netlify/functions&amp;quot;;
+        import { syncFeedItemsToAlgolia } from &amp;quot;../../src/lib/algolia&amp;quot;;
+        
+        export default async (req: Request) =&amp;gt; {
+        const body = await req.json().catch(() =&amp;gt; ({}));
+        
+        try {
+        const result = await syncFeedItemsToAlgolia();
+        const summary = {
+        next_run: body?.next_run ?? null,
+        ...result,
+        };
+        
+        console.log(&amp;quot;Algolia sync complete&amp;quot;, JSON.stringify(summary));
+        
+        return new Response(JSON.stringify(summary), {
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        });
+        } catch (error) {
+        const message = error instanceof Error ? error.message : &amp;quot;Unknown error&amp;quot;;
+        console.error(&amp;quot;Algolia sync failed&amp;quot;, message);
+        
+        return new Response(JSON.stringify({ error: message }), {
+        status: 500,
+        headers: { &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot; },
+        });
+        }
+        };
+        
+        export const config: Config = {
+        schedule: &amp;quot;@daily&amp;quot;,
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Running locally, I was able to use curl to run this function and then the Algolia MCP to search and confirm it actually worked.&lt;/p&gt;
+        &lt;h2 id=&quot;searching&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#searching&quot;&gt;Searching&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Algolia has multiple options for performing searches, but for me the basic JavaScript SDK is all I need. I asked Cursor to implement that following the pattern I have on my blog here and as I described above. Cursor wired up the search in the top nav, built a new page, &lt;code&gt;search.astro&lt;/code&gt;, and mostly followed the same pattern I did here. Here&apos;s the complete Astro page:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;---
+        import Header from &amp;quot;../components/Header.astro&amp;quot;;
+        import { SITE_NAME } from &amp;quot;../config&amp;quot;;
+        import BaseLayout from &amp;quot;../layouts/BaseLayout.astro&amp;quot;;
+        ---
+        
+        &amp;lt;BaseLayout title={`Search · ${SITE_NAME}`} description=&amp;quot;Search watch articles and news&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;site-shell&amp;quot;&amp;gt;
+        &amp;lt;Header /&amp;gt;
+        
+        &amp;lt;main class=&amp;quot;search-page&amp;quot;&amp;gt;
+        &amp;lt;h1&amp;gt;Search&amp;lt;/h1&amp;gt;
+        
+        &amp;lt;form class=&amp;quot;search-page-form&amp;quot; action=&amp;quot;/search&amp;quot; method=&amp;quot;get&amp;quot; role=&amp;quot;search&amp;quot;&amp;gt;
+        &amp;lt;input
+        id=&amp;quot;search-input&amp;quot;
+        type=&amp;quot;search&amp;quot;
+        name=&amp;quot;search&amp;quot;
+        placeholder=&amp;quot;Search watches, brands, or articles&amp;quot;
+        autocomplete=&amp;quot;off&amp;quot;
+        /&amp;gt;
+        &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Search&amp;lt;/button&amp;gt;
+        &amp;lt;/form&amp;gt;
+        
+        &amp;lt;p id=&amp;quot;search-status&amp;quot; class=&amp;quot;search-status&amp;quot; aria-live=&amp;quot;polite&amp;quot;&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;div id=&amp;quot;search-results&amp;quot; class=&amp;quot;search-results&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        
+        &amp;lt;p class=&amp;quot;search-attribution&amp;quot;&amp;gt;
+        Search by
+        &amp;lt;a href=&amp;quot;https://www.algolia.com/&amp;quot; target=&amp;quot;_blank&amp;quot; rel=&amp;quot;noopener noreferrer&amp;quot;&amp;gt;Algolia&amp;lt;/a&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;/main&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/BaseLayout&amp;gt;
+        
+        &amp;lt;script is:inline src=&amp;quot;https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script is:inline&amp;gt;
+        (() =&amp;gt; {
+        const appId = &amp;quot;0FJBPN4K5D&amp;quot;;
+        const apiKey = &amp;quot;8f741f50b983176875b65e252402b140&amp;quot;;
+        const indexName = &amp;quot;iwatchwatches&amp;quot;;
+        
+        const statusEl = document.getElementById(&amp;quot;search-status&amp;quot;);
+        const resultsEl = document.getElementById(&amp;quot;search-results&amp;quot;);
+        const inputEl = document.getElementById(&amp;quot;search-input&amp;quot;);
+        
+        const params = new URLSearchParams(window.location.search);
+        const term = (params.get(&amp;quot;search&amp;quot;) || &amp;quot;&amp;quot;).trim();
+        
+        if (inputEl) {
+        inputEl.value = term;
+        }
+        
+        if (!term) {
+        statusEl.textContent = &amp;quot;Enter a search term above to find articles.&amp;quot;;
+        return;
+        }
+        
+        if (typeof algoliasearch !== &amp;quot;function&amp;quot;) {
+        statusEl.textContent = &amp;quot;Search is temporarily unavailable.&amp;quot;;
+        return;
+        }
+        
+        statusEl.textContent = &amp;quot;Searching…&amp;quot;;
+        
+        const client = algoliasearch(appId, apiKey);
+        const index = client.initIndex(indexName);
+        const dateFormatter = new Intl.DateTimeFormat(&amp;quot;en&amp;quot;, {
+        month: &amp;quot;short&amp;quot;,
+        day: &amp;quot;numeric&amp;quot;,
+        year: &amp;quot;numeric&amp;quot;,
+        });
+        
+        function escapeHtml(value) {
+        return String(value)
+        .replace(/&amp;amp;/g, &amp;quot;&amp;amp;amp;&amp;quot;)
+        .replace(/&amp;lt;/g, &amp;quot;&amp;amp;lt;&amp;quot;)
+        .replace(/&amp;gt;/g, &amp;quot;&amp;amp;gt;&amp;quot;)
+        .replace(/&amp;quot;/g, &amp;quot;&amp;amp;quot;&amp;quot;)
+        .replace(/&apos;/g, &amp;quot;&amp;amp;#39;&amp;quot;);
+        }
+        
+        function formatDate(value) {
+        if (!value) return &amp;quot;&amp;quot;;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return &amp;quot;&amp;quot;;
+        return dateFormatter.format(date).toUpperCase();
+        }
+        
+        index
+        .search(term, {
+        hitsPerPage: 50,
+        attributesToRetrieve: [&amp;quot;title&amp;quot;, &amp;quot;url&amp;quot;, &amp;quot;synopsis&amp;quot;, &amp;quot;published_at&amp;quot;],
+        })
+        .then((response) =&amp;gt; {
+        const hits = response.hits || [];
+        const count = response.nbHits ?? hits.length;
+        
+        if (hits.length === 0) {
+        statusEl.textContent = &amp;quot;Sorry, but there were no results.&amp;quot;;
+        resultsEl.innerHTML = &amp;quot;&amp;quot;;
+        return;
+        }
+        
+        statusEl.textContent =
+        count === 1
+        ? &amp;quot;There was one result for this search.&amp;quot;
+        : `There were ${count} results for this search.`;
+        
+        resultsEl.innerHTML = hits
+        .map((hit) =&amp;gt; {
+        const title = escapeHtml(hit.title || &amp;quot;Untitled&amp;quot;);
+        const url = escapeHtml(hit.url || &amp;quot;#&amp;quot;);
+        const synopsis = hit.synopsis ? escapeHtml(hit.synopsis) : &amp;quot;&amp;quot;;
+        const published = formatDate(hit.published_at);
+        
+        return `
+        &amp;lt;article class=&amp;quot;search-result&amp;quot;&amp;gt;
+        &amp;lt;h2 class=&amp;quot;search-result-title&amp;quot;&amp;gt;
+        &amp;lt;a href=&amp;quot;${url}&amp;quot; target=&amp;quot;_blank&amp;quot; rel=&amp;quot;noopener noreferrer&amp;quot;&amp;gt;${title}&amp;lt;/a&amp;gt;
+        &amp;lt;/h2&amp;gt;
+        ${published ? `&amp;lt;p class=&amp;quot;search-result-meta&amp;quot;&amp;gt;${published}&amp;lt;/p&amp;gt;` : &amp;quot;&amp;quot;}
+        ${synopsis ? `&amp;lt;p class=&amp;quot;search-result-synopsis&amp;quot;&amp;gt;${synopsis}&amp;lt;/p&amp;gt;` : &amp;quot;&amp;quot;}
+        &amp;lt;/article&amp;gt;
+        `;
+        })
+        .join(&amp;quot;&amp;quot;);
+        })
+        .catch(() =&amp;gt; {
+        statusEl.textContent = &amp;quot;Search failed. Please try again.&amp;quot;;
+        resultsEl.innerHTML = &amp;quot;&amp;quot;;
+        });
+        })();
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In case you&apos;re curious, the key embedded in code is safe - it&apos;s a read only search key.&lt;/p&gt;
+        &lt;h2 id=&quot;show-me-the-code...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#show-me-the-code...&quot;&gt;Show me the code...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;If you want to see everything behind the aggregator, you can check out the repo here: &lt;a href=&quot;https://github.com/cfjedimaster/iwatchwatches&quot;&gt;https://github.com/cfjedimaster/iwatchwatches&lt;/a&gt;. Note that the readme was updated by Cursor and it did a dang good job. It handled updating the configuration as well as the &lt;code&gt;Changes&lt;/code&gt; section.&lt;/p&gt;
+        &lt;p&gt;The next change will be somewhat larger - a web based interface to add new feeds to the site - behind authentication of course.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@shahrukh_rehman1?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Shahrukh Rehman&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/silver-and-black-chronograph-watch-05IxAEjVNl0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building Agentically and Celebrating Watches</title>
       <link>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</link>
       <guid>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared past experiences with vibe coding and it&apos;s been a fascinating way to experiment and build on a small scale, but while it works well for POCs and other small utilities (I won&apos;t say &apos;toys&apos; as I&apos;ve built useful, if small, things now multiple times), it isn&apos;t really a &amp;quot;process&amp;quot; and not one that would work over a project with a longer time frame. This is where &amp;quot;Agentic Development&amp;quot; comes in. It&apos;s not always referred to as such and it&apos;s a huge topic, but let me give you my opinion on it and then demonstrate how I used it to build my newest project, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;agentic-development-in-a-nutshell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agentic-development-in-a-nutshell&quot;&gt;Agentic Development in a Nutshell&lt;/a&gt;&lt;/h2&gt;
@@ -180,7 +464,7 @@
       <title>Copying HTML Tables as Text, Markdown, and CSV</title>
       <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
       <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
         &lt;p&gt;First, I added a table of course:&lt;/p&gt;
@@ -366,7 +650,7 @@
       <title>Links For You (7/18/26)</title>
       <link>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</link>
       <guid>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs. I&apos;m currently at a conference (&lt;a href=&quot;https://www.sqlsatbr.com/&quot;&gt;Day of Data&lt;/a&gt;), but thankfully one just down the road. I&apos;ll be back tonight, and thought I&apos;d take a break between sessions to share some links. I&apos;ll be presenting later today one of my favorite talks, &amp;quot;A Beginner&apos;s Guide to Wrangling Asynchronicity in JavaScript&amp;quot;. I love the talk, but given I&apos;m up against &lt;em&gt;eight&lt;/em&gt; other talks at the same time and I&apos;m not talking AI... well it may be a small personal affair. We shall see.&lt;/p&gt;
         &lt;h2 id=&quot;building-a-blog-with-astro&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-blog-with-astro&quot;&gt;Building a Blog with Astro&lt;/a&gt;&lt;/h2&gt;
@@ -391,7 +675,7 @@
       <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
       <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
       <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
         &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
@@ -568,7 +852,7 @@
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -825,7 +1109,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -1152,7 +1436,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -1166,7 +1450,7 @@
       <title>Links For You (7/5/26)</title>
       <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
       <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
         &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
@@ -1205,7 +1489,7 @@
       <title>Building Custom Form Selection Boxes - Working on Accessibility</title>
       <link>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</link>
       <guid>https://www.raymondcamden.com/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
+      <pubDate>Thu, 30 Jul 2026 16:31:48 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Whenever I find myself needing to update a previous blog post, I either correct it inline and add a small note on top, for small tweaks, or write a whole new piece for larger changes. My &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;last blog post&lt;/a&gt; talked about how to use CSS to style a &amp;quot;block&amp;quot; such that it acted like a form radio button. When I worked on that demo, I was a bit worried about accessibility. I did one quick check with an online tool, and thought I was ok. I was not.&lt;/p&gt;
         &lt;p&gt;When I shared my post on LinkedIn, &lt;a href=&quot;https://www.linkedin.com/in/kevbonett/&quot;&gt;Kevin Bonett&lt;/a&gt; shared this feedback with me:&lt;/p&gt;
@@ -1373,122 +1657,6 @@
         &lt;/zero-md&gt;&lt;/p&gt;
         &lt;p&gt;I went ahead and gave Cursor permission to edit and update my files, and while I&apos;m keeping the original CodePen as is, I pushed up the new files to Netlify: &lt;a href=&quot;https://formselectionblock.netlify.app/&quot;&gt;https://formselectionblock.netlify.app/&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;The keyboard navigation is improved and the text helps too. I passed this by Kevin; he agreed with the updates, so going forward when I use this UX on my sites, I&apos;ll work with this version. Let me know what you think!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building Custom Form Selection Blocks - no JS, all CSS</title>
-      <link>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</link>
-      <guid>https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css</guid>
-      <pubDate>Wed, 29 Jul 2026 16:26:12 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Edit on July 3 - See my &lt;a href=&quot;/2026/07/03/building-custom-form-selection-boxes-working-on-accessibility&quot;&gt;update&lt;/a&gt;.&lt;/strong&gt; I apologize for what may be a slightly misleading title. The topic for this post is something I&apos;ve had on my list of things to explore for some time now, and while I wait for the new job to start, I&apos;ve found myself with time to kill. Let me explain what I&apos;m talking about and hopefully it will make a bit more sense. You are, dear reader, familiar with form controls and how to build forms both big and small. One type of user interface I&apos;ve seen from time to time is the ability to select an item where the &amp;quot;item&amp;quot; is an arbitrary block of code. What do I mean by that?&lt;/p&gt;
-        &lt;p&gt;Typically a choice element in a form is either a select, checkbox, or radio set. But I&apos;ve seen some forms where you select something a bit more abstract. Consider the screen shot below:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css1.png&quot; loading=&quot;lazy&quot; alt=&quot;Form Sample&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;See the two regular text fields and the cat selection? If I pick one, it visually updates:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/06/css2.png&quot; alt=&quot;Form sample with selected cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;On submitting the form, there will be something representing the selected value, along with any other form field values as well. In theory, the &amp;quot;thing&amp;quot; you select can be any arbitrary block with the selection look and feel being whatever makes sense for your site.&lt;/p&gt;
-        &lt;p&gt;So given this UX, I was curious how I&apos;d build it myself.&lt;/p&gt;
-        &lt;h2 id=&quot;first-thought---web-components&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-thought---web-components&quot;&gt;First thought - Web Components&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Initially, I thought this would be a great use for web components. Web components can participate in forms (see &lt;a href=&quot;https://www.raymondcamden.com/2023/05/24/adding-form-participation-support-to-web-components&quot;&gt;my post&lt;/a&gt; from... wow, three years ago!) so in theory, I could build something like this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot;&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
-        This is area select 1.
-        &amp;lt;/area-select&amp;gt;
-        
-        &amp;lt;area-select name=&amp;quot;foo&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
-        This is area select 2.
-        &amp;lt;/area-select&amp;gt;
-        
-        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;In the sample code above, &lt;code&gt;area-select&lt;/code&gt; is a web component which will participate in a form by setting the &lt;code&gt;foo&lt;/code&gt; value to whatever is selected, using the string in &lt;code&gt;value&lt;/code&gt; as the value.&lt;/p&gt;
-        &lt;p&gt;I wrote this out and was about to start hacking away at the code. Because of course JavaScript would be needed for this, right?&lt;/p&gt;
-        &lt;h2 id=&quot;sorry-i-doubted-you-css...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#sorry-i-doubted-you-css...&quot;&gt;Sorry I doubted you CSS...&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Before I started writing JavaScript, I thought - let me Google some more and research this because maybe, just maybe, a pure CSS solution would work?&lt;/p&gt;
-        &lt;p&gt;I&apos;m glad I did.&lt;/p&gt;
-        &lt;p&gt;Turns out - it&apos;s actually relatively simple to achieve this with a bit of CSS. First, let&apos;s consider this version of the HTML:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;https://postman-echo.com/post&amp;quot;&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;name&amp;quot;&amp;gt;Name:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;name&amp;quot; id=&amp;quot;name&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;label for=&amp;quot;email&amp;quot;&amp;gt;Email:&amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;email&amp;quot; name=&amp;quot;email&amp;quot; id=&amp;quot;email&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        
-        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
-        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;1&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;Option 1 - Luna&amp;lt;/h3&amp;gt;
-        &amp;lt;img src=&amp;quot;https://placecats.com/200/250&amp;quot;&amp;gt;
-        &amp;lt;/label&amp;gt;
-        
-        &amp;lt;label class=&amp;quot;custom-card&amp;quot;&amp;gt;
-        &amp;lt;input type=&amp;quot;radio&amp;quot; name=&amp;quot;option&amp;quot; value=&amp;quot;2&amp;quot;&amp;gt;
-        &amp;lt;h3&amp;gt;Option 2 - Pig&amp;lt;/h3&amp;gt;
-        &amp;lt;img src=&amp;quot;https://placecats.com/300/200&amp;quot;&amp;gt;
-        &amp;lt;/label&amp;gt;
-        
-        &amp;lt;p&amp;gt;
-        &amp;lt;input type=&amp;quot;submit&amp;quot;&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;My two &amp;quot;custom selectable doohickies&amp;quot; are just &lt;code&gt;label&lt;/code&gt; elements with an internal radio button. After the button I&apos;ve got arbitrary HTML.&lt;/p&gt;
-        &lt;p&gt;Now for the CSS:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-css&quot;&gt;.custom-card input[type=&amp;quot;radio&amp;quot;] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-        }
-        
-        /* Style the label container itself as the button */
-        .custom-card {
-        display: inline-block;
-        padding: 12px 24px;
-        border: 2px solid #ccc;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        width: 350px;
-        height: 350px;
-        vertical-align: top;
-        }
-        
-        /* Style change when active */
-        .custom-card:has(input[type=&amp;quot;radio&amp;quot;]:checked) {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This does a few things. It completely hides the radio field, styles the label like a &amp;quot;card&amp;quot; element, and defines the &amp;quot;selected&amp;quot; look to add a blue border and background. It also swaps out the text color to white. Because I&apos;m wrapping everything in a label, the entire block is selectable, and a cursor pointer helps make that clear to the user.&lt;/p&gt;
-        &lt;p&gt;In theory... that&apos;s it. I spent a bit of time tweaking the initial CSS I had found and more could be done of course, but this ended up being simpler than I imagined.&lt;/p&gt;
-        &lt;p&gt;You can play with the full demo here: &lt;a href=&quot;https://capital-wood-marlin.codepen.app/&quot;&gt;https://capital-wood-marlin.codepen.app/&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;And here&apos;s the full CodePen:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;600&quot; data-pen-title=&quot;Custom Radio&quot; data-version=&quot;2&quot; data-default-tab=&quot;html,result&quot; data-slug-hash=&quot;xbgXbxd&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f1383-8203-7ff3-ab04-5aa9afa75d18&quot;&gt;
-        Custom Radio&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
