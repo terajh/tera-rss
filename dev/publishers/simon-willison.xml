@@ -4,7 +4,147 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Thu, 30 Jul 2026 16:47:05 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 31 Jul 2026 17:14:04 GMT</lastBuildDate>
+    <item>
+      <title>Advancing the price-performance frontier with GPT‑5.6</title>
+      <link>https://simonwillison.net/2026/Jul/30/luna-price-drop/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/luna-price-drop/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 23:58:42 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/&quot;&gt;Advancing the price-performance frontier with GPT‑5.6&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Huge price drop from OpenAI today: GPT-5.6 Terra got a 20% reduction, and GPT-5.6 Luna got a massive 80% drop.&lt;/p&gt;
+        &lt;p&gt;OpenAI credit 5.6 Sol with enabling this: in &lt;a href=&quot;https://openai.com/index/gpt-5-6-frontier-intelligence-efficiency/&quot;&gt;How GPT‑5.6 fuses frontier intelligence with frontier efficiency&lt;/a&gt; they describe using 5.6 Sol to optimize load balancing, and more impressively to optimize inference itself:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;We also used GPT‑5.6 Sol to optimize the model’s forward pass: the computation that transforms inputs into next-token predictions. Even when individual operations are fast, excess memory movement, synchronization, and inefficient data layouts can leave GPUs idle. To avoid this, GPT‑5.6 Sol found work that could be precomputed, avoided, or parallelized. With Codex, GPT‑5.6 Sol autonomously rewrote and optimized our production kernels, the core code that executes the mathematical operations that make up the model. This worked in part because we’ve trained GPT‑5.6 to be effective at writing and improving kernels in &lt;a href=&quot;https://triton-lang.org/main/index.html&quot;&gt;Triton⁠&lt;/a&gt;and &lt;a href=&quot;https://triton-lang.org/main/gluon/index.html&quot;&gt;Gluon⁠&lt;/a&gt;, two open-source GPU programming languages maintained by OpenAI. These efforts, combined with broader kernel advancements from GPT‑5.6 Sol, reduced end-to-end serving costs by 20%.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That Luna price drop completely changes the landscape with respect to lower priced models. At $0.20/million tokens for input and $1.20/million for output Luna is now cheaper than Google&apos;s Gemini 3.1 Flash-Lite ($.025/$1.50).&lt;/p&gt;
+        &lt;p&gt;Anthropic&apos;s cheapest current model is Claude Haiku 4.5, and that&apos;s $1/$5 - Luna is now 1/5th of that for input, previously it cost the same.&lt;/p&gt;
+        &lt;p&gt;My &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;agent.datasette.io&lt;/a&gt; demo site was running on Gemini 3.1 Flash-Lite. I&apos;ve switched it over to Luna.
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49112867&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gemini&quot;&gt;gemini&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Investigating three real-world incidents in our cybersecurity evaluations</title>
+      <link>https://simonwillison.net/2026/Jul/30/three-real-world-incidents/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/three-real-world-incidents/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 23:41:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals&quot;&gt;Investigating three real-world incidents in our cybersecurity evaluations&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        It happened again! This is turning into something of a pattern.&lt;/p&gt;
+        &lt;p&gt;Last week &lt;a href=&quot;https://simonwillison.net/2026/Jul/22/openai-cyberattack/&quot;&gt;OpenAI accidentally exploited Hugging Face&lt;/a&gt; when one of their frontier models broke out of a sandboxed container and hacked into Hugging Face to try and get the solutions to the cyber benchmark it was executing.&lt;/p&gt;
+        &lt;p&gt;This inspired Anthropic to double-check their own logs, and it turned out they had three similar (albeit less impressive) incidents, the earliest of which played out in April!&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Of the 141,006 evaluation runs we reviewed, we identified three separate incidents (involving six total runs, four of which impacted the same organization; the other two incidents each happened in independent evaluation runs). [...]&lt;/p&gt;
+        &lt;p&gt;In all cases, Anthropic’s evaluation prompt specified to Claude that its environment was a simulation and that it had no internet access. Due to a misunderstanding between us and our evaluation partner, this was not the case, and internet access was available. Because of this, when Claude’s search led it to real systems on the open internet, it treated them as part of the exercise. [...]&lt;/p&gt;
+        &lt;p&gt;Operating under the false belief that all accessible entities were intended to be in-scope for the exercise, Claude compromised the impacted organizations’ infrastructure using basic techniques, such as exploiting weak passwords and unauthenticated endpoints.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;One of the companies was targeted because its name happened to match the fictional name in the eval.&lt;/p&gt;
+        &lt;p&gt;The most concerning of the three incidents involved Claude uploading a malware package to PyPI, after a comically convoluted sequence of steps to get an account: &lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;[...] in order to create a PyPI account, Claude needed an email address. And in order to create an email address, it needed a phone number. To get a phone number, after failing to find a free phone number service, it tried—and failed—to obtain funds to pay for a phone number through several different means. It finally backtracked, found a free, non-blocked email provider, used this to register a PyPI account, and then used this account to upload malware to PyPI.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That package was then installed by a security company that &quot;routinely installs Python packages and scans them for malware&quot;, and the executed code was able to exfiltrate credentials back to Claude!&lt;/p&gt;
+        &lt;p&gt;Thankfully that package was removed from PyPI by other automated scanners an hour after it was published, but it had still been downloaded and executed on &quot;15 real systems&quot; by that point.&lt;/p&gt;
+        &lt;p&gt;It&apos;s abundantly clear now that running evals of cyberattack potential in models is a &lt;em&gt;spectacularly&lt;/em&gt; risky business. Every AI lab needs to pay attention to this. Keeping a close eye on what&apos;s happening in those sandboxes is crucial.
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49116922#49117088&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/pypi&quot;&gt;pypi&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-security-research&quot;&gt;ai-security-research&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm 0.32rc2</title>
+      <link>https://simonwillison.net/2026/Jul/30/llm-rc2/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/llm-rc2/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 22:52:06 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.32rc2&quot;&gt;llm 0.32rc2&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Hot on the heels of &lt;a href=&quot;https://simonwillison.net/2026/Jul/30/llm-rc1/&quot;&gt;RC1&lt;/a&gt;, this fixes a dependency issue and also adds two neat new features:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;The default model for users who have not set their own default is now &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-5.6-luna&quot;&gt;GPT-5.6 Luna&lt;/a&gt;. It was previously &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-4o-mini&quot;&gt;GPT-4o mini&lt;/a&gt;. Luna is a much better and more recent model, albeit slightly more expensive - $0.20 per million input tokens and $1.20 per million output tokens, compared to $0.15/$0.60 for 4o mini. You can switch back to 4o mini using &lt;code&gt;llm models default gpt-4o-mini&lt;/code&gt;, or switch to &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-5-nano&quot;&gt;GPT-5 nano&lt;/a&gt;, an even cheaper default model ($0.05/$0.40), using &lt;code&gt;llm models default gpt-5-nano&lt;/code&gt;. &lt;a href=&quot;https://github.com/simonw/llm/issues/1576&quot;&gt;#1576&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;New &lt;a href=&quot;https://llm.datasette.io/en/latest/other-models.html#openai-endpoint&quot;&gt;llm openai endpoint&lt;/a&gt; command for running prompts, chats and model listings against arbitrary OpenAI-compatible endpoints without first configuring a model. These calls are not logged. &lt;a href=&quot;https://github.com/simonw/llm/issues/1565&quot;&gt;#1565&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The &lt;code&gt;llm openai endpoint&lt;/code&gt; command is &lt;em&gt;really&lt;/em&gt; cool. I got frustrated at the lack of an obvious CLI tool for trying out prompts against arbitrary OpenAI Chat Completions imitation endpoints, so I decided to add that to LLM itself.&lt;/p&gt;
+        &lt;p&gt;You don&apos;t even have to install LLM to use this. Here&apos;s a &lt;code&gt;uvx&lt;/code&gt; one-liner for running a prompt - with tools - against an &lt;a href=&quot;https://lmstudio.ai&quot;&gt;LM Studio&lt;/a&gt; local model:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;uvx --pre llm openai endpoint http://127.0.0.1:1234/v1 \
+        T llm_version -T llm_time --td \
+        -m google/gemma-4-31b &apos;what is the current LLM version? And the time?&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;a href=&quot;https://github.com/simonw/llm/pull/1568#issuecomment-5136163707&quot;&gt;Output here&lt;/a&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/uv&quot;&gt;uv&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/lm-studio&quot;&gt;lm-studio&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting Bruce Schneier</title>
+      <link>https://simonwillison.net/2026/Jul/30/bruce-schneier/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/bruce-schneier/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 18:25:26 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://www.schneier.com/blog/archives/2026/07/should-you-use-ai-for-a-task-heres-a-simple-way-to-decide.html&quot;&gt;&lt;p&gt;The writing assignments I give my students are gym tasks, not work tasks. I ask them to write policy memos not because the world needs more policy memos. I assign them because the very act of writing, which includes thinking and outlining and drafting and editing, making and criticizing and revising arguments, will help develop the critical thinking skills they will need in their future careers. And without this constant mental exercise, those skills will atrophy. Employers are &lt;a href=&quot;https://futurism.com/future-society/college-critical-thinking-ai&quot;&gt;already noticing&lt;/a&gt;.&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.schneier.com/blog/archives/2026/07/should-you-use-ai-for-a-task-heres-a-simple-way-to-decide.html&quot;&gt;Bruce Schneier&lt;/a&gt;, Should You Use AI for a Task? Here’s a Simple Way to Decide&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/writing&quot;&gt;writing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/bruce-schneier&quot;&gt;bruce-schneier&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm-chat-completions-server 0.1a0</title>
+      <link>https://simonwillison.net/2026/Jul/30/llm-chat-completions-server/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/llm-chat-completions-server/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 15:43:16 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-chat-completions-server/releases/tag/0.1a0&quot;&gt;llm-chat-completions-server 0.1a0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;A key goal of the new content-addressable logs &lt;a href=&quot;https://simonwillison.net/2026/Jul/30/llm-rc1/&quot;&gt;in LLM 0.32rc1&lt;/a&gt; was being able to support OpenAI Chat Completion style requests where each incoming message extends the previous conversation, like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;curl http://localhost:8002/v1/chat/completions \
+        -H &apos;Content-Type: application/json&apos; \
+        -d &apos;{
+        &quot;model&quot;: &quot;qwen3.5-4b&quot;,
+        &quot;messages&quot;: [
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Capital of France?&quot;},
+        {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Paris.&quot;},
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Germany?&quot;}
+        ]
+        }&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here the conversation state is tracked by the client, so each of these requests gets longer and longer. The new schema design in LLM is designed to de-duplicate these using hashes of the individual message parts.&lt;/p&gt;
+        &lt;p&gt;To test that out, I built this plugin:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;uv tool install llm --pre
+        llm install llm-chat-completions-server
+        llm chat-completions-server -p 9001
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Running this starts a localhost server on port 9001 that exposes your full collection of LLM models (from any plugins you have installed) using a ChatGPT Completions compatible endpoint.&lt;/p&gt;
+        &lt;p&gt;GPT-5.6 Sol &lt;a href=&quot;https://gist.github.com/simonw/53be513c1bd4a29a7aa480d9bde9b4a5&quot;&gt;wrote the whole thing&lt;/a&gt; - it turns out it knows the OpenAI Chat Completions API shape really well.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm 0.32rc1</title>
+      <link>https://simonwillison.net/2026/Jul/30/llm-rc1/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Jul/30/llm-rc1/#atom-everything</guid>
+      <pubDate>Thu, 30 Jul 2026 15:30:20 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.32rc1&quot;&gt;llm 0.32rc1&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This RC for LLM 0.32 finishes the work that &lt;a href=&quot;https://simonwillison.net/2026/Apr/29/llm/&quot;&gt;started in LLM 0.32a0&lt;/a&gt; - it adds a &lt;a href=&quot;https://llm.datasette.io/en/latest/logging.html#the-message-store&quot;&gt;new schema design&lt;/a&gt; that does a much better job of capturing the details of the prompts and responses returned by the latest model families.&lt;/p&gt;
+        &lt;p&gt;The most important change is the use of content-addressable hash IDs for stored messages. This allows de-duplication in the database, and means that LLM can now represent trees of messages for forked conversations.&lt;/p&gt;
+        &lt;p&gt;Since it involves a significant schema change - new tables only, and old data should not be affected at all - it&apos;s worth running a backup of your existing &lt;code&gt;logs.db&lt;/code&gt; before upgrading to the RC:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm logs backup logs-backup.db
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The RC also adds support for &lt;code&gt;gpt-5.6-sol&lt;/code&gt;, &lt;code&gt;gpt-5.6-terra&lt;/code&gt;, and &lt;code&gt;gpt-5.6-luna&lt;/code&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Quoting D. Richard Hipp</title>
       <link>https://simonwillison.net/2026/Jul/29/d-richard-hipp/#atom-everything</link>
@@ -809,139 +949,6 @@
         &lt;/blockquote&gt;
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/prompt-engineering&quot;&gt;prompt-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-talks&quot;&gt;annotated-talks&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/thariq-shihipar&quot;&gt;thariq-shihipar&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/cat-wu&quot;&gt;cat-wu&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Reverse-engineering is cheap now</title>
-      <link>https://simonwillison.net/2026/Jul/20/cheap-reverse-engineering/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/20/cheap-reverse-engineering/#atom-everything</guid>
-      <pubDate>Mon, 20 Jul 2026 19:24:05 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I keep hearing anecdotes from people who used coding agents to reverse-engineer and automate devices in their homes.&lt;/p&gt;
-        &lt;p&gt;I think this is an interesting illustration of the impact of the reduced cost of writing code.&lt;/p&gt;
-        &lt;p&gt;Prior to agents, it was entirely possible to reverse-engineer home devices. The problem was the ROI - was it really worth all of that effort? More importantly, any experienced programmer knows that undocumented, unstable APIs like that may well change or break in the future. Is that initial work worth the effort if you&apos;re committing yourself to a frustrating cycle of maintenance in the future?&lt;/p&gt;
-        &lt;p&gt;Coding agents change that equation entirely. The effort to get a simple automation working has dropped, as has the cost of trying and failing to get it to work. Since the code is so cheap, the idea of having to maintain it in the future - or throw it away and start again - carries way less psychological baggage.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/reverse-engineering&quot;&gt;reverse-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Who’s Afraid of Chinese Models?</title>
-      <link>https://simonwillison.net/2026/Jul/20/afraid-of-chinese-models/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/20/afraid-of-chinese-models/#atom-everything</guid>
-      <pubDate>Mon, 20 Jul 2026 17:09:19 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://stratechery.com/2026/whos-afraid-of-chinese-models/&quot;&gt;Who’s Afraid of Chinese Models?&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Interesting proposal from Ben Thompson that both addresses the hypocrisy of labs outlawing distillation against their models despite training on unlicensed data, and could help US open models compete more effectively with their Chinese counterparts:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;The U.S. should pass a law that (1) makes explicit that collecting data for training models is fair use, and (2) bars terms of service that forbid distillation, for U.S. companies at a minimum. Stopping distillation — which is literally just querying the API — is nearly impossible; the U.S. should go the other way and lean into a new copyright policy that both indemnifies the labs and also guarantees that what they learned fuels further innovation for everyone else.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Ben also theorizes that Alibaba&apos;s decision to release Qwen 3.8 Max as open weights - a reversal from their decision &lt;a href=&quot;https://qwen.ai/blog?id=qwen3.7&quot;&gt;not to release Qwen 3.7 Max&lt;/a&gt; in May - may have been influenced by a &lt;a href=&quot;http://english.scio.gov.cn/topnews/2026-07/18/content_118605932.html&quot;&gt;recent speech&lt;/a&gt; by Xi Jinping, who said:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;We should seize this rare, historic opportunity to encourage open source, openness, collaboration and sharing.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;And on the subject of &lt;a href=&quot;https://twitter.com/Alibaba_Qwen/status/2078759124914098291&quot;&gt;Qwen 3.8 Max&lt;/a&gt; - a new 2.4T parameter model (nearly as large as the 2.8T Kimi K3) - here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F735f2cf19b795517cb2ff6cae1c71c64&quot;&gt;a pelican it drew&lt;/a&gt;:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;Described by Qwen 3.8 Max: Flat vector cartoon illustration of a white pelican with a large orange beak and pouch riding a red bicycle, its orange legs on the pedals, against a light blue sky with a yellow sun top right and a white cloud top left, with horizontal motion lines behind the bike and a pale green ground strip at the bottom.&quot; src=&quot;https://static.simonwillison.net/static/2026/qwen-3.8-max-pelican.png&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;I particularly enjoyed seeing these notes in the (extensive) reasoning trace:  &quot;Could add helmet? No.&quot; and &quot;Maybe add small bell? no.&quot; and &quot;Need maybe add small fish in basket? Not necessary.&quot;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://daringfireball.net/linked/2026/07/20/thompson-chinese-models-distillation&quot;&gt;John Gruber&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/training-data&quot;&gt;training-data&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/qwen&quot;&gt;qwen&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-in-china&quot;&gt;ai-in-china&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Sam Altman</title>
-      <link>https://simonwillison.net/2026/Jul/20/sam-altman/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/20/sam-altman/#atom-everything</guid>
-      <pubDate>Mon, 20 Jul 2026 03:47:59 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://twitter.com/techemails/status/2078854346683678927&quot;&gt;&lt;p&gt;We have been having extensive discussions around open source strategy. We will discuss it more at our next board meeting, but one thing we’d like to do soon is to create a language model with the approximate capability of GPT-3 that can run locally on consumer hardware and release that. We’d like to do it soon, before Stability or someone else does. In general, we think this helps discourage others from releasing similarly-powerful models, and makes it harder for new efforts to get funded.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/techemails/status/2078854346683678927&quot;&gt;Sam Altman&lt;/a&gt;, Email to OpenAI&apos;s board, October 1, 2022 - exposed in Musk v. Altman (2026)&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sam-altman&quot;&gt;sam-altman&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>AI Mania Is Eviscerating Global Decision-Making</title>
-      <link>https://simonwillison.net/2026/Jul/19/ai-mania/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/19/ai-mania/#atom-everything</guid>
-      <pubDate>Sun, 19 Jul 2026 05:06:21 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://ludic.mataroa.blog/blog/ai-mania-is-eviscerating-global-decision-making/&quot;&gt;AI Mania Is Eviscerating Global Decision-Making&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Here&apos;s an entertaining perspective from Nik Suresh on the AI mania that is overwhelming the large companies that he consults with. It&apos;s crammed with spicy anecdotes from anonymous sources.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;In one extreme case, I have seen an executive confess that they had never even used ChatGPT or any AI tool in their life, immediately after producing a technical strategy for an organisation with $2B+ in revenue which was entirely centered around AI.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Here&apos;s a report from an engineer at a company with a token leaderboard:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Checking out a parallel copy of our Go repository and telling the AI to rewrite the whole thing in Zig while I work on something else just so I can keep my job.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I particularly enjoyed this conversation with a skeptical executive at an over-enthusiastic company:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I asked &lt;em&gt;why&lt;/em&gt; this was being repeated without opposition. Was it just sales fluff?&lt;/p&gt;
-        &lt;p&gt;The answer was a lot more interesting. It was &lt;em&gt;partially&lt;/em&gt; ridiculous sales material being delivered to an easily excitable audience, but this was not the dominant factor constraining honesty. Executives at their &lt;em&gt;customers&lt;/em&gt; were saying absurd things about achieving 100x productivity, and this meant that if any executive at the &lt;em&gt;vendor&lt;/em&gt; said that these gains were not plausible, it would undermine the credibility of the customer’s executive, be perceived as an attack (or heresy), and possibly result in an enterprise contract cancellation. And getting enterprise contracts cancelled because you wanted to opine on something that doesn’t really matter to your organisation’s mission is a great way to get fired.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=48964185&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Claude Code uses Bun written in Rust now</title>
-      <link>https://simonwillison.net/2026/Jul/19/claude-code-in-bun-in-rust/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/19/claude-code-in-bun-in-rust/#atom-everything</guid>
-      <pubDate>Sun, 19 Jul 2026 03:54:09 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;In &lt;a href=&quot;https://bun.com/blog/bun-in-rust&quot;&gt;Rewriting Bun in Rust&lt;/a&gt; Jarred Sumner made the following claim:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Claude Code v2.1.181 (released June 17th) and later use the Rust port of Bun. Startup got 10% faster on Linux but otherwise, barely anyone noticed. Boring is good.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I decided to have a poke at my own Claude Code installation to see if I could find evidence that it was using Bun written in Rust.&lt;/p&gt;
-        &lt;p&gt;I found these two commands convincing:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;strings ~/.local/bin/claude | grep -m1 &apos;Bun v1&apos;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;For me this outputs &lt;code&gt;Bun v1.4.0 (macOS arm64)&lt;/code&gt;. The most recent release of &lt;a href=&quot;https://github.com/oven-sh/bun/releases&quot;&gt;Bun on GitHub&lt;/a&gt; is currently &lt;a href=&quot;https://github.com/oven-sh/bun/releases/tag/bun-v1.3.14&quot;&gt;v1.3.14&lt;/a&gt; from May 12th, so that v1.4.0 version number in Claude supports them shipping a preview of a not-yet-released Bun version.&lt;/p&gt;
-        &lt;p&gt;(&lt;strong&gt;Update&lt;/strong&gt;: The Rust version &lt;em&gt;has&lt;/em&gt; been released as &lt;a href=&quot;https://bun.com/docs/installation#canary-builds&quot;&gt;Bun canary&lt;/a&gt; - running &lt;code&gt;bun upgrade --canary&lt;/code&gt; will install &lt;a href=&quot;https://github.com/oven-sh/bun/releases/tag/canary&quot;&gt;this release&lt;/a&gt;.)&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;strings ~/.local/bin/claude | grep -Eo &apos;src/[[:alnum:]_./-]+\.rs&apos;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This outputs a list of &lt;a href=&quot;https://gist.github.com/simonw/c92fb0f67b114ac26e3b95a09ddccfdc&quot;&gt;563 filenames&lt;/a&gt;, starting with these:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;src/runtime/bake/dev_server/mod.rs
-        src/runtime/bake/production.rs
-        src/bundler/bundle_v2.rs
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;It looks like Bun in Rust is indeed being run in production across millions of different devices. Like Jarred said, &quot;Boring is good&quot;.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: Here&apos;s a neat trick &lt;a href=&quot;https://twitter.com/ajanraj25/status/2078825794701242697&quot;&gt;from Ajan Raj&lt;/a&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;cat &amp;gt; /tmp/bun-version.ts &amp;lt;&amp;lt;&apos;EOF&apos;
-        console.log(&quot;embedded bun:&quot;, Bun.version);
-        process.exit(0);
-        EOF
-        BUN_OPTIONS=&quot;--preload=/tmp/bun-version.ts&quot; claude --version
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This outputs &lt;code&gt;1.4.0&lt;/code&gt; for me.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://github.com/oven-sh/bun/commit/b18bf6d1d0a92238f240bfd125f0e3b3461b9243#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519&quot;&gt;the commit from May 17th&lt;/a&gt; that updated the version in &lt;code&gt;package.json&lt;/code&gt; to 1.4.0. That version hasn&apos;t been changed since then, but also hasn&apos;t yet made it into a tagged release outside of &lt;code&gt;canary&lt;/code&gt;.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/bun&quot;&gt;bun&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/rust&quot;&gt;rust&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jarred-sumner&quot;&gt;jarred-sumner&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>SQLite Query Explainer</title>
-      <link>https://simonwillison.net/2026/Jul/18/sqlite-query-explainer/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/18/sqlite-query-explainer/#atom-everything</guid>
-      <pubDate>Sat, 18 Jul 2026 17:19:10 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/sqlite-query-explainer&quot;&gt;SQLite Query Explainer&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Julia Evan&apos;s, in &lt;a href=&quot;https://jvns.ca/blog/2026/07/17/learning-about-running-sqlite/&quot;&gt;Learning a few things about running SQLite&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Maybe one day I’ll learn to read a query plan.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Big same.... which inspired me to &lt;a href=&quot;https://github.com/simonw/tools/pull/299#issue-4919268017&quot;&gt;have Fable build&lt;/a&gt; this interactive explain tool, which runs SQLite in Python in Pyodide in Web Assembly in the browser and adds a layer of explanation to the results of both EXPLAIN and EXPLAIN QUERY PLAN.&lt;/p&gt;
-        &lt;p&gt;Approach with caution, since I don&apos;t know enough about SQLite query plans to verify the results myself, but it seems cromulent enough to me.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/sql&quot;&gt;sql&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/julia-evans&quot;&gt;julia-evans&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pyodide&quot;&gt;pyodide&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos-fable&quot;&gt;claude-mythos-fable&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
