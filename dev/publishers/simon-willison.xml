@@ -4,7 +4,60 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sun, 02 Aug 2026 16:48:12 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 03 Aug 2026 17:31:33 GMT</lastBuildDate>
+    <item>
+      <title>Quoting David Crawshaw&apos;s prompt</title>
+      <link>https://simonwillison.net/2026/Aug/3/david-crawshaw/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Aug/3/david-crawshaw/#atom-everything</guid>
+      <pubDate>Mon, 03 Aug 2026 16:15:27 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://blog.exe.dev/devtools-must-be-open-source&quot;&gt;&lt;p&gt;&lt;code&gt;Set up a nightly cron job that executes the prompt: fetch upstream changes to the &amp;lt;software&amp;gt; and rebase all local changes on top of upstream. Check that the software works as intended and replace the current version.&lt;/code&gt;&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://blog.exe.dev/devtools-must-be-open-source&quot;&gt;David Crawshaw&amp;#x27;s prompt&lt;/a&gt;, Devtools must be open source&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/prompt-engineering&quot;&gt;prompt-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>condense-json 1.0</title>
+      <link>https://simonwillison.net/2026/Aug/2/condense-json/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Aug/2/condense-json/#atom-everything</guid>
+      <pubDate>Sun, 02 Aug 2026 22:19:59 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/condense-json/releases/tag/1.0&quot;&gt;condense-json 1.0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I&apos;m trying to get braver at releasing 1.0 versions. This little library is a year and a half old now - I&apos;ve applied some sensible and non-disruptive fixes and shipped the big 1.0 for it.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example of what it can do, lifted from the README:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-json&quot;&gt;&lt;pre&gt;{
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;foo&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;bar&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;string&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;This is a string with foxes in it&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;,
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;nested&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;more&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Here is a string&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;another with foxes in it too&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;]
+        }
+        }
+        }
+        }&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;Combine that with a replacements object:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-json&quot;&gt;&lt;pre&gt;{&lt;span class=&quot;pl-ent&quot;&gt;&quot;1&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;with foxes in it&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;}&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;And &lt;code&gt;condense_json(input_json, replacements)&lt;/code&gt; produces the following:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-json&quot;&gt;&lt;pre&gt;{
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;foo&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;bar&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;string&quot;&lt;/span&gt;: {&lt;span class=&quot;pl-ent&quot;&gt;&quot;$r&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;This is a string &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, {&lt;span class=&quot;pl-ent&quot;&gt;&quot;$&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;1&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;}]},
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;nested&quot;&lt;/span&gt;: {
+        &lt;span class=&quot;pl-ent&quot;&gt;&quot;more&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Here is a string&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, {&lt;span class=&quot;pl-ent&quot;&gt;&quot;$r&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;another &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, {&lt;span class=&quot;pl-ent&quot;&gt;&quot;$&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;1&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;}, &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt; too&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;]}]
+        }
+        }
+        }
+        }&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;It scans for strings or substrings that are present in that replacements object and replaces those with a special &lt;code&gt;{&quot;$r&quot;: ...}&lt;/code&gt; syntax in the output.&lt;/p&gt;
+        &lt;p&gt;You can reverse the effect with &lt;code&gt;uncondense_json(condensed, replacements)&lt;/code&gt;.&lt;/p&gt;
+        
+        &lt;p&gt;The idea is to make it easier to store JSON that includes duplicated data from other related structures. I use it to save space in the SQLite logs generated by &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt; - see &lt;a href=&quot;https://github.com/simonw/llm/pull/1586&quot;&gt;PR #1586&lt;/a&gt; for the latest iteration of that.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/json&quot;&gt;json&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Open letters about AI development</title>
       <link>https://simonwillison.net/2026/Aug/2/open-letters/#atom-everything</link>
@@ -729,40 +782,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ethan-mollick&quot;&gt;ethan-mollick&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/code-interpreter&quot;&gt;code-interpreter&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/general-agents&quot;&gt;general-agents&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>An Inside Look at the Relay Market Powering Token Resellers and Fraud</title>
-      <link>https://simonwillison.net/2026/Jul/26/relay-market/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/26/relay-market/#atom-everything</guid>
-      <pubDate>Sun, 26 Jul 2026 19:30:54 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://vectoral.com/blog/token-relay-market&quot;&gt;An Inside Look at the Relay Market Powering Token Resellers and Fraud&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Fascinating investigation by Matt Lenhard into the market that has grown up around reselling LLM tokens at a discount by pooling API keys from various sources.&lt;/p&gt;
-        &lt;p&gt;This looks to be mostly a thing in China. Resellers sell access to an LLM proxy that offers significant discounts on regular API pricing, which they achieve by abusing free trials, proxying through unprotected support bots, or sometimes through stolen credit cards or chargeback attacks.&lt;/p&gt;
-        &lt;p&gt;The software they are using for these proxies is open source - mostly &lt;a href=&quot;https://github.com/songquanpeng/one-api&quot;&gt;one-api&lt;/a&gt; and its more actively developed fork &lt;a href=&quot;https://github.com/QuantumNous/new-api&quot;&gt;new-api&lt;/a&gt;, both legitimate API proxy products which can be used to load. balance requests across a pool of API credentials.&lt;/p&gt;
-        &lt;p&gt;The buyers are seeking cheap tokens, avoiding geo-restrictions, and in some cases collecting data for model distillation.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve been cautious about exposing my own LLM-driven applications publicly out of fear of abuse leading to big token bills. The existence of this marketplace makes me even more cautious: there&apos;s now an entire ecosystem that can profit from finding a new unprotected endpoint to exploit.&lt;/p&gt;
-        &lt;p&gt;LLM vendors &lt;em&gt;really&lt;/em&gt; need to get better at offering strict caps for their API keys. I want my LLM apps to stop working the moment they hit a dollar threshold I&apos;ve set for a period of time.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://www.v2ex.com/t/1196011&quot;&gt;the (Chinese language) forum thread&lt;/a&gt; that served as the principal source for Matt&apos;s article.
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49058993&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-in-china&quot;&gt;ai-in-china&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>sqlite-utils 3.39.1</title>
-      <link>https://simonwillison.net/2026/Jul/26/sqlite-utils/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Jul/26/sqlite-utils/#atom-everything</guid>
-      <pubDate>Sun, 26 Jul 2026 04:38:46 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/sqlite-utils/releases/tag/3.39.1&quot;&gt;sqlite-utils 3.39.1&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;I back-ported &lt;a href=&quot;https://github.com/simonw/sqlite-utils/issues/815&quot;&gt;a fix&lt;/a&gt; for &lt;code&gt;table.delete_where()&lt;/code&gt; that shipped in version 4.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
