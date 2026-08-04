@@ -20,6 +20,71 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "A layout setup that I wished worked … perhaps a way?",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>To explain the situation, I&#39;ll start off with two simple cases which work. CodePen links provided.</p> <p>The css &amp; html are mostly fixed as: ``` .div-a { height: 500px; max-height: 750px; background-color: lightblue;</p> <p>overflow: hidden; }</p> <p>.div-b { display: grid; grid-template-rows: min-content 1fr min-content; height: 100%; background-color: lightcoral; }</p> <p>.content-a { height: 10vh; background-color: red; }</p> <p>.body-container { overflow-y: auto; }</p> <p>.content-b { background-image: linear-gradient(0deg, #000000, #AAAAAA, #000000); height: 40vh; overflow-y: auto; }</p> <p>.content-c { height: 10vh; background-color: blue; } ```</p> <p><code> &lt;!DOCTYPE html&gt; &lt;html lang=&quot;en&quot;&gt; &lt;head&gt; &lt;meta charset=&quot;UTF-8&quot;&gt; &lt;link rel=&quot;stylesheet&quot; href=&quot;./style.css&quot;&gt; &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt; &lt;title&gt;Pen&lt;/title&gt; &lt;/head&gt; &lt;body&gt; &lt;div class=&quot;div-a&quot;&gt; &lt;div class=&quot;div-b&quot;&gt; &lt;div class=&quot;content-a&quot;&gt;&lt;/div&gt; &lt;div class=&quot;body-container&quot;&gt; &lt;div class=&quot;content-b&quot;&gt;&lt;/div&gt; &lt;/div&gt; &lt;div class=&quot;content-c&quot;&gt;&lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/body&gt; &lt;/html&gt; </code></p> <p>(1) -- working</p> <p><a href=\"https://codepen.io/editor/ericg_off/pen/019fccc5-9d9c-7c29-b6ab-e4d94fd7d908\">Simple Layout -- Large Body</a></p> <p>div-a has a height of 500px and a max-height of 750px. div-a contains div-b which should be the height of div-a and divides itself into three parts. content-a is on top; fixed height. content-c is on the bottom; fixed height; body-container is a flexible height, has overlow-y: auto and holds content-b which has a large height. </p> <p>I can scroll through content-b as expected. This is what the css &amp; html above do.</p> <p>(2) -- working</p> <p><a href=\"https://codepen.io/editor/ericg_off/pen/019fcced-7ffa-7798-a7a5-922890272cf2\">Simple Layout -- Small Body</a></p> <p>Let&#39;s say that content-b was small. If I kept the above case, there would be a lot of wasted space. This can be resolved by setting the height of div-a to min-content.</p> <p>``` .div-a { height: min-content; max-height: 750px; background-color: lightblue;</p> <p>overflow: hidden; }</p> <p>.content-b { background-image: linear-gradient(0deg, #000000, #AAAAAA, #000000); height: 15vh; overflow-y: auto; } ```</p> <p>This all remains well defined and easy for the browser to resolve.</p> <p>(3) -- not working</p> <p><a href=\"https://codepen.io/editor/ericg_off/pen/019fccf6-c333-74dc-8791-539bc48ffd85\">Simple Layout -- Large Body -- min-content</a></p> <p>It would be nice if div-a.height could remain as min-content for the large content-b, but this does not work.</p> <p><code> .content-b { background-image: linear-gradient(0deg, #000000, #AAAAAA, #000000); height: 75vh; overflow-y: auto; } </code></p> <p>I think I understand why. It would take a couple of passes by the browser to figure out that it is dealing with a fixed height -- because max-height on div-a is hit. And because it has a fixed height, everything should resolve itself as in (1). But, it does not.</p> <p>Or, should it? Is there a way to get what I want? (which is a div-a that can grow or shrink as needed up to a max-height regardless of the size of content-b which will scroll if necessary)</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Obvious-Ebb-7780\"> /u/Obvious-Ebb-7780 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vfba5k/a_layout_setup_that_i_wished_worked_perhaps_a_way/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vfba5k/a_layout_setup_that_i_wished_worked_perhaps_a_way/\">[comments]</a></span>",
+    "date": "2026-08-04T14:03:44.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vfba5k/a_layout_setup_that_i_wished_worked_perhaps_a_way/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Turns out extracting design tokens from real production sites is way messier than I expected",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Nobody is pasting a 300-line <code>:root {}</code> block into their project. Nobody.</p> <p>But that&#39;s what I got scanning <a href=\"http://Linear.app\">Linear.app</a> for a <a href=\"https://chromewebstore.google.com/detail/design-snap-%E2%80%93-design-toke/eenpmkjgihcopkabmkdjjoagenpdlfon\">Design Snap</a> demo. 300+ variables, half of them looking like this:</p> <pre><code>--sx-105wzx7: #edbf0a; --sx-10845vo: #c9ffff; --sx-11vg3qk: #ff7235; </code></pre> <p>Turns out CSS-in-JS (Stitches, vanilla-extract, etc.) generates hashed variable names instead of semantic ones. Technically accurate extraction, completely unusable output. Plus tons of duplicates — <code>--color-fg-primary</code>, <code>--color-text-primary</code>, and <code>--color-01</code> all pointing to the same hex.</p> <p>Building a clean/filtered mode now : strips the hashed noise, dedupes by value, keeps whichever name is actually readable. Goal is scanning a real production site gives you something you&#39;d actually paste, not a wall of garbage.</p> <p>Anyone else dealt with this on the design tokens side ? Manual pruning, or is there a convention I&#39;m missing?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Accurate_Board_9401\"> /u/Accurate_Board_9401 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vfcmfi/turns_out_extracting_design_tokens_from_real/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vfcmfi/turns_out_extracting_design_tokens_from_real/\">[comments]</a></span>",
+    "date": "2026-08-04T14:53:21.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vfcmfi/turns_out_extracting_design_tokens_from_real/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "CSS Challenges for 200 IQ",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hi everyone, I&#39;m new here, previously was mostly writing for Angular. I just published an article explaining 3 interesting CSS puzzles of increasing difficulty, hope you will find it helpful or interesting.</p> <p>Check it out!</p> <p><a href=\"https://medium.com/angularwave/css-challenges-for-200-iq-4ecd6433dd63\">https://medium.com/angularwave/css-challenges-for-200-iq-4ecd6433dd63</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Alex-Inkin\"> /u/Alex-Inkin </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vf5x8l/css_challenges_for_200_iq/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vf5x8l/css_challenges_for_200_iq/\">[comments]</a></span>",
+    "date": "2026-08-04T09:57:27.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vf5x8l/css_challenges_for_200_iq/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Can someone help pls?",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1vf52bd/can_someone_help_pls/\"> <img src=\"https://preview.redd.it/cfk44qwupbhh1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=7f37725106ea1d46c198dc47ce42b9339d0f47c6\" alt=\"Can someone help pls?\" title=\"Can someone help pls?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>So basically I got a site skin on Ao3 from somewhere (I forgot where) and these symbols don’t appear along with those explanations from the question marks that you see while making a fic. So I was wondering what could be wrong with the code?</p> <p>here’s the link to the google doc with the CSS: <a href=\"https://docs.google.com/document/d/1cQ7j_tfqBi6yrc43V3fQm2TYNG25LricsH-qsPwf8Vo/edit?usp=sharing\">https://docs.google.com/document/d/1cQ7j_tfqBi6yrc43V3fQm2TYNG25LricsH-qsPwf8Vo/edit?usp=sharing</a></p> <p>update: I changed the access of the google doc so you don’t have to ask for permissions now (sorry, I get rlly forgetfu). And here’s a lil vid of the demo of the skin: <a href=\"https://youtu.be/zNrdSstUdFg?si=XIXyWl5cJT9NLZPH\">https://youtu.be/zNrdSstUdFg?si=XIXyWl5cJT9NLZPH</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Amiliia\"> /u/Amiliia </a> <br/> <span><a href=\"https://i.redd.it/cfk44qwupbhh1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vf52bd/can_someone_help_pls/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-08-04T09:07:23.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vf52bd/can_someone_help_pls/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "A collection of free CSS tools for everyday frontend work",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1vesdlk/a_collection_of_free_css_tools_for_everyday/\"> <img src=\"https://preview.redd.it/oacbk9qhm8hh1.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=429d6744858f73035bbf9ce52ee507bad529ed6d\" alt=\"A collection of free CSS tools for everyday frontend work\" title=\"A collection of free CSS tools for everyday frontend work\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I often switch between multiple websites just to create gradients, shadows, border-radius values, or convert colors.</p> <p>So I collected the most common CSS utilities into one place.</p> <p>Included tools:</p> <p>• CSS Gradient Generator</p> <p>• Border Radius Generator</p> <p>• Box Shadow Generator</p> <p>• Color Palette Generator</p> <p>• HEX ↔ RGB ↔ HSL Converter</p> <p>• CSS Formatter</p> <p>• CSS Minifier</p> <p>Everything works directly in the browser.</p> <p><a href=\"https://toolsforall.cloud\">https://toolsforall.cloud</a></p> <p>I&#39;m looking for feedback from CSS developers.</p> <p>Which CSS utility do you think is still missing?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/omarmayo9872\"> /u/omarmayo9872 </a> <br/> <span><a href=\"https://i.redd.it/oacbk9qhm8hh1.jpeg\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vesdlk/a_collection_of_free_css_tools_for_everyday/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-08-03T22:39:49.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vesdlk/a_collection_of_free_css_tools_for_everyday/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
     "title": "How to create such such effect using gsap and css",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1ve8q55/how_to_create_such_such_effect_using_gsap_and_css/\"> <img src=\"https://external-preview.redd.it/MmkzcHBxZTRyNGhoMabXXxhjy53iqD-znrtfvKxzBFfsuAtX68wDOvxfVPHa.png?width=320&amp;crop=smart&amp;auto=webp&amp;s=ea9f4d5d252eb30df8fd42beb04e56a061c18e48\" alt=\"How to create such such effect using gsap and css\" title=\"How to create such such effect using gsap and css\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I use phosphor icons ,is there a way to transition from the regular to fill icons smoothly using gsap ,and how do I create this tab effect ,simply changing the color creates a fade in effect </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/DesDeve\"> /u/DesDeve </a> <br/> <span><a href=\"https://v.redd.it/kpdkcly5r4hh1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1ve8q55/how_to_create_such_such_effect_using_gsap_and_css/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-08-03T09:37:42.000Z",
@@ -37,6 +102,19 @@
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hey guys, i have just eneded up making my website (leadspitch.com) and its CSS design looks off, can anyone guide?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/mrsawage_io\"> /u/mrsawage_io </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vefwn7/why_my_website_design_looks_off/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vefwn7/why_my_website_design_looks_off/\">[comments]</a></span>",
     "date": "2026-08-03T15:01:23.000Z",
     "url": "https://www.reddit.com/r/css/comments/1vefwn7/why_my_website_design_looks_off/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "We replaced the JavaScript in our progress bars with the new typed attr() — here's how it works",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>For years, <code>attr()</code> had exactly one trick: putting attribute text into <code>content</code>. The new version from CSS Values Level 5 changes that — it works in <strong>any property</strong>, it can <strong>parse the attribute into a real type</strong>, and it takes a <strong>fallback</strong>. We&#39;ve been using it in <a href=\"https://github.com/henkpb/micl\">MICL</a>, our Material Design 3 component library, to make the ProgressIndicator component fully CSS-driven, and it removed a whole class of JavaScript.</p> <h1>The old problem</h1> <p>A native <code>&lt;progress value=&quot;7&quot; max=&quot;10&quot;&gt;</code> knows its own fraction, but CSS couldn&#39;t read it. If you wanted a custom-drawn bar (rounded caps, a gap before the track, M3&#39;s little stop dot), you had to mirror <code>value</code> into a custom property with JS on every update.</p> <h1>The new way</h1> <p>The element&#39;s own attributes <em>are</em> the styling input now:</p> <pre><code>progress.micl-linear-progress:not(:indeterminate) { --_fraction: min(calc( attr(value type(&lt;number&gt;), 0) / max(attr(max type(&lt;number&gt;), 1), 0.001) ), 1); } </code></pre> <p>Three details worth stealing:</p> <ul> <li><code>type(&lt;number&gt;)</code> parses the attribute as an actual number, so it participates in <code>calc()</code>. A missing or unparseable attribute uses the fallback (<code>0</code> and <code>1</code> here).</li> <li>The <code>max(..., 0.001)</code> guards the division against <code>max=&quot;0&quot;</code> — with a plain division the whole declaration would go invalid-at-computed-value-time.</li> <li>The outer <code>min(..., 1)</code> clamps <code>value &gt; max</code> overshoot.</li> </ul> <p>From that one fraction, the linear bar drives a stack of background gradients (bar body, round cap, track gap, stop dot), and the circular variant turns it into geometry:</p> <pre><code>--micl-progress-sweep: calc(var(--_fraction) * 360deg); /* conic-gradient() draws the arcs; the round caps sit at 50% + r·sin(sweep) / 50% − r·cos(sweep); the track gap angle comes from atan2(gap + thickness, radius) */ </code></pre> <h1>The best part: attribute changes animate</h1> <p>Register the derived property with u/property and transition it:</p> <pre><code> --micl-progress-sweep { syntax: &#39;&lt;angle&gt;&#39;; inherits: false; initial-value: 0deg; } progress.micl-circular-progress:not(:indeterminate) { transition: --micl-progress-sweep 0.5s ease; } </code></pre> <p>Now the only JavaScript anyone writes is <code>bar.value = 7</code> — and the arc <em>sweeps</em> smoothly to its new position. The attribute change becomes a typed interpolation. No classes, no rAF, no width-tweening.</p> <h1>Accessibility attributes as the source of truth</h1> <p>Our wavy indicator variants aren&#39;t <code>&lt;progress&gt;</code> elements (they need pseudo-elements), so they carry <code>role=&quot;progressbar&quot;</code> with <code>aria-valuenow</code>/<code>aria-valuemax</code> — and the CSS reads <em>those</em>:</p> <pre><code>--_fraction: min(calc( attr(aria-valuenow type(&lt;number&gt;), 0) / max(attr(aria-valuemax type(&lt;number&gt;), 1), 0.001) ), 1); </code></pre> <p>The visual state literally cannot drift from the accessible state, because they&#39;re the same attribute. (The wave&#39;s amplitude also derives from it — it ramps in below 10% and flattens out near 100%, via one <code>clamp()</code>.)</p> <h1>Support and fallback</h1> <p>Chromium ships typed <code>attr()</code>; Firefox and Safari are still experimental, so everything sits behind a feature guard with the native rendering as fallback:</p> <pre><code>u/supports (inline-size: attr(value type(&lt;number&gt;))) { /* custom-drawn indicator */ } </code></pre> <p>Browsers without it still get a styled <code>::-webkit-progress-value</code> / <code>::-moz-progress-bar</code> bar — just without the fancy caps and gaps.</p> <p>Live demo: <a href=\"https://henkpb.github.io/micl/progressindicator.html\">https://henkpb.github.io/micl/progressindicator.html</a> </p> <p>Source: <a href=\"https://github.com/henkpb/micl\">https://github.com/henkpb/micl</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/miclhermana\"> /u/miclhermana </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vf6bon/we_replaced_the_javascript_in_our_progress_bars/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vf6bon/we_replaced_the_javascript_in_our_progress_bars/\">[comments]</a></span>",
+    "date": "2026-08-04T10:19:21.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vf6bon/we_replaced_the_javascript_in_our_progress_bars/"
   },
   {
     "publisherId": "reddit-dev",
@@ -124,10 +202,10 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Why I don't recommend Tailwind CSS",
-    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Either_Collection349\"> /u/Either_Collection349 </a> <br/> <span><a href=\"https://en.andros.dev/blog/af3ee191/why-i-dont-recommend-tailwind-css/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vds08b/why_i_dont_recommend_tailwind_css/\">[comments]</a></span>",
-    "date": "2026-08-02T20:03:28.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vds08b/why_i_dont_recommend_tailwind_css/"
+    "title": "Codepen 2 crash. What is causing it?",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I go to the new codepen 2 and it shows this.<br/> What &quot;infinite loops or other performance drains&quot; could this be?<br/> <a href=\"https://codepen.io/editor/davidhelp/pen/019fb0db-4ba0-7ade-b4bd-13c1c7c540ee\">https://codepen.io/editor/davidhelp/pen/019fb0db-4ba0-7ade-b4bd-13c1c7c540ee</a></p> <p>&quot;Uh-Oh.<br/> The Preview was removed to prevent a browser crash. Save your current work then check your code for infinite loops or other performance drains that could be causing trouble. Disable Infinite Loop protection for this session&quot;</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/notepad987\"> /u/notepad987 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/\">[comments]</a></span>",
+    "date": "2026-08-01T23:51:34.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/"
   },
   {
     "publisherId": "reddit-dev",
@@ -137,10 +215,10 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Codepen 2 crash. What is causing it?",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I go to the new codepen 2 and it shows this.<br/> What &quot;infinite loops or other performance drains&quot; could this be?<br/> <a href=\"https://codepen.io/editor/davidhelp/pen/019fb0db-4ba0-7ade-b4bd-13c1c7c540ee\">https://codepen.io/editor/davidhelp/pen/019fb0db-4ba0-7ade-b4bd-13c1c7c540ee</a></p> <p>&quot;Uh-Oh.<br/> The Preview was removed to prevent a browser crash. Save your current work then check your code for infinite loops or other performance drains that could be causing trouble. Disable Infinite Loop protection for this session&quot;</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/notepad987\"> /u/notepad987 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/\">[comments]</a></span>",
-    "date": "2026-08-01T23:51:34.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vd2kbt/codepen_2_crash_what_is_causing_it/"
+    "title": "Why I don't recommend Tailwind CSS",
+    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Either_Collection349\"> /u/Either_Collection349 </a> <br/> <span><a href=\"https://en.andros.dev/blog/af3ee191/why-i-dont-recommend-tailwind-css/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vds08b/why_i_dont_recommend_tailwind_css/\">[comments]</a></span>",
+    "date": "2026-08-02T20:03:28.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1vds08b/why_i_dont_recommend_tailwind_css/"
   },
   {
     "publisherId": "reddit-dev",
@@ -245,83 +323,5 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1vbmf29/can_someone_explain_how_to_get_this_effect_using/\"> <img src=\"https://external-preview.redd.it/bXJpZjhzNG1lamdoMRFYj1BFl6ohAfqbqL0lEsstLA1tT_f4ktabupP_ZiGy.png?width=320&amp;crop=smart&amp;auto=webp&amp;s=dbfcf2714c35cb07524d0a2af2fc41036fc36800\" alt=\"Can someone explain how to get this effect using css and gsap\" title=\"Can someone explain how to get this effect using css and gsap\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I am begginer coder ,I tried using z index but the cards get clipped under the tab menu and moreover I created a separate overlay element with translucent background and set it z-index to be lower than the selected card but for some reason the selected card also gets faded</p> <p><a href=\"https://stackblitz.com/edit/vitejs-vite-5afsvuwm?file=src%2FApp.jsx,src%2FApp.css\">https://stackblitz.com/edit/vitejs-vite-5afsvuwm?file=src%2FApp.jsx,src%2FApp.css</a></p> <p>Is the link of the file ,the page I have made is not that great I just wanted to try gsap. If you visit the page and see thar the tittle of thr content does not match the image it&#39;s because I was lazy and asked chatgpt( pardon me ) to create me an array of cards but later I used images from my favourite shows and things</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/DesDeve\"> /u/DesDeve </a> <br/> <span><a href=\"https://v.redd.it/q5mlercmejgh1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vbmf29/can_someone_explain_how_to_get_this_effect_using/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-07-31T09:50:36.000Z",
     "url": "https://www.reddit.com/r/css/comments/1vbmf29/can_someone_explain_how_to_get_this_effect_using/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "I Need help",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Hello everyone, I need some advice on how to learn CSS effectively. I asked Claude AI to put together a training programme for me, but right from the start of the programme, when it suggested I practise using Flexbox on Froggy, I felt completely lost. I didn’t understand much of it and it left me feeling a bit frustrated (I keep thinking my brain’s too small to get it), I’ve done the HTML course on FreeCodeCamp, but my foundations aren’t strong enough. I’d really appreciate some advice on how to properly learn CSS (as a bit of a beginner) and consolidate my HTML basics at the same time.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Mulomiracle\"> /u/Mulomiracle </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vbqkn2/i_need_help/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vbqkn2/i_need_help/\">[comments]</a></span>",
-    "date": "2026-07-31T13:11:49.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vbqkn2/i_need_help/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "New CodePen 2 look",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1vbgdkx/new_codepen_2_look/\"> <img src=\"https://preview.redd.it/psarhez5shgh1.jpg?width=140&amp;height=140&amp;crop=1:1,smart&amp;auto=webp&amp;s=04f77966b41dfb1f47b5cf648f7dfefd1021cda9\" alt=\"New CodePen 2 look\" title=\"New CodePen 2 look\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Can the left side sidebar be hidden?<br/> It takes up too much room.</p> <p><a href=\"https://preview.redd.it/psarhez5shgh1.jpg?width=564&amp;format=pjpg&amp;auto=webp&amp;s=f75d255d119fefd1ac6523e637a9e0f140c87a1b\">https://preview.redd.it/psarhez5shgh1.jpg?width=564&amp;format=pjpg&amp;auto=webp&amp;s=f75d255d119fefd1ac6523e637a9e0f140c87a1b</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/notepad987\"> /u/notepad987 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vbgdkx/new_codepen_2_look/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vbgdkx/new_codepen_2_look/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-07-31T04:23:21.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vbgdkx/new_codepen_2_look/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Showcase : a Chrome extension that turns any site's CSS into copy-paste design tokens",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>Whenever I liked the look of a site, I&#39;d end up in devtools manually hunting for color values, font stacks, and <code>:root</code> variables to figure out how it was built. Got tedious enough that I built <a href=\"https://chromewebstore.google.com/detail/design-snap-%E2%80%93-design-toke/eenpmkjgihcopkabmkdjjoagenpdlfon\">Design Snap</a> to do it automatically.</p> <p>Point it at any page and it pulls out :</p> <ul> <li>Color palette (with semantic role detection — primary, background, border, etc., not just a flat list of hex codes)</li> <li>Typography scale</li> <li>Border radius and shadow tokens</li> <li>CSS custom properties, with light/dark mode variants detected separately</li> </ul> <p>The part most relevant to this sub: for every token, you can hover it and see the exact CSS selector(s) it came from, how many times it&#39;s used across the page, and whether it&#39;s a <code>:root</code> var or a hardcoded value. So instead of just getting &quot;here&#39;s a blue,&quot; you get &quot;here&#39;s a blue, used in 12 places, defined once as <code>--color-primary</code>.&quot;</p> <p>Export goes straight to CSS variables, JSON, or Figma Tokens (free), or Tailwind v4 <code>u/ theme</code> / shadcn/ui / Style Dictionary format if you&#39;re working in one of those systems.</p> <p>Runs 100% locally in the browser, no account, no server round-trip.</p> <p>Happy to hear what this sub thinks is missing from a CSS-extraction workflow like this — genuinely curious what other devs here reach for <code>:root</code> vars vs hardcoded values for, and whether that&#39;d be useful to detect/flag automatically.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Accurate_Board_9401\"> /u/Accurate_Board_9401 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vbpdy1/showcase_a_chrome_extension_that_turns_any_sites/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vbpdy1/showcase_a_chrome_extension_that_turns_any_sites/\">[comments]</a></span>",
-    "date": "2026-07-31T12:20:38.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vbpdy1/showcase_a_chrome_extension_that_turns_any_sites/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "How to combine two CSS \"content\" strings that have different styles?",
-    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>How do I append two CSS strings here? <code> &lt;style type=&quot;text/css&quot;&gt; ul li:first-child::before { {content: &#39;X&#39;; color:white; background-color:black;} {content: &#39;Y&#39;; color:black; background-color:white;} } &lt;/style&gt; </code> I want to append them, not override the first.\\ I want a white X, followed by a black Y.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/jidanni\"> /u/jidanni </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vawbxy/how_to_combine_two_css_content_strings_that_have/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vawbxy/how_to_combine_two_css_content_strings_that_have/\">[comments]</a></span>",
-    "date": "2026-07-30T15:09:42.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vawbxy/how_to_combine_two_css_content_strings_that_have/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "¿Cómo convertir tarjetas de Elementor en un slider usando solo un botón \"Siguiente\"?",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1vav76m/cómo_convertir_tarjetas_de_elementor_en_un_slider/\"> <img src=\"https://preview.redd.it/9ftg918tmdgh1.png?width=140&amp;height=80&amp;auto=webp&amp;s=c699b5fdc7eca93d924b52f909ee25833d8566fc\" alt=\"¿Cómo convertir tarjetas de Elementor en un slider usando solo un botón &quot;Siguiente&quot;?\" title=\"¿Cómo convertir tarjetas de Elementor en un slider usando solo un botón &quot;Siguiente&quot;?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Hola a todos, estoy utilizando una plantilla de Elementor y me encanta cómo queda visualmente las tarjetas de testimonios. Ahora quiero convertirlas en un carrusel/slider.</p> <p><strong>Lo que necesito:</strong></p> <ul> <li>Mantener el diseño exacto de las tarjetas</li> <li>Que solo tenga un botón o flecha de &quot;Siguiente&quot; (Next) para ir pasando las tarjetas,</li> </ul> <p><strong>El problema:</strong></p> <ul> <li>Desconozco de CSS</li> <li>No tengo Elementor PRO</li> <li>Prefiero no meter plugins porque me desarma la estética</li> </ul> <p><a href=\"https://preview.redd.it/9ftg918tmdgh1.png?width=1387&amp;format=png&amp;auto=webp&amp;s=8f0e0fc24fe6f96b2c26c91fa170ba12a819ba5d\">https://preview.redd.it/9ftg918tmdgh1.png?width=1387&amp;format=png&amp;auto=webp&amp;s=8f0e0fc24fe6f96b2c26c91fa170ba12a819ba5d</a></p> <p>¿Cuál es la forma más limpia de resolver esto? ¿Hay algún código liviano o truco en Elementor para vincular el botón &quot;Siguiente&quot; a las tarjetas sin perder el diseño?</p> <p>¡Gracias!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Substantial_Tap6064\"> /u/Substantial_Tap6064 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1vav76m/cómo_convertir_tarjetas_de_elementor_en_un_slider/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1vav76m/cómo_convertir_tarjetas_de_elementor_en_un_slider/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-07-30T14:27:33.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1vav76m/cómo_convertir_tarjetas_de_elementor_en_un_slider/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Codepen 2.0 - RIP classic Pen?",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1v909z8/codepen_20_rip_classic_pen/\"> <img src=\"https://preview.redd.it/mharw9zndzfh1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=387aaa0616b0642f8580240ff1688e6f17b22552\" alt=\"Codepen 2.0 - RIP classic Pen?\" title=\"Codepen 2.0 - RIP classic Pen?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>I use Codepen for all sorts of things and a lot for teaching in the early stages. Some of my newer students said they didn&#39;t have this button so, I had them forking a classic pen for a while - but I knew the day would come where it wouldn&#39;t be there anymore for me too. That day is today. I&#39;m all for the evolution of Codepen / and it&#39;s been an amazing tool. But it sure seems like this is going to confuse a lot of people. Your average person expects the CSS pane to be wired up. I used to write &lt;!-- body is already included --&gt; in the HTML to remind them at first (since some people will write out the doctype and everything in there) - but now it&#39;s swung to the other end. Codepen can be used for anything now. So, really - what you&#39;re making might not utilize CSS at all. So, I understand how modular it is - and how many other great things it will allow for -- but for entry-level people, it seems like this will really stifle adoption. What do you think? Wha thas been your 2.0 experience so far?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/sheriffderek\"> /u/sheriffderek </a> <br/> <span><a href=\"https://i.redd.it/mharw9zndzfh1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1v909z8/codepen_20_rip_classic_pen/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-07-28T14:34:12.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1v909z8/codepen_20_rip_classic_pen/"
   }
 ]
