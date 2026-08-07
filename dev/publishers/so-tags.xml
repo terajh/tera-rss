@@ -1,0 +1,1684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>dev RSS - Stack Overflow Tags</title>
+    <link>https://stackoverflow.com/</link>
+    <description>Stack Overflow Tags RSS 피드</description>
+    <lastBuildDate>Fri, 07 Aug 2026 16:40:50 GMT</lastBuildDate>
+    <item>
+      <title>How to test Vue ripple directive has been used?</title>
+      <link>https://stackoverflow.com/questions/79989578/how-to-test-vue-ripple-directive-has-been-used</link>
+      <guid>https://stackoverflow.com/questions/79989578/how-to-test-vue-ripple-directive-has-been-used</guid>
+      <pubDate>Fri, 31 Jul 2026 20:17:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;My Vue App uses Quasar plugin. Quasar includes &lt;code&gt;ripple&lt;/code&gt; directive, which my component uses.&lt;/p&gt;
+        &lt;p&gt;How can I test &lt;code&gt;v-ripple&lt;/code&gt; has been used?&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;q-item v-ripple&amp;gt;...&amp;lt;/q-item&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;ve been trying this way but it does not work.&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import { mount } from &apos;@vue/test-utils&apos;
+        
+        const vRipple = { beforeMount: () =&amp;gt; console.log(&apos;Ripple used&apos;)}
+        mount(MyComponent, {
+        global: { plugins: [], directives: { Ripple: vRipple } }
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is my Vitest setup:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import { config } from &apos;@vue/test-utils&apos;
+        import { Quasar, LocalStorage } from &apos;quasar&apos;
+        
+        config.global.plugins = [[Quasar, { plugins: { LocalStorage } }]
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is my Vitest configuration:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import { defineConfig } from &apos;vite&apos;
+        import ViteRails from &apos;vite-plugin-rails&apos;
+        import { fileURLToPath } from &apos;node:url&apos;
+        import vue from &apos;@vitejs/plugin-vue&apos;
+        import { quasar, transformAssetUrls } from &apos;@quasar/vite-plugin&apos;
+        import jsconfigPaths from &apos;vite-jsconfig-paths&apos;
+        
+        export default defineConfig({
+        plugins: [
+        ViteRails(),
+        vue({
+        template: { transformAssetUrls }
+        }),
+        quasar({
+        sassVariables: fileURLToPath(
+        new URL(&apos;/stylesheets/quasar-variables.scss&apos;, import.meta.url)
+        )
+        }),
+        jsconfigPaths()
+        ]
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I was suggested to not install Quasar to make the ripple test work. However, most of my tests wouldn&apos;t work without Quasar.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Error event not triggered after Vite build</title>
+      <link>https://stackoverflow.com/questions/79971923/error-event-not-triggered-after-vite-build</link>
+      <guid>https://stackoverflow.com/questions/79971923/error-event-not-triggered-after-vite-build</guid>
+      <pubDate>Wed, 01 Jul 2026 01:22:15 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m working on a Vue.js project and in the App.vue file I wrote this code that reacts to all exceptions and rejections of my app.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;  window.addEventListener(&apos;error&apos;, event =&amp;gt; {
+        errorDialog.value = true
+        errorMessage.value = event.error.message
+        })
+        
+        window.addEventListener(&apos;unhandledrejection&apos;, event =&amp;gt; {
+        errorDialog.value = true
+        errorMessage.value = event.reason.message
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;In dev mode everything works smoothlessly... But once built it gets weird...&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;After many tests I understood that : it doesn&apos;t work when and only when the exception is thrown directly by an eventlistener.&lt;/p&gt;
+        &lt;p&gt;To be clearer here is a usecase&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;button @click=&amp;quot;onClick_1()&amp;quot;&amp;gt;CLIK ME&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;onClick_2()&amp;quot;&amp;gt;CLIK ME&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;onClick_3()&amp;quot;&amp;gt;CLIK ME&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;onClick_4()&amp;quot;&amp;gt;CLIK ME&amp;lt;/button&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup&amp;gt;
+        function onClick_1 () {
+        throw &apos;1&apos; // Doesn&apos;t trigger anything
+        }
+        
+        async function onClick_2 () {
+        /** With or without &apos;await&apos; here **/
+        throw &apos;2&apos; // Doesn&apos;t trigger anything
+        }
+        
+        function onClick_3 () {
+        (async () =&amp;gt; {
+        throw &apos;3&apos; // Triggers the unhandledrejection listener
+        })()
+        }
+        
+        async function onClick_4 () {
+        (async () =&amp;gt; {
+        throw &apos;4&apos; // Triggers the unhandledrejection listener
+        })()
+        }
+        &amp;lt;script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Could someone please explain what&apos;s the ding-dong here and how to fix it ?&lt;/p&gt;
+        &lt;p&gt;Thank you in advance !&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to use select ui component in Laravel vue-starter-kit</title>
+      <link>https://stackoverflow.com/questions/79971787/how-to-use-select-ui-component-in-laravel-vue-starter-kit</link>
+      <guid>https://stackoverflow.com/questions/79971787/how-to-use-select-ui-component-in-laravel-vue-starter-kit</guid>
+      <pubDate>Tue, 30 Jun 2026 14:57:49 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using Laravel&apos;s &lt;strong&gt;&lt;a href=&quot;https://github.com/laravel/vue-starter-kit&quot; rel=&quot;nofollow noreferrer&quot;&gt;vue-starter-kit&lt;/a&gt;&lt;/strong&gt; and inside &lt;em&gt;&lt;code&gt;resources/js/components/ui/&lt;/code&gt;&lt;/em&gt; folder there are some different ui components. For example If you need to use Input it&apos;s easy, this is how:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Input } from &apos;@/components/ui/input&apos;;
+        
+        &amp;lt;Input id=&amp;quot;name&amp;quot; v-model=&amp;quot;team.name&amp;quot; type=&amp;quot;text&amp;quot; placeholder=&amp;quot;choose a name...&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now I am trying to use &lt;a href=&quot;https://github.com/laravel/vue-starter-kit/tree/main/resources/js/components/ui/select&quot; rel=&quot;nofollow noreferrer&quot;&gt;Select&lt;/a&gt; component and I don&apos;t know how! I have an array of objects called &lt;code&gt;groups&lt;/code&gt; and I need to use them as options for the select component.  (Each Group has a title&amp;lt;string&amp;gt; and an id&amp;lt;number&amp;gt;)&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import { Select } from &apos;@/components/ui/select&apos;;
+        
+        &amp;lt;Select v-model=&amp;quot;team.group&amp;quot; :options=&amp;quot;groups&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Of course when I try using Select component this way, I get no where! How can I use this select ui component? what do I need to import, how can I pass in my options?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>High FCP/LCP Huge &quot;Other&quot; time in Main-Thread Work and unused vendor JS</title>
+      <link>https://stackoverflow.com/questions/79966399/high-fcp-lcp-huge-other-time-in-main-thread-work-and-unused-vendor-js</link>
+      <guid>https://stackoverflow.com/questions/79966399/high-fcp-lcp-huge-other-time-in-main-thread-work-and-unused-vendor-js</guid>
+      <pubDate>Wed, 24 Jun 2026 14:44:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I deployed my first Laravel/Vue website for the company I work at (not a software one) and I am trying to optimize the performance of a SPA built with Laravel 11, Vue 3 with Tailwind, Inertia.js, and Vite, hosted on a shared GoDaddy server, despite implementing base optimization techniques, my main public index page Lighthouse performance score varies between 65 and 85 but never goes above that, with critical FCP and LCP issues.&lt;/p&gt;
+        &lt;p&gt;Here are the specific Lighthouse metrics on mobile:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;First Contentful Paint (FCP)&lt;strong&gt;:&lt;/strong&gt; 4.5 s&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Largest Contentful Paint (LCP)&lt;strong&gt;:&lt;/strong&gt; 5.1 s&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Speed Index: 4.5 s&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;strong&gt;1.&lt;/strong&gt; Minimize main-thread work (4.3 s total)&lt;br /&gt;
+        This is the most confusing part. The execution time is massively consumed by &amp;quot;Other&amp;quot;:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Other: 3,861 ms&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Script Evaluation: 295 ms&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Style &amp;amp; Layout: 101 ms&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Rendering: 26 ms&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Parse HTML &amp;amp; CSS: 8 ms&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;strong&gt;2.&lt;/strong&gt; Reduce unused JavaScript&lt;br /&gt;
+        Lighthouse flags my &apos;vendor-vue&apos; chunk&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;build/assets/vendor-vue-[hash].js: 234.0 KiB transfer -&amp;gt; 139.1 KiB unused.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;strong&gt;3.&lt;/strong&gt; Render-blocking requests&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;build/assets/app-[hash].css: 22.2 KiB (0 ms duration, but still flagged).&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3&gt;What I have already tried:&lt;/h3&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Images: Replaced hero images with AVIF/WebP, implemented &lt;code&gt;&amp;lt;picture&amp;gt;&lt;/code&gt; tags with &apos;srcset&apos; and &apos;sizes&apos; for mobile devices.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Fonts: Sub Google Fonts to only download specific weights used in the design.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Vite Code Splitting: Admin components are lazy-loaded and do not bleed into the public app.js.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;How can i track and fix this? i donw know what typically causes 3.8 seconds of &amp;quot;Other&amp;quot; time in Lighthouse for a Vue/Inertia app or how can I profile this specific metric and since &apos;vendor-vue.js&apos; contains the core of Vue and Inertia, how can I reduce the &amp;quot;139 KiB unused&amp;quot; warning? and Is there a Vite plugin for Laravel to inline critical CSS considering the CSS is already minified and small (22 KiB)?&lt;/p&gt;
+        &lt;p&gt;Any guidance would be greatly appreciated.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Why is TypeScript rejecting Quasar alias?</title>
+      <link>https://stackoverflow.com/questions/79963325/why-is-typescript-rejecting-quasar-alias</link>
+      <guid>https://stackoverflow.com/questions/79963325/why-is-typescript-rejecting-quasar-alias</guid>
+      <pubDate>Fri, 19 Jun 2026 18:36:35 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Why does my &lt;code&gt;@&lt;/code&gt; alias not work with TypeScript?&lt;/p&gt;
+        &lt;p&gt;I have these settings in my &lt;code&gt;quasar.config.ts&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-typescript prettyprint-override&quot;&gt;&lt;code&gt;    build: {
+        target: {
+        browser: &apos;baseline-widely-available&apos;,
+        node: &apos;node22&apos;,
+        },
+        
+        typescript: {
+        strict: true,
+        vueShim: true,
+        // extendTsConfig (tsConfig) {}
+        },
+        
+        alias: {
+        &apos;@&apos;: &apos;/src&apos;,
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and this setting in &lt;code&gt;tsconfig.json&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;extends&amp;quot;: &amp;quot;./.quasar/tsconfig.json&amp;quot;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The app is running correctly but I have error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Cannot find module &apos;@/features/theme/lib&apos; or its corresponding type declarations.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The imports with @ working, components successfully importing.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How can I apply a &apos;for&apos; loop for my ASCII pattern for it to be in the X and Y direction when needed?</title>
+      <link>https://stackoverflow.com/questions/79949032/how-can-i-apply-a-for-loop-for-my-ascii-pattern-for-it-to-be-in-the-x-and-y-di</link>
+      <guid>https://stackoverflow.com/questions/79949032/how-can-i-apply-a-for-loop-for-my-ascii-pattern-for-it-to-be-in-the-x-and-y-di</guid>
+      <pubDate>Sat, 30 May 2026 20:17:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;After a really long time searching, I can&apos;t find the logic to apply to this code for it to loop without me needing to type out all of the pattern. It goes in a Y direction but I want it to be in a X direction too:&lt;/p&gt;
+        &lt;p&gt;My TypeScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { onMounted, computed } from &apos;vue&apos;;
+        import { useGithub } from &apos;../composables/useGithub&apos;;
+        
+        const { user: githubProfile, fetchUserProfile } = useGithub();
+        
+        onMounted(() =&amp;gt; {
+        fetchUserProfile();
+        });
+        
+        const motifs = computed(() =&amp;gt; {
+        const ASCIILigne1 = &amp;quot;|__|   __|__|   __|__|   &amp;quot;; 
+        const ASCIILigne2 = &amp;quot; __|__|   __|__|   __|__|&amp;quot;; 
+        const ASCIILigne3 = &amp;quot;|   __|__|   __|__|   __|&amp;quot;; 
+        
+        const totalLignes = 40;
+        const repetitionX = 6;
+        
+        let lignes: string[] = [];
+        
+        for (let i = 0; i &amp;lt; totalLignes; i++) {
+        let ligneDeBase = &amp;quot;&amp;quot;;
+        
+        if (i % 3 === 0) {
+        ligneDeBase = ASCIILigne1;
+        } else if (i % 3 === 1) {
+        ligneDeBase = ASCIILigne2;
+        } else {
+        ligneDeBase = ASCIILigne3;
+        }
+        
+        lignes.push(ligneDeBase.repeat(repetitionX));
+        }
+        
+        return lignes;
+        });
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My HTML with bootstrap:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;portfolio-wrapper position-relative overflow-hidden&amp;quot; style=&amp;quot;min-height: 100vh;&amp;quot;&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;brick-background position-absolute top-0 start-0 w-100 h-100 z-0 m-0 p-0 text-secondary pe-none user-select-none&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;
+        &amp;lt;div 
+        v-for=&amp;quot;(ligne, index) in motifs&amp;quot; 
+        :key=&amp;quot;index&amp;quot; 
+        class=&amp;quot;pattern-line&amp;quot;
+        &amp;gt;
+        {{ ligne }}
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;container py-5 position-relative z-1&amp;quot;&amp;gt;
+        &amp;lt;header class=&amp;quot;text-center mb-5 fade-in&amp;quot;&amp;gt;
+        &amp;lt;h1 class=&amp;quot;display-4 fw-bold gradient-text&amp;quot;&amp;gt;&amp;lt;/h1&amp;gt;
+        &amp;lt;div class=&amp;quot;underline mx-auto&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;/header&amp;gt;
+        
+        &amp;lt;div v-if=&amp;quot;githubProfile&amp;quot; class=&amp;quot;&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;profile-content&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;avatar-container&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;../assets/1776786464860.jpg&amp;quot; alt=&amp;quot;Avatar&amp;quot; class=&amp;quot;profile-avatar&amp;quot; /&amp;gt;
+        &amp;lt;div class=&amp;quot;status-badge&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;h2 class=&amp;quot;mt-3 fw-bold&amp;quot;&amp;gt;{{ &apos;Arthur Dubé&apos;}}&amp;lt;/h2&amp;gt;
+        &amp;lt;p class=&amp;quot;text-muted bio-text&amp;quot;&amp;gt;
+        {{ githubProfile.bio || &apos;Développeur Full Stack Junior, Un des créateurs de Air-Métique.&apos; }}
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;stats d-flex justify-content-center gap-4 mt-3&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;stat-item&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;d-block fw-bold&amp;quot;&amp;gt;{{ githubProfile.public_repos }}&amp;lt;/span&amp;gt;
+        &amp;lt;small&amp;gt;Projets&amp;lt;/small&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;stat-item&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;d-block fw-bold&amp;quot;&amp;gt;{{ githubProfile.followers }}&amp;lt;/span&amp;gt;
+        &amp;lt;small&amp;gt;Followers&amp;lt;/small&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;text-center mt-5&amp;quot;&amp;gt;
+        &amp;lt;h3 class=&amp;quot;mb-4 section-title&amp;quot;&amp;gt;Explorez mon univers&amp;lt;/h3&amp;gt;
+        &amp;lt;div class=&amp;quot;row justify-content-center g-4&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;col-md-5 col-sm-6&amp;quot;&amp;gt;
+        &amp;lt;router-link to=&amp;quot;/repos/all?view=featured&amp;quot; class=&amp;quot;category-card featured-btn&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;label&amp;quot;&amp;gt;Projets Vedettes&amp;lt;/span&amp;gt;
+        &amp;lt;small class=&amp;quot;text-muted-hover&amp;quot;&amp;gt;Mes réalisations majeures&amp;lt;/small&amp;gt;
+        &amp;lt;/router-link&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;col-md-5 col-sm-6&amp;quot;&amp;gt;
+        &amp;lt;router-link to=&amp;quot;/repos/all?view=repos&amp;quot; class=&amp;quot;category-card&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;label&amp;quot;&amp;gt;Dépôts GitHub&amp;lt;/span&amp;gt;
+        &amp;lt;small class=&amp;quot;text-muted-hover&amp;quot;&amp;gt;Explorations et code brut&amp;lt;/small&amp;gt;
+        &amp;lt;/router-link&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My CSS:&lt;/p&gt;
+        &lt;pre class=&quot;lang-css prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;style scoped&amp;gt;
+        .pattern-line {
+        font-family: monospace;
+        white-space: pre;   
+        line-height: 1;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I want the code to give this pattern in my background:&lt;/p&gt;
+        &lt;p&gt;&lt;div class=&quot;snippet&quot; data-lang=&quot;js&quot; data-hide=&quot;false&quot; data-console=&quot;true&quot; data-babel=&quot;false&quot; data-babel-preset-react=&quot;false&quot; data-babel-preset-ts=&quot;false&quot;&gt;
+        &lt;div class=&quot;snippet-code&quot;&gt;
+        &lt;pre class=&quot;snippet-code-css lang-css prettyprint-override&quot;&gt;&lt;code&gt;.pattern-line {
+        font-family: monospace;
+        white-space: pre;   
+        line-height: 1;
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;snippet-code-html lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;div class=&quot;pattern-line&quot;&amp;gt;
+        
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|  
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        |   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|
+        |__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|  
+        __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|   __|__|
+        &amp;lt;/div&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Thanks in advance for the response and comments!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Disable custom button in the fc-header-toolbar with &apos;disable&apos; in stead of CSS</title>
+      <link>https://stackoverflow.com/questions/79948599/disable-custom-button-in-the-fc-header-toolbar-with-disable-in-stead-of-css</link>
+      <guid>https://stackoverflow.com/questions/79948599/disable-custom-button-in-the-fc-header-toolbar-with-disable-in-stead-of-css</guid>
+      <pubDate>Fri, 29 May 2026 16:50:33 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;We have defined a custombutton which is diabled \enabled on a certain value. This is working so far:&lt;br /&gt;
+        I&apos;m working with Vue.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const updateMyCustomButton = async (): Promise&amp;lt;void&amp;gt; =&amp;gt; {
+        
+        await nextTick();
+        const btn = document.querySelector(&amp;quot;.fc-my-custom-button&amp;quot;) as HTMLButtonElement | null;
+        
+        if (btn) {
+        if (buss.value?.startDay === undefined) {
+        btn.classList.add(&amp;quot;is-disabled&amp;quot;);
+        } else {
+        btn.classList.remove(&amp;quot;is-disabled&amp;quot;);
+        }
+        }
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is working.&lt;br /&gt;
+        But if try it with adding the attribute &apos;disabled like:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;btn.toggleAttribute(&amp;quot;disabled&amp;quot;, ?);
+        btn.setAttribute(&amp;quot;disabled&amp;quot;, &amp;quot;?&amp;quot;);
+        btn.disabled = ?;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The question mark &amp;quot;?&amp;quot; is than replaced with &apos;true&apos; or &apos;false&apos;.  The attribute is added and the button is disabled.&lt;br /&gt;
+        But if I click on the calendar, than the button is already enabled while on that moment nothing has been changed so it should stay disabled&lt;br /&gt;
+        It seems that the fullcalendar is rerendering the calendar when I click on the calendar and removing the attribute &amp;quot;disabled&amp;quot;&lt;br /&gt;
+        This is not happening with adding\removing the css class &apos;is-disabled&apos;.&lt;br /&gt;
+        I&apos;ve tried the &apos;viewDidMount&apos;, I try to find another hook function, to call the &apos;updateMyCustomButton&apos;.&lt;/p&gt;
+        &lt;p&gt;I should like to use the attribute because than the behaviour is the same in the whole application. For example I have cursor: not-allowed and pointer-events: none, if I hover over the disabled button than it shows nothing while other disabled buttons shows &apos;red circle with bar&apos;.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to enable live reload on localhost:8000 without a separate dev server</title>
+      <link>https://stackoverflow.com/questions/79944247/how-to-enable-live-reload-on-localhost8000-without-a-separate-dev-server</link>
+      <guid>https://stackoverflow.com/questions/79944247/how-to-enable-live-reload-on-localhost8000-without-a-separate-dev-server</guid>
+      <pubDate>Wed, 20 May 2026 19:24:52 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am developing a custom app in Frappe Framework using Vue.js as the frontend framework. The Vue frontend is connected to an HTML page inside the &lt;code&gt;www&lt;/code&gt; folder of Frappe.&lt;/p&gt;
+        &lt;p&gt;I have already configured the &lt;code&gt;Procfile&lt;/code&gt; and added the required watch commands. When I edit Vue files, the assets are rebuilt correctly while running &lt;code&gt;bench start&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;The issue is that the changes are not automatically reflected in the browser at &lt;code&gt;localhost:8000/...&lt;/code&gt;. I currently need to manually perform a hard reload every time to see the updates.&lt;/p&gt;
+        &lt;p&gt;I know that standard Hot Module Replacement (HMR) usually runs on a separate development server such as &lt;code&gt;localhost:8080&lt;/code&gt; or &lt;code&gt;localhost:5173&lt;/code&gt;, but that is not the setup I want.&lt;/p&gt;
+        &lt;p&gt;My requirement is:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;I want to continue using the Frappe server at &lt;code&gt;localhost:8000&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;I do not want a separate frontend development server&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;I want automatic browser reload or live reload directly on the Frappe-served page whenever Vue files are modified&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;How can this be implemented properly in a Frappe + Vue setup? What configurations or tools are needed to achieve automatic reload on &lt;code&gt;localhost:8000&lt;/code&gt; itself without manually refreshing the page?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Parametric tests don&apos;t seem to play nice with vitest-browser-vue</title>
+      <link>https://stackoverflow.com/questions/79942224/parametric-tests-dont-seem-to-play-nice-with-vitest-browser-vue</link>
+      <guid>https://stackoverflow.com/questions/79942224/parametric-tests-dont-seem-to-play-nice-with-vitest-browser-vue</guid>
+      <pubDate>Sat, 16 May 2026 16:50:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;This is a &lt;a href=&quot;https://github.com/vitest-community/vitest-browser-vue/issues/26&quot; rel=&quot;nofollow noreferrer&quot;&gt;crosspost&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I am using Playwright as my &lt;code&gt;provider&lt;/code&gt; in the vitest configuration file and chromium as my browser &lt;code&gt;instance&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;vitest-browser-vue&lt;/code&gt; docs are more or less clear on how to write a simple component test. I therefore created two simple components and wrote the folllowing tests:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;test(&amp;quot;Component 1&amp;quot;, async () =&amp;gt; {
+        await render(Component1, {
+        props: { items: [&amp;quot;item one&amp;quot;, &amp;quot;item two&amp;quot;, &amp;quot;item three&amp;quot;] },
+        });
+        });
+        
+        test(&amp;quot;Component 2&amp;quot;, async () =&amp;gt; {
+        await render(Component2, {
+        props: { items: [&amp;quot;item one&amp;quot;, &amp;quot;item two&amp;quot;] },
+        });
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;When I launch the test suite a browser window opens, showing me the Vitest browser mode UI. The first test runs and passes.  The second test fails with the following error:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;NotFoundError: Failed to execute &apos;removeChild&apos; on &apos;Node&apos;: The node to be removed is not a child of this node.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Is this a bug? or am I doing something wrong on my end? Is &lt;code&gt;vitest-browser-vue&lt;/code&gt; equipped to run two consecutive tests on two different Vue components? If not what is the point?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How can I make a Hero section fill the remaining viewport height below a header in Nuxt 4 without breaking when the page grows?</title>
+      <link>https://stackoverflow.com/questions/79940624/how-can-i-make-a-hero-section-fill-the-remaining-viewport-height-below-a-header</link>
+      <guid>https://stackoverflow.com/questions/79940624/how-can-i-make-a-hero-section-fill-the-remaining-viewport-height-below-a-header</guid>
+      <pubDate>Wed, 13 May 2026 15:16:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am currently building a website using Nuxt 4 + Tailwind CSS and I am having a problem with viewport units (&lt;code&gt;dvh&lt;/code&gt;, &lt;code&gt;vh&lt;/code&gt;) and percentage heights (&lt;code&gt;h-full&lt;/code&gt;) inside a Nuxt layout.&lt;/p&gt;
+        &lt;p&gt;My layout structure is basically:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;A global &lt;code&gt;default.vue&lt;/code&gt; layout&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;A &lt;code&gt;Header&lt;/code&gt; and a &lt;code&gt;main&lt;/code&gt; inside it&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Multiple sections rendered inside &lt;code&gt;index&lt;/code&gt; the page (&lt;code&gt;Hero&lt;/code&gt;, &lt;code&gt;OurTechnologies&lt;/code&gt;, etc.), where it uses the default layout&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The layout currently looks like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;min-h-dvh grid grid-rows-[auto_1fr]&amp;quot;&amp;gt;
+        &amp;lt;LayoutHeader /&amp;gt;
+        
+        &amp;lt;main&amp;gt;
+        &amp;lt;slot /&amp;gt;
+        &amp;lt;/main&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;index.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre class=&quot;lang-html prettyprint-override&quot;&gt;&lt;code&gt;
+        &amp;lt;template&amp;gt;
+        &amp;lt;LayoutSectionsHomeHero /&amp;gt; 
+        &amp;lt;LayoutSectionsSeparator /&amp;gt; 
+        &amp;lt;LayoutSectionsHomeOurTechnologies /&amp;gt; 
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;HeroSection.vue&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;section
+        class=&amp;quot;homeHero__main-section h-full flex flex-col items-center justify-center&amp;quot; &amp;gt;
+        &amp;lt;h1 class=&amp;quot;homeHero__main-title title__default text-center&amp;quot;&amp;gt;
+        Welcome to
+        &amp;lt;br /&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;gradient__text bg-linear-green-1&amp;quot;&amp;gt;
+        &amp;lt;span class=&amp;quot;mt-5 inline-block&amp;quot;&amp;gt;AutoAI&amp;lt;/span&amp;gt;
+        
+        &amp;lt;span class=&amp;quot;hidden sm:inline&amp;quot;&amp;gt; - &amp;lt;/span&amp;gt;
+        
+        &amp;lt;br class=&amp;quot;sm:hidden&amp;quot; /&amp;gt;
+        
+        &amp;lt;span&amp;gt;Pandemics&amp;lt;/span&amp;gt;
+        &amp;lt;/span&amp;gt;
+        &amp;lt;/h1&amp;gt;
+        
+        &amp;lt;p class=&amp;quot;homeHero__welcome-paragraph text__default mt-5 text-center&amp;quot;&amp;gt;
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+        velit esse cillum dolore eu fugiat nulla pariatur.
+        &amp;lt;/p&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;homeHero__buttons-container mt-10 flex w-full flex-col gap-5&amp;quot;&amp;gt;
+        &amp;lt;UiButtonsPrimary class=&amp;quot;font-header-text&amp;quot;&amp;gt;
+        Explore our technologies
+        &amp;lt;/UiButtonsPrimary&amp;gt;
+        
+        &amp;lt;UiButtonsSecondary class=&amp;quot;font-header-text&amp;quot;&amp;gt;
+        About us
+        &amp;lt;/UiButtonsSecondary&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And finally, the &lt;code&gt;OurTechnologiesSection.vue&lt;/code&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;section class=&amp;quot;homeOurTechnologies__main-section flex flex-col items-center&amp;quot;&amp;gt;
+        &amp;lt;UiCardsTool
+        v-for=&amp;quot;item in tools&amp;quot;
+        :toolName=&amp;quot;item.toolName&amp;quot;
+        :toolDescription=&amp;quot;item.toolDescription&amp;quot;
+        :toolLink=&amp;quot;item.toolLink&amp;quot;
+        &amp;gt;&amp;lt;/UiCardsTool&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        const tools = [
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        { toolName: &amp;quot;Test&amp;quot;, toolDescription: &amp;quot;This is test&amp;quot;, toolLink: &amp;quot;/&amp;quot; },
+        ];
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The problem is:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;If the page only contains the Hero section, everything works perfectly. Check the image below&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/65W2OApB.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Layout without OurTechnologies Section working perfectly&lt;/a&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;The Hero fills the remaining viewport space below the header exactly as expected.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;But as soon as I add another section below it (&lt;code&gt;OurTechnologies&lt;/code&gt;), the Hero suddenly becomes much taller than the viewport, like the image below:&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;a href=&quot;https://i.sstatic.net/26KpTgcM.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;Layout broken with OurTechnologies Section&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Because of this:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;justify-center&lt;/code&gt; starts centering based on the entire page height instead of only the visible screen.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;The Hero content gets pushed down vertically.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;The selected element in DevTools becomes much taller than the viewport.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;What I want is a hero section that always fills exactly the visible viewport area remaining below the header(like you can see in the first image above) using best practices for responsive layout.&lt;/p&gt;
+        &lt;p&gt;Oh, and I also tried:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;h-full&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;min-h-full&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;h-dvh&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;code&gt;min-h-dvh&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;CSS &lt;code&gt;calc()&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Changing Grid/Flex configurations&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;In the hero section, but the behavior still breaks once the page grows vertically.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;*Just a small note: Feel free to give me feedback about Vue, HTML, CSS, and best practices. I’m currently starting my journey in front-end development, and I want to learn as much as I can about this huge area, and sorry for my english :)&lt;/p&gt;
+        &lt;/blockquote&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>VueJS3 DOM event not forwarded to child component</title>
+      <link>https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component</link>
+      <guid>https://stackoverflow.com/questions/79937583/vuejs3-dom-event-not-forwarded-to-child-component</guid>
+      <pubDate>Thu, 07 May 2026 13:04:41 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am migrating a Vue2 app to Vue3.&lt;/p&gt;
+        &lt;p&gt;I am running the &lt;strong&gt;compatibility build&lt;/strong&gt; (vue 3.1.0 with @vue/compat: 3.1.0).&lt;/p&gt;
+        &lt;p&gt;I have custom buttons components like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;button class=&amp;quot;EditButton&amp;quot;&amp;gt;
+        &amp;lt;SvgIcon name=&amp;quot;edit&amp;quot; /&amp;gt;
+        &amp;lt;span&amp;gt;Edit&amp;lt;/span&amp;gt;
+        &amp;lt;/button&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        /* Some style */
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My app currently calls this button like&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;EditButton
+        id=&amp;quot;edit-button&amp;quot;
+        :disabled=&amp;quot;!aCondition&amp;quot;
+        @click.native=&amp;quot;editPost(post)&amp;quot;
+        /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Doing this works fine. &lt;code&gt;.native&lt;/code&gt; event modifier being deprecated in Vue 3, I removed it (see &lt;a href=&quot;https://v3-migration.vuejs.org/breaking-changes/v-on-native-modifier-removed.html&quot; rel=&quot;nofollow noreferrer&quot;&gt;vue3 v-on-native-modifier documentation&lt;/a&gt;). According to the documentation, &lt;code&gt;v-on&lt;/code&gt; listeners that are not part declared as a component event should be added as DOM event on thefirst  root element (&lt;code&gt;button&lt;/code&gt; in my case).&lt;/p&gt;
+        &lt;p&gt;However that does not work. Removing &lt;code&gt;.native&lt;/code&gt;  removes the &lt;code&gt;onClick&lt;/code&gt; listener in the &lt;code&gt;$attrs&lt;/code&gt; of the component and here is what I get on the devTools window:
+        &lt;a href=&quot;https://i.sstatic.net/8MgZlFkT.png&quot; rel=&quot;nofollow noreferrer&quot;&gt;&lt;img src=&quot;https://i.sstatic.net/8MgZlFkT.png&quot; alt=&quot;vuejs DevTools&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Here is my vite configuration, should it be useful&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export default defineConfig({
+        resolve: {
+        alias: {
+        &amp;quot;@&amp;quot;: fileURLToPath(new URL(&amp;quot;./src&amp;quot;, import.meta.url)),
+        vue: &apos;@vue/compat&apos;
+        },
+        },
+        plugins: [
+        vue({
+        template: {
+        compilerOptions: {
+        compatConfig: {
+        MODE: 2
+        }
+        }
+        }
+        }),
+        createSvgIconsPlugin({
+        iconDirs: [fileURLToPath(new URL(&amp;quot;./src/assets/icons&amp;quot;, import.meta.url))],
+        symbolId: &amp;quot;icon-[name]&amp;quot;,
+        }),
+        ]});
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My question is simple, how to handle click event in vueJS 3, what am I doing wrong?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to split locale messages into multiple files with @nuxtjs/i18n</title>
+      <link>https://stackoverflow.com/questions/79937570/how-to-split-locale-messages-into-multiple-files-with-nuxtjs-i18n</link>
+      <guid>https://stackoverflow.com/questions/79937570/how-to-split-locale-messages-into-multiple-files-with-nuxtjs-i18n</guid>
+      <pubDate>Thu, 07 May 2026 12:35:27 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m using &lt;code&gt;@nuxtjs/i18n&lt;/code&gt; v10.2.1 with Nuxt 4. My &lt;code&gt;i18n/i18n.config.ts&lt;/code&gt; has grown large because it contains ~250 country name translations for both German and English. I want to extract the countries into a separate file to keep &lt;code&gt;i18n.config.ts&lt;/code&gt; manageable.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Current setup:&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// i18n/i18n.config.ts
+        export default defineI18nConfig(() =&amp;gt; ({
+        messages: {
+        de: {
+        countries: { AF: &apos;Afghanistan&apos;, AL: &apos;Albanien&apos;, /* ~250 more */ },
+        about: &apos;Über uns&apos;,
+        // ...
+        },
+        en: {
+        countries: { AF: &apos;Afghanistan&apos;, AL: &apos;Albania&apos;, /* ~250 more */ },
+        about: &apos;About&apos;,
+        // ...
+        },
+        },
+        }))
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;What I tried:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;I extracted the countries into &lt;code&gt;i18n/i18n.countries.js&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;export default {
+        de: { AF: &apos;Afghanistan&apos;, /* ... */ },
+        en: { AF: &apos;Afghanistan&apos;, /* ... */ },
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And tried to import it:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// i18n/i18n.config.ts
+        import countries from &apos;./i18n.countries.js&apos;
+        
+        export default defineI18nConfig(() =&amp;gt; ({
+        messages: {
+        de: { countries: countries.de, about: &apos;Über uns&apos; },
+        en: { countries: countries.en, about: &apos;About&apos; },
+        },
+        }))
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This fails with:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;Cannot find module &apos;/i18n/i18n.countries.js&apos; imported from
+        /path/to/project/.nuxt/dev/index.mjs
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The path is wrong — it resolves to an absolute path from filesystem root (&lt;code&gt;/i18n/...&lt;/code&gt;) instead of the project root, because &lt;code&gt;defineI18nConfig&lt;/code&gt; files are virtualized by nuxt-i18n and relative imports don&apos;t resolve correctly.&lt;/p&gt;
+        &lt;p&gt;I also tried moving to file-based locale files (&lt;code&gt;langDir&lt;/code&gt; + &lt;code&gt;file&lt;/code&gt; per locale in &lt;code&gt;nuxt.config.ts&lt;/code&gt;) and importing from within those files — same resolution error regardless of where I put the countries file or what import path I use.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Question:&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;What is the correct way to split a large &lt;code&gt;messages&lt;/code&gt; object in &lt;code&gt;@nuxtjs/i18n&lt;/code&gt; v10 across multiple files? Specifically, how can I keep country translations in a dedicated file and reference them from either &lt;code&gt;i18n.config.ts&lt;/code&gt; or locale files without hitting the virtual module path resolution issue?&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;nuxt.config.ts i18n section:&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;i18n: {
+        strategy: &apos;prefix_except_default&apos;,
+        defaultLocale: &apos;en&apos;,
+        locales: [
+        { name: &apos;Deutsch&apos;, code: &apos;de&apos;, language: &apos;de-CH&apos; },
+        { name: &apos;English&apos;, code: &apos;en&apos;, language: &apos;en-US&apos; },
+        ],
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Astro for design system + Vue for interactivity, is this correct approach?</title>
+      <link>https://stackoverflow.com/questions/79929396/astro-for-design-system-vue-for-interactivity-is-this-correct-approach</link>
+      <guid>https://stackoverflow.com/questions/79929396/astro-for-design-system-vue-for-interactivity-is-this-correct-approach</guid>
+      <pubDate>Tue, 21 Apr 2026 10:54:20 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m building my first real website, and I’d like some architectural advice.&lt;/p&gt;
+        &lt;p&gt;I’m using Astro to build a small design system: buttons, inputs, cards, surfaces, typography, etc, and they look great. I really like this workflow for styling and layout.&lt;/p&gt;
+        &lt;p&gt;Now I want to add interactivity like modals, forms, notifications and API-requested content. For that, I started using Vue islands inside Astro via ant-design-vue package which provides all I need except one thing.&lt;/p&gt;
+        &lt;p&gt;When I create a Vue component (for example, a modal), I can’t directly reuse my beautiful Astro components inside Vue like:&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;&amp;lt;template&amp;gt;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;  &amp;lt;Button =&amp;quot;open = true&amp;quot;&amp;gt;Open form&amp;lt;/Button&amp;gt;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;  &amp;lt;Modal v-if=&amp;quot;open&amp;quot;&amp;gt;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;    &amp;lt;Input v-model=&amp;quot;name&amp;quot; /&amp;gt;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;  &amp;lt;/Modal&amp;gt;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;&amp;lt;/template&amp;gt;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;import { ref } from &amp;quot;vue&amp;quot;;&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;const open = ref(false);&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;const name = ref(&amp;quot;&amp;quot;);&lt;/code&gt;&lt;br /&gt;
+        &lt;code&gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;But of course, Astro components don’t run in the browser, so this doesn’t work (and yes, Button, Input, etc is not just div with styles and can&apos;t be replaced by simple css class).&lt;/p&gt;
+        &lt;p&gt;So, now I doubt about this entire approach. Is it correct? What about best practices? How real projects combine astro and interactivity?&lt;/p&gt;
+        &lt;p&gt;Thanks!&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>When using the DynamicScroller of vue-virtual-list, there is unexpected gap between sub-list items</title>
+      <link>https://stackoverflow.com/questions/79926795/when-using-the-dynamicscroller-of-vue-virtual-list-there-is-unexpected-gap-betw</link>
+      <guid>https://stackoverflow.com/questions/79926795/when-using-the-dynamicscroller-of-vue-virtual-list-there-is-unexpected-gap-betw</guid>
+      <pubDate>Thu, 16 Apr 2026 16:16:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Screenshot of actual effect：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/gwo8ilrI.png&quot; alt=&quot;enter image description here&quot; title=&quot;unexpected gap&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;The abnormal blank space is circled in red。The template and CSS code are as follows:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;      &amp;lt;DynamicScroller
+        :items=&amp;quot;msg_list&amp;quot;
+        :min-item-size=&amp;quot;50&amp;quot;
+        id=&amp;quot;chat-box-container&amp;quot;&amp;gt;
+        &amp;lt;template v-slot=&amp;quot;{ item, index, active }&amp;quot;&amp;gt;
+        &amp;lt;DynamicScrollerItem
+        :item=&amp;quot;item&amp;quot;
+        :active=&amp;quot;active&amp;quot;
+        :size-dependencies=&amp;quot;[item.message]&amp;quot;
+        :data-index=&amp;quot;index&amp;quot;
+        :key=&amp;quot;item.id&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-box&amp;quot;&amp;gt;
+        &amp;lt;img class=&amp;quot;avatar&amp;quot; :src=&amp;quot;item.avatar&amp;quot; /&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-content-container&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;name&amp;quot;&amp;gt;{{ item.username }}&amp;lt;/div&amp;gt;
+        &amp;lt;div class=&amp;quot;chat-content&amp;quot;&amp;gt;{{ item.content }}&amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/DynamicScrollerItem&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/DynamicScroller&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;lang-css prettyprint-override&quot;&gt;&lt;code&gt;.chat-box {
+        display: flex;
+        }
+        .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: aqua;
+        }
+        
+        .chat-content-container {
+        margin-left: 10px;
+        }
+        .name {
+        color: #d1d5db;
+        }
+        .chat-content {
+        display: inline-block;
+        margin-top: 10px;
+        border: 2px solid rgba(185, 172, 172, 0.527);
+        border-radius: 6px;
+        background-color: rgba(185, 172, 172, 0.527);
+        padding: 5px 10px;
+        direction: ltr;
+        
+        color: #d1d5db;
+        }
+        #chat-box-container {
+        border: 1px solid #fff;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 20px 20px;
+        
+        background-color: #36393f;
+        overflow: auto;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Format of data source：&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;{
+        &amp;quot;id&amp;quot;: 1,
+        &amp;quot;userID&amp;quot;: 2,
+        &amp;quot;avatar&amp;quot;: &amp;quot;https://ts3.tc.mm.bing.net/th/id/OIP-C.7GLMYPqMlt2LgkbPsOnDIAAAAA?cb=ucfimg2ucfimg=1&amp;amp;rs=1&amp;amp;pid=ImgDetMain&amp;amp;o=7&amp;amp;rm=3&amp;quot;,
+        &amp;quot;content&amp;quot;: &amp;quot;hello，我是管理员&amp;quot;,
+        &amp;quot;username&amp;quot;: &amp;quot;admin&amp;quot;,
+        &amp;quot;createTime&amp;quot;: &amp;quot;2026-04-05T13:14:18.000+00:00&amp;quot;,
+        &amp;quot;isDelete&amp;quot;: 0
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Since I haven&apos;t set any padding or margin in CSS, I expect the layout to follow the normal document flow, as shown in the image(The effect without using DynamicScroller)：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/B3SoMwzu.png&quot; alt=&quot;enter image description here&quot; title=&quot;without using DynamicScroller&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;When I inspected the page structure, I found that the transformY property had been added to each sub-item, and it was precisely this property that caused the gap (because when I manually changed the transformY to 0, the gap disappeared)：&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://i.sstatic.net/cc0D07gY.png&quot; alt=&quot;enter image description here&quot; title=&quot;F12 screenshot&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;All items are 56px in height in this case.&lt;br /&gt;
+        I don&apos;t know why there is such a transformY, and there are only four elements on the page shown in the image above, yet all the data has been rendered.This is clearly incorrect.&lt;/p&gt;
+        &lt;p&gt;I would like to know where I went wrong, as well as the reasons behind the unexpected gaps and incorrect rendering behavior.&lt;br /&gt;
+        I would be very grateful if you could help me with this : )&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Debounce not working properly in Vue 3 input field</title>
+      <link>https://stackoverflow.com/questions/79923271/debounce-not-working-properly-in-vue-3-input-field</link>
+      <guid>https://stackoverflow.com/questions/79923271/debounce-not-working-properly-in-vue-3-input-field</guid>
+      <pubDate>Fri, 10 Apr 2026 04:06:53 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Debounce not working properly in Vue 3 input field&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;watch(searchQuery, (newVal) =&amp;gt; {
+        debounceFetch(newVal)
+        })
+        
+        function debounceFetch(val) {
+        setTimeout(() =&amp;gt; {
+        fetchData(val)
+        }, 500)
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>@google/genai SDK: ai.files.upload ignores abortSignal and doesn&apos;t throw any exception when I try to abort</title>
+      <link>https://stackoverflow.com/questions/79921501/google-genai-sdk-ai-files-upload-ignores-abortsignal-and-doesnt-throw-any-exc</link>
+      <guid>https://stackoverflow.com/questions/79921501/google-genai-sdk-ai-files-upload-ignores-abortsignal-and-doesnt-throw-any-exc</guid>
+      <pubDate>Tue, 07 Apr 2026 11:45:09 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using the official &lt;code&gt;@google/genai&lt;/code&gt; SDK in a Vue.js application. I am trying to implement a cancellation mechanism for file uploads using an &lt;code&gt;AbortController&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;However, when I trigger &lt;code&gt;.abort()&lt;/code&gt;, the &lt;code&gt;ai.files.upload&lt;/code&gt; method completely ignores the signal. It does not throw any exception, the execution flow completely bypasses the &lt;code&gt;catch&lt;/code&gt; block, and the upload resolves successfully. Funny enough, &lt;code&gt;abortController.signal.aborted&lt;/code&gt; evaluates to &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a minimal reproducible example (note that even though the blob is tiny, I can click the abort button fast enough):&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import { GoogleGenAI } from &amp;quot;@google/genai&amp;quot;;
+        
+        const ai = new GoogleGenAI({ apiKey: &amp;quot;BLABLABLABLABLA&amp;quot; });
+        
+        const result = ref(&amp;quot;&amp;quot;);
+        let abortController;
+        
+        async function sendRequest() {
+        abortController = new AbortController();
+        
+        try {
+        console.log(&amp;quot;Uploading blob&amp;quot;);
+        const mockAudioBlob = new Blob([&amp;quot;fake audio bytes&amp;quot;], { type: &amp;quot;audio/mp3&amp;quot; });
+        const myFile = await ai.files.upload({
+        file: mockAudioBlob,
+        config: {
+        abortSignal: abortController.signal
+        }
+        });
+        
+        result.value = myFile.uri;
+        console.log(myFile.uri);
+        console.log(&amp;quot;Aborted? &amp;quot; + abortController.signal.aborted);
+        }
+        catch (e) {
+        if (e &amp;amp;&amp;amp; e.name === &amp;quot;AbortError&amp;quot;) {
+        console.log(&amp;quot;Request was aborted&amp;quot;);
+        }
+        else {
+        console.log(e);
+        }
+        }
+        finally {
+        abortController = null;
+        }
+        }
+        
+        function abortRequest() {
+        if (abortController &amp;amp;&amp;amp; abortController.signal &amp;amp;&amp;amp; !abortController.signal.aborted) {
+        abortController.abort();
+        }
+        }
+        
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        
+        &amp;lt;button @click=&amp;quot;sendRequest&amp;quot;&amp;gt;Upload&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;abortRequest&amp;quot;&amp;gt;Abort&amp;lt;/button&amp;gt;
+        &amp;lt;p&amp;gt;{{ result }}&amp;lt;/p&amp;gt;
+        
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I would expect that an exception is raised and the code flows into the catch block.&lt;/p&gt;
+        &lt;p&gt;Is this intended or is it a bug in the SDK?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>@google/genai SDK: Does chat.sendMessage config override the ai.chats.create config?</title>
+      <link>https://stackoverflow.com/questions/79921477/google-genai-sdk-does-chat-sendmessage-config-override-the-ai-chats-create-con</link>
+      <guid>https://stackoverflow.com/questions/79921477/google-genai-sdk-does-chat-sendmessage-config-override-the-ai-chats-create-con</guid>
+      <pubDate>Tue, 07 Apr 2026 11:02:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am using the official &lt;code&gt;@google/genai&lt;/code&gt; SDK in a Vue.js application. My goal is to establish a persistent &lt;code&gt;systemInstruction&lt;/code&gt; for a chat session, while retaining the ability to cancel individual requests using an &lt;code&gt;AbortController&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Because an &lt;code&gt;AbortController&lt;/code&gt; is single-use, I must instantiate a new one and pass its &lt;code&gt;abortSignal&lt;/code&gt; into every individual &lt;code&gt;sendMessage&lt;/code&gt; call.&lt;/p&gt;
+        &lt;p&gt;However, doing this seems to completely overwrite the base configuration established in &lt;code&gt;chats.create&lt;/code&gt;. The LLM entirely forgets the system prompt.&lt;/p&gt;
+        &lt;p&gt;Here is a minimal reproducible example:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import { GoogleGenAI } from &amp;quot;@google/genai&amp;quot;;
+        
+        const ai = new GoogleGenAI({ apiKey: &amp;quot;BLABLABLABLABLABLA&amp;quot; });
+        
+        const chat = ai.chats.create({
+        model: &amp;quot;gemini-3-flash-preview&amp;quot;,
+        config: {
+        systemInstruction: &amp;quot;You are an expert about tennis. Don&apos;t reply to other kinds of requests, but apologize and state that you&apos;re a tennis assistant only&amp;quot;,
+        }
+        });
+        
+        const inputText = ref(&amp;quot;&amp;quot;);
+        const result = ref(&amp;quot;&amp;quot;);
+        let abortController;
+        
+        async function sendRequest() {
+        abortController = new AbortController();
+        
+        try {
+        console.log(&amp;quot;Sending message&amp;quot;);
+        const response = await chat.sendMessage({
+        message: inputText.value,
+        config: {
+        abortSignal: abortController.signal
+        }
+        });
+        console.log(response.text);
+        result.value = response.text;
+        }
+        catch (e) {
+        if (e &amp;amp;&amp;amp; e.name === &amp;quot;AbortError&amp;quot;) {
+        console.log(&amp;quot;Request was aborted&amp;quot;);
+        }
+        else {
+        console.log(e);
+        }
+        }
+        finally{
+        abortController = null;
+        }
+        }
+        
+        function abortRequest(){
+        if(abortController){
+        abortController.abort();
+        }
+        abortController = null;
+        }
+        
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        
+        &amp;lt;input type=&amp;quot;text&amp;quot; v-model=&amp;quot;inputText&amp;quot;&amp;gt;
+        &amp;lt;button @click=&amp;quot;sendRequest&amp;quot;&amp;gt;Send&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;abortRequest&amp;quot;&amp;gt;Abort&amp;lt;/button&amp;gt;
+        &amp;lt;p&amp;gt;{{ result }}&amp;lt;/p&amp;gt;
+        
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I would expect that the 2 configs are merged. Instead, the second one completely overrides the first one.&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;Is this complete configuration overwrite the intended behavior of the SDK?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Is manually spreading the base configuration into every single &lt;code&gt;sendMessage&lt;/code&gt; call (e.g., &lt;code&gt;config: { ...baseConfig, abortSignal }&lt;/code&gt;) the only correct architectural approach here?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to create and implement templates that allow for information to be automatically filled in on envelope creation using Docusign API</title>
+      <link>https://stackoverflow.com/questions/79917163/how-to-create-and-implement-templates-that-allow-for-information-to-be-automatic</link>
+      <guid>https://stackoverflow.com/questions/79917163/how-to-create-and-implement-templates-that-allow-for-information-to-be-automatic</guid>
+      <pubDate>Mon, 30 Mar 2026 14:04:59 GMT</pubDate>
+      <content:encoded>
+        &lt;h2&gt;Problem&lt;/h2&gt;
+        &lt;p&gt;I’m using the DocuSign eSignature API with &lt;strong&gt;composite templates&lt;/strong&gt; and can’t get &lt;strong&gt;prefill (sender-filled) text tabs&lt;/strong&gt; to populate when creating an envelope.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;What I’m Doing&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;I built a template builder that places PDF annotations (via Nutrient)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;These are converted into &lt;strong&gt;anchor-based Text tabs&lt;/strong&gt; in a DocuSign template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Prefill fields are created like:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Anchor: &lt;code&gt;PreFillLegalCompanyName_GUID&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;TabLabel: &lt;code&gt;LegalCompanyName&lt;/code&gt;&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;At send time:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;I retrieve the tabs&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Map &lt;code&gt;TabLabel → value&lt;/code&gt; (e.g. &lt;code&gt;&amp;quot;LegalCompanyName&amp;quot; → &amp;quot;Test Customer LLC&amp;quot;&lt;/code&gt;)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Send values using an inline template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;signer.Tabs = new Tabs
+        {
+        TextTabs = new List&amp;lt;Text&amp;gt;
+        {
+        new Text
+        {
+        TabLabel = &amp;quot;LegalCompanyName&amp;quot;,
+        Value = &amp;quot;Test Customer LLC&amp;quot;
+        }
+        }
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Issue&lt;/h2&gt;
+        &lt;p&gt;The tab &lt;strong&gt;exists in the document&lt;/strong&gt;, but the &lt;strong&gt;value is not populated&lt;/strong&gt; when the envelope is created.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;What I’ve Tried&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Matching &lt;code&gt;TabLabel&lt;/code&gt; exactly (verified from template)&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Applying tabs on the same recipient as the server template&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Using a separate inline template for prefills&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Verifying anchor strings and tab metadata&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;None of these resulted in the value being applied.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Question&lt;/h2&gt;
+        &lt;p&gt;What is the correct way to populate &lt;strong&gt;prefill text tabs&lt;/strong&gt; when using &lt;strong&gt;composite templates&lt;/strong&gt;?&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;p&gt;Do prefill tabs need to be assigned differently in the template?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Should values be applied in a specific inline template or recipient context?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Do anchor-based tabs behave differently when setting values via &lt;code&gt;TabLabel&lt;/code&gt;?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr /&gt;
+        &lt;h2&gt;Expected Result&lt;/h2&gt;
+        &lt;p&gt;The document should be pre-filled (e.g. &lt;code&gt;LegalCompanyName = &amp;quot;Test Customer LLC&amp;quot;&lt;/code&gt;) before the recipient views it.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;Any guidance would be appreciated.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to create button hover animations in Nuxt 4 using GSAP like on https://www.museumofmoney.com/?</title>
+      <link>https://stackoverflow.com/questions/79913418/how-to-create-button-hover-animations-in-nuxt-4-using-gsap-like-on-https-www-m</link>
+      <guid>https://stackoverflow.com/questions/79913418/how-to-create-button-hover-animations-in-nuxt-4-using-gsap-like-on-https-www-m</guid>
+      <pubDate>Tue, 24 Mar 2026 10:25:47 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I’m working on a project using &lt;strong&gt;Nuxt 4&lt;/strong&gt; and I want to create button hover animations similar to the ones on &lt;a href=&quot;https://www.museumofmoney.com/&quot; rel=&quot;nofollow noreferrer&quot;&gt;Museum of Money&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;My questions are:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;How can I structure GSAP animations in Nuxt 4 for buttons to achieve this type of hover effect?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;Are there best practices for combining GSAP with Vue’s reactivity for multiple buttons on a page?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;How can I replicate a “fluid background hover” effect similar to the Museum of Money buttons?&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;Any guidance, examples, or references would be very helpful.&lt;/p&gt;
+        &lt;p&gt;I tried this basic GSAP example:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { gsap } from &apos;gsap&apos;;
+        
+        const btn = ref&amp;lt;HTMLElement | null&amp;gt;(null);
+        
+        onMounted(() =&amp;gt; {
+        if (!btn.value) return;
+        
+        const myEase = &amp;quot;power2.out&amp;quot;;
+        
+        const hover = () =&amp;gt; {
+        const tl = gsap.timeline();
+        
+        tl.to(btn.value, {
+        backgroundColor: &amp;quot;#fff&amp;quot;,
+        borderRadius: &amp;quot;8px&amp;quot;,
+        duration: 0.2,
+        ease: myEase,
+        });
+        
+        tl.to(btn.value, { y: -1, duration: 0.1, ease: &amp;quot;power2.out&amp;quot; });
+        tl.to(btn.value, { y: 1, duration: 0.1, ease: &amp;quot;power2.inOut&amp;quot; });
+        tl.to(btn.value, { y: 0, duration: 0.1, ease: &amp;quot;bounce.out&amp;quot; });
+        };
+        
+        const unhover = () =&amp;gt; {
+        const tl = gsap.timeline();
+        
+        tl.to(btn.value, {
+        backgroundColor: &amp;quot;#28a745&amp;quot;,
+        borderRadius: &amp;quot;30px&amp;quot;,
+        duration: 0.2,
+        ease: myEase,
+        });
+        
+        tl.to(btn.value, { y: -6, duration: 0.1, ease: &amp;quot;power2.out&amp;quot; });
+        tl.to(btn.value, { y: 3, duration: 0.08, ease: &amp;quot;power2.inOut&amp;quot; });
+        tl.to(btn.value, { y: 0, duration: 0.1, ease: &amp;quot;bounce.out&amp;quot; });
+        };
+        
+        btn.value.addEventListener(&apos;mouseenter&apos;, hover);
+        btn.value.addEventListener(&apos;mouseleave&apos;, unhover);
+        });
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div class=&amp;quot;btn-wrapper&amp;quot;&amp;gt;
+        &amp;lt;button ref=&amp;quot;btn&amp;quot; class=&amp;quot;fancy-btn&amp;quot;&amp;gt;Click Me&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        .btn-wrapper {
+        display: inline-block;
+        position: relative;
+        }
+        
+        .fancy-btn {
+        height: 50px;
+        padding: 0 1rem;
+        border: 2px solid #333;
+        border-radius: 30px;
+        background: #28a745;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        user-select: none;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vite shared option &apos;define&apos; seems to not work as documented on build mode</title>
+      <link>https://stackoverflow.com/questions/79911959/vite-shared-option-define-seems-to-not-work-as-documented-on-build-mode</link>
+      <guid>https://stackoverflow.com/questions/79911959/vite-shared-option-define-seems-to-not-work-as-documented-on-build-mode</guid>
+      <pubDate>Sat, 21 Mar 2026 16:29:30 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have successfully migrated my small app from Vue 2 + Vue-cli to Vue 3 and Vite (8.0.1). There is just one small annoyance I cannot get around. It is related to the Vite shared option &apos;define&apos;. It seems to not work as documented.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;The Issue&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;Although following the Vite (8.0.1) documentation for the shared option &apos;define&apos;, in env mode this setup is working properly, but in build mode the value is &apos;undefined&apos;. I assume the defined global is not statically replaced  as described in &lt;a href=&quot;https://vite.dev/config/shared-options#define&quot; rel=&quot;nofollow noreferrer&quot;&gt;Vite Config&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Here are short extracts from my code.&lt;/p&gt;
+        &lt;p&gt;I my &apos;package.json&apos; I have the app version specified as&lt;/p&gt;
+        &lt;pre class=&quot;lang-json prettyprint-override&quot;&gt;&lt;code&gt;&amp;quot;version&amp;quot;: &amp;quot;1.0.0&amp;quot;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In &apos;vite.config.ts&apos; I have defined a global as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;import packageJson from `&apos;./package.json&apos;;
+        
+        define: {
+        __APP_VERSION__: JSON.stringify(packageJson.version),
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In &apos;vite-env.d.ts&apos; it is declared as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;declare const __APP_VERSION__: string;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In my &apos;ApplicationStore.ts&apos; it is assigned to &apos;appVersion&apos; as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;state: () =&amp;gt; ({
+        ...
+        appVersion: globalThis.__APP_VERSION__,
+        }),
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and used in component &apos;AboutView.vue&apos; like&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;computed: {
+        ...mapStores(useApplicationStore),
+        appTitle: function () {
+        return &apos;cDirector v&apos; + this.applicationStore.appVersion;
+        },
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;and in the template as&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;...
+        &amp;lt;NavBarTitle :title=&amp;quot;appTitle&amp;quot; /&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;Tried Solutions&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;I have tried to not take the version from &apos;package.json&apos; and hardcode it in&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;__APP_VERSION__: JSON.stringify(&apos;1.0.0&apos;),
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But this is not the solution (same issue).&lt;/p&gt;
+        &lt;p&gt;I also added &apos;./package.json&apos; to the include files in &apos;tsconfig.node.json&apos;, but no change as well.&lt;/p&gt;
+        &lt;p&gt;Why is &lt;code&gt;__APP_VERSION__&lt;/code&gt; not statically replaced on build? I have read some of the recommended posts but none does match my issue.&lt;/p&gt;
+        &lt;p&gt;Do I misunderstand the documentation or is there another working approch to the intented feature?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Vue 3 component&apos;s v-html doesn&apos;t update after hydration</title>
+      <link>https://stackoverflow.com/questions/79902409/vue-3-components-v-html-doesnt-update-after-hydration</link>
+      <guid>https://stackoverflow.com/questions/79902409/vue-3-components-v-html-doesnt-update-after-hydration</guid>
+      <pubDate>Fri, 06 Mar 2026 16:50:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am experiencing a strange hydration behaviour in Vue 3 (Nuxt/SSR context). In my component, I have a reactive variable that initialises with a timestamp.&lt;/p&gt;
+        &lt;p&gt;On the initial client-side render, the standard mustache interpolation &lt;code&gt;{{ processedHtml }}&lt;/code&gt; updates to the client-side time correctly, but the content inside &lt;code&gt;v-html&lt;/code&gt; stays stuck on the server-side value. Both only &amp;quot;sync up&amp;quot; once a subsequent reactive change occurs (e.g., via a &lt;code&gt;setTimeout&lt;/code&gt;).&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;The Problem:&lt;/strong&gt;&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Server Renders:&lt;/strong&gt; Both values show Server Time (e.g., &lt;code&gt;12:00:00&lt;/code&gt;).&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;Client Hydration:&lt;/strong&gt; &lt;code&gt;{{ processedHtml }}&lt;/code&gt; updates to Client Time (&lt;code&gt;12:00:01&lt;/code&gt;), but &lt;code&gt;v-html&lt;/code&gt; &lt;strong&gt;remains&lt;/strong&gt; &lt;code&gt;12:00:00&lt;/code&gt;.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;p&gt;&lt;strong&gt;After 2000ms:&lt;/strong&gt; Both update to the new timestamp and are finally in sync.&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;&lt;strong&gt;Minimal reproducable component:&lt;/strong&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        {{ processedHtml }}
+        &amp;lt;div v-html=&amp;quot;processedHtml&amp;quot; class=&amp;quot;prose max-w-none prose-a:text-blue-600 hover:prose-a:underline&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { computed } from &apos;vue&apos;;
+        
+        const props = defineProps&amp;lt;{
+        node: any;
+        }&amp;gt;();
+        
+        
+        const nowDate = ref&amp;lt;string&amp;gt;(Date.now().toString());
+        
+        setTimeout(() =&amp;gt; {
+        nowDate.value = Date.now().toString();
+        }, (2000));
+        
+        const processedHtml = computed(() =&amp;gt; {
+        return `&amp;lt;p&amp;gt;${nowDate.value}&amp;lt;/p&amp;gt;`;
+        });
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I suspect Vue&apos;s hydration algorithm is skipping the &lt;code&gt;v-html&lt;/code&gt; update because the root element tag matches, but I&apos;m not sure why it differs from the mustache interpolation behavior.&lt;/p&gt;
+        &lt;p&gt;How can I ensure &lt;code&gt;v-html&lt;/code&gt; stays in sync with the client-side reactive state immediately upon hydration?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Buefy 3.0.4 and nuxt 4 gives me Cannot read properties of undefined (reading &apos;$buefy&apos;)</title>
+      <link>https://stackoverflow.com/questions/79902206/buefy-3-0-4-and-nuxt-4-gives-me-cannot-read-properties-of-undefined-reading-b</link>
+      <guid>https://stackoverflow.com/questions/79902206/buefy-3-0-4-and-nuxt-4-gives-me-cannot-read-properties-of-undefined-reading-b</guid>
+      <pubDate>Fri, 06 Mar 2026 10:30:49 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;After trying the nuxt-buefy plugin with no successful outcome I tried adding buefy to nuxt using the plugin option. This gives me an server 500 error declaring&lt;/p&gt;
+        &lt;p&gt;&apos;Cannot read properties of undefined (reading &apos;$buefy&apos;)&apos;&lt;/p&gt;
+        &lt;p&gt;It is a near fresh installation of nuxt.&lt;/p&gt;
+        &lt;p&gt;My plugins/buefy.ts file looks like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import Buefy from &apos;buefy&apos;
+        import &apos;buefy/dist/css/buefy.css&apos;
+        
+        export default defineNuxtPlugin((nuxtApp) =&amp;gt; {
+        nuxtApp.vueApp.use(Buefy, {})
+        nuxtApp.provide(&apos;buefy&apos;, Buefy)
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Has anyone had the same error?&lt;/p&gt;
+        &lt;p&gt;I have been at this trying different aproaches and nothing seems to work&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to make cookies work with axios and vue3-cookies?</title>
+      <link>https://stackoverflow.com/questions/79901062/how-to-make-cookies-work-with-axios-and-vue3-cookies</link>
+      <guid>https://stackoverflow.com/questions/79901062/how-to-make-cookies-work-with-axios-and-vue3-cookies</guid>
+      <pubDate>Wed, 04 Mar 2026 17:22:21 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I have successfully created a session-based, httpOnly-cookie stored authentification process between my Vue3 frontend and Spring Boot backend. Now, since the authentification cookie is httpOnly, I cant access it on the frontend (afaik). But the login backend gives back the user id (an integer) of the user who just logged in, which I store in a variable named &lt;code&gt;activeSession&lt;/code&gt;, which I use in several &lt;code&gt;v-if&lt;/code&gt;s. As long as I follow links on my site (proper &lt;code&gt;RouterLink&lt;/code&gt;s), everything is fine. For example, I can visit &lt;code&gt;localhost/profile/1&lt;/code&gt; via links no problem. However, when I &lt;em&gt;change&lt;/em&gt; the address bar to e.g. &lt;code&gt;localhost/profile/2&lt;/code&gt; and hit enter, &lt;code&gt;activeSession&lt;/code&gt; is reset. I would like to avoid that.&lt;/p&gt;
+        &lt;p&gt;What I tried: My idea was cookies, and I successfully send a cookie containing the user id from the backend, and it IS being received according to the agent console, but I don&apos;t see it anywhere during frontent debugging. More specifically, whenever I debug into&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const result = await axios.post(serverAddress + &apos;api/v1/auth/login&apos;, JSON.stringify(requestBody), {
+        headers: { &apos;content-type&apos;: &apos;application/json&apos; },
+        withCredentials: true
+        }).then(response =&amp;gt; response, reason =&amp;gt; reason);
+        if (result instanceof Error) {
+        alert(result.toString());
+        }
+        else {
+        const r = result;
+        activeSession.value = +cookies.get(&apos;example.activeSession&apos;); // + is an int cast
+        await router.push({ path: &apos;/profile/&apos;+activeSession.value });
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;the result does not contain the set-cookie header (a &lt;em&gt;feature&lt;/em&gt; of axios, or so I have heard) and vue3-cookies doesn&apos;t sees it either. The session cookie is EXPLICITLY not httpOnly and visible in the response in the user agent. Cookie is also set when using Postman. This is my current CORS config in the backend:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;        response.addHeader(&amp;quot;Access-Control-Allow-Origin&amp;quot;, origin);
+        response.setHeader(&amp;quot;Access-Control-Allow-Methods&amp;quot;, &amp;quot;GET,POST&amp;quot;);
+        response.setHeader(&amp;quot;Access-Control-Allow-Credentials&amp;quot;, &amp;quot;true&amp;quot;);
+        response.setHeader(&amp;quot;Access-Control-Allow-Headers&amp;quot;, &amp;quot;content-type,set-cookie&amp;quot;);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;How can I make the cookie-solution work?&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;I have read many SO posts with similar problems, but so far no solution has worked for me.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Nuxt useFetch does not refetch on URL parameter change</title>
+      <link>https://stackoverflow.com/questions/79900219/nuxt-usefetch-does-not-refetch-on-url-parameter-change</link>
+      <guid>https://stackoverflow.com/questions/79900219/nuxt-usefetch-does-not-refetch-on-url-parameter-change</guid>
+      <pubDate>Tue, 03 Mar 2026 15:04:43 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Given this Nuxt example code of the app root component using the Nuxt UI calendar component to handle the current selected day&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { today, getLocalTimeZone } from &apos;@internationalized/date&apos;;
+        
+        const foo = &apos;some-id&apos;; // this is a page parameter but for the sake of simplicity...
+        
+        const currentSelectedDate = shallowRef(today(getLocalTimeZone()));
+        
+        const currentSelectedISODate = computed(() =&amp;gt; {
+        return currentSelectedDate.value.toString();
+        });
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;UApp&amp;gt;
+        &amp;lt;UCalendar v-model:model-value=&amp;quot;currentSelectedDate&amp;quot; /&amp;gt;
+        &amp;lt;Child :foo=&amp;quot;foo&amp;quot; :bar=&amp;quot;currentSelectedISODate&amp;quot; /&amp;gt;
+        &amp;lt;/UApp&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now I got a child component expecting the values as props&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        const { foo, bar } = defineProps&amp;lt;{
+        foo: string;
+        bar: string;
+        }&amp;gt;();
+        
+        // does not refetch on bar ( isoDate ) change
+        const { data, pending, error } = await useFetch(`/api/${foo}/${bar}`);
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;UCard&amp;gt;
+        &amp;lt;template #header&amp;gt; Foo: {{ foo }} &amp;lt;/template&amp;gt;
+        &amp;lt;template #footer&amp;gt; Bar: {{ bar }} &amp;lt;/template&amp;gt;
+        &amp;lt;/UCard&amp;gt;
+        &amp;lt;UCard&amp;gt;
+        &amp;lt;template #header&amp;gt; data: {{ data }} &amp;lt;/template&amp;gt;
+        &amp;lt;div&amp;gt;pending: {{ pending }}&amp;lt;/div&amp;gt;
+        &amp;lt;template #footer&amp;gt; error: {{ error }} &amp;lt;/template&amp;gt;
+        &amp;lt;/UCard&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For the sake of simplicity I created an API endpoint at&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;/api/[foo]/[bar].get.ts&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;pre class=&quot;lang-ts prettyprint-override&quot;&gt;&lt;code&gt;export default defineEventHandler(async (event) =&amp;gt; {
+        return new Date().toISOString();
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I can see that the props change but &lt;code&gt;useFetch&lt;/code&gt; won&apos;t refetch if &lt;code&gt;bar&lt;/code&gt; changes. Whenever I select another day I can see that &lt;code&gt;bar&lt;/code&gt; changes but &lt;code&gt;data&lt;/code&gt; never changes. Further there is no API call so &lt;code&gt;useFetch&lt;/code&gt; is not reactive anymore.&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;&lt;em&gt;I&apos;m currently working on a sandbox&lt;/em&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&lt;/a&gt;&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;How can I take care of the reactivity?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Fullcalendar Vue slot templates</title>
+      <link>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</link>
+      <guid>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</guid>
+      <pubDate>Tue, 03 Mar 2026 10:14:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Fullcalendar docs mention only one slot template, &amp;quot;event-content&amp;quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren&apos;t mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/resourceAreaColumns&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/resourceAreaColumns&lt;/a&gt;) from resource timeline feature, but it doesn&apos;t work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/vue#slot-templates&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/vue#slot-templates&lt;/a&gt;)&lt;/p&gt;
+        &lt;p&gt;So while this works:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #eventContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This doesn&apos;t:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #cellContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Architectural differences between Laravel + Inertia (Vue) and Laravel API + React SPA</title>
+      <link>https://stackoverflow.com/questions/79897129/architectural-differences-between-laravel-inertia-vue-and-laravel-api-reac</link>
+      <guid>https://stackoverflow.com/questions/79897129/architectural-differences-between-laravel-inertia-vue-and-laravel-api-reac</guid>
+      <pubDate>Thu, 26 Feb 2026 14:34:51 GMT</pubDate>
+      <content:encoded>&lt;p&gt;I am building a Laravel 11 backend for a job portal application with real-time features and REST APIs. I am deciding between Vue 3 and React 18 for the frontend. Considering ecosystem support, integration with Laravel (Sanctum, Inertia, etc.), and long-term scalability, what are the architectural trade-offs?&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
+      <title>File download not working in iPhone Safari but works in Chrome [duplicate]</title>
+      <link>https://stackoverflow.com/questions/79895739/file-download-not-working-in-iphone-safari-but-works-in-chrome</link>
+      <guid>https://stackoverflow.com/questions/79895739/file-download-not-working-in-iphone-safari-but-works-in-chrome</guid>
+      <pubDate>Tue, 24 Feb 2026 21:16:14 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m having trouble finding a solution for downloading files on &lt;strong&gt;iPhone Safari&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;The code I shared is the current function in my application. It downloads the file correctly in &lt;strong&gt;Google Chrome&lt;/strong&gt;, but it does not work in &lt;strong&gt;Safari&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;How can I fix this so the file download works on Safari as well?&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const downloadDocument = async (url) =&amp;gt; {
+        try {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const blobUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement(&apos;a&apos;)
+        link.href = blobUrl
+        link.target = &apos;_blank&apos;
+        link.download = url.split(&apos;/&apos;).pop() || &apos;document&apos;
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        setTimeout(() =&amp;gt; window.URL.revokeObjectURL(blobUrl), 100)
+        } catch (error) {
+        console.error(&apos;Error downloading document.:&apos;, error)
+        window.open(url, &apos;_blank&apos;, &apos;noopener,noreferrer&apos;)
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Can&apos;t get svg markup to render as a data uri in an image source [duplicate]</title>
+      <link>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</link>
+      <guid>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</guid>
+      <pubDate>Tue, 24 Feb 2026 00:33:15 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I am attempting to get the google material symbols loaded into a canvas to download them. This is generally straight forward, except the fill property in the font-variation-settings. This I cannot get to work in the canvas. I only saw how to kind of do this through &lt;a href=&quot;https://stackoverflow.com/questions/65670959/variable-fonts-in-html5-canvas&quot;&gt;this&lt;/a&gt; SO post, but this is not working for me.&lt;/p&gt;
+        &lt;p&gt;My attempt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;const canvas = document.createElement( &amp;quot;canvas&amp;quot; );
+        
+        const svgNS = &apos;https://www.w3.org/2000/svg&apos;;
+        const svg = document.createElementNS( svgNS, &amp;quot;svg&amp;quot; );
+        
+        const style = document.createElementNS( svgNS, &amp;quot;style&amp;quot; );
+        style.textContent = `@font-face {
+        font-family: &apos;Material Symbols Outlined&apos;;
+        font-style: normal;
+        font-weight: 100 700;
+        src: url(&apos;https://fonts.gstatic.com/s/materialsymbolsoutlined/v315/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2&apos;) format(&apos;woff2&apos;); 
+        }
+        .material-symbols-outlined {
+        font-family: &apos;Material Symbols Outlined&apos;;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;  /* Preferred icon size */
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+        }`;
+        svg.append( style );
+        
+        const foreignObject = document.createElementNS( svgNS, &amp;quot;foreignObject&amp;quot; );
+        foreignObject.setAttribute( &amp;quot;x&amp;quot;, &apos;0&apos; );
+        foreignObject.setAttribute( &amp;quot;y&amp;quot;, &apos;0&apos; );
+        
+        
+        const clone = icon.cloneNode(true);
+        foreignObject.append( clone );
+        
+        const { width, height } = icon.getBoundingClientRect();
+        foreignObject.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
+        foreignObject.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
+        svg.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
+        svg.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
+        
+        svg.append( foreignObject );
+        
+        const svg_markup = new XMLSerializer().serializeToString( svg );
+        const svg_file = new Blob( [ svg_markup ], { type: &amp;quot;image/svg+xml&amp;quot; } );
+        
+        Object.assign( canvas, { width, height } );
+        const ctx = canvas.getContext( &amp;quot;2d&amp;quot; );
+        
+        const img = new Image();
+        img.onload = () =&amp;gt; {
+        console.log(&apos;img loaded&apos;);
+        };
+        img.onerror = () =&amp;gt; {
+        console.log(&apos;image failed to load&apos;);
+        }
+        const svgURL = &apos;data:image/svg+xml,&apos; + encodeURIComponent(svg_markup);
+        img.src = svgURL;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;No matter what, the img onerror always fires. I can go to the data uri I get and it is valid. the I have even tried turning the turning svg_file blob into a data uri and using that. Same issue, I can go to that data uri, but img always throws an error. I don&apos;t get it!&lt;/p&gt;
+        &lt;p&gt;And of course the onerror for img doesn&apos;t give any info on why it failed. There are no errors in the console. It just hits the onerror.&lt;/p&gt;
+        &lt;p&gt;I tried to simplify it too by just putting the svg markup as the canvas innerHTML, of course that didn&apos;t work...&lt;/p&gt;
+        &lt;p&gt;Wondering if anyone has any clue how I may get the google material symbols to be able to apply the FILL font-variation-setting to render in canvas to download. Just toggling it on the span or parent container doesn&apos;t work. Canvas doesn&apos;t naturally pick that css attribute up it seems.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How to correctly react to a promise in Vue/axios</title>
+      <link>https://stackoverflow.com/questions/79893889/how-to-correctly-react-to-a-promise-in-vue-axios</link>
+      <guid>https://stackoverflow.com/questions/79893889/how-to-correctly-react-to-a-promise-in-vue-axios</guid>
+      <pubDate>Sun, 22 Feb 2026 09:22:19 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;m writing a signup form with Vue 3 and use axios to check if a username is already taken. My component looks like this:&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;;
+        import axios from &apos;axios&apos;;
+        const nickname = ref(&apos;&apos;);
+        function checkNickname() {
+        if (nickname.value.length === 0) {
+        return true;
+        }
+        return axios.post(&apos;localhost:8080/api/v1/public/account/nickname&apos;, nickname.value.toString().trim(), {
+        headers: {
+        &apos;content-type&apos;: &apos;text/plain&apos;,
+        }
+        })
+        .then(response =&amp;gt; !Boolean(response.data), () =&amp;gt; true);
+        }
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;form&amp;gt;
+        &amp;lt;input v-model=&amp;quot;nickname&amp;quot; /&amp;gt;
+        &amp;lt;span v-show=&amp;quot;!checkNickname()&amp;quot;&amp;gt;Nickname taken!&amp;lt;/span&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now my server returns a plain &lt;code&gt;true&lt;/code&gt; when the submitted String is &lt;code&gt;Admin&lt;/code&gt; and &lt;code&gt;false&lt;/code&gt; otherwise. I checked that the post request actually receives these answers via the browser debugger. However, the error span is never shown. What am I doing wrong?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Fluid colums with fixed header element [closed]</title>
+      <link>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element</link>
+      <guid>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element</guid>
+      <pubDate>Fri, 20 Feb 2026 17:11:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve got a table with &lt;code&gt;table-layout=&amp;quot;auto&amp;quot;&lt;/code&gt; for autowidth of the columns, and &lt;code&gt;height=400&lt;/code&gt; for the fixed header, but the scroll overflows the header which should not happen.&lt;/p&gt;
+        &lt;p&gt;With &lt;code&gt;table-layout=&amp;quot;fixed&amp;quot;&lt;/code&gt; the scroll will fix, but the columns will not get all the width. It uses Vue3 and the library component element plus.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;el-table
+        height=&amp;quot;400&amp;quot;
+        :data=&amp;quot;internalData&amp;quot;
+        :default-sort=&amp;quot;defaultSort&amp;quot;
+        @sort-change=&amp;quot;$emit(&apos;sort-change&apos;, $event)&amp;quot;
+        style=&amp;quot;width: 100%&amp;quot;
+        border
+        class=&amp;quot;custom-table&amp;quot;
+        table-layout=&amp;quot;fixed&amp;quot;
+        overflow-x=&amp;quot;auto&amp;quot;
+        @row-click=&amp;quot;handleRowClick&amp;quot;
+        &amp;gt;
+        &amp;lt;el-table-column
+        v-for=&amp;quot;col in columns&amp;quot;
+        :key=&amp;quot;col.prop&amp;quot;
+        :prop=&amp;quot;col.prop&amp;quot;
+        :label=&amp;quot;col.label&amp;quot;
+        :width=&amp;quot;col.width&amp;quot;
+        :min-width=&amp;quot;col.minWidth&amp;quot;
+        :sortable=&amp;quot;col.sortable ? &apos;custom&apos; : false&amp;quot;
+        &amp;gt;
+        &amp;lt;/el-table-column&amp;gt;
+        &amp;lt;/el-table&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+        import { ref, onBeforeMount, watch } from &apos;vue&apos;
+        
+        // Define props and emits (añadí `desync` para debugging)
+        const props = defineProps&amp;lt;{
+        data: Record&amp;lt;string, any&amp;gt;[],
+        columns: any[],
+        desync?: boolean
+        }&amp;gt;()
+        
+        defineEmits([&apos;sort-change&apos;])
+        
+        const handleRowClick = (row: any) =&amp;gt; {
+        console.log(row)
+        }
+        
+        // defaultSort definido antes del render
+        const defaultSort = ref({
+        prop: &apos;id&apos;,
+        order: &apos;ascending&apos; as &apos;ascending&apos; | &apos;descending&apos; | null, // Element Plus usa &apos;ascending&apos;/&apos;descending&apos;
+        })
+        
+        // datos internos que usa la tabla (permite simular desincronía)
+        const internalData = ref&amp;lt;Record&amp;lt;string, any&amp;gt;[]&amp;gt;([])
+        
+        function applySort(arr: Record&amp;lt;string, any&amp;gt;[], sort: { prop?: string; order?: string | null }) {
+        if (!sort?.prop || !sort.order) return
+        const prop = sort.prop
+        const order = sort.order === &apos;ascending&apos; ? 1 : -1
+        arr.sort((a, b) =&amp;gt; {
+        if (a[prop] == null) return 1 * order
+        if (b[prop] == null) return -1 * order
+        if (a[prop] &amp;gt; b[prop]) return 1 * order
+        if (a[prop] &amp;lt; b[prop]) return -1 * order
+        return 0
+        })
+        }
+        
+        function shuffle(arr: Record&amp;lt;string, any&amp;gt;[]) {
+        // Fisher–Yates
+        for (let i = arr.length - 1; i &amp;gt; 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+        }
+        }
+        
+        // inicializar antes del primer render
+        onBeforeMount(() =&amp;gt; {
+        internalData.value = props.data ? [...props.data] : []
+        if (props.desync) {
+        // para reproducir el bug: la UI se muestra en orden distinto al sort por defecto
+        shuffle(internalData.value)
+        // mantiene defaultSort para la cabecera pero la lista mostrada está desordenada
+        } else {
+        // aplicar sort por defecto antes del render para evitar flicker
+        applySort(internalData.value, defaultSort.value)
+        }
+        })
+        
+        // si los datos externos cambian, sincronizar respetando el modo desync
+        watch(
+        () =&amp;gt; props.data,
+        (newData) =&amp;gt; {
+        internalData.value = newData ? [...newData] : []
+        if (props.desync) {
+        shuffle(internalData.value)
+        } else {
+        applySort(internalData.value, defaultSort.value)
+        }
+        },
+        { immediate: false }
+        )
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;style scoped&amp;gt;
+        :deep(.cell) {
+        white-space: nowrap !important;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;How can I fix it? I need a mix between &lt;code&gt;table-layout=&amp;quot;fixed&amp;quot;&lt;/code&gt; and &lt;code&gt;table-layout=&amp;quot;auto&amp;quot;&lt;/code&gt; for full width columns.&lt;/p&gt;
+      </content:encoded>
+    </item>
+  </channel>
+</rss>
