@@ -4,1093 +4,26 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Sat, 08 Aug 2026 15:55:11 GMT</lastBuildDate>
-    <item>
-      <title>Istio ServiceEntry로 외부 서비스 등록하기</title>
-      <link>https://blog.outsider.ne.kr/1806</link>
-      <guid>https://blog.outsider.ne.kr/1806</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Istio &lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/service-entry/&quot;&gt;ServiceEntry&lt;/a&gt;는 문서에서 다음과 같이 설명한다.&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;ServiceEntry&lt;/code&gt;를 사용하면 Istio 내부 서비스 레지스트리에 항목을 추가해 메시 내에서 자동으로 발견된 서비스가 수동으로 지정한 서비스에 접근하거나 라우팅할 수 있다. ServiceEntry는 서비스의 속성(DNS 이름, VIP, 포트, 프로토콜, 엔드포인트)를 설정한다. 이러한 서비스는 메시 외부에 있을 수도 있고 메시 내부 서비스일 수도 있다.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;h2&gt;outboundTrafficPolicy&lt;/h2&gt;
-        &lt;p&gt;이 글은 Istio의 Sidecar 모드를 전제로 설명한다.&lt;/p&gt;
-        &lt;p&gt;이전 &lt;a href=&quot;/1804&quot;&gt;Sidecar 글&lt;/a&gt;에서 봤듯이, Istio 서비스 메시를 사용하면 Pod의 요청은 함께 구성된 &lt;code&gt;istio-proxy&lt;/code&gt;를 통해 나간다. 메시 내 서비스는 자동으로 등록되지만, 외부 서비스로 요청을 보내면 메시가 목적지를 알지 못한다.&lt;/p&gt;
-        &lt;p&gt;이런 경우 &lt;strong&gt;외부 API를 Istio 내부 서비스 레지스트리에 수동으로 등록해 메시 서비스처럼 관리하려면 &lt;code&gt;ServiceEntry&lt;/code&gt;를 사용&lt;/strong&gt;한다.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/service-entry/&quot;&gt;ServiceEntry&lt;/a&gt;가 없으면 전역 설정인 &lt;code&gt;meshConfig&lt;/code&gt;의 &lt;code&gt;outboundTrafficPolicy&lt;/code&gt;를 따르게 된다.&lt;/p&gt;
-        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;meshConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;outboundTrafficPolicy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;REGISTRY_ONLY&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href=&quot;https://istio.io/latest/docs/reference/config/istio.mesh.v1alpha1/#MeshConfig-OutboundTrafficPolicy&quot;&gt;outboundTrafficPolicy&lt;/a&gt;는 애플리케이션이 알 수 없는 아웃바운드 트래픽을 어떻게 다룰지 정하는 설정이다. 모드는 다음 세 가지 중 하나를 선택할 수 있다.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;REGISTRY_ONLY&lt;/code&gt; : 알지 못하는 아웃바운드 트래픽을 드랍한다. 트래픽의 목적지는 명시적으로 &lt;code&gt;ServiceEntry&lt;/code&gt;를 통해 서비스 레지스트리에 선언해야 한다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;ALLOW_ANY&lt;/code&gt; : 알지 못하는 목적지로의 트래픽을 허용한다. &lt;code&gt;PassthroughCluster&lt;/code&gt;를 통해 원래 목적지 IP로 전달한다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;ALLOW_ANY_DYNAMIC_DNS&lt;/code&gt; : 알 수 없는 목적지로의 트래픽을 동적 DNS 해결로 허용한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;이 &lt;code&gt;outboundTrafficPolicy&lt;/code&gt;는 &lt;code&gt;Sidecar&lt;/code&gt;에서 설정할 수 있다.&lt;/p&gt;
-        &lt;h2&gt;ServiceEntry&lt;/h2&gt;
-        &lt;p&gt;알 수 없는 목적지는 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/service-entry/&quot;&gt;ServiceEntry&lt;/a&gt;로 허용 여부만 선택할 수도 있다. 하지만 Istio가 이를 인식하면 타임아웃, 재시도 규칙, 서킷 브레이커 같은 트래픽 정책을 적용할 수 있다. 또한 실제 서비스 이름으로 식별하므로 로그와 메트릭의 관측성도 높아진다.&lt;/p&gt;
-        &lt;p&gt;다음은 간단한 &lt;code&gt;ServiceEntry&lt;/code&gt; 예시이다.&lt;/p&gt;
-        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;networking.istio.io/v1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;ServiceEntry&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;external-svc-https&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;api.dropboxapi.com&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;www.googleapis.com&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;api.facebook.com&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;443&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;TLS&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;MESH_EXTERNAL&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;resolution&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;DNS&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;주요 필드를 살펴보자.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;hosts&lt;/code&gt; : Istio에 등록할 호스트명이다.
-        &lt;ul&gt;
-        &lt;li&gt;와일드카드 접두사를 쓴 DNS 이름도 가능하다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;VirtualService&lt;/code&gt;와 &lt;code&gt;DestinationRule&lt;/code&gt;에서 일치하는 호스트를 찾을 때 사용한다.&lt;/li&gt;
-        &lt;li&gt;HTTP에서는 Host/Authority 헤더와 매칭한다.&lt;/li&gt;
-        &lt;li&gt;HTTPS/TLS에서는 SNI 값과 매칭한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;ports&lt;/code&gt; : 서비스가 제공하는 포트와 프로토콜이다.
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;name&lt;/code&gt; : (필수) 포트에 할당된 레이블&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;number&lt;/code&gt; : (필수) 정수 형식의 포트 번호&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;protocol&lt;/code&gt; : &lt;code&gt;HTTP&lt;/code&gt;|&lt;code&gt;HTTPS&lt;/code&gt;|&lt;code&gt;HTTP2&lt;/code&gt;|&lt;code&gt;GRPC&lt;/code&gt;|&lt;code&gt;MONGO&lt;/code&gt;|&lt;code&gt;TCP&lt;/code&gt;|&lt;code&gt;TLS&lt;/code&gt; 중 하나의 값이다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;targetPort&lt;/code&gt; : 트래픽을 수신할 포트 번호&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;location&lt;/code&gt; : 서비스가 메시 외부(&lt;code&gt;MESH_EXTERNAL&lt;/code&gt;)인지 메시 내부(&lt;code&gt;MESH_INTERNAL&lt;/code&gt;)인지를 정한다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;resolution&lt;/code&gt; : &lt;code&gt;istio-proxy&lt;/code&gt;가 최종 엔드포인트 주소를 결정하는 방법을 지정하며, 아래 값 중 하나를 사용한다.
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;DNS&lt;/code&gt; : Envoy가 DNS를 조회해 엔드포인트를 결정하며, 외부 API에는 보통 가장 안전한 선택이다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;DNS_ROUND_ROBIN&lt;/code&gt; : DNS 결과 중 첫 주소를 사용한다.
-        &lt;ul&gt;
-        &lt;li&gt;이름을 보면 여러 주소를 돌려서 사용할 것 같지만, 실제로는 새 연결이 계속 첫 주소를 사용하는 방식이다. DNS 변경이 잦아 기존 엔드포인트를 제거하고 커넥션 풀을 드레인한 뒤 새로 연결해야 할 때, 커넥션 풀이 너무 자주 생성되는 문제를 막기 위해 사용한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;STATIC&lt;/code&gt; : &lt;code&gt;endpoints&lt;/code&gt; 필드에 선언한 정적 IP 주소를 사용한다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;NONE&lt;/code&gt; : 들어오는 요청이 이미 IP로 해석되었다고 가정하고 아무것도 하지 않는다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;endpoints&lt;/code&gt; : 서비스에 연결된 IP 주소&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;workloadSelector&lt;/code&gt; : &lt;code&gt;MESH_INTERNAL&lt;/code&gt;에서만 사용할 수 있으며, &lt;code&gt;endpoints&lt;/code&gt;와 둘 중 하나만 사용할 수 있다.&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;addresses&lt;/code&gt; : 서비스에 연결된 가상 IP 주소&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;exportTo&lt;/code&gt; : 해당 ServiceEntry를 어느 네임스페이스에 노출할지를 정한다. 생략하면 모든 네임스페이스에 노출한다.
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;.&amp;quot;&lt;/code&gt; : ServiceEntry가 생성된 네임스페이스에만 노출&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt; : 모든 네임스페이스에 노출&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;구성이 간단하므로 몇 가지 예시를 보면 어떤 상황에 쓰는지 이해할 수 있다.&lt;/p&gt;
-        &lt;h3&gt;추가 예시&lt;/h3&gt;
-        &lt;p&gt;다음은 MongoDB를 ServiceEntry에 등록한 예시이다.&lt;/p&gt;
-        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;networking.istio.io/v1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;ServiceEntry&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;external-svc-mongocluster&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;mymongodb.somedomain&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# not used&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;addresses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;m&quot;&gt;192.192.192.192&lt;/span&gt;&lt;span class=&quot;l&quot;&gt;/24&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# VIPs&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;27018&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;mongodb&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;MONGO&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;MESH_INTERNAL&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;resolution&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;STATIC&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;endpoints&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;address&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2.2.2.2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;address&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3.3.3.3&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;19&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;-------&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;21&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;22&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;networking.istio.io/v1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;23&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;DestinationRule&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;24&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;25&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;mtls-mongocluster&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;26&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;27&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;mymongodb.somedomain&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;28&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;trafficPolicy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;29&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;tls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;MUTUAL&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;clientCertificate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;/etc/certs/myclientcert.pem&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;privateKey&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;/etc/certs/client_private_key.pem&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;33&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;caCertificates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;/etc/certs/rootcacerts.pem&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;다음은 &lt;code&gt;ServiceEntry&lt;/code&gt;와 &lt;code&gt;VirtualService&lt;/code&gt;의 TLS 라우팅을 이용해서 SNI 값으로 방화벽에 연결하는 예시다.&lt;/p&gt;
-        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;networking.istio.io/v1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;ServiceEntry&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;external-svc-redirect&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;wikipedia.org&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;s2&quot;&gt;&amp;#34;*.wikipedia.org&amp;#34;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;MESH_EXTERNAL&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;443&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;TLS&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;resolution&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;NONE&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;----&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;networking.istio.io/v1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;19&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;VirtualService&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;21&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;tls-routing&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;22&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;23&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;24&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;wikipedia.org&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;25&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;s2&quot;&gt;&amp;#34;*.wikipedia.org&amp;#34;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;26&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;tls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;27&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;28&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;sniHosts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;29&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;- &lt;span class=&quot;l&quot;&gt;wikipedia.org&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;- &lt;span class=&quot;s2&quot;&gt;&amp;#34;*.wikipedia.org&amp;#34;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;31&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;route&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;32&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;destination&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;33&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;internal-egress-firewall.ns1.svc.cluster.local&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
+    <lastBuildDate>Sun, 09 Aug 2026 15:54:30 GMT</lastBuildDate>
     <item>
       <title>밑바닥부터 만들면서 배우는 LLM 깃허브 업데이트 안내</title>
       <link>https://tensorflow.blog/2026/08/08/%eb%b0%91%eb%b0%94%eb%8b%a5%eb%b6%80%ed%84%b0-%eb%a7%8c%eb%93%a4%eb%a9%b4%ec%84%9c-%eb%b0%b0%ec%9a%b0%eb%8a%94-llm-%ea%b9%83%ed%97%88%eb%b8%8c-%ec%97%85%eb%8d%b0%ec%9d%b4%ed%8a%b8-%ec%95%88%eb%82%b4/</link>
       <guid>https://tensorflow.blog/2026/08/08/%eb%b0%91%eb%b0%94%eb%8b%a5%eb%b6%80%ed%84%b0-%eb%a7%8c%eb%93%a4%eb%a9%b4%ec%84%9c-%eb%b0%b0%ec%9a%b0%eb%8a%94-llm-%ea%b9%83%ed%97%88%eb%b8%8c-%ec%97%85%eb%8d%b0%ec%9d%b4%ed%8a%b8-%ec%95%88%eb%82%b4/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
       <content:encoded>세바스찬 라시카의 &amp;#60;밑바닥부터 만들면서 배우는 LLM&gt; 도서의 예제 코드가 담긴 깃허브 노트북을 코랩, 파이토치 2.11 버전에서 실행하여 업데이트했습니다. 이번 실행에서는 본문과 부록의 코드와 연습문제 노트북이 포함되어 있습니다. 기존 코드 모두 최신 파이토치 버전에서 오류 없이 실행되는 것을 확인했으니 안심하고 책을 보셔도 좋을 것 같습니다. 3쇄 이전의 도서를 보신다면 블로그 에러타 페이지를 확인해 주세요. 감사합니다!</content:encoded>
     </item>
     <item>
       <title>핸즈온 머신러닝 3판 깃허브 노트북 업데이트 안내</title>
       <link>https://tensorflow.blog/2026/08/04/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-3%ed%8c%90-%ea%b9%83%ed%97%88%eb%b8%8c-%eb%85%b8%ed%8a%b8%eb%b6%81-%ec%97%85%eb%8d%b0%ec%9d%b4%ed%8a%b8-%ec%95%88%eb%82%b4/</link>
       <guid>https://tensorflow.blog/2026/08/04/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-3%ed%8c%90-%ea%b9%83%ed%97%88%eb%b8%8c-%eb%85%b8%ed%8a%b8%eb%b6%81-%ec%97%85%eb%8d%b0%ec%9d%b4%ed%8a%b8-%ec%95%88%eb%82%b4/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
       <content:encoded>안녕하세요. 오랜만에 핸즈온 머신러닝 3판의 깃허브 노트북을 최신 라이브러리에 맞춰 업데이트했습니다. 또 몇몇 에러타도 블로그에 등록되어 있으니 꼭 확인 부탁드립니다. 안타깝게도 16장의 코드부터는 텐서플로 최신 버전에 포함된 케라스 3과 호환되지 않습니다. 이로 인해 케라스 2버전을 사용하도록 환경 설정을 해야 합니다. import osos.environ[&quot;TF_USE_LEGACY_KERAS&quot;] = &quot;1&quot;import tf_keras 더 자세한 내용은 깃허브 노트북을 참고해 주세요. 감사합니다!</content:encoded>
-    </item>
-    <item>
-      <title>단점 대신 약점</title>
-      <link>https://jojoldu.tistory.com/883</link>
-      <guid>https://jojoldu.tistory.com/883</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;최근, 장기간의 이직 준비에 지친 분과 이야기를 나눴다.&lt;br&gt;면접 자리에만 가면 말을 제대로 전달하지 못하고, 대화가 수월하게 이어지지 않는다는 점이 자기 단점이라고 이야기하시길래 그건 단점이 아니라 약점일 뿐이라고 말씀드렸다.&lt;/p&gt;
-        &lt;p&gt;요즘 스스로 부족한 점을 발견할 때마다, 일부러 단점이라고 말하지 않으려고 한다.&lt;br&gt;습관처럼 &amp;quot;이게 내 단점이지&amp;quot;라는 말이 올라오면, 이를 꽉 깨물고 &amp;quot;이건 내 약점이야&amp;quot;라고 생각한다.&lt;/p&gt;
-        &lt;p&gt;영어로 미팅할 수도 없고,&lt;br&gt;고객이 원하는 것을 포착하는 감각도 떨어지고,&lt;br&gt;돈을 버는 감각도 뛰어나지 않다.&lt;br&gt;(요즘은 코딩도 너무 오래 쉬었다.)&lt;/p&gt;
-        &lt;p&gt;예전에는 이런 것들을 모두 내 &amp;quot;단점&amp;quot;이라고 생각했다.&lt;br&gt;근데 &amp;quot;영어를 못하는 게 내 단점이야&amp;quot;라고 말하면, 영어를 못하는 현재의 상태가 마치 나라는 사람의 결함처럼 느껴졌다.&lt;/p&gt;
-        &lt;p&gt;말은 능력 하나를 설명했을 뿐인데, 듣고 있는 나는 내 전체를 평가받은 것처럼 받아들인다.&lt;/p&gt;
-        &lt;p&gt;반면에 &amp;quot;영어는 지금 내 약점이야&amp;quot;라고 말하면 조금 달랐다.&lt;br&gt;지금은 영어가 약하다.&lt;br&gt;그러면 연습하면 된다.&lt;br&gt;다른 사람의 도움을 받을 수도 있고, 번역 도구를 쓸 수도 있고, 영어가 덜 필요한 다른 능력으로 보완할 수도 있다.&lt;br&gt;혹은 지금 내 삶에서 중요하지 않다면 우선순위를 뒤로 미룰 수도 있다.&lt;br&gt;어느 쪽이든 선택지가 생긴다.&lt;/p&gt;
-        &lt;p&gt;단점이라고 부를 때는 자책부터 했는데,&lt;br&gt;약점이라고 부르면 해야 할 것들을 떠올리게 된다.&lt;/p&gt;
-        &lt;p&gt;물론 단점이라는 말을 아예 없애려는 것은 아니다.&lt;br&gt;나 자신이나 다른 사람을 해치는 태도는 여전히 단점이라고 생각한다.&lt;br&gt;무례함.&lt;br&gt;폭력적인 성향.&lt;br&gt;잘못을 인정하지 않는 태도.&lt;br&gt;다른 사람을 반복해서 상처 입히면서도 대수롭지 않게 여기는 태도.&lt;br&gt;이런 건 &amp;quot;원래 내가 좀 그래&amp;quot;라고 받아들일 일이 아니다.&lt;br&gt;반성하고 고쳐야 한다.&lt;br&gt;(내가 그렇다는 건 아니고...)&lt;/p&gt;
-        &lt;p&gt;하지만 아직 잘하지 못하는 능력까지 나의 흠으로 만들고 싶지는 않다.&lt;br&gt;영어를 못하는 것도,&lt;br&gt;고객이 원하는 것을 포착하지 못하는 것도,&lt;br&gt;돈에 대한 감각이 부족한 것도&lt;br&gt;나라는 사람의 결함은 아니다.&lt;br&gt;그것은 지금의 내 약점이다.&lt;br&gt;키워 갈 수도 있고, 때로는 그대로 안고 살아갈 수도 있는 것들이다.&lt;/p&gt;
-        &lt;p&gt;사전에서 두 단어를 어떻게 구분하는지는 여기서 크게 중요하지 않다.&lt;br&gt;이것은 내가 나를 대하기 위해 만든 언어 규칙에 가깝다.&lt;br&gt;나는 자주 쓰는 단어가 결국 내 생각을 지배한다고 믿는다.&lt;br&gt;부족함을 계속 단점으로 부르면, 나는 나를 결함이 있는 사람으로 보게 될 것 같다.&lt;br&gt;반대로 약점이라고 부르면, 부족함을 외면하지 않으면서도 그 자리에 가능성을 남겨둘 수 있다.&lt;/p&gt;
-        &lt;p&gt;말만 바꾼다고 영어가 늘지는 않는다.&lt;br&gt;그분이 다음 면접에서 갑자기 말을 잘하게 되는 것도 아니다.&lt;/p&gt;
-        &lt;p&gt;그래도 말이 바뀌면, 그 부족함을 대하는 태도가 바뀐다.&lt;br&gt;&amp;quot;나는 왜 이것도 못하지?&amp;quot;에서&lt;br&gt;&amp;quot;이건 지금 내 약점이구나. 어떻게 더 나아질 수 있을까?&amp;quot;로.&lt;/p&gt;
-        &lt;p&gt;그래서 요즘은 이를 꽉 깨물고라도 고쳐 부르려고 한다.&lt;br&gt;&amp;quot;이게 내 단점이야&amp;quot; 대신, &amp;quot;이건 지금 내 약점이야&amp;quot;.&lt;/p&gt;
-        &lt;p&gt;계속 그렇게 부르다 보면, 그 부족함들은 정말로 내가 키워 갈 수 있는 영역이 될 것이라고 믿는다.&lt;/p&gt;
-        &lt;p&gt;내가 나를 부르는 말이, 내가 나를 대하는 방식이 될 테니까.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>[SE-0535] Add CLI for editing global mirrors configuration</title>
-      <link>https://green1229.tistory.com/632</link>
-      <guid>https://green1229.tistory.com/632</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;b&gt;그린&lt;/b&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0535 &amp;mdash; 전역 mirrors 설정을 위한 CLI 추가&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fkzmdg%2FdJMcaafgnfB%2FJginJjfYXHUs8tNKmKUXAk%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Intro&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;div style=&quot;background: #f2f8ee; border-radius: 10px; padding: 16px 20px; margin: 16px 0;&quot;&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0535&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Author:&lt;/b&gt; Samuel Murray&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Tim Condon&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Accepted&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift-package-manager#9950&lt;/span&gt;&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;SPM은 로컬(프로젝트 단위)과 공유(사용자 단위) mirrors 설정을 둘 다 지원하지만, CLI로는 로컬 설정 파일만 편집할 수 있었어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이 제안은 기존 CLI에 전역 설정을 편집할 수 있는 --global 플래그를 옵션으로 추가합니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Motivation&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;원래 mirrors는 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0219-package-manager-dependency-mirroring.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;최초 제안&lt;/a&gt;에서 설명된 대로 프로젝트별 로컬 설정만 가능했어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이후 릴리스에서 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-package-manager/pull/3670&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;전역 설정 파일 지원&lt;/a&gt;이 추가됐는데, &lt;b&gt;처음부터 로컬/전역 설정을 모두 지원해온 package registry의 디자인을 따른 거예요.&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;mirrors와 package registry의 전역 설정 파일은 특정 패키지를 항상 커스텀 URL에서 받아와야 하는 엔터프라이즈 환경에서 특히 유용해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;게다가 곧 추가될 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-package-manager/pull/9647&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;바이너리 타깃 미러링 지원&lt;/a&gt;으로 전역 설정의 유용함은 더 커질 예정입니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;하지만 현재는 전역 mirrors 설정을 쉽게 편집하고 확인할 방법이 없어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;유일한 방법은 설정 파일을 직접 만들고 손으로 편집하는 것뿐이죠. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이걸 위한 CLI를 제공하면 이미 있는 전역 package registry 기능과 결을 맞추면서, 전역 mirrors 설정의 발견 가능성도 높일 수 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Proposed Solution&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;로컬 설정 파일을 다루는 기존 CLI는 다음과 같아요.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config set-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config unset-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config get-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 이 명령어들 각각에 선택적인 &lt;code&gt;--global&lt;/code&gt; 플래그를 추가합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예시&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;https://example.com/file.json&lt;/code&gt;의 mirror를 전역으로 추가하려면:&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;dsconfig&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config set-mirror --global --original https://example.com/file.json --mirror https://internal.com/file.json&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그러면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에 아래 내용이 추가돼요. (파일이 없으면 새로 만듭니다)&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;json&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;{
-        &quot;object&quot; : [
-        {
-        &quot;mirror&quot; : &quot;https://internal.com/file.json&quot;,
-        &quot;original&quot; : &quot;https://example.com/file.json&quot;
-        }
-        // ...
-        ],
-        &quot;version&quot; : 1
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 설정을 확인하려면:&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;dsconfig&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config get-mirror --global --original https://example.com/file.json
-        https://internal.com/file.json&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;설정을 해제하려면:&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;tcl&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config unset-mirror --global --original https://example.com/file.json&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;package registry용 CLI에서 아이디어를 얻어서, 이 명령어들 각각에 &lt;code&gt;--global&lt;/code&gt; 플래그를 추가하자고 제안해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예를 들면 &lt;code&gt;swift package config set-mirror --global [...]&lt;/code&gt; 이렇게요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 플래그와 함께 쓰면 명령어는 전역 설정 파일만 고려하게 됩니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 플래그를 쓰면 명령어를 어느 디렉터리에서든 실행할 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;반면 지금의 (플래그 없는) 명령어는 현재 디렉터리나 그 상위 디렉터리 어디에도 &lt;code&gt;Package.swift&lt;/code&gt;가 없으면 실패하죠.&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style3&quot;&gt;현재 swift package config get-mirror의 동작은, 로컬 설정 파일이 비어 있거나 없으면 전역 설정 파일을 읽는 방식이에요. &lt;br /&gt;제안자는 이 동작을 그대로 두자고 제안합니다. &lt;br /&gt;로컬 설정이 하나라도 있으면 전역 설정을 완전히 무시하는 것보다, 로컬을 더 높은 우선순위로 두고 로컬/전역을 병합하는 게 더 합리적이라고 생각하지만, 이건 이 제안과는 다소 별개의 주제라 후속 제안으로 다루는 게 좋겠다고 봤다고 합니다!&lt;/blockquote&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Detailed Design&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;--global&lt;/code&gt; 플래그와 함께 쓰는 모든 명령어는 어느 디렉터리에서든 사용할 수 있어요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;즉, 현재 디렉터리(또는 그 상위 디렉터리)에 &lt;code&gt;Package.swift&lt;/code&gt; 파일이 있을 필요가 없습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;--global&lt;/code&gt; 플래그 없이 쓰면 모든 명령어의 동작은 기존과 동일합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;set-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config set-mirror --help
-        OVERVIEW: Set a mirror for a dependency.
-        
-        USAGE: swift package config set-mirror [--global] [--original ] [--mirror ]
-        
-        OPTIONS:
-        --global                Apply settings to all projects for this user.
-        --original    The original url or identity.
-        --mirror        The mirror url or identity.
-        --version               Show the version.
-        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에 mirror 설정을 추가하거나, 파일이 없으면 새로 만듭니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;unset-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config unset-mirror --help
-        OVERVIEW: Remove an existing mirror.
-        
-        USAGE: swift package config unset-mirror [--original ] [--mirror ]
-        
-        OPTIONS:
-        --global                Apply settings to all projects for this user.
-        --original    The original url or identity.
-        --mirror        The mirror url or identity.
-        --version               Show the version.
-        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에서 일치하는 mirror 설정을 제거해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;일치하는 항목이 없거나 파일이 없으면 에러 메시지를 표시합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;get-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;OVERVIEW: Print mirror configuration for the given package dependency.
-        
-        USAGE: swift package config get-mirror [--original ]
-        
-        OPTIONS:
-        --global                Only read settings applied to all projects for this user.
-        --original    The original url or identity.
-        --version               Show the version.
-        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에서 일치하는 mirror 설정을 가져와요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;일치하는 항목이 없거나 파일이 없으면 에러 메시지를 표시합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Security&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안이 보안에 미치는 영향은 미미해요. 사용자 홈 디렉터리에 있는 파일을 수정하거나 읽는 정도입니다. mirrors의 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0219-package-manager-dependency-mirroring.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;최초 제안&lt;/a&gt;에서는 전역 설정이 &quot;예상 못한 함정&quot; 같은 순간을 만들 수 있다는 우려가 있었지만, SPM에 전역 mirrors 설정 지원이 이미 추가된 상태라 이 CLI를 추가한다고 해서 새로운 이슈가 생기진 않습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Impact on Existing Packages&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 기존 패키지에 아무런 영향을 주지 않아요. 새 CLI 플래그를 추가할 뿐, 기존 동작은 전혀 바뀌지 않습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Conclusion&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;작지만 실용적인 CLI 개선이에요. 그동안 전역 mirrors 설정을 편집하려면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;을 직접 손으로 만지는 수밖에 없었는데, &lt;code&gt;--global&lt;/code&gt; 플래그 하나로 &lt;code&gt;set-mirror&lt;/code&gt;, &lt;code&gt;unset-mirror&lt;/code&gt;, &lt;code&gt;get-mirror&lt;/code&gt;를 어느 디렉터리에서든 쓸 수 있게 됐어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;엔터프라이즈 환경에서 특정 패키지를 항상 내부 URL로 받아오게 설정해두고 싶을 때, 그리고 곧 추가될 바이너리 타깃 미러링과 함께 쓰기에도 훨씬 편리해질 것 같습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;figure id=&quot;og_1786189403564&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0535-global-mirrors-configuration-cli.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/chaC8q/dJMb8Xku60Y/CXWKyTWcewmOCqXsS7KXN1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/btxF3C/dJMb8TCpsj9/hJ1yPW3IKLQsvDu5vfSb6K/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot;&gt;
-        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/chaC8q/dJMb8Xku60Y/CXWKyTWcewmOCqXsS7KXN1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/btxF3C/dJMb8TCpsj9/hJ1yPW3IKLQsvDu5vfSb6K/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
-        &lt;div class=&quot;og-text&quot;&gt;
-        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0535-global-mirrors-configuration-cli.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/a&gt;&lt;/figure&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>[SE-0527] RigidArray &amp;amp; UniqueArray</title>
-      <link>https://green1229.tistory.com/631</link>
-      <guid>https://green1229.tistory.com/631</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0527 &amp;mdash; RigidArray와 UniqueArray&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/b6TCH1/dJMcajiSpJc/xxoLjgkKDu4GPsXcmzkmh1/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/b6TCH1/dJMcajiSpJc/xxoLjgkKDu4GPsXcmzkmh1/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/b6TCH1/dJMcajiSpJc/xxoLjgkKDu4GPsXcmzkmh1/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fb6TCH1%2FdJMcajiSpJc%2FxxoLjgkKDu4GPsXcmzkmh1%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Intro&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;div style=&quot;background: #f2f8ee; border-radius: 10px; padding: 16px 20px; margin: 16px 0;&quot;&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0527&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Authors:&lt;/b&gt; Karoy Lorentey, Alejandro Alonso&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Steve Canon&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Implemented (Swift 6.4)&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift#87521&lt;/span&gt;&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Motivation&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Swift 5.9에서 noncopyable struct/enum이 들어온 이후로 이를 지원하는 API가 하나둘 추가되어 왔습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;표준 라이브러리도 &lt;code&gt;Atomic&lt;/code&gt;, &lt;code&gt;Mutex&lt;/code&gt;, inline 저장소에 noncopyable 값을 담을 수 있는 &lt;code&gt;InlineArray&lt;/code&gt; 같은 타입을 직접 구현했죠. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;하지만 noncopyable 원소를 지원하는 크기 조절 가능한(resizable) 자료구조는 아직 없었습니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Swift 개발자라면 동적으로 크기가 변하는 값 목록이 필요할 때 &lt;code&gt;Array&lt;/code&gt;를 찾게 마련&lt;/b&gt;인데, 안타깝게도 클래식 &lt;code&gt;Array&lt;/code&gt;는 noncopyable 값을 지원하지 않아요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;noncopyable 원소 지원을 Array에 억지로 끼워 넣는 방법은 두 가지가 있을 수 있어요.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;1️⃣ &lt;b&gt;&lt;code&gt;Array&lt;/code&gt;를 copyable로 유지하면서, mutation 연산이 원소를 복사하는 대신 다른 방식으로 uniqueness를 보장하게 만드는 방법&lt;/b&gt;. &lt;br /&gt;예를 들어 mutation이 런타임 에러를 일으키게 하거나, 원소를 어떻게 clone할지 설명하는 새 인자를 추가하는 방식이 있는데, 둘 다 실제로는 받아들이기 힘든 프로그래밍 경험으로 이어집니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;2️⃣ &lt;b&gt;&lt;code&gt;Array&lt;/code&gt;를 원소의 copyability에 따라 조건부로 copyable하게 만드는 방법.&lt;/b&gt; &lt;br /&gt;이러려면 mutation 연산이 &lt;code&gt;Element&lt;/code&gt;가 copyable인 경우에만 copy-on-write 경로로 분기하는 런타임 조건을 추가로 가져야 해요. 여기엔 두 가지 기술적 문제가 있습니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Swift 코드는 현재 런타임에 타입 인자가 copyable인지 확인할 방법이 없고, 이런 &quot;conformance&quot; 체크는 모든 배열 mutation에 잠재적 오버헤드를 더하게 됩니다.&lt;/b&gt; &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;첫 번째 문제는 해결 가능하지만, 두 번째는 굉장히 가져가기 어려운 문제예요.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;특히 noncopyable 원소를 허용하는 제네릭 컨텍스트에 큰 영향을 주는데, 그런 컨텍스트에서는 copyability 체크가 런타임 조건이어야만 하거든요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;noncopyable 원소를 허용하는 컨텍스트에서 호출됐다는 이유만으로 &lt;code&gt;append&lt;/code&gt;가 storage가 unique하다고 가정할 순 없으니까요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이미 복잡한 &lt;code&gt;Array&lt;/code&gt;의 성능 분석을 더 어렵게 만드는 건 noncopyable 타입 도입의 배경이 된 &lt;a href=&quot;https://github.com/swiftlang/swift/blob/main/docs/OwnershipManifesto.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Swift Ownership Manifesto&lt;/a&gt;의 목표에 정면으로 반하는 일이에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;목표는 단순히 noncopyable 값을 담는 배열이 아니라, 예측 가능하고 분석하기 쉬운 좋은 성능으로 그걸 해내는 겁니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이 외에도 Array에는 예측 불가능한 복잡도 급증을 만드는 두 가지 주요 원인이 있어요.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;1️⃣ copy-on-write 값 시맨틱스&lt;/b&gt; &amp;mdash; 공유된 복사본을 실수로 mutate하기 쉽습니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그럴 때마다 배열 전체를 새로 할당해야 해서, 평소엔 상수 복잡도인 단순 subscript 재할당 같은 연산도 선형 복잡도 괴물이 될 수 있어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;2️⃣ 동적 자료구조&lt;/b&gt; &amp;mdash; 필요할 때마다 암묵적으로 크기를 재조정합니다. 적&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;절한 크기의 새 버퍼를 할당하고 기존 원소를 복사하거나 옮기는 방식이라, 대부분은 상수 시간/공간에 실행되지만 어쩌다 한 번씩 resize가 트리거되면서 갑자기 선형이 돼요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;기하급수적 성장 패턴 덕분에 &lt;code&gt;append&lt;/code&gt;는 평균적으로 amortized O(1)이지만,&lt;b&gt; 실제 최악의 경우 복잡도는 O(count)입니다.&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 두 특징 자체가 나쁜 건 아니에요. &lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;오히려 Swift의 프로그래밍 모델을 크게 단순화해주는 바람직한 이점이죠. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;하지만 신뢰할 수 있는 고성능이 필요한 컨텍스트에서는 이 특징들이 코드가 런타임에 어떻게 동작할지 분석하고 보장하기 어렵게 만드는 걸림돌이 됩니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;Array에 기능을 계속 덧붙이는 건 답이 아니에요.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;필요한 건 &lt;code&gt;Array&lt;/code&gt;보다 더 예측 가능한 성능이 필요한 용례에 특화된 추가 배열 구현체입니다&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-size=&quot;size18&quot; data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그럼 새 배열 타입이 몇 개나 필요할까요? &lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;위 두 특징은 기술적으로 서로 독립적이라 개별적으로 켜고 끌 수 있어요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그러면 &lt;b&gt;이론상 네 가지 조합&lt;/b&gt;이 나오는데, 그중 하나는 이미 존재하는 &lt;code&gt;Array&lt;/code&gt;입니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%; margin: 16px 0;&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&amp;nbsp;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Noncopyable&lt;/span&gt;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Copy-on-write&lt;/span&gt;&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Fixed capacity&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;???&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;???&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Dynamic&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;???&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;Array&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;fixed-capacity 자료구조를 쓰는 주된 이유는 암묵적 할당을 피하기 위해서인데, copy-on-write는 그것과 정면으로 충돌해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그래서 오른쪽 위 칸은 비워둘 수 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%; margin: 16px 0;&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&amp;nbsp;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Noncopyable&lt;/span&gt;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Copy-on-write&lt;/span&gt;&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Fixed capacity&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;???&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;---&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;Dynamic&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;???&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px; text-align: center;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;Array&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Proposed Solution&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;표준 라이브러리에 RigidArray와 UniqueArray라는 두 새 배열 타입을 추가할 것을 제안합니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;둘 다 진짜 배열 타입으로, append, insert, replace, remove, 임의 재정렬, 정수 오프셋을 통한 빠른 접근 등 익숙한 배열 연산을 제공&lt;/b&gt;해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 하나의 힙 할당된 연속 메모리 영역을 저장소로 쓰고, 부분적으로만 초기화될 수 있으며, 초기화된 항목들은 앞쪽에 모여 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;요컨대 기존 &lt;code&gt;Array&lt;/code&gt;, &lt;code&gt;ContiguousArray&lt;/code&gt;와 마찬가지로 고전적인 가변 크기 배열 자료구조를 구현합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 타입들은 Swift 툴체인의 새 모듈 &lt;code&gt;Containers&lt;/code&gt;에 포함돼요. s&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;wift-collections의 &lt;code&gt;Collections&lt;/code&gt;처럼, 이 모듈은 앞으로 ring buffer 같은 자료구조들의 집합이 될 예정입니다 ☺️&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style6&quot; /&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;UniqueArray&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;UniqueArray&lt;/code&gt;는 &lt;b&gt;copy-on-write 컨테이너를 피하고 싶지만 메모리를 엄격하게 관리할 필요는 없는, 일반적인 고성능 컨텍스트에 좋은 선택&lt;/b&gt;이에요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;C++의 &lt;code&gt;std::vector&lt;/code&gt;나 Rust의 &lt;code&gt;Vec&lt;/code&gt;처럼 단순하고 동적으로 크기가 조정되는 배열 타입입니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;UniqueArray는 저장소가 항상 유일하게(uniquely) 소유되는 Array variant예요.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;UniqueArray&lt;/code&gt;를 noncopyable 타입으로 선언해서 정적으로 강제하는데, 그래서 &lt;code&gt;UniqueArray&lt;/code&gt; 자신은 한 번에 하나의 변수(저장 프로퍼티, 지역 변수, 함수 인자 등)만 가질 수 있고 그 변수를 통해서만 mutate할 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;다른 변수로 옮길 수는 있지만, 이건 원본을 consume해서 사용 불가능/미초기화 상태로 만듭니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;reasonml&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;import Containers
-        
-        struct FileHandle: ~Copyable {
-        let fd: UInt32
-        
-        init(reading path: String) throws { fd = try open(path, .read) }
-        
-        deinit {
-        try! close(fd)
-        }
-        }
-        
-        let foo = try FileHandle(reading: &quot;foo.txt&quot;)
-        let bar = try FileHandle(reading: &quot;bar.md&quot;)
-        
-        var a = UniqueArray()
-        a.append(foo) // OK, consumes \`foo\`
-        a.append(bar) // OK, consumes \`bar\`
-        
-        var b = a // OK, consumes \`a\`, moving the array instance into \`b\`
-        
-        b.append(try FileHandle(reading: &quot;baz.swift&quot;)) // OK
-        // \`b\`는 이제 foo.txt, bar.md, baz.swift에 대한 열린 핸들을 담고 있음
-        
-        a.append(try FileHandle(reading: &quot;Info.plist&quot;)) // error: \`a\` used after consume (used here)&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;noncopyable 자신인 덕분에 &lt;code&gt;UniqueArray&lt;/code&gt;는 위 예시의 파일 핸들처럼 noncopyable 원소도 자연스럽게 담을 수 있어요.&lt;/b&gt; &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;원소를 다루는 배열 연산들은 소유권을 신중하게 고려해서 설계되었고, &lt;code&gt;consuming&lt;/code&gt;이나 &lt;code&gt;borrowing&lt;/code&gt; 키워드로 원소 소유권과 어떻게 상호작용하는지 표시되어 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;제대로 된 동적 크기 조정 컨테이너답게, &lt;code&gt;UniqueArray&lt;/code&gt;도 기하급수적 성장 곡선에 의존해서 (amortized) 성능을 확보해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;resize가 필요할 때 이전 capacity에 상수 배율을 곱하는 방식이지, 단순히 그 연산에 필요한 만큼만 선형으로 키우지 않습니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 키워지는 비율은 내부 구현 세부사항이라 환경/플랫폼/Swift 릴리스에 따라 바뀔 수 있고, 사용자가 설정할 수 없습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style6&quot; /&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;RigidArray&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;핵심 시스템 프로그래밍, 메모리 제약이 있는 임베디드 플랫폼, 실시간 컨텍스트 같은 가장 low-level인 용례에는 UniqueArray만으로는 충분하지 않아요.&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;고정 capacity를 갖는 noncopyable 배열 타입이 필요합니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;가용 메모리가 킬로바이트 단위인 환경을 위한 Swift 코드를 작성한다고 생각해보면, 모든 할당이 소스에 명시적으로 드러나서 정확히 계산하고 예산을 세울 수 있어야 해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이런 컨텍스트에서는 알아서 resize하거나 복사하는 컨테이너 타입이 들어설 자리가 없죠.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;RigidArray는 이런 용례를 위한 타입이고, 이름 그대로 유연하지 않고 rigid(경직된)한 성격을 반영합니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;RigidArray&lt;/code&gt; 인스턴스는 항상 특정 capacity로 할당되고, 그 안에서만 동작해야 해요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그래서 더 이상 새 항목을 담을 수 없는 &quot;가득 찬&quot; 상태가 될 수 있고, 가득 찬 &lt;code&gt;RigidArray&lt;/code&gt;에 값을 추가하려 하면 런타임 트랩이 발생합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;stylus&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;var c = RigidArray(capacity: 2)
-        print(c.isFull)       // =&amp;gt; false
-        print(c.freeCapacity) // =&amp;gt; 2
-        
-        c.append(23)
-        print(c.isFull)       // =&amp;gt; false
-        print(c.freeCapacity) // =&amp;gt; 1
-        
-        c.append(42)
-        print(c.isFull)       // =&amp;gt; true
-        print(c.freeCapacity) // =&amp;gt; 0
-        
-        c.append(7) // runtime error: RigidArray capacity overflow&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이걸 복구 가능한 에러가 아니라 precondition 위반으로 다루면, &lt;b&gt;&lt;code&gt;RigidArray&lt;/code&gt;가 &lt;code&gt;UniqueArray&lt;/code&gt;와 같은 기본 연산을 제공하면서도 향후 이 둘을 &lt;a href=&quot;https://github.com/apple/swift-collections/blob/1.4.1/Sources/ContainersPreview/Protocols/Container/RangeReplaceableContainer.swift&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ownership-aware RangeReplaceableCollection 같은 추상화&lt;/a&gt; 아래로 통합&lt;/b&gt;할 길을 열어둘 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;또한 연산들이 어떤 식으로든 실패를 복구 가능하게 보고하도록 억지로 복잡하게 만들 필요도 없어지고요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;실제로 &lt;code&gt;RigidArray&lt;/code&gt; 저장소를 오버플로우시키는 건 프로그래머의 실수처럼 느껴져요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;타입을 잘못 사용했다는 신호지, 일상적인 문제가 아닙니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;빈 &lt;code&gt;Array&lt;/code&gt;에서 마지막 항목을 지우려 하면 트랩이 나는 것처럼, 가득 찬 &lt;code&gt;RigidArray&lt;/code&gt;에 항목을 추가하려는 것도 자연스럽게 트랩으로 이어집니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;RigidArray&lt;/code&gt;는 스스로 resize하지 않지만, capacity가 타입의 일부는 아니에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;rigid array 인스턴스는 사실 &lt;code&gt;reallocate&lt;/code&gt; 연산을 명시적으로 호출해서 임의로 저장소를 키우거나 줄일 수 있습니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;stylus&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;var d = RigidArray(capacity: 2)
-        d.append(10)
-        d.append(20)
-        print(d.isFull)       // =&amp;gt; true
-        print(d.freeCapacity) // =&amp;gt; 0
-        
-        d.reallocate(capacity: 10)
-        print(d.isFull)       // =&amp;gt; false
-        print(d.freeCapacity) // =&amp;gt; 8
-        
-        d.append(30) // OK!&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;배열은 요청한 만큼 정확히 저장소를 할당해요 (더 많지도 적지도 않게). &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 연산 덕분에 &lt;code&gt;RigidArray&lt;/code&gt;로 임의의 커스텀 resize 로직을 갖는 wrapper 배열 타입도 만들 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;사&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;실 &lt;code&gt;UniqueArray&lt;/code&gt; 자체가 그렇게 구현되어 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Detailed Design&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;타입 선언&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@frozen
-        public struct RigidArray: ~Copyable {}
-        
-        extension RigidArray: Sendable where Element: Sendable &amp;amp; ~Copyable {}
-        
-        @frozen
-        public struct UniqueArray: ~Copyable {}
-        
-        extension UniqueArray: Sendable where Element: Sendable &amp;amp; ~Copyable {}&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; 기본&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;capacity&lt;/code&gt;, &lt;code&gt;freeCapacity&lt;/code&gt;, &lt;code&gt;span&lt;/code&gt;/&lt;code&gt;mutableSpan&lt;/code&gt;, &lt;code&gt;isTriviallyIdentical(to:)&lt;/code&gt;, 그리고 &lt;code&gt;OutputSpan&lt;/code&gt;을 통해 저장소를 직접 편집하는 &lt;code&gt;edit(_:)&lt;/code&gt;, capacity를 조정하는 &lt;code&gt;reallocate(capacity:)&lt;/code&gt;와 &lt;code&gt;reserveCapacity(_:)&lt;/code&gt;가 공통으로 제공됩니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;copyable 원소에 대해서는 &lt;code&gt;clone()&lt;/code&gt; / &lt;code&gt;clone(capacity:)&lt;/code&gt;로 깊은 복사도 가능해요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public var capacity: Int { get }
-        public var freeCapacity: Int { get }
-        public var span: Span { get }
-        public var mutableSpan: MutableSpan { mutating get }
-        public func isTriviallyIdentical(to: borrowing Self) -&amp;gt; Bool
-        
-        public mutating func edit(
-        _ body: (inout OutputSpan) throws(E) -&amp;gt; R
-        ) throws(E) -&amp;gt; R
-        
-        public mutating func reallocate(capacity newCapacity: Int)
-        public mutating func reserveCapacity(_ n: Int)
-        }
-        
-        extension [Rigid|Unique]Array where Element: Copyable {
-        public func clone() -&amp;gt; Self
-        public func clone(capacity: Int) -&amp;gt; Self
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; 이니셜라이저&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public init()
-        public init(capacity: Int)
-        
-        public init(
-        capacity: Int,
-        initializingWith initializer: (inout OutputSpan) throws(E) -&amp;gt; Void
-        ) throws(E)
-        }
-        
-        extension [Rigid|Unique]Array where Element: Copyable {
-        public init(repeating repeatedValue: Element, count: Int)
-        
-        public init(
-        capacity: Int? = nil,
-        copying span: Span
-        )
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; 컬렉션 기반&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;배열의 위치를 나타내는 &lt;code&gt;Index&lt;/code&gt;는 정수 오프셋(&lt;code&gt;typealias Index = Int&lt;/code&gt;)이고, &lt;code&gt;isEmpty&lt;/code&gt;, &lt;code&gt;count&lt;/code&gt;, &lt;code&gt;startIndex&lt;/code&gt;, &lt;code&gt;endIndex&lt;/code&gt;, &lt;code&gt;indices&lt;/code&gt;, subscript, &lt;code&gt;swapAt&lt;/code&gt;, &lt;code&gt;index(after:)&lt;/code&gt;/&lt;code&gt;index(before:)&lt;/code&gt;, &lt;code&gt;formIndex&lt;/code&gt; 계열, &lt;code&gt;distance(from:to:)&lt;/code&gt; 등 기존 &lt;code&gt;Collection&lt;/code&gt; API와 결을 맞춘 연산들이 제공됩니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;성능을 위해 대부분의 인덱스 관련 연산은 인덱스 유효성을 미리 검증하지 않고, 실제로 접근할 때 검증을 미룹니다.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public typealias Index = Int
-        
-        public var isEmpty: Bool { get }
-        public var count: Int { get }
-        public var startIndex: Int { get }
-        public var endIndex: Int { get }
-        public var indices: Range { get }
-        
-        public subscript(position: Int) -&amp;gt; Element {
-        borrow
-        mutate
-        }
-        
-        public mutating func swapAt(_ i: Int, _ j: Int)
-        
-        public func index(after index: Int) -&amp;gt; Int
-        public func index(before index: Int) -&amp;gt; Int
-        public func formIndex(after index: inout Int)
-        public func formIndex(before index: inout Int)
-        public func index(_ index: Int, offsetBy n: Int) -&amp;gt; Int
-        public func distance(from start: Index, to end: Index) -&amp;gt; Int
-        
-        public func formIndex(
-        _ index: inout Index,
-        offsetBy n: inout Int,
-        limitedBy limit: Index
-        )
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; Append&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;단일 원소 &lt;code&gt;append(_:)&lt;/code&gt; 외에, &lt;code&gt;OutputSpan&lt;/code&gt;을 직접 채우는 &lt;code&gt;append(addingCount:initializingWith:)&lt;/code&gt;, 버퍼나 &lt;code&gt;OutputSpan&lt;/code&gt;을 이동시키는 &lt;code&gt;append(moving:)&lt;/code&gt;, copyable 원소를 위한 버퍼/span/시퀀스 복사 &lt;code&gt;append(copying:)&lt;/code&gt; 계열이 있습니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;capacity가 부족하면 &lt;code&gt;RigidArray&lt;/code&gt;는 런타임 에러, &lt;code&gt;UniqueArray&lt;/code&gt;는 기하급수적으로 storage를 늘려요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public mutating func append(_ item: consuming Element)
-        
-        public mutating func append(
-        addingCount newItemCount: Int,
-        initializingWith initializer: (inout OutputSpan) throws(E) -&amp;gt; Void
-        ) throws(E)
-        
-        public mutating func append(
-        moving items: UnsafeMutableBufferPointer
-        )
-        
-        public mutating func append(
-        moving items: inout OutputSpan
-        )
-        }
-        
-        extension [Rigid|Unique]Array where Element: Copyable {
-        public mutating func append(
-        copying newElements: UnsafeBufferPointer
-        )
-        public mutating func append(
-        copying newElements: UnsafeMutableBufferPointer
-        )
-        public mutating func append(copying newElements: Span)
-        public mutating func append(copying newElements: some Sequence)
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; Insert&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;지정한 위치에 원소를 끼워 넣는 &lt;code&gt;insert(_:at:)&lt;/code&gt;부터, &lt;code&gt;OutputSpan&lt;/code&gt;을 채우는 버전, 버퍼/span을 이동/복사하는 버전까지 append와 짝을 이루는 형태로 제공됩니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;지정 위치 이후 원소들은 뒤로 밀려서 공간을 만듭니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public mutating func insert(_ item: consuming Element, at index: Int)
-        
-        public mutating func insert(
-        addingCount newItemCount: Int,
-        at index: Int,
-        initializingWith initializer: (inout OutputSpan) throws(E) -&amp;gt; Void
-        ) throws(E)
-        
-        public mutating func insert(
-        moving items: UnsafeMutableBufferPointer,
-        at index: Int
-        )
-        
-        public mutating func insert(
-        moving items: inout OutputSpan,
-        at index: Int
-        )
-        }
-        
-        extension [Rigid|Unique]Array where Element: Copyable {
-        public mutating func insert(
-        copying newElements: UnsafeBufferPointer, at index: Int
-        )
-        public mutating func insert(
-        copying newElements: UnsafeMutableBufferPointer,
-        at index: Int
-        )
-        public mutating func insert(
-        copying newElements: Span, at index: Int
-        )
-        public mutating func insert(
-        copying newElements: some Collection, at index: Int
-        )
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; Remove&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public mutating func popLast() -&amp;gt; Element?
-        public mutating func removeLast() -&amp;gt; Element
-        public mutating func removeLast(_ k: Int)
-        public mutating func remove(at index: Int) -&amp;gt; Element
-        public mutating func removeSubrange(_ bounds: Range)
-        public mutating func removeSubrange(_ bounds: some RangeExpression)
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; Replace&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;지정한 범위를 새 항목으로 교체하는 &lt;code&gt;replaceSubrange&lt;/code&gt; 계열이에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;r&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;emove 후 insert하는 것과 같은 효과지만, 원소를 두 번 옮기지 않아서 상수 배 더 빠릅니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array where Element: ~Copyable {
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        addingCount newItemCount: Int,
-        initializingWith initializer: (inout OutputSpan) throws(E) -&amp;gt; Void
-        ) throws(E) -&amp;gt; Void
-        
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        moving newElements: UnsafeMutableBufferPointer
-        )
-        
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        moving items: inout OutputSpan
-        )
-        }
-        
-        extension [Rigid|Unique]Array where Element: Copyable {
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        copying newElements: UnsafeBufferPointer
-        )
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        copying newElements: UnsafeMutableBufferPointer
-        )
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        copying newElements: Span
-        )
-        public mutating func replaceSubrange(
-        _ subrange: Range,
-        copying newElements: consuming some Collection
-        )
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 갖는 API &amp;mdash; Conformance&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;두 타입 모두 &lt;code&gt;Equatable&lt;/code&gt;, &lt;code&gt;Hashable&lt;/code&gt;, &lt;code&gt;CustomStringConvertible&lt;/code&gt;, &lt;code&gt;CustomDebugStringConvertible&lt;/code&gt;을 채택하고, &lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0516-borrowing-sequence.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0516&lt;/a&gt;에서 제안된 &lt;code&gt;BorrowingSequence&lt;/code&gt;도 채택해서 그 프로포절의 &lt;code&gt;SpanIterator&lt;/code&gt;를 iterator로 씁니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension [Rigid|Unique]Array: Equatable where Element: Equatable &amp;amp; ~Copyable {
-        public static func ==(left: borrowing Self, right: borrowing Self) -&amp;gt; Bool
-        }
-        
-        extension [Rigid|Unique]Array: Hashable where Element: Hashable &amp;amp; ~Copyable {
-        public func hash(into hasher: inout Hasher)
-        }
-        
-        extension [Rigid|Unique]Array: CustomStringConvertible where Element: ~Copyable {
-        public var description: String { get }
-        }
-        
-        extension [Rigid|Unique]Array: CustomDebugStringConvertible where Element: ~Copyable {
-        public var debugDescription: String { get }
-        }
-        
-        extension [Rigid|Unique]Array: BorrowingSequence where Element: ~Copyable {
-        @lifetime(borrow self)
-        public func makeBorrowingIterator() -&amp;gt; SpanIterator
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;CustomStringConvertible&lt;/code&gt;과 &lt;code&gt;CustomDebugStringConvertible&lt;/code&gt; 채택은 &lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0499-support-non-copyable-simple-protocols.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0499&lt;/a&gt;가 구현된 뒤에야 정식으로 배포될 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그 전까지는 (지금으로선 다소 소박한) &lt;code&gt;description&lt;/code&gt;/&lt;code&gt;debugDescription&lt;/code&gt; 구현을 우선 제공합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;RigidArray 전용 API&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;isFull&lt;/code&gt; 프로퍼티, 시퀀스/컬렉션을 복사해서 초기화하는 이니셜라이저, capacity가 부족하면 항목을 그대로 돌려주는 &lt;code&gt;pushLast(_:)&lt;/code&gt;, 저장 capacity는 유지한 채 모든 원소를 지우는 &lt;code&gt;removeAll()&lt;/code&gt;이 있어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension RigidArray where Element: ~Copyable {
-        public var isFull: Bool { get }
-        
-        public init(
-        capacity: Int,
-        copying contents: some Sequence
-        )
-        
-        public init(
-        capacity: Int? = nil,
-        copying contents: some Collection
-        )
-        
-        public mutating func pushLast(_ item: consuming Element) -&amp;gt; Element?
-        
-        public mutating func removeAll()
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;UniqueArray 전용 API&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;초기 capacity를 지정하는 이니셜라이저와, capacity를 유지할지 선택할 수 있는 &lt;code&gt;removeAll(keepingCapacity:)&lt;/code&gt;가 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;extension UniqueArray where Element: ~Copyable {
-        public init(
-        capacity: Int? = nil,
-        copying contents: some Sequence
-        )
-        
-        public init(minimumCapacity: Int)
-        
-        public mutating func removeAll(keepingCapacity keepCapacity: Bool = false)
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Source Compatibility&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;RigidArray와 UniqueArray는 표준 라이브러리의 새 타입이라 추가는 소스 호환적인 변경이에요.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;swift-collections에서 이 타입들을 import하고 있거나 같은 이름으로 커스텀 타입을 정의한 개발자라도, 표준 라이브러리 타입 이름에 대한 shadowing 규칙 덕분에 기존 import/커스텀 타입은 그대로 동작합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;ABI Compatibility&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 제안은 표준 라이브러리 ABI에 순수하게 추가만 하는 변경이라 기존 바이너리를 깨지 않아요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;두 타입은 frozen으로 제안되는데, 이는 향후 표현 방식 변경을 막습니다 (capacity 축소를 구현하려고 예약된 capacity를 추적하고 싶을 수 있는 &lt;code&gt;UniqueArray&lt;/code&gt;에 특히 관련이 있어요).&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Implications on Adoption&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;RigidArray&lt;/code&gt;와 &lt;code&gt;UniqueArray&lt;/code&gt;는 표준 라이브러리의 새 타입이므로, 적어도 이 타입들이 도입된 버전의 Swift를 써야 해요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;swift-collections에서 이 타입들을 쓰던 개발자라면, 패키지 소스의 하위 배포 특성 때문에 계속 그 버전을 쓰는 게 더 나을 수도 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Future Directions&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Clonable&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 제안은 &lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0517-uniquebox.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;UniqueBox&lt;/a&gt; 제안처럼 &lt;code&gt;RigidArray&lt;/code&gt;와 &lt;code&gt;UniqueArray&lt;/code&gt; 모두에 &lt;code&gt;clone()&lt;/code&gt;/&lt;code&gt;clone(capacity:)&lt;/code&gt;를 도입해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;다만 지금은 &lt;code&gt;Element: Copyable&lt;/code&gt;을 요구해서 &lt;code&gt;UniqueArray&amp;lt;UniqueArray&amp;lt;Int&amp;gt;&amp;gt;&lt;/code&gt; 같은 중첩 2차원 배열은 불가능한데, &lt;code&gt;UniqueBox&lt;/code&gt; 제안에서 언급했듯 이런 기능을 가능하게 할 &lt;code&gt;Clonable&lt;/code&gt; 프로토콜의 여지가 있어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;public protocol Cloneable: ~Copyable {
-        func clone() -&amp;gt; Self
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;다른 표준 자료구조의 Rigid/Unique variant&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 제안이 도입하는 &lt;code&gt;Rigid&lt;/code&gt;/&lt;code&gt;Unique&lt;/code&gt; 접두어는 비슷한 동작을 하는 컨테이너 타입들의 일반적인 네이밍 패턴으로 자리잡길 의도한 것이에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;swift-collections 패키지는 이미 같은 시맨틱스의 ring buffer인 &lt;code&gt;RigidDeque&lt;/code&gt;, &lt;code&gt;UniqueDeque&lt;/code&gt;를 정의하고 있고, ownership-aware한 &lt;code&gt;Set&lt;/code&gt;/&lt;code&gt;Dictionary&lt;/code&gt; 프로토타입도 같은 접두어로 제공합니다. &lt;code&gt;RigidDeque&lt;/code&gt;, &lt;code&gt;UniqueDeque&lt;/code&gt;, &lt;code&gt;RigidSet&lt;/code&gt;, &lt;code&gt;UniqueSet&lt;/code&gt;, &lt;code&gt;RigidDictionary&lt;/code&gt;, &lt;code&gt;UniqueDictionary&lt;/code&gt; 모두 표준 라이브러리에 추가될 잠재적 후보들이에요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Container 프로토콜&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 제안이 두 배열 타입에 &lt;code&gt;BorrowingSequence&lt;/code&gt; 채택을 더하긴 하지만, 그 위에 컨테이너 프로토콜을 제안할 준비는 아직 안 됐어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;swift-collections에서 &lt;a href=&quot;https://github.com/apple/swift-collections/tree/1.4.1/Sources/ContainersPreview/Protocols/Container&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;이런 추상화를 위한 설계 접근을 탐색&lt;/a&gt; 중입니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;리터럴 초기화&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;제안된 배열 타입들은 원소가 copyable이든 아니든 &lt;code&gt;ExpressibleByArrayLiteral&lt;/code&gt;을 채택하지 않아요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;기존 프로토콜은 variadic 이니셜라이저를 통한 &lt;code&gt;Array&lt;/code&gt; 인스턴스 구성 위에 만들어져 있어서 일반화하기 쉽지 않고, &lt;code&gt;RigidArray&lt;/code&gt;/&lt;code&gt;UniqueArray&lt;/code&gt; 초기화가 임시 &lt;code&gt;Array&lt;/code&gt; 인스턴스를 거치도록 강제하면 이 타입들의 성능 목표를 만족시킬 수 없어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;대신 target 타입 저장 버퍼 위의 &lt;code&gt;OutputSpan&lt;/code&gt; 인스턴스를 채우는 방식으로 배열 리터럴 초기화를 재구성하는 방법을 하나 생각해볼 수 있어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;angelscript&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;protocol ArrayLiterable: ~Copyable {
-        associatedtype ArrayLiteralElement: ~Copyable
-        
-        init(
-        arrayLiteralCount count: Int, 
-        initializingWith initializer: (inout OutputSpan) throws(E) -&amp;gt; Void
-        ) throws(E)
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 방식이라면 타입 컨텍스트 T에서 &lt;code&gt;[a, b, c, d]&lt;/code&gt; 같은 배열 초기화 표현이 대략 이렇게 확장될 거예요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;T(arrayLiteralCount: 4) { target in
-        target.append(a)
-        target.append(b)
-        target.append(c)
-        target.append(d)
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;(T가 연속된 저장소를 갖는다고 가정한 것이고, 불연속적인 target 저장소를 초기화하도록 허용하는 건 항목을 반환하는 함수들의 inline array를 다루는 등 조금 더 까다로워요.) &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 방향이든 다른 방향이든, 후속 작업의 주제가 될 것으로 예상합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Alternatives Considered&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Allocator 인자와 비슷한 설정 값들&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;새 배열 타입을 제안하는 김에, 커스텀 allocator로 이 자료구조들을 할당할 수 있게 하는 방법도 고려했어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;cpp&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;public struct UniqueArray: ~Copyable {}&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;allocator 제네릭 인자를 추가하는 건 C++이나 Rust의 컨테이너 타입과 비슷한 방식이에요. 이러려면 커스텀 allocator가 채택할 &lt;code&gt;Allocator&lt;/code&gt; 프로토콜과, 표준 라이브러리 기본으로 제공되는 &lt;code&gt;SystemAllocator&lt;/code&gt; 같은 것이 필요합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;protocol Allocator {
-        func allocate(_: T.Type) -&amp;gt; UnsafeMutablePointer
-        func deallocate(_: UnsafeMutablePointer)
-        ...
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;하지만 이런 타입 인자는 함수 시그니처를 훨씬 번거롭게 만들어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;ada&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;func foo(_ x: borrowing UniqueArray)
-        // error: generic type &apos;UniqueArray&apos; specialized with too few type parameters (got 1, but expected 2)&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;C++과 Rust는 제네릭 타입 매개변수에 기본값을 허용해서 이 문제를 풀지만, Swift에는 아직 그런 언어 기능이 없어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;설령 있다 해도 &lt;code&gt;foo(_:)&lt;/code&gt;가 시스템 allocator를 쓰도록 과도하게 제약해버리는 더 나쁜 문제가 생겨요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;unique array를 그냥 borrow하는 함수는 어떤 allocator를 쓰는지 신경 쓸 이유가 없거든요 (어차피 mutate할 방법도 없으니까요). 결국 &lt;code&gt;foo&lt;/code&gt;도 제네릭이 되어야 합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;func foo(_ x: borrowing UniqueArray&amp;lt;Int, some Allocator&amp;gt;)&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;배열을 consume하거나 mutate하려는 함수라면 이 allocator 인자를 이름 붙여서 코드베이스 전체에 전파해야 하는 경우가 잦아, 인터페이스 정의를 오염시키고 코드를 흐릴 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이런 타입 인자 오염은 C++ 개발자들의 흔한 불만이기도 하죠. 게&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;다가 &lt;code&gt;Allocator&lt;/code&gt; 추상화는 구현체가 copyable이어야 하는지, allocate/deallocate가 mutating으로 표시돼서 동시 사용과 호환이 안 되는 건 아닌지, 애초에 Swift 개발자들이 allocator를 어떻게 구현해야 하는지 같은 질문도 남겨요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;무엇보다 allocator는 unsafe 포인터를 다루기 때문에 Swift 메모리 안전성 스토리에 눈에 띄는 구멍이 될 수 있습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;RigidArray/UniqueArray가 Array와 저장 표현을 공유하게 하기&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;UniqueArray는 사실 RigidArray 인스턴스를 감싼 얇은 wrapper 타입이라 서로  (1) 복잡도로 변환 가능해요.&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;클래식 &lt;code&gt;Array&lt;/code&gt;도 이 상호 변환 가능한 패밀리에 들어오면 좋겠지만, &lt;code&gt;Array&lt;/code&gt;의 저장 표현은 ABI의 일부라 변경할 수 없어요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;RigidArray&lt;/code&gt;/&lt;code&gt;UniqueArray&lt;/code&gt;가 tail-allocated 저장소를 갖는 특정 제네릭 클래스를 중심으로 지어진 그 표현을 그대로 빌려오는 건 부적절할 거예요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;같은 표현을 쓰면 새 low-level 타입에 불필요한 성능 오버헤드가 생겨서 경쟁 시스템 프로그래밍 언어의 비슷한 타입들과 경쟁력이 떨어질 수 있습니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;그래서 &lt;code&gt;Array&lt;/code&gt;와 새 타입 사이의 변환은 새로 할당한 저장소로 원소를 복사/이동하는 선형 시간 연산이 필요하고, 실제로는 큰 문제가 되지 않을 것으로 봅니다&lt;/b&gt;.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Array를 noncopyable 원소를 지원하도록 일반화하기&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;copy-on-write 값 시맨틱스가 Array와 다른 표준 Collection 타입들, 그리고 Swift 자체의 핵심 특징이라고 생각해요.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;code&gt;Array&lt;/code&gt;를 조건부로 noncopyable하게 만들거나 copy-on-write 동작을 조건화하는 건 Swift Ownership Manifesto의 목표에 오히려 반하고, 실제로도 실용적이지 않다고 봅니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;그리고 그런 작업을 하더라도 이 문서가 제안하는 전용 fixed-capacity/guaranteed-noncopyable 배열 variant의 필요성이 사라지진 않아요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt; &lt;code&gt;Element&lt;/code&gt;가 copyable이라는 이유만으로 개발자에게 동적으로 크기가 조정되는 copy-on-write &lt;code&gt;Array&lt;/code&gt;를 강제하는 건 적절하지 않으니까요. &lt;code&gt;Array&lt;/code&gt;가 언젠가 noncopyable 콘텐츠를 지원하게 되든 안 되든, 정수용 &lt;code&gt;RigidArray&lt;/code&gt;나 float용 &lt;code&gt;UniqueArray&lt;/code&gt;에 대한 실질적이고 시급한 수요가 있습니다. 다만 이 제안이 그런 미래 작업을 막는 건 전혀 아니에요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 타입들을 기본 Swift 모듈로 옮기기&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 타입들이 Swift 개발자의 기본 네임스페이스에 들어가야 한다고는 생각하지 않아요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;Array는 여전히 모두의 첫 번째 선택이어야 하니까요.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;이 배열 타입들의 추가가 &lt;code&gt;Array&lt;/code&gt;를 대체하는 게 아니라, 더 제약된 환경에서 작업할 때 쓸 수 있는 대안적인 도구일 뿐입니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;Conclusion&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;SE-0527은 표준 라이브러리에 &lt;code&gt;RigidArray&lt;/code&gt;와 &lt;code&gt;UniqueArray&lt;/code&gt;라는 두 개의 noncopyable 지원 배열 타입을 가져다줘요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;copy-on-write와 암묵적 resize라는 &lt;code&gt;Array&lt;/code&gt;의 두 특징을 각각 유연하게 켜고 끌 수 있게 설계된 셈인데, &lt;code&gt;RigidArray&lt;/code&gt;는 고정 capacity로 예측 가능한 성능을, &lt;code&gt;UniqueArray&lt;/code&gt;는 기하급수적 성장 곡선으로 편리한 동적 크기 조정을 제공합니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;둘 다 noncopyable 원소를 자연스럽게 담을 수 있어서, 그동안 &lt;code&gt;Array&lt;/code&gt;로는 손댈 수 없었던 고성능&amp;middot;저수준 영역에서 Swift가 훨씬 쓸모 있어질 것 같습니다  &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;hr contenteditable=&quot;false&quot; data-ke-type=&quot;horizontalRule&quot; data-ke-style=&quot;style5&quot; /&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;figure id=&quot;og_1785628327727&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0527-rigidarray-uniquearray.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0527-rigidarray-uniquearray.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0527-rigidarray-uniquearray.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/G0k5v/dJMb8Z3Gcjl/ImgwAeLuLAuBqWxjnx26f1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/yYVuK/dJMb8Yp91PG/A3OoYHm0TqP3UeaOvzLnj0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0527-rigidarray-uniquearray.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0527-rigidarray-uniquearray.md&quot;&gt;
-        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/G0k5v/dJMb8Z3Gcjl/ImgwAeLuLAuBqWxjnx26f1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/yYVuK/dJMb8Yp91PG/A3OoYHm0TqP3UeaOvzLnj0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
-        &lt;div class=&quot;og-text&quot;&gt;
-        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0527-rigidarray-uniquearray.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;/a&gt;&lt;/figure&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>일요아카데미 - AI의 현재와 미래</title>
-      <link>https://tech.jehyunlee.dev/2026/08/02/General-96_sundayacademy/</link>
-      <guid>https://tech.jehyunlee.dev/2026/08/02/General-96_sundayacademy/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;h2 id=&quot;0-일요아카데미&quot;&gt;0. 일요아카데미&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;성균관대 원병묵 교수님 초대로 일요아카데미에서 발표를 드렸습니다.&lt;/li&gt;
-        &lt;li&gt;수년간 여러 발표를 하면서 분절된 생각이 어느 정도 모여가더군요.&lt;/li&gt;
-        &lt;li&gt;&amp;lt;AI
-      </content:encoded>
-    </item>
-    <item>
-      <title>Unsloth DeepSeek V4는 정말 2배 빠를까? DGX Spark 두 대에서 확인해봤다</title>
-      <link>https://seapy.com/unsloth-deepseek-v4-2x-dgx-spark-benchmark/</link>
-      <guid>https://seapy.com/unsloth-deepseek-v4-2x-dgx-spark-benchmark/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded></content:encoded>
-    </item>
-    <item>
-      <title>DeepSeek V4 Flash API가 이렇게 싼데, 왜 DGX Spark 2대를 돌릴까?</title>
-      <link>https://seapy.com/deepseek-v4-flash-api-vs-2x-dgx-spark/</link>
-      <guid>https://seapy.com/deepseek-v4-flash-api-vs-2x-dgx-spark/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded></content:encoded>
-    </item>
-    <item>
-      <title>[Java] 에러 스택 트레이스 최적화를 도와주는 -XX:+OmitStackTraceInFastThrow(사라진 예외 스택 트레이스)</title>
-      <link>https://mangkyu.tistory.com/472</link>
-      <guid>https://mangkyu.tistory.com/472</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;color: #000000; text-align: start;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;color: #f15f5f;&quot;&gt;1. 에러 스택 트레이스 최적화를 도와주는 &lt;br /&gt;-XX:+OmitStackTraceInFastThrow(사라진 예외 스택 트레이스)&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;hr data-ke-style=&quot;style5&quot; data-ke-type=&quot;horizontalRule&quot; /&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ OmitStackTraceInFastThrow 옵션이란? ]&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;-XX:+OmitStackTraceInFastThrow 옵션은 JVM이 동일한 위치에서 반복해서 예외를 던질 경우, JIT 컴파일러가 스택트레이스와 메시지가 없는 싱글턴 예외로 바꿔 던지는 최적화 기법이다. 이는 JDK 1.4부터 기본 활성화되어 있는 상태이다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;예외 생성 비용의 대부분은 fillInStackTrace() 메서드로 콜스택을 훑어 프레임 배열을 만드는 작업이다. 스택이 깊으면 예외 하나당 수 ms씩 소요되곤 하는데, 같은 지점에서 뻔한 예외가 수천 번 반복되면 매번 스택을 뜨는게 낭비이다. 따라서 JIT이 그 메서드를 재컴파일하면서 미리 만들어 둔 예외 인스턴스를 던지도록 바꾼다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ OmitStackTraceInFastThrow 최적화의 대상 ]&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;이 최적화는 직접 new로 만들어 던지는 예외는 영향을 받지 않는다. 참고로 해당 예외는 JVM이 암묵적으로 던지는 예외만 해당한다. 이때 &amp;ldquo;JVM이 암묵적으로 던지는 예외&amp;rdquo;란, 바이트코드 내부에서 던져지는 예외라고 보면 된다. 다음의 &lt;a href=&quot;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&quot;&gt;Run-time Exception에 대한 정리&lt;/a&gt;를 보면, &amp;ldquo;어떤 명령어(instruction)의 실행으로 인해 런타임 예외가 발생할 수 있는 경우&amp;rdquo;가 존재함을 알 수 있다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;188&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcAcjtJ%2FdJMcaftZxFJ%2F9R0AvK8WjEEqu9XRc6BP6k%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;2048&quot; height=&quot;188&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;188&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;그리고 바이트코드에 대한 정의서를 보면, 각 바이트코드에 따라 Run-time Exception 필드가 존재하는데, 바이트코드 내부에서 던져지는 예외를 정의하고 있다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;그리고 여기서 얘기하는 &amp;ldquo;JVM이 암묵적으로 던지는 예외&amp;rdquo;란, 바로 바이트코드 명령어가 직접 던지는 예외를 의미하는 것이다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;731&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FKyc6D%2FdJMcabE6aWd%2FZ6JyifxYKJiyQN9b6g3KP1%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;2048&quot; height=&quot;731&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;731&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ 재현해보기 ]&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;다음의 간단한 코드로 문제 상황을 재현해볼 수 있다.&lt;/p&gt;
-        &lt;pre class=&quot;angelscript&quot;&gt;&lt;code&gt;/**
-        * 같은 자리에서 JVM 이 던지는 예외가 반복되면, JIT 이 스택트레이스와 메시지가 없는 예외로 바꿔 던진다. 이 옵션은 JVM 기본값이 true 라 별도 설정 없이 동작한다.
-        *   java FastThrow.java
-        *   java -XX:-OmitStackTraceInFastThrow FastThrow.java
-        */
-        public class FastThrow {
-        
-        static final int[] arr = new int[10];
-        
-        public static void main(String[] args) {
-        for (int i = 1; i &amp;lt;= 100_000; i++) {
-        try {
-        int x = arr[100];                  // 항상 범위를 벗어난다
-        } catch (ArrayIndexOutOfBoundsException e) {
-        if (e.getStackTrace().length == 0) {
-        System.out.printf(&quot;%,d 회째: 스택트레이스 사라짐, message=%s%n&quot;, i, e.getMessage());
-        return;
-        }
-        if (i == 1) {
-        System.out.printf(&quot;%,d 회째: 스택 %d줄, message=%s%n&quot;,
-        i, e.getStackTrace().length, e.getMessage());
-        }
-        }
-        }
-        System.out.println(&quot;10만 회까지 스택트레이스 유지됨&quot;);
-        }
-        }
-        
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;참고로 이때 임계치는 코드 구조와 JIT 컴파일 시점에 좌우된다. 같은 코드를 같은 JVM에서 돌리면 재현되지만, 코드가 조금만 달라져도 크게 바뀐다. 절대적인 기준값이 있는 게 아니다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;만약 이미 JIT 컴파일이 되어 있는 경우에는, 같은 지점 트랩이 PerBytecodeTrapLimit(기본 4) 만큼만 쌓이면 바로 전환된다. 위에서는 4만 회를 넘게 해야 최적화가 진행되는데, 이는 JIT 컴파일 자체를 기다린 시간이 대부분이라고 볼 수 있다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;참고자료&lt;/p&gt;
-        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;a href=&quot;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&quot;&gt;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>2026 한국정보올림피아드 2차 대회 문제 풀이</title>
-      <link>https://justicehui.github.io/koi/2026/08/04/koi-2026-2/</link>
-      <guid>https://justicehui.github.io/koi/2026/08/04/koi-2026-2/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>서론 2026년 7월 18일에 개최된 2026 한국정보올림피아드 2차대회 문제 풀이입니다.</content:encoded>
-    </item>
-    <item>
-      <title>요즘 가장 많이 쓰는 도구, Mux</title>
-      <link>https://xguru.net/2390/</link>
-      <guid>https://xguru.net/2390/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;a href=&quot;https://news.hada.io/topic?id=28504&quot;&gt;긱뉴스 Show GN&lt;/a&gt;에 올라와서 알게 된 도구인데요&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;mux&lt;/strong&gt;는 여러 tmux 세션에서 Claude Code, Codex 같은 AI CLI를 동시에 실행할 때, 각 세션의 &lt;strong&gt;상태를 미리 확인하고 빠르게 전환&lt;/strong&gt;할 수 있게 해주는 도구입니다.&lt;/p&gt;
-        &lt;p&gt;저는 AI CLI 관리보다는 서버에서 동시에 돌아가는 &lt;strong&gt;여러 tmux 세션 사이를 이동&lt;/strong&gt;할 때 더 많이 사용합니다.
-        전환하기 전에 &lt;strong&gt;실제 터미널 출력&lt;/strong&gt;을 볼 수 있어서, 세션에 직접 들어가지 않고도 현재 어떤 작업이 진행 중인지 빠르게 파악할 수 있는 점이 특히 좋습니다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Why Identity Is the Hardest Problem in Programming</title>
-      <link>https://evan-moon.github.io/2026/08/02/why-identity-is-hard-in-programming/en/</link>
-      <guid>https://evan-moon.github.io/2026/08/02/why-identity-is-hard-in-programming/en/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>Not long ago I saw the news that JEP 401, Java’s , had been merged into OpenJDK master. In plain terms it’s a proposal to introduce, at the language level, an object type that behaves like a value — one judged by the contents inside it rather than by a memory address or an ID. It isn’t finished, of course. It lands in JDK 28 as a preview and ships properly in March 2027, so for now you need a flag to touch it. The JEP document was written in 2020, but its root, Project Valhalla, started back in 2014 — twelve years of wrestling with it. Twelve years to graft a single question onto the surface of a language: when, and by what standard, do we call two objects with different memory addresses the same? What the Java community spent all that time on was, at bottom, redefining identity at the language level. But is that really a twelve-year problem? We already use  every day to decide whether two values are the same, so it’s hard to see what’s supposed to be so hard. Dig a little further, though, and you start to see why these people couldn’t nail down this one thing for twelve years. This post is about identity, the culprit behind an enormous amount of developer suffering.</content:encoded>
-    </item>
-    <item>
-      <title>동일성은 왜 프로그래밍에서 가장 어려운 문제인가</title>
-      <link>https://evan-moon.github.io/2026/08/02/why-identity-is-hard-in-programming/</link>
-      <guid>https://evan-moon.github.io/2026/08/02/why-identity-is-hard-in-programming/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>얼마 전 JEP 401, 그러니까 자바의 가 OpenJDK master에 머지됐다는 소식을 봤다. 쉽게 말해 메모리 주소나 식별자(ID) 대신 객체 내부의 값 자체를 기준으로 삼는, 즉 값(Value)처럼 동작하는 객체 타입을 언어 차원에서 도입하자는 제안이다. 물론 아직 다 끝난 건 아니다. JDK 28에 미리보기로 들어가고 정식 출시는 2027년 3월이라, 당분간은 플래그를 켜야 만져볼 수 있다. JEP 문서가 작성된 건 2020년이지만 그 뿌리인 Project Valhalla가 시작된 게 2014년이니 무려 12년이나 붙들고 있는 셈이다. 메모리 주소가 다른 두 객체를 “언제, 무엇을 기준으로 같다고 판단할 것인가”라는 질문 하나를 언어 표면에 고쳐 넣는 데 그만한 세월이 필요했다. 결국 자바 커뮤니티가 그 긴 시간 동안 씨름한 문제의 본질은 “이 두 개가 같은 것인가”라는 동일성을 언어 차원에서 다시 정의하는 작업이었다. 그런데 이게 12년이나 걸릴 만한 일일까? 어차피 우리는 이미 두 값이 동일함을 판단하는  연산자를 쓰고 있는데, 그게 뭐가 어렵다는 건지 잘 와닿지 않는다. 하지만 조금만 더 파고들어보면 왜 이 사람들이 12년 동안이나 이거 하나를 정의하지 못 했었는지 알 수 있다. 이번 포스팅에서는 많은 개발자들을 고통에 빠트리는 주범, 동일성에 대한 이야기를 해보려고 한다.</content:encoded>
-    </item>
-    <item>
-      <title>프로그래머의 수명</title>
-      <link>https://jeho.page/essay/2026/08/02/programmer-lifespan.html</link>
-      <guid>https://jeho.page/essay/2026/08/02/programmer-lifespan.html</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>제가 프로그래머라는 직업을 처음으로 가졌던 2006년에는 프로그래머의 수명이 짧다고 생각했습니다. 40대가 되면 은퇴해야 한다는 말을 많이 들었던 것 같고, 실제로 40살 넘는 프로그래머가 드물기도 했습니다. 제 직업이 그렇게 일찍 끝난 다는 게 살짝 불안하긴 했지만, 한참 나중의 일이니 큰 신경은 쓰지 않았던 것 같네요.</content:encoded>
-    </item>
-    <item>
-      <title>Dockhand 백업 기능으로 Docker 볼륨 2중 백업 구성하기</title>
-      <link>https://lamanus.kr/dockhand-backup-two-tier/</link>
-      <guid>https://lamanus.kr/dockhand-backup-two-tier/</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
-      <content:encoded>Dockhand 백업 기능으로 Docker 볼륨을 Garage에, 다시 Cloudflare R2로 백업하는 2단계 구성을 소개합니다.</content:encoded>
     </item>
     <item>
       <title>Istio External Authorization의 로컬리티 로드 밸런싱 확인하기</title>
       <link>https://blog.outsider.ne.kr/1807</link>
       <guid>https://blog.outsider.ne.kr/1807</guid>
-      <pubDate>Sat, 08 Aug 2026 15:25:41 GMT</pubDate>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;수많은 마이크로서비스가 있을 때 일부 서비스에 공통 인증이 필요한 상황을 가정해 보자. 비교적 간단한 JWT 토큰을 검증하는 정도라면 Istio의 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/security/request_authentication/&quot;&gt;RequestAuthentication&lt;/a&gt;을 사용할 수 있겠지만 더 복잡한 인증 로직이 있다면 이를 사용할 수 없다.&lt;/p&gt;
         &lt;p&gt;내부에 인증 서버가 이미 구축돼 있다고 할 때, 인증이 필요한 서비스는 인증 서버를 거치도록 해야 한다. 각 서비스에서 인증 서버로 리다이렉트하거나, 요청을 처리하기 전에 인증 서버에서 인증 여부를 확인하도록 구현할 수도 있다. 하지만 모든 서비스가 이를 구현하면 작업 비용이 많이 들고 구현 수준도 달라져 좋지 않다. 그런 면에서 가능하다면 인프라 차원에서 처리하는 것이 훨씬 좋다.&lt;/p&gt;
@@ -1991,6 +924,317 @@
         &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;22&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;        &lt;/span&gt;- &lt;span class=&quot;nt&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;ap-northeast-2c&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
         &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;trafficDistribution&lt;/code&gt;을 지정하면 위처럼 &lt;code&gt;hints.forZones&lt;/code&gt; 같은 힌트가 기록된다. 그러면 kube-proxy가 자신의 노드 zone 레이블과 &lt;code&gt;forZones&lt;/code&gt;를 비교해서 &lt;strong&gt;모든 엔드포인트에 힌트가 있고 그중 자신의 zone과 일치하는 게 하나 이상 있으면&lt;/strong&gt; 그 엔드포인트만 라우팅 대상으로 남긴다. 참고로 Istio가 이 힌트를 보진 않는다.&lt;/p&gt;
         &lt;p&gt;&lt;code&gt;PreferSameZone&lt;/code&gt; 구성을 따로 테스트해보진 않았지만, 최신 Kubernetes를 사용한다면 Istio가 없더라도 Zone Aware Routing을 적용하는 데 이 기능을 검토해볼 수 있다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>단점 대신 약점</title>
+      <link>https://jojoldu.tistory.com/883</link>
+      <guid>https://jojoldu.tistory.com/883</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;최근, 장기간의 이직 준비에 지친 분과 이야기를 나눴다.&lt;br&gt;면접 자리에만 가면 말을 제대로 전달하지 못하고, 대화가 수월하게 이어지지 않는다는 점이 자기 단점이라고 이야기하시길래 그건 단점이 아니라 약점일 뿐이라고 말씀드렸다.&lt;/p&gt;
+        &lt;p&gt;요즘 스스로 부족한 점을 발견할 때마다, 일부러 단점이라고 말하지 않으려고 한다.&lt;br&gt;습관처럼 &amp;quot;이게 내 단점이지&amp;quot;라는 말이 올라오면, 이를 꽉 깨물고 &amp;quot;이건 내 약점이야&amp;quot;라고 생각한다.&lt;/p&gt;
+        &lt;p&gt;영어로 미팅할 수도 없고,&lt;br&gt;고객이 원하는 것을 포착하는 감각도 떨어지고,&lt;br&gt;돈을 버는 감각도 뛰어나지 않다.&lt;br&gt;(요즘은 코딩도 너무 오래 쉬었다.)&lt;/p&gt;
+        &lt;p&gt;예전에는 이런 것들을 모두 내 &amp;quot;단점&amp;quot;이라고 생각했다.&lt;br&gt;근데 &amp;quot;영어를 못하는 게 내 단점이야&amp;quot;라고 말하면, 영어를 못하는 현재의 상태가 마치 나라는 사람의 결함처럼 느껴졌다.&lt;/p&gt;
+        &lt;p&gt;말은 능력 하나를 설명했을 뿐인데, 듣고 있는 나는 내 전체를 평가받은 것처럼 받아들인다.&lt;/p&gt;
+        &lt;p&gt;반면에 &amp;quot;영어는 지금 내 약점이야&amp;quot;라고 말하면 조금 달랐다.&lt;br&gt;지금은 영어가 약하다.&lt;br&gt;그러면 연습하면 된다.&lt;br&gt;다른 사람의 도움을 받을 수도 있고, 번역 도구를 쓸 수도 있고, 영어가 덜 필요한 다른 능력으로 보완할 수도 있다.&lt;br&gt;혹은 지금 내 삶에서 중요하지 않다면 우선순위를 뒤로 미룰 수도 있다.&lt;br&gt;어느 쪽이든 선택지가 생긴다.&lt;/p&gt;
+        &lt;p&gt;단점이라고 부를 때는 자책부터 했는데,&lt;br&gt;약점이라고 부르면 해야 할 것들을 떠올리게 된다.&lt;/p&gt;
+        &lt;p&gt;물론 단점이라는 말을 아예 없애려는 것은 아니다.&lt;br&gt;나 자신이나 다른 사람을 해치는 태도는 여전히 단점이라고 생각한다.&lt;br&gt;무례함.&lt;br&gt;폭력적인 성향.&lt;br&gt;잘못을 인정하지 않는 태도.&lt;br&gt;다른 사람을 반복해서 상처 입히면서도 대수롭지 않게 여기는 태도.&lt;br&gt;이런 건 &amp;quot;원래 내가 좀 그래&amp;quot;라고 받아들일 일이 아니다.&lt;br&gt;반성하고 고쳐야 한다.&lt;br&gt;(내가 그렇다는 건 아니고...)&lt;/p&gt;
+        &lt;p&gt;하지만 아직 잘하지 못하는 능력까지 나의 흠으로 만들고 싶지는 않다.&lt;br&gt;영어를 못하는 것도,&lt;br&gt;고객이 원하는 것을 포착하지 못하는 것도,&lt;br&gt;돈에 대한 감각이 부족한 것도&lt;br&gt;나라는 사람의 결함은 아니다.&lt;br&gt;그것은 지금의 내 약점이다.&lt;br&gt;키워 갈 수도 있고, 때로는 그대로 안고 살아갈 수도 있는 것들이다.&lt;/p&gt;
+        &lt;p&gt;사전에서 두 단어를 어떻게 구분하는지는 여기서 크게 중요하지 않다.&lt;br&gt;이것은 내가 나를 대하기 위해 만든 언어 규칙에 가깝다.&lt;br&gt;나는 자주 쓰는 단어가 결국 내 생각을 지배한다고 믿는다.&lt;br&gt;부족함을 계속 단점으로 부르면, 나는 나를 결함이 있는 사람으로 보게 될 것 같다.&lt;br&gt;반대로 약점이라고 부르면, 부족함을 외면하지 않으면서도 그 자리에 가능성을 남겨둘 수 있다.&lt;/p&gt;
+        &lt;p&gt;말만 바꾼다고 영어가 늘지는 않는다.&lt;br&gt;그분이 다음 면접에서 갑자기 말을 잘하게 되는 것도 아니다.&lt;/p&gt;
+        &lt;p&gt;그래도 말이 바뀌면, 그 부족함을 대하는 태도가 바뀐다.&lt;br&gt;&amp;quot;나는 왜 이것도 못하지?&amp;quot;에서&lt;br&gt;&amp;quot;이건 지금 내 약점이구나. 어떻게 더 나아질 수 있을까?&amp;quot;로.&lt;/p&gt;
+        &lt;p&gt;그래서 요즘은 이를 꽉 깨물고라도 고쳐 부르려고 한다.&lt;br&gt;&amp;quot;이게 내 단점이야&amp;quot; 대신, &amp;quot;이건 지금 내 약점이야&amp;quot;.&lt;/p&gt;
+        &lt;p&gt;계속 그렇게 부르다 보면, 그 부족함들은 정말로 내가 키워 갈 수 있는 영역이 될 것이라고 믿는다.&lt;/p&gt;
+        &lt;p&gt;내가 나를 부르는 말이, 내가 나를 대하는 방식이 될 테니까.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>[SE-0535] Add CLI for editing global mirrors configuration</title>
+      <link>https://green1229.tistory.com/632</link>
+      <guid>https://green1229.tistory.com/632</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;b&gt;그린&lt;/b&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0535 &amp;mdash; 전역 mirrors 설정을 위한 CLI 추가&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/kzmdg/dJMcaafgnfB/JginJjfYXHUs8tNKmKUXAk/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fkzmdg%2FdJMcaafgnfB%2FJginJjfYXHUs8tNKmKUXAk%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Intro&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;div style=&quot;background: #f2f8ee; border-radius: 10px; padding: 16px 20px; margin: 16px 0;&quot;&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0535&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Author:&lt;/b&gt; Samuel Murray&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Tim Condon&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Accepted&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift-package-manager#9950&lt;/span&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;SPM은 로컬(프로젝트 단위)과 공유(사용자 단위) mirrors 설정을 둘 다 지원하지만, CLI로는 로컬 설정 파일만 편집할 수 있었어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이 제안은 기존 CLI에 전역 설정을 편집할 수 있는 --global 플래그를 옵션으로 추가합니다.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Motivation&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;원래 mirrors는 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0219-package-manager-dependency-mirroring.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;최초 제안&lt;/a&gt;에서 설명된 대로 프로젝트별 로컬 설정만 가능했어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이후 릴리스에서 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-package-manager/pull/3670&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;전역 설정 파일 지원&lt;/a&gt;이 추가됐는데, &lt;b&gt;처음부터 로컬/전역 설정을 모두 지원해온 package registry의 디자인을 따른 거예요.&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;mirrors와 package registry의 전역 설정 파일은 특정 패키지를 항상 커스텀 URL에서 받아와야 하는 엔터프라이즈 환경에서 특히 유용해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;게다가 곧 추가될 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-package-manager/pull/9647&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;바이너리 타깃 미러링 지원&lt;/a&gt;으로 전역 설정의 유용함은 더 커질 예정입니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;하지만 현재는 전역 mirrors 설정을 쉽게 편집하고 확인할 방법이 없어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;유일한 방법은 설정 파일을 직접 만들고 손으로 편집하는 것뿐이죠. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이걸 위한 CLI를 제공하면 이미 있는 전역 package registry 기능과 결을 맞추면서, 전역 mirrors 설정의 발견 가능성도 높일 수 있습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Proposed Solution&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;로컬 설정 파일을 다루는 기존 CLI는 다음과 같아요.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config set-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config unset-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swift package config get-mirror&lt;/code&gt;&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 이 명령어들 각각에 선택적인 &lt;code&gt;--global&lt;/code&gt; 플래그를 추가합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예시&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;https://example.com/file.json&lt;/code&gt;의 mirror를 전역으로 추가하려면:&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;dsconfig&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config set-mirror --global --original https://example.com/file.json --mirror https://internal.com/file.json&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그러면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에 아래 내용이 추가돼요. (파일이 없으면 새로 만듭니다)&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;json&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;{
+        &quot;object&quot; : [
+        {
+        &quot;mirror&quot; : &quot;https://internal.com/file.json&quot;,
+        &quot;original&quot; : &quot;https://example.com/file.json&quot;
+        }
+        // ...
+        ],
+        &quot;version&quot; : 1
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 설정을 확인하려면:&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;dsconfig&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config get-mirror --global --original https://example.com/file.json
+        https://internal.com/file.json&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;설정을 해제하려면:&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;tcl&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config unset-mirror --global --original https://example.com/file.json&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;package registry용 CLI에서 아이디어를 얻어서, 이 명령어들 각각에 &lt;code&gt;--global&lt;/code&gt; 플래그를 추가하자고 제안해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예를 들면 &lt;code&gt;swift package config set-mirror --global [...]&lt;/code&gt; 이렇게요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 플래그와 함께 쓰면 명령어는 전역 설정 파일만 고려하게 됩니다. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 플래그를 쓰면 명령어를 어느 디렉터리에서든 실행할 수 있어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;반면 지금의 (플래그 없는) 명령어는 현재 디렉터리나 그 상위 디렉터리 어디에도 &lt;code&gt;Package.swift&lt;/code&gt;가 없으면 실패하죠.&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style3&quot;&gt;현재 swift package config get-mirror의 동작은, 로컬 설정 파일이 비어 있거나 없으면 전역 설정 파일을 읽는 방식이에요. &lt;br /&gt;제안자는 이 동작을 그대로 두자고 제안합니다. &lt;br /&gt;로컬 설정이 하나라도 있으면 전역 설정을 완전히 무시하는 것보다, 로컬을 더 높은 우선순위로 두고 로컬/전역을 병합하는 게 더 합리적이라고 생각하지만, 이건 이 제안과는 다소 별개의 주제라 후속 제안으로 다루는 게 좋겠다고 봤다고 합니다!&lt;/blockquote&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Detailed Design&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;--global&lt;/code&gt; 플래그와 함께 쓰는 모든 명령어는 어느 디렉터리에서든 사용할 수 있어요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;즉, 현재 디렉터리(또는 그 상위 디렉터리)에 &lt;code&gt;Package.swift&lt;/code&gt; 파일이 있을 필요가 없습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;--global&lt;/code&gt; 플래그 없이 쓰면 모든 명령어의 동작은 기존과 동일합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;set-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config set-mirror --help
+        OVERVIEW: Set a mirror for a dependency.
+        
+        USAGE: swift package config set-mirror [--global] [--original ] [--mirror ]
+        
+        OPTIONS:
+        --global                Apply settings to all projects for this user.
+        --original    The original url or identity.
+        --mirror        The mirror url or identity.
+        --version               Show the version.
+        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에 mirror 설정을 추가하거나, 파일이 없으면 새로 만듭니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;unset-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;$ swift package config unset-mirror --help
+        OVERVIEW: Remove an existing mirror.
+        
+        USAGE: swift package config unset-mirror [--original ] [--mirror ]
+        
+        OPTIONS:
+        --global                Apply settings to all projects for this user.
+        --original    The original url or identity.
+        --mirror        The mirror url or identity.
+        --version               Show the version.
+        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에서 일치하는 mirror 설정을 제거해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;일치하는 항목이 없거나 파일이 없으면 에러 메시지를 표시합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;get-mirror&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;routeros&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;OVERVIEW: Print mirror configuration for the given package dependency.
+        
+        USAGE: swift package config get-mirror [--original ]
+        
+        OPTIONS:
+        --global                Only read settings applied to all projects for this user.
+        --original    The original url or identity.
+        --version               Show the version.
+        -h, -help, --help       Show help information.&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 명령어를 실행하면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;에서 일치하는 mirror 설정을 가져와요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;일치하는 항목이 없거나 파일이 없으면 에러 메시지를 표시합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Security&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안이 보안에 미치는 영향은 미미해요. 사용자 홈 디렉터리에 있는 파일을 수정하거나 읽는 정도입니다. mirrors의 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0219-package-manager-dependency-mirroring.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;최초 제안&lt;/a&gt;에서는 전역 설정이 &quot;예상 못한 함정&quot; 같은 순간을 만들 수 있다는 우려가 있었지만, SPM에 전역 mirrors 설정 지원이 이미 추가된 상태라 이 CLI를 추가한다고 해서 새로운 이슈가 생기진 않습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Impact on Existing Packages&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 기존 패키지에 아무런 영향을 주지 않아요. 새 CLI 플래그를 추가할 뿐, 기존 동작은 전혀 바뀌지 않습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Conclusion&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;작지만 실용적인 CLI 개선이에요. 그동안 전역 mirrors 설정을 편집하려면 &lt;code&gt;~/.swiftpm/configuration/mirrors.json&lt;/code&gt;을 직접 손으로 만지는 수밖에 없었는데, &lt;code&gt;--global&lt;/code&gt; 플래그 하나로 &lt;code&gt;set-mirror&lt;/code&gt;, &lt;code&gt;unset-mirror&lt;/code&gt;, &lt;code&gt;get-mirror&lt;/code&gt;를 어느 디렉터리에서든 쓸 수 있게 됐어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;엔터프라이즈 환경에서 특정 패키지를 항상 내부 URL로 받아오게 설정해두고 싶을 때, 그리고 곧 추가될 바이너리 타깃 미러링과 함께 쓰기에도 훨씬 편리해질 것 같습니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;figure id=&quot;og_1786189403564&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0535-global-mirrors-configuration-cli.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/chaC8q/dJMb8Xku60Y/CXWKyTWcewmOCqXsS7KXN1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/btxF3C/dJMb8TCpsj9/hJ1yPW3IKLQsvDu5vfSb6K/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0535-global-mirrors-configuration-cli.md&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/chaC8q/dJMb8Xku60Y/CXWKyTWcewmOCqXsS7KXN1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/btxF3C/dJMb8TCpsj9/hJ1yPW3IKLQsvDu5vfSb6K/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;div class=&quot;og-text&quot;&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0535-global-mirrors-configuration-cli.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/a&gt;&lt;/figure&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Unsloth DeepSeek V4는 정말 2배 빠를까? DGX Spark 두 대에서 확인해봤다</title>
+      <link>https://seapy.com/unsloth-deepseek-v4-2x-dgx-spark-benchmark/</link>
+      <guid>https://seapy.com/unsloth-deepseek-v4-2x-dgx-spark-benchmark/</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded></content:encoded>
+    </item>
+    <item>
+      <title>DeepSeek V4 Flash API가 이렇게 싼데, 왜 DGX Spark 2대를 돌릴까?</title>
+      <link>https://seapy.com/deepseek-v4-flash-api-vs-2x-dgx-spark/</link>
+      <guid>https://seapy.com/deepseek-v4-flash-api-vs-2x-dgx-spark/</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded></content:encoded>
+    </item>
+    <item>
+      <title>[Java] 에러 스택 트레이스 최적화를 도와주는 -XX:+OmitStackTraceInFastThrow(사라진 예외 스택 트레이스)</title>
+      <link>https://mangkyu.tistory.com/472</link>
+      <guid>https://mangkyu.tistory.com/472</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;color: #000000; text-align: start;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;color: #f15f5f;&quot;&gt;1. 에러 스택 트레이스 최적화를 도와주는 &lt;br /&gt;-XX:+OmitStackTraceInFastThrow(사라진 예외 스택 트레이스)&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;hr data-ke-style=&quot;style5&quot; data-ke-type=&quot;horizontalRule&quot; /&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ OmitStackTraceInFastThrow 옵션이란? ]&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;-XX:+OmitStackTraceInFastThrow 옵션은 JVM이 동일한 위치에서 반복해서 예외를 던질 경우, JIT 컴파일러가 스택트레이스와 메시지가 없는 싱글턴 예외로 바꿔 던지는 최적화 기법이다. 이는 JDK 1.4부터 기본 활성화되어 있는 상태이다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;예외 생성 비용의 대부분은 fillInStackTrace() 메서드로 콜스택을 훑어 프레임 배열을 만드는 작업이다. 스택이 깊으면 예외 하나당 수 ms씩 소요되곤 하는데, 같은 지점에서 뻔한 예외가 수천 번 반복되면 매번 스택을 뜨는게 낭비이다. 따라서 JIT이 그 메서드를 재컴파일하면서 미리 만들어 둔 예외 인스턴스를 던지도록 바꾼다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ OmitStackTraceInFastThrow 최적화의 대상 ]&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;이 최적화는 직접 new로 만들어 던지는 예외는 영향을 받지 않는다. 참고로 해당 예외는 JVM이 암묵적으로 던지는 예외만 해당한다. 이때 &amp;ldquo;JVM이 암묵적으로 던지는 예외&amp;rdquo;란, 바이트코드 내부에서 던져지는 예외라고 보면 된다. 다음의 &lt;a href=&quot;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&quot;&gt;Run-time Exception에 대한 정리&lt;/a&gt;를 보면, &amp;ldquo;어떤 명령어(instruction)의 실행으로 인해 런타임 예외가 발생할 수 있는 경우&amp;rdquo;가 존재함을 알 수 있다.&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;188&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/cAcjtJ/dJMcaftZxFJ/9R0AvK8WjEEqu9XRc6BP6k/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcAcjtJ%2FdJMcaftZxFJ%2F9R0AvK8WjEEqu9XRc6BP6k%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;2048&quot; height=&quot;188&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;188&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;그리고 바이트코드에 대한 정의서를 보면, 각 바이트코드에 따라 Run-time Exception 필드가 존재하는데, 바이트코드 내부에서 던져지는 예외를 정의하고 있다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;그리고 여기서 얘기하는 &amp;ldquo;JVM이 암묵적으로 던지는 예외&amp;rdquo;란, 바로 바이트코드 명령어가 직접 던지는 예외를 의미하는 것이다.&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;731&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/Kyc6D/dJMcabE6aWd/Z6JyifxYKJiyQN9b6g3KP1/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FKyc6D%2FdJMcabE6aWd%2FZ6JyifxYKJiyQN9b6g3KP1%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;2048&quot; height=&quot;731&quot; data-origin-width=&quot;2048&quot; data-origin-height=&quot;731&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;[ 재현해보기 ]&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;다음의 간단한 코드로 문제 상황을 재현해볼 수 있다.&lt;/p&gt;
+        &lt;pre class=&quot;angelscript&quot;&gt;&lt;code&gt;/**
+        * 같은 자리에서 JVM 이 던지는 예외가 반복되면, JIT 이 스택트레이스와 메시지가 없는 예외로 바꿔 던진다. 이 옵션은 JVM 기본값이 true 라 별도 설정 없이 동작한다.
+        *   java FastThrow.java
+        *   java -XX:-OmitStackTraceInFastThrow FastThrow.java
+        */
+        public class FastThrow {
+        
+        static final int[] arr = new int[10];
+        
+        public static void main(String[] args) {
+        for (int i = 1; i &amp;lt;= 100_000; i++) {
+        try {
+        int x = arr[100];                  // 항상 범위를 벗어난다
+        } catch (ArrayIndexOutOfBoundsException e) {
+        if (e.getStackTrace().length == 0) {
+        System.out.printf(&quot;%,d 회째: 스택트레이스 사라짐, message=%s%n&quot;, i, e.getMessage());
+        return;
+        }
+        if (i == 1) {
+        System.out.printf(&quot;%,d 회째: 스택 %d줄, message=%s%n&quot;,
+        i, e.getStackTrace().length, e.getMessage());
+        }
+        }
+        }
+        System.out.println(&quot;10만 회까지 스택트레이스 유지됨&quot;);
+        }
+        }
+        
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;참고로 이때 임계치는 코드 구조와 JIT 컴파일 시점에 좌우된다. 같은 코드를 같은 JVM에서 돌리면 재현되지만, 코드가 조금만 달라져도 크게 바뀐다. 절대적인 기준값이 있는 게 아니다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;만약 이미 JIT 컴파일이 되어 있는 경우에는, 같은 지점 트랩이 PerBytecodeTrapLimit(기본 4) 만큼만 쌓이면 바로 전환된다. 위에서는 4만 회를 넘게 해야 최적화가 진행되는데, 이는 JIT 컴파일 자체를 기다린 시간이 대부분이라고 볼 수 있다.&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;참고자료&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;a href=&quot;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&quot;&gt;https://docs.oracle.com/javase/specs/jvms/se26/html/jvms-6.html&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>요즘 가장 많이 쓰는 도구, Mux</title>
+      <link>https://xguru.net/2390/</link>
+      <guid>https://xguru.net/2390/</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;a href=&quot;https://news.hada.io/topic?id=28504&quot;&gt;긱뉴스 Show GN&lt;/a&gt;에 올라와서 알게 된 도구인데요&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;mux&lt;/strong&gt;는 여러 tmux 세션에서 Claude Code, Codex 같은 AI CLI를 동시에 실행할 때, 각 세션의 &lt;strong&gt;상태를 미리 확인하고 빠르게 전환&lt;/strong&gt;할 수 있게 해주는 도구입니다.&lt;/p&gt;
+        &lt;p&gt;저는 AI CLI 관리보다는 서버에서 동시에 돌아가는 &lt;strong&gt;여러 tmux 세션 사이를 이동&lt;/strong&gt;할 때 더 많이 사용합니다.
+        전환하기 전에 &lt;strong&gt;실제 터미널 출력&lt;/strong&gt;을 볼 수 있어서, 세션에 직접 들어가지 않고도 현재 어떤 작업이 진행 중인지 빠르게 파악할 수 있는 점이 특히 좋습니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>2026 한국정보올림피아드 2차 대회 문제 풀이</title>
+      <link>https://justicehui.github.io/koi/2026/08/04/koi-2026-2/</link>
+      <guid>https://justicehui.github.io/koi/2026/08/04/koi-2026-2/</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>서론 2026년 7월 18일에 개최된 2026 한국정보올림피아드 2차대회 문제 풀이입니다.</content:encoded>
+    </item>
+    <item>
+      <title>나는 남 부끄럽지 않게 일하고 있을까</title>
+      <link>https://w0nder.land/posts/80-%EB%82%98%EB%8A%94%20%EB%82%A8%20%EB%B6%80%EB%81%84%EB%9F%BD%EC%A7%80%20%EC%95%8A%EA%B2%8C%20%EC%9D%BC%ED%95%98%EA%B3%A0%20%EC%9E%88%EC%9D%84%EA%B9%8C</link>
+      <guid>https://w0nder.land/posts/80-%EB%82%98%EB%8A%94%20%EB%82%A8%20%EB%B6%80%EB%81%84%EB%9F%BD%EC%A7%80%20%EC%95%8A%EA%B2%8C%20%EC%9D%BC%ED%95%98%EA%B3%A0%20%EC%9E%88%EC%9D%84%EA%B9%8C</guid>
+      <pubDate>Sun, 09 Aug 2026 15:27:07 GMT</pubDate>
+      <content:encoded>
+        인테리어라는 건 참 어렵다. 집을 고치려고 하면 공사 자체보다 사람에 대한 걱정이 먼저 생긴다. 공사하는 동안 자주 가서 확인해야 한다고 하고, 가능하면 돈은 나중에 주는 게 좋다는 이야기도 듣는다. 내가 현장에 없으면 대충하지 않을까, 내가 잘 모르는 부분이라고 적당히 넘어가지는 않을까, 돈을 이미 받았으니 이 정도면 됐다고 생각하지는 않을까. 결국 신뢰의 문제다.
+        그래서 사람들은 인테리어 업자들을 욕한다. 어떻게 돈을 받고 이렇게 대충 할 수 있느냐고, 조금만 더 신경 쓰면 되는 일을 왜 이렇게 했느냐고, 본인 집이라면 이렇게 했겠느냐고 말한다. 나 역시 인테리어와 관련된 이야기를 듣다 보면 비슷한 생각을 하게 된다. 그런데 한편으로는 이런 생각도 든다. 우리는 정말 저 사람들과 다른가.
+        물론 안 그런 사람들이 많다. 일부다. 일부. 하지만 그 말을 잠시 빼고 생각해보면, 나 역시 그 질문에서 완전히 자유롭지는 않은 것 같다. 우리는 다른 사람이 만든 결과물을 볼 때는 꽤 엄격하다. 돈을 받았으면 그만큼 잘해야 한다고 생각하고, 조금이라도 허술한 부분이 보이면 &quot;조금만 더 하면 되는 걸 왜 이렇게 했을까&quot;라고 생각한다. 그런데 정작 내가 무언가를 만들 때는 꽤 많은 이유를 가지고 스스로를 이해시킨다.
+        시간이 부족했으니까. 사람이 부족했으니까. 일정이 촉박했으니까. 다른 일이 더 중요했으니까. 고객이 요구사항을 계속 바꿨으니까. 회사에서 이 정도를 원했으니까. 어쩌면 모두 사실일 것이다. 실제로 일을 하다 보면 내가 원하는 만큼 결과물에 시간을 쏟을 수 없는 상황은 흔하다. 모든 일을 완벽하게 만들 수는 없고, 모든 일에 내 능력의 최대치를 쏟아부으며 살 수도 없다.
+        게다가 회사에서 일하다 보면 이런 생각이 드는 것도 너무 자연스럽다. 내가 왜 남 좋은 일을 해야 하지? 내가 조금 더 열심히 일한다고 해서 결국 더 많이 가져가는 건 대표나 주주 아닌가. 회사가 더 성장하고 매출이 늘어난다고 해서 그 과실이 나에게 그대로 돌아오는 것도 아닌데, 내가 왜 굳이 내 시간과 에너지를 더 써야 할까. 월급을 받는 만큼만 하면 되는 것 아닌가.
+        나는 이 생각 자체가 잘못됐다고 생각하지 않는다. 오히려 너무 당연한 질문이라고 생각한다. 회사에 내 삶을 전부 바칠 이유는 없다. 대표를 위해 희생할 필요도 없고, 회사가 잘되기 위해 내 삶의 중요한 것들을 포기할 필요도 없다. 더 많은 일을 한다고 해서 반드시 더 좋은 사람이 되는 것도 아니다. 내가 받는 보상과 역할에 맞는 수준을 요구하고, 정해진 시간에 일하고 퇴근하는 것도 충분히 정당한 태도다.
+        그런데 여기서 한 가지는 구분해야 하지 않을까 싶다. 회사를 위해 더 희생하지 않는 것과, 내가 맡은 일을 대충 하는 것은 같은 이야기가 아니다.
+        내 시간을 더 주지 않을 수 있다. 야근하지 않을 수도 있고, 회사가 더 성장할 수 있는 기회가 보인다고 해서 그것을 내 삶의 희생으로 해결할 필요도 없다. 하지만 내가 일하기로 한 시간 동안 내가 할 수 있는 일을 굳이 낮은 수준으로 만들어야 하는지는 또 다른 문제다.
+        나는 이 차이가 꽤 중요하다고 생각한다. 회사에 내 시간을 더 주는 것은 회사에 대한 추가적인 헌신일 수 있다. 하지만 내가 가진 능력을 제대로 사용하는 것은 조금 다른 문제다. 내가 알고 있는 더 나은 방법을 굳이 외면하고, 조금만 더 신경 쓰면 좋아질 부분을 &quot;월급만큼 했으니까&quot;라는 이유로 그냥 넘기는 순간부터는 회사와의 관계를 넘어 내 자신에 대한 이야기가 된다.
+        그래서 월급이 적다고 해서 결과물까지 그만큼 대충 만들어도 된다는 생각에는 선뜻 동의하기 어렵다. 그렇다고 월급을 많이 받으니 더 많이 희생해야 한다는 이야기도 아니다. 월급은 회사와 내가 합의한 노동의 대가이고, 내가 만든 결과물은 그 노동의 결과로 남는 것이다. 둘 사이에는 분명 관계가 있지만, 내가 받은 돈이 결과물의 품질을 대신 결정해주지는 않는다.
+        물론 좋은 결과물을 만드는 데에는 환경이 중요하다. 충분한 시간이 주어지는지, 사람이 있는지, 필요한 도구를 쓸 수 있는지, 제대로 판단할 수 있는 권한이 있는지에 따라 결과물은 달라진다. 계속해서 일정이 부족하고 자원이 주어지지 않는다면 아무리 잘하고 싶은 사람이라도 포기해야 하는 것들이 생긴다. 그러니 결과물의 품질을 오로지 개인의 의지나 성실함으로만 이야기하는 것도 공정하지 않다.
+        다만 그런 조건들이 내가 만든 결과물에 대한 설명은 될 수 있어도, 결과물 자체를 바꿔주지는 않는다. 시간이 부족해서 여기까지밖에 못 만들었다면 그렇게 판단한 것이다. 그렇다면 적어도 나는 그 결과물이 충분히 좋은지 아닌지는 알고 있어야 하지 않을까. &quot;이 돈 받고 이 정도면 됐지&quot;라는 말로 결과물에 대한 아쉬움까지 없던 일로 만들어버릴 필요는 없다는 것이다.
+        결국 내가 만든 것은 그대로 남는다. 회사가 얼마를 벌었는지와 별개로, 고객이 얼마나 만족했는지와 별개로, 내가 얼마를 받았는지와도 별개로 결과물은 남는다. 그리고 그 결과물을 만든 과정에서 내가 어떤 판단을 했는지도 결국 내 경험으로 남는다.
+        개인사업자라고 해서 무조건 더 좋은 결과물을 만들어야 하는 것도 아닐 것이다. 반대로 회사원이라고 해서 자기 것이 아니니 적당히 해도 되는 것도 아닐 것이다. 결국 자기 사업인지 아닌지가 본질은 아닌 것 같다. 내가 만든 것을 다시 봤을 때 스스로 납득할 수 있는가에 더 가까운 문제인 것 같다.
+        여기서 조금 불편한 질문이 하나 생긴다.
+        나는 남 부끄럽지 않게 일하고 있을까.
+        남들이 나를 어떻게 평가하는지를 묻는 질문은 아니다. 상사가 만족하는지, 고객이 칭찬하는지, 시장에서 성공했는지를 묻는 것도 아니다. 내가 만든 결과물을 누군가 앞에 꺼내놓으면서 &quot;나는 이 정도로 일하는 사람입니다&quot;라고 말해도 괜찮은가를 묻는 것이다.
+        이 질문이 불편한 이유는 내가 어디에서 타협했는지를 내가 알고 있기 때문이다. 다른 사람은 모를 수도 있다. 고객은 모를 수도 있고, 상사는 더더욱 모를 수도 있다. 하지만 나는 안다. 이 부분은 조금만 더 다듬었으면 좋았다는 것도 알고, 이 부분은 사실 귀찮아서 넘어갔다는 것도 알고, 이 부분은 시간이 없어서 어쩔 수 없었다는 것도 안다.
+        그래서 결과물에 대한 가장 엄격한 평가는 어쩌면 다른 사람이 아니라 나 자신에게서 시작되는지도 모르겠다.
+        그것이 꼭 회사에 대한 충성심일 필요도 없고, 더 많은 일을 하겠다는 약속일 필요도 없다. 그냥 내가 내 일을 바라보는 기준에 대한 이야기다. 회사에 내 시간을 더 주지 않더라도, 내가 일하기로 한 그 시간만큼은 내가 가진 능력을 제대로 사용하는 것. 나는 그것과 회사에 헌신하는 것을 굳이 같은 것으로 볼 필요는 없다고 생각한다.
+        그렇다고 모든 결과물을 완벽하게 만들자는 이야기는 아니다. 나 역시 그렇게 살고 싶지는 않다. 시간도 필요하고 돈도 필요하고 내 삶도 중요하다. 회사가 요구하는 모든 일을 내 일처럼 끌어안고 살 필요도 없다. 좋은 결과물을 만드는 것과 자기 삶을 갈아 넣는 것은 전혀 다른 이야기다.
+        오히려 중요한 것은 내가 무엇을 포기했는지를 알고 있는 것인지도 모른다. 시간이 없어서 여기까지 한 것과 그냥 이 정도면 됐다고 생각해서 여기까지 한 것은 다르다. 전자는 현실적인 판단이고, 후자는 나의 기준일 수 있다. 내가 더 잘할 수 있다는 것을 알고도 다른 이유를 붙여 넘어갔다면, 적어도 그 사실만큼은 스스로에게 솔직해야 한다.
+        그리고 그다음은 결국 내가 할 일이다. 결과물이 마음에 들지 않는다면, 그 불편함을 그냥 넘기지 않고 무엇이 부족한지 들여다봐야 한다. 실력의 문제라면 배우고, 경험의 문제라면 더 부딪혀보고, 기준의 문제라면 더 좋은 결과물을 찾아봐야 한다. 잘한다고 생각해도 더 좋은 것이 없는지 찾아봐야 하고, 다른 사람이 나보다 훨씬 좋은 결과물을 만들었다면 왜 좋은지 들여다봐야 한다. 그리고 다음에는 조금 더 잘 만들면 된다.
+        인테리어 업자에게 &quot;본인 집이라면 이렇게 했겠어요?&quot;라고 묻는 것처럼, 우리에게도 비슷한 질문을 해볼 수 있을 것 같다. 내가 이 서비스를 직접 쓴다면 이렇게 만들었을까. 내가 이 디자인을 내 이름을 걸고 보여줘도 괜찮을까. 내가 이 시스템을 앞으로 몇 년 동안 직접 사용해야 한다면 지금처럼 만들었을까. 결국 직업은 크게 중요하지 않다. 인테리어를 하든, 코드를 짜든, 디자인을 하든, 글을 쓰든, 제품을 만들든 누군가에게 돈을 받고 무언가를 만든다는 점에서는 비슷하다.
+        그래서 다른 사람의 결과물을 보며 &quot;어떻게 돈 받고 이렇게 하지?&quot;라고 말하기 전에 한 번쯤 내 결과물을 돌아볼 필요가 있다. 나는 정말 내가 받은 만큼 하고 있는가. 아니면 그보다 못하고 있는가. 조금만 더 잘할 수 있다는 것을 알면서도 그냥 넘어가고 있지는 않은가. 그리고 내가 만족하지 못한다는 사실을 일정이나 월급이나 회사나 고객 같은 수많은 이유 뒤에 그냥 묻어버리고 있는 것은 아닌가.
+        아마 나도 항상 남 부끄럽지 않게 일한다고 말하기는 어려울 것이다. 나 역시 적당히 타협한 적이 있고, 귀찮아서 넘어간 적도 있고, 시간이 없다는 이유로 포기한 적도 있다. 중요한 것은 그런 일이 없도록 완벽해지는 것이 아니라, 적어도 내가 그것을 알고 있는 것인지도 모르겠다. 내가 만든 결과물을 다시 봤을 때 마음 한구석이 불편하다면, 그 불편함을 너무 빨리 다른 이유로 덮어버리지 않는 것 말이다.
+        모든 결과물이 완벽할 필요는 없다. 모든 일을 최선을 다할 필요도 없다. 다만 내가 만든 것을 누군가에게 내놓으면서 &quot;이게 지금 내가 할 수 있는 만큼은 제대로 한 결과물입니다&quot;라고 말할 수 있었으면 좋겠다. 부족하다면 인정하고, 공부하고, 다음에 더 잘하면 된다. 잘 만들었다면 거기서 멈추지 않고 더 좋은 것을 찾아보면 된다.
+        어쩌면 장인정신이라는 것도 거창한 것이 아닐 것이다. 매일 밤늦게까지 일하는 것도 아니고, 회사에 헌신하는 것도 아니다. 내가 만든 것을 남 앞에 내놓았을 때 남 부끄럽지 않은 것. 그리고 만약 부끄럽다면 그 사실을 그럴듯한 이유로 덮어버리지 않는 것. 결국 내가 만든 결과물에는 내가 일하는 방식과 내가 가진 기준이 어느 정도는 남기 때문이다.
+        그래서 다른 사람의 일을 보며 쉽게 실망하거나 화가 날 때면, 나에게도 같은 질문을 해보려고 한다.
+        나는 남 부끄럽지 않게 일하고 있을까.
+        아마 매번 그렇다고 대답할 수는 없을 것이다. 그렇다면 적어도 무엇이 부끄러운지는 알고 있어야겠다. 그리고 그다음에는 조금 더 잘하면 된다. 그것이 지금 내가 생각하는, 일을 잘한다는 것에 가장 가까운 모습이다.
       </content:encoded>
     </item>
   </channel>
