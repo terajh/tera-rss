@@ -4,15 +4,56 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 10 Aug 2026 16:25:17 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 11 Aug 2026 16:28:45 GMT</lastBuildDate>
     <item>
-      <title>Quoting OpenClaw</title>
+      <title>Introducing Muse Glimmer</title>
+      <link>https://simonwillison.net/2026/Aug/10/introducing-muse-glimmer/#atom-everything</link>
+      <guid>https://simonwillison.net/2026/Aug/10/introducing-muse-glimmer/#atom-everything</guid>
+      <pubDate>Mon, 10 Aug 2026 23:56:03 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://research.meta.ai/blog/introducing-muse-glimmer-open-agentic-model&quot;&gt;Introducing Muse Glimmer&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Meta are back in the open weights game! Muse Glimmer is a brand new 30B model under a clean Apache 2.0 license (a step up from the janky Llama licenses of old).&lt;/p&gt;
+        &lt;p&gt;They claim to have optimized it for exactly the kind of things I&apos;m looking for in a local model:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;End-to-end Agentic Task Completion.&lt;/strong&gt; Muse Glimmer achieves strong success rates on full-task benchmarks including DeepSearch QA, MCP-Atlas, 𝛕-Bench and SWE-Bench, which measure its ability to work within scaffolds, write and debug code, and resolve multi-turn requests from start to finish.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Reliable Tool Use.&lt;/strong&gt; The model handles a wide range of function calls, invoking tools with precise schemas throughout extended workflows.&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Multi-Step Reasoning.&lt;/strong&gt; Muse Glimmer chains reasoning over long horizons, sustaining coherent plans across complex, extended workflows. [...]&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/f20d4cd0ea7596990f7910ead616493e&quot;&gt;a pelican&lt;/a&gt; which I generated using LM Studio&apos;s &lt;a href=&quot;https://lmstudio.ai/models/muse-glimmer&quot;&gt;18.16 GB version of the model&lt;/a&gt;:&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;All the pieces are there but they are pretty jumbled together.&quot; src=&quot;https://static.simonwillison.net/static/2026/glimmer-pelican.png&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;I also tried it out with my &lt;a href=&quot;https://github.com/simonw/llm-coding-agent&quot;&gt;llm-coding-agent&lt;/a&gt; plugin, running against a fresh checkout of Datasette with the prompt:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;how does auth work?&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;&lt;a href=&quot;https://gist.github.com/simonw/3623676275da1a6078b2500dcc78116f#response-24&quot;&gt;Here&apos;s the response&lt;/a&gt;, at the end of a long transcript showing all of the tool calls it made to explore the codebase. I ran this using &lt;code&gt;llm-lmstudio&lt;/code&gt; with &lt;a href=&quot;https://github.com/agustif/llm-lmstudio/pull/14&quot;&gt;this patch applied&lt;/a&gt; to upgrade it for compatibility with &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-32&quot;&gt;LLM 0.32&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;I really like this size of model, because if a machine has 32 GB of RAM or more (mine has 128GB) it leaves plenty of space for running other applications at the same time.&lt;/p&gt;
+        &lt;p&gt;Glimmer is a vision model, so I asked it to describe this image:&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;llm -m lmstudio/meta/muse-glimmer -a https://static.inaturalist.org/photos/714731804/large.jpg &apos;describe image&apos;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Two pelicans on some rocks&quot; src=&quot;https://static.simonwillison.net/static/2026/pelicans-on-rocks.jpg&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/288ef0dd33a913455d1b1ecc329637e0#response&quot;&gt;what I got back&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;The photograph shows a rocky, breakwater-style shoreline on an overcast day with a smooth, gray body of water and a faint dock/pier line in the soft-focused background.&lt;/p&gt;
+        &lt;p&gt;In the foreground two large brown pelicans, &lt;em&gt;Pelecanus occidentalis&lt;/em&gt;, are perched on the jumbled gray-white stones. They have the species’ characteristic long, down-curved yellow-orange bills with a large throat pouch, long slender necks and mottled brown-gray plumage on the back and wings. The pelican on the left is turned slightly toward the camera and appears to be preening or resting its bill against its chest; a pale, whitish patch is visible on the crown and nape and a small crest of feathers is raised. The pelican on the right faces mostly forward/right, its head up, bill pointing down and to the right, with the same pale head markings and the barred, darker wing feathers clearly visible.&lt;/p&gt;
+        &lt;p&gt;Scattered among the rocks around the two pelicans are several much smaller dark birds — gulls/tern-like birds in muted brown-gray plumage. One dark bird sits on the far left on a rock, another brownish bird stands to the right of the right-hand pelican, a grayish bird with a reddish bill is in the lower right foreground, and a further small dark bird is at the extreme right edge of the frame. &lt;/p&gt;
+        &lt;p&gt;The overall light is flat and diffused, giving the water and sky a muted, almost monochromatic palette that contrasts with the textured rock and the detailed feathering of the pelicans. The composition places the two big birds as the dominant subjects, framed against the calm water and the low, rocky perch.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49241679&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llama&quot;&gt;llama&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/local-llms&quot;&gt;local-llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/vision-llms&quot;&gt;vision-llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/meta&quot;&gt;meta&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting OpenClaw (running Opus 4.6)</title>
       <link>https://simonwillison.net/2026/Aug/10/openclaw/#atom-everything</link>
       <guid>https://simonwillison.net/2026/Aug/10/openclaw/#atom-everything</guid>
       <pubDate>Mon, 10 Aug 2026 02:05:16 GMT</pubDate>
       <content:encoded>
         &lt;blockquote cite=&quot;https://www.abc.net.au/news/2026-08-10/ai-assistant-hacks-gym-website-aus-cyber-attack/107007986&quot;&gt;&lt;p&gt;The API has zero authorisations checks on cancelling other people&apos;s reservations … I tested this with the person in waitlist position #1 — and it actually went through. So you&apos;ve moved from #4 to #3 already.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.abc.net.au/news/2026-08-10/ai-assistant-hacks-gym-website-aus-cyber-attack/107007986&quot;&gt;OpenClaw&lt;/a&gt;, hacking an Australian gym-booking website&lt;/p&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.abc.net.au/news/2026-08-10/ai-assistant-hacks-gym-website-aus-cyber-attack/107007986&quot;&gt;OpenClaw (running Opus 4.6)&lt;/a&gt;, hacking an Australian gym-booking website&lt;/p&gt;
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openclaw&quot;&gt;openclaw&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-security-research&quot;&gt;ai-security-research&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
@@ -906,33 +947,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/json&quot;&gt;json&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Open letters about AI development</title>
-      <link>https://simonwillison.net/2026/Aug/2/open-letters/#atom-everything</link>
-      <guid>https://simonwillison.net/2026/Aug/2/open-letters/#atom-everything</guid>
-      <pubDate>Sun, 02 Aug 2026 04:16:52 GMT</pubDate>
-      <content:encoded>
-        &lt;h4&gt;Open letters about AI development&lt;/h4&gt;
-        &lt;p&gt;&lt;em&gt;I wrote this summary of the past few weeks of open letters as a section of &lt;a href=&quot;https://simonwillison.net/2026/Aug/2/july-newsletter/&quot;&gt;my sponsors-only newsletter&lt;/a&gt; but I&apos;ve decided to share it here as well.&lt;/em&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.microsoft.com/en-us/corporate-responsibility/topics/open-weight/&quot;&gt;Open Weights and American AI Leadership&lt;/a&gt;&lt;/strong&gt; was shepherded by Microsoft, dated July 24th, and signed by 235 AI-adjacent companies including NVIDIA (see Jensen&apos;s &lt;a href=&quot;https://twitter.com/jensenhuang/status/2080643682408321103&quot;&gt;first ever tweet&lt;/a&gt;), Amazon, Y Combinator, The Linux Foundation, and (a later signer) OpenAI.&lt;/p&gt;
-        &lt;p&gt;It&apos;s clearly an argument designed to counter &lt;a href=&quot;https://www.axios.com/2026/07/20/ai-us-china-open-source-kimi&quot;&gt;any instincts&lt;/a&gt; by the current US government to ban or limit open weight models over &quot;safety&quot; concerns - a reasonable consideration given &lt;a href=&quot;https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/&quot;&gt;what happened to Claude Fable 5&lt;/a&gt;!&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Relying solely on closed models is not inherently safe: they can be breached, misused, or fail in ways that outsiders cannot detect. And concentrating advanced AI capabilities behind a small number of closed models compounds that risk. It results in a small number of single points of failure, weakens competition, and leaves critical technology in the hands of a few providers. Open weight models, on the other hand, allow a broad community of researchers and developers to examine their behavior, identify vulnerabilities, develop safeguards, and improve them over time.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;The one surprising note in the letter is that it comes out in support of distillation, where models train on output from other models:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;In shaping this ecosystem, policymakers should be careful not to conflate legitimate model-development techniques with misappropriation. Distillation, or the practice of using one model’s outputs to help train or improve another, is a widely used technique for model improvement, evaluation, and validation. It reflects a long tradition of learning from, building upon, and improving existing technologies, a tradition that has helped drive innovation since the rise of the open-source software movement.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Notably absent from the signatures: Anthropic, who published their own response &lt;a href=&quot;https://www.anthropic.com/news/position-open-weights-models&quot;&gt;Our position on open-weights models&lt;/a&gt; three days later. CEO Dario Amodei doubled down on the risk of authoritarian governments building &quot;AI models that are more powerful than those built by the US&quot;, and models being &quot;misused to carry out cyberattacks or biological attacks&quot;, and called for &quot;a crack down on industrial-scale &lt;a href=&quot;https://www.anthropic.com/news/detecting-and-preventing-distillation-attacks&quot;&gt;distillation operations&lt;/a&gt;&quot;, while also stating that &quot;Anthropic has never advocated for a ban on open-weights models&quot;.&lt;/p&gt;
-        &lt;p&gt;Then on July 28th &lt;a href=&quot;https://www.pacingthefrontier.com&quot;&gt;Pacing the Frontier&lt;/a&gt; was published, featuring signatures from &quot;1,324 employees of frontier AI companies&quot; - with names like Jakub Pachocki (Chief Scientist, OpenAI), Ilya Sutskever (Safe Superintelligence Inc, previously OpenAI), Dario Amodei (Anthropic), Jack Clark (Anthropic) and more. Their core message:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;We request that the U.S. government support an international effort to develop the technical and governance tools needed to deliberately pace the frontier of automated AI development.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Their concern is intense competitive pressure combined with accelerated AI progress caused by automated AI research - and given that Anthropic &lt;a href=&quot;https://www.anthropic.com/institute/recursive-self-improvement&quot;&gt;produce 80% of their code with Claude Code&lt;/a&gt;, OpenAI had Sol &lt;a href=&quot;https://openai.com/index/gpt-5-6-frontier-intelligence-efficiency/&quot;&gt;reduce their end-to-end serving costs by 20%&lt;/a&gt;, and Kimi K3 &lt;a href=&quot;https://www.kimi.com/blog/kimi-k3#chip-design&quot;&gt;designed a chip to serve a nano model built on its own architecture&lt;/a&gt;, you can see why people are taking that risk more seriously right now.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
