@@ -4,12 +4,67 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 11 Aug 2026 16:28:40 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 12 Aug 2026 16:26:59 GMT</lastBuildDate>
+    <item>
+      <title>&lt;file-preview&gt; - A simple web component for file previews</title>
+      <link>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</link>
+      <guid>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</guid>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;This was a &amp;quot;I can&apos;t fall asleep and my mind is wondering&amp;quot; type of idea and honestly, I&apos;m surprised at how good it came out. For a while now I&apos;ve shared demos where a user picks an image and ... something. It doesn&apos;t matter. But I typically add a preview of the image when it&apos;s selected. This works because once the user selects a file on their local system, JavaScript can then access the bits of that file, making it trivial then to render it. The idea I had, late at night, was simple - what if this could be a web component and expanded to cover different file types?&lt;/p&gt;
+        &lt;p&gt;In my imagination, it would look something like this in code:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form&amp;gt;
+        &amp;lt;!-- various other form things --&amp;gt;
+        &amp;lt;label for=&amp;quot;upload&amp;quot;&amp;gt;Select a file: &amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;upload&amp;quot; name=&amp;quot;upload&amp;quot;&amp;gt;
+        &amp;lt;file-preview file-id=&amp;quot;upload&amp;quot;&amp;gt;&amp;lt;/file-preview&amp;gt;
+        &amp;lt;/form&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The component takes one attribute, &lt;code&gt;file-id&lt;/code&gt;, which points to the ID value of the field to monitor. As for preview support, I figured I could cover these:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Images (of course)&lt;/li&gt;
+        &lt;li&gt;HTML, .txt&lt;/li&gt;
+        &lt;li&gt;Markdown (after converting to HTML)&lt;/li&gt;
+        &lt;li&gt;Office docs (Using the excellent &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library)&lt;/li&gt;
+        &lt;li&gt;PDF (ditto)&lt;/li&gt;
+        &lt;li&gt;Audio and Video (using the browser&apos;s built-in support)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;And more. I decided to let Cursor take a swing at this, so I started with this prompt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;I want to create a web component that does the following:
+        
+        It&apos;s tied to a input[type=file] control. When the user selects a file, it attempts to preview it. 
+        
+        It looks like so: &amp;lt;file-preview file-id=&amp;quot;id of file field&amp;quot;&amp;gt;&amp;lt;/file-preview&amp;gt;
+        
+        The user would position/size it with CSS as they see fit. The component would support previews for:
+        
+        * Office docs and PDFs via https://officeparser.harshankur.com/. This will be lazy loaded when a matching file type is selected. It will render the HTML version
+        * HTML docs - as is.
+        * Markdown - parse to HTML via the `marked` library and render the HTML
+        * Images - render as usual
+        * Video and Audio - create a new instance of &amp;lt;video&amp;gt; or &amp;lt;audio&amp;gt; so the user could click play to preview
+        
+        Anything else I&apos;m missing?
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Cursor came back with a bunch of suggestions, including supporting text type documents (JSON, txt, etc) and said it should handle noting when the associated file field was reset.&lt;/p&gt;
+        &lt;p&gt;And that was pretty much it. In the first iteration there was a bug with the iframe it used to render a PDF. This was due to the iframe&apos;s &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox&quot;&gt;sandbox&lt;/a&gt; value and easily corrected.&lt;/p&gt;
+        &lt;p&gt;Cursor&apos;s agent also built a good demo (&lt;a href=&quot;https://cfjedimaster.github.io/file-preview/index.html&quot;&gt;https://cfjedimaster.github.io/file-preview/index.html&lt;/a&gt;) but it was focused on the component, and not a &amp;quot;real&amp;quot; form.&lt;/p&gt;
+        &lt;p&gt;I returned to Cursor with this prompt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;the demo you built in index.html is ok, but the idea here was to 
+        include the web component in a form. make a new file, demo.html, 
+        and have a few form fields in it, one of which is the file 
+        preview. just have it post to nothing that&apos;s fine
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And that created a better demo (imo!):&lt;/p&gt;
+        &lt;iframe src=&quot;https://cfjedimaster.github.io/file-preview/demo.html&quot; style=&quot;width:100%; height: 600px&quot;&gt;&lt;/iframe&gt;
+        &lt;p&gt;You can see the full code at the repo here: &lt;a href=&quot;https://github.com/cfjedimaster/file-preview&quot;&gt;https://github.com/cfjedimaster/file-preview&lt;/a&gt;. If enough people ask (ok, let&apos;s say 2), I&apos;ll put this up on NPM for easier installation.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Links For You (8/2/26)</title>
       <link>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</link>
       <guid>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy August folks. Louisiana is celebrating the approach of Fall by gradually increasing the temperatures to roughly that of the surface of the sun. Last night we saw the new Spider-Man, which was really good, although not as fantastic as &amp;quot;No Way Home&amp;quot;. The point of these posts is for me to share content from other folks, but I&apos;ll remind folks of my &lt;a href=&quot;https://youtube.com/user/theraymondcamden&quot;&gt;Youtube channel&lt;/a&gt;. This past week I shared a few new videos demonstrating some cool stuff with Cursor so if you&apos;ve not checked them out yet, give me a quick watch and let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;web-browsing-on-your-gaming-console&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#web-browsing-on-your-gaming-console&quot;&gt;Web browsing on your gaming console&lt;/a&gt;&lt;/h2&gt;
@@ -40,7 +95,7 @@
       <title>Updating my Watch Site for Algolia Support</title>
       <link>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</link>
       <guid>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Alright, so I was supposed to share this a bit quicker, but life, work, etc, kept me busy. I&apos;ve had this particular change up for a few days but I&apos;m just now getting around to blogging about it. What changes?&lt;/p&gt;
         &lt;ul&gt;
@@ -324,7 +379,7 @@
       <title>Building Agentically and Celebrating Watches</title>
       <link>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</link>
       <guid>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared past experiences with vibe coding and it&apos;s been a fascinating way to experiment and build on a small scale, but while it works well for POCs and other small utilities (I won&apos;t say &apos;toys&apos; as I&apos;ve built useful, if small, things now multiple times), it isn&apos;t really a &amp;quot;process&amp;quot; and not one that would work over a project with a longer time frame. This is where &amp;quot;Agentic Development&amp;quot; comes in. It&apos;s not always referred to as such and it&apos;s a huge topic, but let me give you my opinion on it and then demonstrate how I used it to build my newest project, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;agentic-development-in-a-nutshell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agentic-development-in-a-nutshell&quot;&gt;Agentic Development in a Nutshell&lt;/a&gt;&lt;/h2&gt;
@@ -495,7 +550,7 @@
       <title>Copying HTML Tables as Text, Markdown, and CSV</title>
       <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
       <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
         &lt;p&gt;First, I added a table of course:&lt;/p&gt;
@@ -681,7 +736,7 @@
       <title>Links For You (7/18/26)</title>
       <link>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</link>
       <guid>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs. I&apos;m currently at a conference (&lt;a href=&quot;https://www.sqlsatbr.com/&quot;&gt;Day of Data&lt;/a&gt;), but thankfully one just down the road. I&apos;ll be back tonight, and thought I&apos;d take a break between sessions to share some links. I&apos;ll be presenting later today one of my favorite talks, &amp;quot;A Beginner&apos;s Guide to Wrangling Asynchronicity in JavaScript&amp;quot;. I love the talk, but given I&apos;m up against &lt;em&gt;eight&lt;/em&gt; other talks at the same time and I&apos;m not talking AI... well it may be a small personal affair. We shall see.&lt;/p&gt;
         &lt;h2 id=&quot;building-a-blog-with-astro&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-blog-with-astro&quot;&gt;Building a Blog with Astro&lt;/a&gt;&lt;/h2&gt;
@@ -706,7 +761,7 @@
       <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
       <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
       <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
         &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
@@ -883,7 +938,7 @@
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -1140,7 +1195,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -1467,7 +1522,7 @@
       <title>My New Role - Helping AI Adoption at Cursor</title>
       <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
       <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
+      <pubDate>Wed, 12 Aug 2026 16:08:01 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
         &lt;p&gt;
@@ -1475,45 +1530,6 @@
         &lt;/p&gt;
         &lt;p&gt;I&apos;m starting today as an AI Adoption Engineer, which basically boils down to helping our customers make better use of Cursor and AI in general. If you&apos;ve been visiting my site for a while now, you know I&apos;ve been using AI for quite some time, but more importantly, I&apos;ve also been adopting AI in my own workflows and processes. It takes time and energy but the payoff can be so incredible, and that&apos;s what I get to help our developers with.&lt;/p&gt;
         &lt;p&gt;Happy Day One!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (7/5/26)</title>
-      <link>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</link>
-      <guid>https://www.raymondcamden.com/2026/07/05/links-for-you-7526</guid>
-      <pubDate>Tue, 11 Aug 2026 16:04:47 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/06/21/links-for-you-62126&quot;&gt;last links post&lt;/a&gt;, I hinted that I may have some good news on the job front, and if you follow me on &lt;a href=&quot;https://linkedin.com/in/raymondcamden&quot;&gt;LinkedIn&lt;/a&gt; you already know that I&apos;ve signed on to my next gig. Tomorrow morning I&apos;ll share on here (and on LI) details about the new gig, but I am &lt;em&gt;beyond&lt;/em&gt; excited about this new job. With that out of the way, how about some happy links for what&apos;s going to be a really dang good week?&lt;/p&gt;
-        &lt;h2 id=&quot;javascript-in-the-shadows&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#javascript-in-the-shadows&quot;&gt;JavaScript in the Shadows&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As one of the new proposals for JavaScript, the &lt;a href=&quot;https://github.com/tc39/proposal-shadowrealm&quot;&gt;ShadowRealm API&lt;/a&gt; is pretty interesting. It allows for the creation of a realm, or in my mind, an environment, with JavaScript that is 100% disconnected from the main environment of your browser window. Mat Marquis gives a great introduction to this in &lt;a href=&quot;https://css-tricks.com/soon-we-can-finally-banish-javascript-to-the-shadowrealm/&quot;&gt;Soon We Can Finally Banish JavaScript to the ShadowRealm&lt;/a&gt; over on CSS Tricks. (If for some reason you&apos;ve never heard of &lt;a href=&quot;https://css-tricks.com&quot;&gt;css-tricks&lt;/a&gt;, you should absolutely bookmark it and make it part of your required reading.) Mat&apos;s introduction is a pretty fun read as well.&lt;/p&gt;
-        &lt;h2 id=&quot;brownies-for-storage&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#brownies-for-storage&quot;&gt;Brownies for Storage&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;m a sucker for anything browser-storage related, and &lt;a href=&quot;https://github.com/franciscop/brownies&quot;&gt;Brownies&lt;/a&gt; is a great example of that. Brownies is a library that wraps cookies, Web Storage, and IndexedDB, all in one. Here&apos;s an example from their docs:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { cookies, local, db } from &apos;brownies&apos;;
-        
-        cookies.token = 42;     // Set it
-        let t = cookies.token;  // Get it
-        delete cookies.token;   // Eat it
-        
-        local.token = 42;       // Set it
-        let t = local.token;    // Get it
-        delete local.token;     // Del it
-        
-        // db is ASYNC so read is different
-        db.token = 42;          // Set it
-        let t = await db.token; // Get it
-        delete db.token;        // Del it
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This looks quite delicious. It&apos;s probably not fair to say it is a wrapper for IndexedDB as from what I can see, it&apos;s just doing a key/value store and not letting you specify custom object stores and such. In fact, the docs for &lt;code&gt;db&lt;/code&gt; seem to be missing, and the repository doesn&apos;t have issues enabled so I&apos;m going to have to find another way to leave that feedback, but check it out nonetheless. (I sent the author an email about this.)&lt;/p&gt;
-        &lt;h2 id=&quot;don&apos;t-use-javascript!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#don&apos;t-use-javascript!&quot;&gt;Don&apos;t use JavaScript!&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;My first two links were JavaScript related, so why not advise &lt;em&gt;against&lt;/em&gt; JavaScript in my third link? While not an &amp;quot;anti&amp;quot; JavaScript resource, &lt;a href=&quot;https://aarontgrogg.github.io/NoLoJS/&quot;&gt;NoLoJS&lt;/a&gt; is a resource showing multiple different UX/UI components that can be built with no, or at least little, JavaScript. As I &lt;a href=&quot;https://www.raymondcamden.com/2026/07/01/building-custom-form-selection-blocks-no-js-all-css&quot;&gt;discovered last week&lt;/a&gt;, there&apos;s a lot you can do with CSS and removing JavaScript dependencies is just one benefit.&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Yesterday was July 4th which means hot dogs and fireworks and that&apos;s all... right? Unsurprisingly, there&apos;s quite a few examples of fireworks being rendered in HTML. Here&apos;s one fun example that&apos;s pure CSS:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;700&quot; data-pen-title=&quot;Pure CSS Fireworks&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;WNMmQX&quot; data-user=&quot;yshlin&quot; style=&quot;height: 700px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/yshlin/pen/WNMmQX&quot;&gt;
-        Pure CSS Fireworks&lt;/a&gt; by Eddie Lin (&lt;a href=&quot;https://codepen.io/yshlin&quot;&gt;@yshlin&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
