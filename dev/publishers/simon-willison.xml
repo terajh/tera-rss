@@ -4,7 +4,76 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Thu, 13 Aug 2026 16:34:40 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 14 Aug 2026 16:16:21 GMT</lastBuildDate>
+    <item>
+      <title>sqlite-utils 4.2.1</title>
+      <link>https://simonwillison.net/2026/Aug/13/sqlite-utils-2/</link>
+      <guid>https://simonwillison.net/2026/Aug/13/sqlite-utils-2/</guid>
+      <pubDate>Thu, 13 Aug 2026 23:53:47 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/sqlite-utils/releases/tag/4.2.1&quot;&gt;sqlite-utils 4.2.1&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Fixes a crashing bug in &lt;a href=&quot;https://simonwillison.net/2026/Aug/13/sqlite-utils/&quot;&gt;sqlite-utils 4.2&lt;/a&gt;. I&apos;d introduced code that looks like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;from typing_extensions import Self
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It turned out the &lt;a href=&quot;https://pypi.org/project/typing-extensions/&quot;&gt;typing-extensions&lt;/a&gt; package was not listed as a dependency for &lt;code&gt;sqlite-utils&lt;/code&gt; - it was installed by one of the other dependencies in the &lt;a href=&quot;https://github.com/simonw/sqlite-utils/blob/56dd09702fdb9e899f577ffd51693c1f2176cb08/pyproject.toml#L34-L55&quot;&gt;dev dependency group&lt;/a&gt;, but when you &lt;code&gt;uvx sqlite-utils&lt;/code&gt; directly you don&apos;t get those dependencies.&lt;/p&gt;
+        &lt;p&gt;As part of fixing this I figured out how to run a smoke test to ensure the CLI tool still works even without those dev dependencies, which can be run from the project checkout:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;uv run --isolated --no-default-groups sqlite-utils --help
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;--no-default-groups&lt;/code&gt; argument prevents it from installing that default &lt;code&gt;dev&lt;/code&gt; group, and &lt;code&gt;--isolated&lt;/code&gt; means that even if there is a &lt;code&gt;.venv/&lt;/code&gt; folder containing extra dependencies they will be ignored for the duration of that &lt;code&gt;uv run&lt;/code&gt; command.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/packaging&quot;&gt;packaging&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/uv&quot;&gt;uv&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>sqlite-utils 4.2</title>
+      <link>https://simonwillison.net/2026/Aug/13/sqlite-utils/</link>
+      <guid>https://simonwillison.net/2026/Aug/13/sqlite-utils/</guid>
+      <pubDate>Thu, 13 Aug 2026 20:11:29 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/sqlite-utils/releases/tag/4.2&quot;&gt;sqlite-utils 4.2&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Lots of improvements in this one relating to the &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/python-api.html#transforming-a-table&quot;&gt;table.transform() feature&lt;/a&gt;, which adds support for complex alter table operations by creating a fresh table, copying across the data and then dropping and replacing the old one.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;transform()&lt;/code&gt; now preserves a much larger array of edge-case schema definitions, including check constraints, unique constraints and even comments describing the columns.&lt;/p&gt;
+        &lt;p&gt;There are also &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/python-api.html#checks&quot;&gt;new introspection properties&lt;/a&gt; for check constraints, and a whole lot of other smaller changes.&lt;/p&gt;
+        &lt;p&gt;Includes contributions from &lt;a href=&quot;https://github.com/bunlongheng&quot;&gt;Bunlong Heng&lt;/a&gt;, &lt;a href=&quot;https://github.com/ethanhawkes-gif&quot;&gt;ethanhawkes-gif&lt;/a&gt;, &lt;a href=&quot;https://github.com/RamiNoodle733&quot;&gt;Rami Abdelrazzaq&lt;/a&gt;, &lt;a href=&quot;https://github.com/nyxst4ck&quot;&gt;nyxst4ck&lt;/a&gt;, and &lt;a href=&quot;https://github.com/ikatyal2110&quot;&gt;ikatyal2110&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;(It later turned out 4.2 had &lt;a href=&quot;https://github.com/simonw/sqlite-utils/issues/842&quot;&gt;a crashing bug&lt;/a&gt;, fixed in &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/changelog.html#v4-2-1&quot;&gt;4.2.1&lt;/a&gt;.)&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/releases&quot;&gt;releases&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm-gemini 0.33</title>
+      <link>https://simonwillison.net/2026/Aug/13/llm-gemini/</link>
+      <guid>https://simonwillison.net/2026/Aug/13/llm-gemini/</guid>
+      <pubDate>Thu, 13 Aug 2026 19:37:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-gemini/releases/tag/0.33&quot;&gt;llm-gemini 0.33&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;It&apos;s been a while since the last &lt;code&gt;llm-gemini&lt;/code&gt; release. This version of the plugin adds support for today&apos;s &lt;a href=&quot;https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-3-7-flash/&quot;&gt;Gemini 3.7 Flash&lt;/a&gt; release, plus &lt;code&gt;gemini-3.6-flash&lt;/code&gt;, &lt;code&gt;gemini-3.5-flash-lite&lt;/code&gt; and two embedding models &lt;code&gt;gemini-embedding-2&lt;/code&gt; and &lt;code&gt;gemini-embedding-001&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;The plugin is also upgraded for compatibility with LLM 0.32, which means you can now see reasoning traces and you can also enable server-side tools using this pattern:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm -m gemini-3.7-flash -T CodeExecution \
+        &apos;use python to calculate (factorial of 13) * 3&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I had Gemini 3.7 Flash &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer.html#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6779a22d5e7bb6bdf29936f1600a5259&quot;&gt;draw me some pelicans riding bicycles&lt;/a&gt; at high, medium, and low thinking efforts (minimal, which was an option in 3.6 Flash, has been removed in 3.7.) Here&apos;s the high level one, which is pretty great:&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;This pelican has  a very cool curved green bicycle, a fish in its basket, a lovely red and white spotted scarf and a captain&apos;s hat&quot; src=&quot;https://static.simonwillison.net/static/2026/gemini-3.7-flash-high-pelican.jpg&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;One catch though: the pelican I showed here was rendered with Safari. Both Firefox and Chrome render it differently, due to Safari being more tolerant of empty SVG &lt;code&gt;&amp;lt;filter&amp;gt;&lt;/code&gt; elements than those other two browsers.&lt;/p&gt;
+        &lt;p&gt;They still display the bicycle, but the pelican is missing entirely!&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;The same image except the pelican is entirely missing - it&apos;s just the bicycle.&quot; src=&quot;https://static.simonwillison.net/static/2026/broken-pelican-safari.jpg&quot; /&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/google&quot;&gt;google&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gemini&quot;&gt;gemini&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>alchemy-utils 0.1a1</title>
+      <link>https://simonwillison.net/2026/Aug/13/alchemy-utils/</link>
+      <guid>https://simonwillison.net/2026/Aug/13/alchemy-utils/</guid>
+      <pubDate>Thu, 13 Aug 2026 03:03:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/alchemy-utils/releases/tag/0.1a1&quot;&gt;alchemy-utils 0.1a1&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Performance boost for DuckDB exports and CSV imports, &lt;a href=&quot;https://simonwillison.net/2026/Aug/12/alchemy-utils/&quot;&gt;see here&lt;/a&gt;.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>DeepSeek V4 Pro 0813 (on OpenRouter)</title>
       <link>https://simonwillison.net/2026/Aug/12/deepseek-v4-pro-0813/</link>
@@ -13,7 +82,7 @@
       <content:encoded>
         &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://openrouter.ai/deepseek/deepseek-v4-pro-0813&quot;&gt;DeepSeek V4 Pro 0813 (on OpenRouter)&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
         The latest DeepSeek Pro model is now available, via API only. I had to link to OpenRouter because DeepSeek don&apos;t have any obvious announcement page for their new model.&lt;/p&gt;
-        &lt;p&gt;I haven&apos;t been able to confirm if they plan to release the open weights, but given the weights are available for both April&apos;s &lt;a href=&quot;https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro&quot;&gt;deepseek-ai/DeepSeek-V4-Pro&lt;/a&gt; and July&apos;s &lt;a href=&quot;https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731&quot;&gt;deepseek-ai/DeepSeek-V4-Flash-0731&lt;/a&gt; it seems likely.&lt;/p&gt;
+        &lt;p&gt;I haven&apos;t been able to confirm if they plan to release the open weights, but given the weights are available for both April&apos;s &lt;a href=&quot;https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro&quot;&gt;deepseek-ai/DeepSeek-V4-Pro&lt;/a&gt; and July&apos;s &lt;a href=&quot;https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731&quot;&gt;deepseek-ai/DeepSeek-V4-Flash-0731&lt;/a&gt; it seems likely. &lt;strong&gt;Update&lt;/strong&gt;: the weights &lt;a href=&quot;https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813&quot;&gt;are now available&lt;/a&gt; on Hugging Face, 1.7T parameters, 893 GB.&lt;/p&gt;
         &lt;p&gt;Interestingly I got &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Fc1108a380593547c2def5863bca63160&quot;&gt;&lt;em&gt;very&lt;/em&gt; different looking pelicans&lt;/a&gt; for the three different reasoning levels of low, medium, and high. I&apos;ve not noticed this kind of difference from any other model:&lt;/p&gt;
         &lt;p&gt;Low:&lt;/p&gt;
         &lt;p&gt;&lt;img alt=&quot;Flat vector illustration of a white pelican with a large orange beak, wearing a straw hat with an orange band, riding a teal road bicycle in profile, set against a pale cream circle with a dashed outline and small motion marks trailing behind.&quot; src=&quot;https://static.simonwillison.net/static/2026/deepseek-pro-low.png&quot; /&gt;&lt;/p&gt;
@@ -853,160 +922,6 @@
         &lt;p&gt;&lt;strong&gt;Update 7th August 2026&lt;/strong&gt;: I posed the same prompt to OpenAI Codex Desktop running GPT-5.6 Sol Ultra and got a &lt;a href=&quot;https://simonwillison.net/2026/Aug/7/moonlight-mayhem/&quot;&gt;significantly better result&lt;/a&gt; - GPT-5.6 Sol picked up on the importance of the squad of raccoons going on a heist, and built a game where you must rescue your two crewmates in a museum and then stack on top of them to steal the Golden Sardine.&lt;/p&gt;
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/prompt-engineering&quot;&gt;prompt-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/text-to-image&quot;&gt;text-to-image&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/vibe-coding&quot;&gt;vibe-coding&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos-fable&quot;&gt;claude-mythos-fable&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>New release of LLM adds support for reasoning traces, OpenAI Responses, server-side tools, and smarter logging</title>
-      <link>https://simonwillison.net/2026/Aug/4/new-release-of-llm/</link>
-      <guid>https://simonwillison.net/2026/Aug/4/new-release-of-llm/</guid>
-      <pubDate>Tue, 04 Aug 2026 23:58:24 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I released &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-32&quot;&gt;LLM 0.32&lt;/a&gt; this morning, the most significant new version of LLM since the initial launch of the project. The new version includes support for visible reasoning traces, server-side provider tools, redesigned content-addressable SQLite logs, new models, and new features enabled by the OpenAI Responses API. I also released a new version of the &lt;a href=&quot;https://github.com/simonw/llm-anthropic&quot;&gt;llm-anthropic plugin&lt;/a&gt; with substantial updates of its own.&lt;/p&gt;
-        &lt;h4 id=&quot;headline-features-for-llm-cli-users&quot;&gt;Headline features for LLM CLI users&lt;/h4&gt;
-        &lt;p&gt;Running LLM against reasoning models now &lt;strong&gt;displays their reasoning traces&lt;/strong&gt; to standard error, so you can see what they are &quot;thinking&quot; without that information being included in the standard output that you might pipe to another tool. Add &lt;code&gt;-R/--hide-reasoning&lt;/code&gt; to turn this off.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/best-pelicans.gif&quot; alt=&quot;Running llm &amp;quot;think about the best thing about pelicans&amp;quot; in the macOS terminal window - grey text outputs saying Exploring pelican qualities, then after a paragraph of that a white paragraph of text comes out saying: The best thing about pelicans is their wonderfully oversized, practical design: that enormous bill and pouch look comical, but they make pelicans remarkably skilled fishers. Even better, many species cooperate—working together to herd fish before scooping them up. They’re a great mix of goofy, graceful, and surprisingly clever.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;LLM includes support out-of-the-box for the &lt;strong&gt;GPT-5.6 model family&lt;/strong&gt;, and the new default model used with &lt;code&gt;llm &quot;prompt&quot;&lt;/code&gt; is now the inexpensive but capable &lt;strong&gt;GPT-5.6 Luna&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;LLM calls can now use &lt;strong&gt;server-side tools&lt;/strong&gt; from various providers. OpenAI provide &lt;a href=&quot;https://llm.datasette.io/en/stable/openai-models.html#code-interpreter&quot;&gt;a code execution environment&lt;/a&gt; as a server-side tool; LLM can now run prompts that benefit from that like so:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm --tool CodeInterpreter &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;Show current python and SQLite versions&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;OpenAI also gets a &lt;a href=&quot;https://llm.datasette.io/en/stable/openai-models.html#web-search&quot;&gt;WebSearch&lt;/a&gt; tool.&lt;/p&gt;
-        &lt;p&gt;The &lt;a href=&quot;https://github.com/simonw/llm-anthropic&quot;&gt;llm-anthropic&lt;/a&gt; plugin adds &lt;a href=&quot;https://github.com/simonw/llm-anthropic/blob/0.26/README.md#web-search&quot;&gt;WebSearch&lt;/a&gt;, &lt;a href=&quot;https://github.com/simonw/llm-anthropic/blob/0.26/README.md#web-fetch&quot;&gt;WebFetch&lt;/a&gt;, &lt;a href=&quot;https://github.com/simonw/llm-anthropic/blob/0.26/README.md#code-execution&quot;&gt;CodeExecution&lt;/a&gt;, and &lt;a href=&quot;https://github.com/simonw/llm-anthropic/blob/0.26/README.md#mcp-connector&quot;&gt;AnthropicMCP&lt;/a&gt;, which looks like this:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm -m claude-sonnet-5 -T &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;AnthropicMCP(&quot;https://datasette.simonwillison.net/-/mcp&quot;)&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; \
-        &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;how many rows in the blog_blogmark table?&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;That causes Anthropic to execute MCP calls against my new &lt;a href=&quot;https://simonwillison.net/2026/Jul/31/stateless-mcp/#datasette-mcp&quot;&gt;datasette-mcp&lt;/a&gt; plugin as part of a single request/response interaction with their API.&lt;/p&gt;
-        &lt;p&gt;The new &lt;strong&gt;llm openai endpoint&lt;/strong&gt; command provides a tool for &lt;a href=&quot;https://llm.datasette.io/en/stable/other-models.html#run-against-an-endpoint-without-configuring-it&quot;&gt;executing prompts against &lt;em&gt;any&lt;/em&gt; OpenAI compatible endpoint&lt;/a&gt; as a one-liner. These aren&apos;t logged, which makes this a handy tool for running one-off prompts against anything that speaks the lingua franca of the LLM API world.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s how I use that to run prompts against Gemma 4 12B running in my localhost &lt;a href=&quot;https://lmstudio.ai&quot;&gt;LM Studio&lt;/a&gt; API, via &lt;code&gt;uvx&lt;/code&gt; (no LLM installation required) and mixing in the &lt;a href=&quot;https://github.com/simonw/llm-tools-quickjs&quot;&gt;llm-tools-quickjs&lt;/a&gt; tool plugin for good measure:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;uvx --with llm-tools-quickjs \
-        llm openai endpoint http://localhost:1234/v1 -m google/gemma-4-12b \
-        -T QuickJS &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;Use QuickJS to multiply 3434 * 2434&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; --td&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/openai-endpoint-gemma.webp&quot; alt=&quot;Output reads Tool call: QuickJS_execute_javascript({&apos;javascript&apos;: &apos;3434 * 2434&apos;})  8358356 The result of 3434 * 2434 is 8,358,356.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;new-features-in-the-python-api&quot;&gt;New features in the Python API&lt;/h4&gt;
-        &lt;p&gt;LLM&apos;s Python API previously required you to create a conversation and then send messages to it one at a time. This was an abstraction over the true nature of LLMs, where each request carries a complete history of the messages that came before it. That abstraction started to get in the way for some more advanced cases, so the new release introduces a &lt;code&gt;model.prompt(messages=[])&lt;/code&gt; parameter that can be used like this:&lt;/p&gt;
-        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;llm&lt;/span&gt;
-        &lt;span class=&quot;pl-k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;llm&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;user&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;assistant&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;system&lt;/span&gt;
-        
-        &lt;span class=&quot;pl-s1&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;llm&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;get_model&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;gpt-5.6-luna&quot;&lt;/span&gt;)
-        
-        &lt;span class=&quot;pl-s1&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;model&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;prompt&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt;[
-        &lt;span class=&quot;pl-en&quot;&gt;system&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;You are a helpful pirate.&quot;&lt;/span&gt;),
-        &lt;span class=&quot;pl-en&quot;&gt;user&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;What is the capital of France?&quot;&lt;/span&gt;),
-        &lt;span class=&quot;pl-en&quot;&gt;assistant&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Paris, matey.&quot;&lt;/span&gt;),
-        &lt;span class=&quot;pl-en&quot;&gt;user&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;And Germany?&quot;&lt;/span&gt;),
-        ])
-        &lt;span class=&quot;pl-en&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;response&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;text&lt;/span&gt;())&lt;/pre&gt;
-        &lt;p&gt;LLM previously returned an iterable sequence of strings from each prompt. This worked great when models returned a string response, but failed to predict the weird shape that models would evolve towards. Today many models return a mix of reasoning text, output strings, tool calls, and even image attachments. With LLM 0.32 you can &lt;a href=&quot;https://llm.datasette.io/en/stable/python-api.html#structured-messages-and-streaming-events&quot;&gt;do this instead&lt;/a&gt;:&lt;/p&gt;
-        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;model&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;prompt&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;&quot;Explain cats&quot;&lt;/span&gt;).&lt;span class=&quot;pl-c1&quot;&gt;stream_events&lt;/span&gt;():
-        &lt;span class=&quot;pl-k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;&quot;reasoning&quot;&lt;/span&gt;:
-        &lt;span class=&quot;pl-en&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;f&quot;[thinking] &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;chunk&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;flush&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;True&lt;/span&gt;)
-        &lt;span class=&quot;pl-k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;&quot;text&quot;&lt;/span&gt;:
-        &lt;span class=&quot;pl-en&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;chunk&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;pl-s&quot;&gt;&quot;&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s1&quot;&gt;flush&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;True&lt;/span&gt;)
-        &lt;span class=&quot;pl-k&quot;&gt;else&lt;/span&gt;:
-        &lt;span class=&quot;pl-en&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;pl-s&quot;&gt;f&quot;Other event: &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-kos&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;pl-s1&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;pl-kos&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&quot;&lt;/span&gt;)&lt;/pre&gt;
-        &lt;p&gt;Combine these features and we can &lt;em&gt;finally&lt;/em&gt; provide a robust implementation of the semi-standard OpenAI chat completions API, which I&apos;ve now released as the &lt;a href=&quot;https://github.com/simonw/llm-chat-completions-server&quot;&gt;llm-chat-completions-server&lt;/a&gt; plugin:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm install llm-chat-completions-server
-        llm chat-completions-server --port 9000
-        &lt;span class=&quot;pl-c&quot;&gt;&lt;span class=&quot;pl-c&quot;&gt;#&lt;/span&gt; Server is now running on http://127.0.0.1:9000/v1&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;Now you can run prompts against LLM via that server, using the new &lt;code&gt;llm openai endpoint&lt;/code&gt; command!&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm openai endpoint http://127.0.0.1:9000/v1 &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;hello&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; -m gpt-5.4-mini&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;The bigger challenge with that kind of API concerns logging. If we&apos;re going to support the pattern where the message sequence is appended to on every request, ideally we can avoid logging all of that duplicate JSON for every turn.&lt;/p&gt;
-        &lt;p&gt;The solution is the new &lt;a href=&quot;https://llm.datasette.io/en/stable/logging.html#the-message-store&quot;&gt;content-addressable message store&lt;/a&gt;, modeled after Git. You can see the new schema for that &lt;a href=&quot;https://llm.datasette.io/en/stable/logging.html#sql-schema&quot;&gt;in the documentation&lt;/a&gt;, but the &lt;code&gt;llm logs&lt;/code&gt; and &lt;code&gt;llm logs --json&lt;/code&gt; commands have both been upgraded to convert that format back into something that&apos;s easy to consume.&lt;/p&gt;
-        &lt;h4 id=&quot;and-the-rest&quot;&gt;And the rest&lt;/h4&gt;
-        &lt;p&gt;There is a whole lot more in this release. The &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-32&quot;&gt;0.32 release notes&lt;/a&gt; are pretty comprehensive, and the notes for &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#rc2-2026-07-30&quot;&gt;0.32rc2&lt;/a&gt;, &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#rc1-2026-07-30&quot;&gt;0.32rc&lt;/a&gt;, &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#a3-2026-06-09&quot;&gt;0.32a3&lt;/a&gt;, &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#a2-2026-05-12&quot;&gt;0.32a2&lt;/a&gt;, and &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#a0-2026-04-28&quot;&gt;0.32a0&lt;/a&gt; should fill in any gaps.&lt;/p&gt;
-        &lt;p&gt;Existing LLM plugins should all continue to work, but plugins that provide extra models will need to be upgraded to 0.32 in order to participate fully in the new streaming events system. There&apos;s a guide to implementing plugins with &lt;a href=&quot;https://llm.datasette.io/en/stable/plugins/advanced-model-plugins.html#structured-messages-and-streaming-events&quot;&gt;Structured messages and streaming events&lt;/a&gt; in the documentation.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve updated some of my own plugins:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;a href=&quot;https://github.com/simonw/llm-anthropic/releases/tag/0.26&quot;&gt;llm-anthropic 0.26&lt;/a&gt; adds support for the Claude 5 family of models, plus &lt;code&gt;WebSearch&lt;/code&gt;, &lt;code&gt;WebFetch&lt;/code&gt;, &lt;code&gt;CodeExecution&lt;/code&gt;, and &lt;code&gt;AnthropicMCP&lt;/code&gt; server-side tools.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;a href=&quot;https://github.com/simonw/llm-gemini&quot;&gt;llm-gemini&lt;/a&gt; and &lt;a href=&quot;https://github.com/simonw/llm-openrouter&quot;&gt;llm-openrouter&lt;/a&gt; and &lt;a href=&quot;https://github.com/simonw/llm-mistral&quot;&gt;llm-mistral&lt;/a&gt; are nearly there, releases coming soon.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h4 id=&quot;i-guess-llm-is-an-agent-framework-now&quot;&gt;I guess LLM is an agent framework now&lt;/h4&gt;
-        &lt;p&gt;Quite a few of the lower-level tools changes in this release were driven by the needs of &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt;. When I started work on LLM, the term &quot;agent&quot; had such a vague definition that I refused to use it. In &lt;a href=&quot;https://simonwillison.net/2025/Sep/18/agents/&quot;&gt;September 2025&lt;/a&gt; I came around to the idea that &quot;&lt;strong&gt;An LLM agent runs tools in a loop to achieve a goal&lt;/strong&gt;&quot; is well established enough now that I could stop avoiding the term entirely.&lt;/p&gt;
-        &lt;p&gt;Tool chains can now &lt;a href=&quot;https://llm.datasette.io/en/stable/python-api.html#python-api-tools-pause&quot;&gt;pause for human approval&lt;/a&gt; and &lt;a href=&quot;https://llm.datasette.io/en/stable/python-api.html#python-api-tools-resume&quot;&gt;resume from a stored message history&lt;/a&gt; - both needed by Datasette Agent.&lt;/p&gt;
-        &lt;p&gt;Looking at LLM today it&apos;s beginning to look very agent-shaped to me. There&apos;s something neat about having a CLI utility that can mix and match different tools from different sources with different models all as a one-liner, and that includes a Python library powerful enough to build systems like &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt; and &lt;a href=&quot;https://github.com/simonw/llm-coding-agent&quot;&gt;llm-coding-agent&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;Maybe the next version of LLM will bake the concept of an &quot;agent&quot; into the core library. I&apos;m still trying to figure out what that would look like.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/releases&quot;&gt;releases&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-tool-use&quot;&gt;llm-tool-use&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-reasoning&quot;&gt;llm-reasoning&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/model-context-protocol&quot;&gt;model-context-protocol&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm-anthropic 0.26</title>
-      <link>https://simonwillison.net/2026/Aug/4/llm-anthropic/</link>
-      <guid>https://simonwillison.net/2026/Aug/4/llm-anthropic/</guid>
-      <pubDate>Tue, 04 Aug 2026 22:00:58 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-anthropic/releases/tag/0.26&quot;&gt;llm-anthropic 0.26&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Includes new features enabled by &lt;a href=&quot;https://simonwillison.net/2026/Aug/4/new-release-of-llm/&quot;&gt;LLM 0.32&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;ul&gt;
-        &lt;li&gt;New models: &lt;code&gt;claude-fable-5&lt;/code&gt;, &lt;code&gt;claude-sonnet-5&lt;/code&gt;, and &lt;code&gt;claude-opus-5&lt;/code&gt;. &lt;a href=&quot;https://github.com/simonw/llm-anthropic/issues/75&quot;&gt;#75&lt;/a&gt;, &lt;a href=&quot;https://github.com/simonw/llm-anthropic/issues/76&quot;&gt;#76&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Added server-side tools for &lt;code&gt;WebSearch&lt;/code&gt;, &lt;code&gt;WebFetch&lt;/code&gt;, &lt;code&gt;CodeExecution&lt;/code&gt;, and &lt;code&gt;AnthropicMCP&lt;/code&gt;, available through LLM&apos;s &lt;code&gt;-T&lt;/code&gt; interface or Python &lt;code&gt;tools=&lt;/code&gt;. The previous &lt;code&gt;-o web_search*&lt;/code&gt; options have been removed in favor of &lt;code&gt;-T WebSearch&lt;/code&gt;. &lt;a href=&quot;https://github.com/simonw/llm-anthropic/issues/79&quot;&gt;#79&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Upgraded to &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-32&quot;&gt;llm&amp;gt;=0.32&lt;/a&gt;. Reasoning, tool calls, tool results, and server-side tool results now stream as typed events. Reasoning for &lt;code&gt;llm&lt;/code&gt; CLI prompts now displays to standard error unless you pass &lt;code&gt;--hide-reasoning/-R&lt;/code&gt;.&lt;/li&gt;
-        &lt;li&gt;Simplified extended thinking to &lt;code&gt;thinking&lt;/code&gt; and &lt;code&gt;thinking_effort&lt;/code&gt; (&lt;code&gt;low&lt;/code&gt;, &lt;code&gt;medium&lt;/code&gt;, &lt;code&gt;high&lt;/code&gt;, &lt;code&gt;xhigh&lt;/code&gt;, or &lt;code&gt;max&lt;/code&gt;). Claude 5 models think by default; &lt;code&gt;-o thinking 0&lt;/code&gt; disables thinking for Sonnet 5 and Opus 5, while Fable 5 always thinks. &lt;code&gt;-R/--hide-reasoning&lt;/code&gt; now omits reasoning from responses and logs. The &lt;code&gt;thinking_budget&lt;/code&gt;, &lt;code&gt;thinking_display&lt;/code&gt;, and &lt;code&gt;thinking_adaptive&lt;/code&gt; options have been removed. &lt;a href=&quot;https://github.com/simonw/llm-anthropic/issues/80&quot;&gt;#80&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/model-context-protocol&quot;&gt;model-context-protocol&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>PipeNetwork/minimax-h3-mlx</title>
-      <link>https://simonwillison.net/2026/Aug/4/minimax-h3-mlx/</link>
-      <guid>https://simonwillison.net/2026/Aug/4/minimax-h3-mlx/</guid>
-      <pubDate>Tue, 04 Aug 2026 19:10:09 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/PipeNetwork/minimax-h3-mlx&quot;&gt;PipeNetwork/minimax-h3-mlx&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        MiniMax released &lt;a href=&quot;https://huggingface.co/MiniMaxAI/MiniMax-H3&quot;&gt;MiniMax-H3&lt;/a&gt; two days ago - they describe it as a &quot;a general-purpose, omni-modal generative system&quot;, which in practice means it accepts text, images, audio and video and can use them to generate up to 15 second video clips with audio included.&lt;/p&gt;
-        &lt;p&gt;This Python package ports it to MLX for running on Apple Silicon.&lt;/p&gt;
-        &lt;p&gt;I got it running on my M5 Max MacBook Pro. I cloned the repo and ran the model like this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;# First download the models
-        uvx --from huggingface_hub hf download MiniMaxAI/MiniMax-H3 \
-        --include &apos;FL2VA/*&apos; --exclude &apos;FL2VA/transformer/*&apos;
-        uvx --from huggingface_hub hf download pipenetwork/MiniMax-H3-MLX-8bit
-        
-        # Now run the prompt
-        uv run --with mlx-vlm \
-        --with-requirements requirements.txt python scripts/generate.py \
-        &quot;a rainbow colored skunk leaps over a mossy log in a supermarket&quot; \
-        -o skunk.mp4 \
-        -c ~/.cache/huggingface/hub/models--MiniMaxAI--MiniMax-H3/snapshots/fa9c8ab1eaa21c8ae25e7e40b83b2e6002f340af/FL2VA \
-        -t ~/.cache/huggingface/hub/models--pipenetwork--MiniMax-H3-MLX-8bit/snapshots/3ac52081470b0488921c3ec3ba84a39097bf2361
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the video I got for the prompt:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;a rainbow colored skunk leaps over a mossy log in a supermarket&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;video
-        controls loop
-        preload=&quot;none&quot;
-        poster=&quot;https://static.simonwillison.net/static/2026/skunk.jpg&quot;
-        width=&quot;1344&quot;
-        height=&quot;768&quot;
-        style=&quot;display: block; width: 100%; height: auto;&quot;
-        &gt;
-        &lt;source src=&quot;https://static.simonwillison.net/static/2026/skunk.web.mp4&quot; type=&quot;video/mp4&quot;&gt;
-        Your browser does not support HTML5 video.
-        &lt;/video&gt;
-        &lt;/p&gt;
-        
-        &lt;p&gt;It downloaded ~115 GB of model files, and the video generation took just under 45 minutes.&lt;/p&gt;
-        &lt;p&gt;The video is impressive, but the audio is weird speech-like garbage, because I didn&apos;t provide any prompt guidance as to what the audio should be. The &lt;a href=&quot;https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md&quot;&gt;prompting guide&lt;/a&gt; (which I didn&apos;t read prior to this experiment) has a whole bunch of information on how to get this to work.
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/mlx&quot;&gt;mlx&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/text-to-video&quot;&gt;text-to-video&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/minimax&quot;&gt;minimax&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm 0.32</title>
-      <link>https://simonwillison.net/2026/Aug/4/llm/</link>
-      <guid>https://simonwillison.net/2026/Aug/4/llm/</guid>
-      <pubDate>Tue, 04 Aug 2026 17:15:33 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.32&quot;&gt;llm 0.32&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;See &lt;a href=&quot;https://simonwillison.net/2026/Aug/4/new-release-of-llm/&quot;&gt;my detailed blog post about this release&lt;/a&gt;.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
