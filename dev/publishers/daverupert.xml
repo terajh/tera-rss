@@ -4,7 +4,184 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Sun, 16 Aug 2026 15:41:59 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2026 16:18:19 GMT</lastBuildDate>
+    <item>
+      <title>Shadow-piercing local component variables</title>
+      <link>https://daverupert.com/2026/08/how-to-pierce-your-shadow-belly-button/</link>
+      <guid>https://daverupert.com/2026/08/how-to-pierce-your-shadow-belly-button/</guid>
+      <pubDate>Mon, 17 Aug 2026 15:14:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;Stuart Robson’s post &amp;lt;a href=&amp;quot;https://www.alwaystwisted.com/articles/extending-design-tokens-with-css-layer&amp;quot;&amp;gt;&amp;lt;em&amp;gt;Solving CSS @layer Ordering in Design Systems with Design Token Metadata&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;, a response to Chris Coyier’s &amp;lt;a href=&amp;quot;https://master.dev/blog/thinking-horizontally-in-css-layer/&amp;quot;&amp;gt;&amp;lt;em&amp;gt;Thinking Horizontally in CSS @layer&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;, came to me at a serendipitous time. You know I love a good blog-and-response, but these posts on the topic of lowering the specificity of component-level tokens and scaling that out was a problem I was having with some of my web components.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Their &amp;lt;code&amp;gt;@layer&amp;lt;/code&amp;gt; trick didn’t work for me, but here’s what did…&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;the-local-component-variable-problem&amp;quot;&amp;gt;The local component variable problem&amp;lt;a href=&amp;quot;#the-local-component-variable-problem&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;The local component variable problem&amp;apos;&amp;quot; data-heading-content=&amp;quot;The local component variable problem&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Let’s say we have a global stylesheet with our design system tokens.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
+        :root {
+        --system-bg: #00f1;
+        --system-fg: #000;
+        --system-font: Inter; sans-serif;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And then we set up our web component with some local component variables that use design system tokens as defaults.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;
+        &amp;amp;lt;template shadowrootmode=&amp;amp;quot;open&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;style&amp;amp;gt;
+        :host {
+        /* Local component variables */
+        --card-bg: var(--system-bg);
+        --card-fg: var(--system-fg);
+        --card-font: var(--system-font);
+        
+        /* Apply component styles */
+        background: var(--card-bg);
+        color: var(--card-fg);
+        font-family: var(--card-font);
+        
+        button {
+        font-family: var(--card-font);
+        }
+        }
+        &amp;amp;lt;/style&amp;amp;gt;
+        &amp;amp;lt;slot&amp;amp;gt;&amp;amp;lt;/slot&amp;amp;gt;
+        &amp;amp;lt;/template&amp;amp;gt;
+        
+        Hello world
+        &amp;amp;lt;/ui-card&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;This works great… Except… I sort of expected that if we added some of those component tokens to the stylesheet we could restyle the card.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - This doesn&amp;apos;t work 😭 */
+        :root {
+        /* ...system tokens go here... */
+        
+        --card-bg: #f001;
+        --card-fg: #f00;
+        --card-font: fantasy;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Because &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; has more specificity than &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;, that means &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; wins. This confused even me, a &amp;lt;a href=&amp;quot;https://master.dev/courses/web-components/&amp;quot;&amp;gt;web component front-end master&amp;lt;/a&amp;gt;. But &amp;lt;a href=&amp;quot;https://www.bram.us/&amp;quot;&amp;gt;Bramus&amp;lt;/a&amp;gt; from the Chrome team explained it to me as: If you redeclared the variables in a normal div, it wouldn’t be surprising that the values didn’t inherit. Ok. That tracks.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The canonical way to solve this –of course– is to pull out a bazooka and point it directly at the element:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works, but... */
+        ui-card {
+        --card-font: fantasy;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;This works and I often recommend direct styling the &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; as the primary way to customize web components from the outside.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;But a system is different than laser-guided fixes. Themes should be low-specificity by design. Using an &amp;lt;code&amp;gt;HTMLElement&amp;lt;/code&amp;gt; as a selector is one of the strongest selectors in our CSS toolbox. That means we broke our one rule and if we ever want to change our mind, we’re on a one-way train to &amp;lt;code&amp;gt;!important&amp;lt;/code&amp;gt; town. But –to me– the larger problem is that now our CSS and DOM are super-glued together, which is less ideal compared to a flat list of element-agnostic tokens.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;What if other card-like elements use those tokens? Uh-oh, gotta update the global stylesheet. What if elements in the Light DOM also want to use those tokens? More work. We need a “Set it and forget it” way to handle themes. Also pinning tokens to the custom-element might not always work in nested component scenarios, but that’s a secondary issue.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;There’s a handful of other approaches (see below) to this problem and they all have trade-offs.  I was hoping the &amp;lt;code&amp;gt;@layer&amp;lt;/code&amp;gt; solution would help, but &amp;lt;code&amp;gt;@layer { :host {} }&amp;lt;/code&amp;gt; inside a shadowRoot is still more powerful than &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;. Drat!&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;But is there a low-specificity way to win the specificity war with &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;?&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;a-refined-solution-in-defined&amp;quot;&amp;gt;A refined solution in &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;&amp;lt;a href=&amp;quot;#a-refined-solution-in-defined&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;A refined solution in :defined&amp;apos;&amp;quot; data-heading-content=&amp;quot;A refined solution in :defined&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;After throwing every scoping method I could at the wall, I found a decent one-liner that allows us to preserve the inheritance in a way that’s web-component’y:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
+        :root {
+        --system-bg: #00f1;
+        --system-fg: #000;
+        --system-font: Inter; sans-serif;
+        }
+        
+        :defined {
+        --card-bg: #f001;
+        --card-fg: #f00;
+        --card-font: fantasy;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;When you put &amp;lt;code&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;&amp;lt;/code&amp;gt; on the page, it’s an &amp;lt;code&amp;gt;HTMLUnknownElement&amp;lt;/code&amp;gt;. Because HTML is chill, it treats the unknown element as a &amp;lt;code&amp;gt;&amp;amp;lt;span&amp;amp;gt;&amp;lt;/code&amp;gt; with a gigantic typo. The &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; pseudo-state triggers on &amp;lt;code&amp;gt;customElement.define()&amp;lt;/code&amp;gt; and with that small change we’re able to pierce the shadow boundary and win the specificity war because &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; is more powerful than &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;But… You know what else gets &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;? All native HTML elements! &amp;lt;code&amp;gt;div:defined&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;video:defined&amp;lt;/code&amp;gt;, and every native element your browser supports also works with &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;That sneaky fact gives us some portability that the &amp;lt;code&amp;gt;ui-card&amp;lt;/code&amp;gt; selector didn’t. If we need to re-use these tokens inside a Light DOM CSS class, we can also support that with &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;.ad-unit-block {
+        /* Local component variables */
+        --card-bg: var(--system-bg);
+        --card-fg: var(--system-fg);
+        --card-font: var(--system-font);
+        
+        /* Apply component styles */
+        background: var(--card-bg);
+        color: var(--card-fg);
+        font-family: var(--card-font);
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And that’s pretty handy if your default styles and system overrides need to go more places.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;full-walkthru-demo&amp;quot;&amp;gt;Full walkthru demo&amp;lt;a href=&amp;quot;#full-walkthru-demo&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Full walkthru demo&amp;apos;&amp;quot; data-heading-content=&amp;quot;Full walkthru demo&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;600&amp;quot; data-pen-title=&amp;quot;shadow-piercing local component variables&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;result&amp;quot; data-slug-hash=&amp;quot;emgoBJO&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
+        &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/019fed74-fe7a-71f1-b3f7-a74aadb2b8b4&amp;quot;&amp;gt;
+        shadow-piercing local component variables&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
+        on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;h2 id=&amp;quot;one-small-quirk-notdefined-elements&amp;quot;&amp;gt;One small quirk &amp;lt;code&amp;gt;:not(:defined)&amp;lt;/code&amp;gt; elements&amp;lt;a href=&amp;quot;#one-small-quirk-notdefined-elements&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;One small quirk :not(:defined) elements&amp;apos;&amp;quot; data-heading-content=&amp;quot;One small quirk :not(:defined) elements&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;https://www.youtube.com/watch?v=T_WQpYXPPT0&amp;quot;&amp;gt;As Chris and I discovered in a live recording of ShopTalk&amp;lt;/a&amp;gt;, you can run into a weird quirk hanging tokens off &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; if you have strong opinions about &amp;lt;code&amp;gt;:not(:defined)&amp;lt;/code&amp;gt; custom-elements inheriting styles.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;If an undefined custom-element has a &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; parent, variables from the parent will pierce the shadow boundary. There’s two ways that I found to fix this…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* The not-has-not route */
+        :defined:not(:has(:not(:defined))) {
+        --card-font: fantasy
+        }
+        
+        /* The unset if has-not route */ 
+        :defined {
+        --card-font: fantasy;
+        }
+        
+        :has(:not(:defined)) {
+        --card-font: unset;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;I don’t love either of those approaches, so I probably won’t optimize for the “&amp;lt;em&amp;gt;I put a fake undefined element on the page that uses our CSS variables but it must not inherit our CSS variables!&amp;lt;/em&amp;gt;” edge case.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Bramus told me about one potential future option that might help this exact situation, the already spec’d out was the &amp;lt;code&amp;gt;inherit()&amp;lt;/code&amp;gt; function.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:host {
+        --card-bg: inherit(--card-bg, var(--system-bg));
+        background: var(--card-bg);
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;I like that. That could work. Let’s do that? Ok. We all agree. Ship it.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Either way, that’s the end of my post. If you’re curious about other ways to handle component-level variables, keep reading!&amp;lt;/p&amp;gt;
+        &amp;lt;hr /&amp;gt;
+        &amp;lt;h2 id=&amp;quot;alternatives-considered&amp;quot;&amp;gt;Alternatives considered&amp;lt;a href=&amp;quot;#alternatives-considered&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Alternatives considered&amp;apos;&amp;quot; data-heading-content=&amp;quot;Alternatives considered&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Below are a handful of different workarounds for local-component variables, each with trade-offs.&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;make-all-root-overrides-important&amp;quot;&amp;gt;Make all root overrides !important&amp;lt;a href=&amp;quot;#make-all-root-overrides-important&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Make all root overrides !important&amp;apos;&amp;quot; data-heading-content=&amp;quot;Make all root overrides !important&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works but, too heavy-handed */
+        :root {
+        --card-font: fantasy!important;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;This works, but should be the nuclear option for specificity battles. Also makes it more difficult to override later.&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;shipping-all-variables-in-the-theme&amp;quot;&amp;gt;Shipping all variables in the theme&amp;lt;a href=&amp;quot;#shipping-all-variables-in-the-theme&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Shipping all variables in the theme&amp;apos;&amp;quot; data-heading-content=&amp;quot;Shipping all variables in the theme&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
+        :root {
+        /* system theme */
+        --system-bg: #00f1;
+        --system-fg: #000;
+        --system-font: Inter, sans-serif;
+        
+        /* custom overrides */
+        --card-bg: #f001;
+        --card-fg: var(--system-fg);
+        --card-font: fantasy;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;This works too. You’ll need to change your &amp;lt;code&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;&amp;lt;/code&amp;gt; styles to directly access &amp;lt;code&amp;gt;background: var(--card-bg)&amp;lt;/code&amp;gt;. The problem here is that all variables are mandatory and must ship in the theme. Even if a product only uses or customizes just one component, they have to ship all the tokens for every component. And now your theme CSS will be ever-growing at the rate of &amp;lt;code&amp;gt;num_options * num_components&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;optional-variable-fallback-chains-in-shadowroot&amp;quot;&amp;gt;Optional variable fallback chains in shadowRoot&amp;lt;a href=&amp;quot;#optional-variable-fallback-chains-in-shadowroot&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Optional variable fallback chains in shadowRoot&amp;apos;&amp;quot; data-heading-content=&amp;quot;Optional variable fallback chains in shadowRoot&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works but, can be confusing to CSS learners */
+        :host {
+        font-family: var(--card-font, var(--system-font));
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;I’ve been down this path. It works well and the first variable in the fallback chain becomes totally optional, meaning we can ship less tokens in the production theme. Fallback chains (a ternary, basically) and Aliases (a DOM walker) have dramatically different performance profiles when it comes to style calculation costs, so you may want to consider this… but that’s for another post.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;In practice though, I find the beauty of the CSS cascade gets lost on a lot of six-figure engineers (&amp;lt;em&amp;gt;waves generally in the direction of Hacker News and popular CSS frameworks&amp;lt;/em&amp;gt;).&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;And this also works less good if you’re going to re-use a local variable token… which leads us to…&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;private-variables-with-fallback-chains-in-shadowroot&amp;quot;&amp;gt;Private variables with fallback chains in shadowRoot&amp;lt;a href=&amp;quot;#private-variables-with-fallback-chains-in-shadowroot&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Private variables with fallback chains in shadowRoot&amp;apos;&amp;quot; data-heading-content=&amp;quot;Private variables with fallback chains in shadowRoot&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Work but, too noisy */
+        :host {
+        --_card-font: var(--card-font, var(--system-font));
+        font-family: var(--_card-font);
+        
+        button {
+        font-family: var(--_card-font);
+        }
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;This is the fully exploded version of the previous pattern. We can re-use &amp;lt;code&amp;gt;--_card-font&amp;lt;/code&amp;gt; on other elements inside our component. You can do this but it begins explode the surface area of the number of tokens we’re managing inside a component. Fallbacks were confusing enough, now we’re doing fallbacks with aliases. Uf.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Vibe Check №43</title>
       <link>https://daverupert.com/2026/08/vibe-check-43/</link>
@@ -327,7 +504,7 @@
         &amp;lt;div slot=&amp;quot;required&amp;quot;&amp;gt;Required content&amp;lt;/div&amp;gt;
         &amp;lt;div slot=&amp;quot;optional&amp;quot;&amp;gt;Optional content - expected: show content with gap&amp;lt;/div&amp;gt;
         &amp;lt;/optional-slot-demo-broken&amp;gt;
-        &amp;lt;pre lang=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;optional-slot-demo-broken&amp;amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;optional-slot-demo-broken&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;required&amp;amp;quot;&amp;amp;gt;Required content&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;optional&amp;amp;quot;&amp;amp;gt;Optional content - expected: show content with gap&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;/optional-slot-demo-broken&amp;amp;gt;
@@ -336,7 +513,7 @@
         &amp;lt;optional-slot-demo-broken&amp;gt;
         &amp;lt;div slot=&amp;quot;required&amp;quot;&amp;gt;Required content&amp;lt;/div&amp;gt;
         &amp;lt;/optional-slot-demo-broken&amp;gt;
-        &amp;lt;pre lang=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;optional-slot-demo-broken&amp;amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;optional-slot-demo-broken&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;required&amp;amp;quot;&amp;amp;gt;Required content&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;!-- expected: does not show extra whitespace --&amp;amp;gt;
         &amp;amp;lt;/optional-slot-demo-broken&amp;amp;gt;
@@ -352,7 +529,7 @@
         &amp;lt;p&amp;gt;This week my co-worker &amp;lt;a href=&amp;quot;https://www.linkedin.com/in/jeff-smith-28624711/&amp;quot;&amp;gt;Jeff&amp;lt;/a&amp;gt; and I were navigating this issue again. Coincidentally, the ShopTalkShow Discord was discussing the same exact problem and cited the &amp;lt;a href=&amp;quot;https://github.com/shoelace-style/shoelace/blob/next/src/internal/slot.ts&amp;quot;&amp;gt;&amp;lt;code&amp;gt;HasSlotController&amp;lt;/code&amp;gt;&amp;lt;/a&amp;gt; in &amp;lt;a href=&amp;quot;https://webawesome.com/&amp;quot;&amp;gt;WebAwesome&amp;lt;/a&amp;gt; (née Shoelace) as a working solution to this problem. I’d prefer to keep the solution in pure CSS, but was getting desperate.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;While glancing through the code I noticed the use of &amp;lt;code&amp;gt;:scope&amp;lt;/code&amp;gt; in &amp;lt;a href=&amp;quot;https://github.com/shoelace-style/shoelace/blob/next/src/internal/slot.ts#L38-L40&amp;quot;&amp;gt;L38-40&amp;lt;/a&amp;gt; and while unrelated it sparked a curiosity to try to use &amp;lt;code&amp;gt;:scope&amp;lt;/code&amp;gt; to juke Chromium’s shadow limitations. A handful of tries later and I had a working solution.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Here’s what I came up with:&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;css&amp;quot;&amp;gt;&amp;lt;code&amp;gt;:host {
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:host {
         display: grid;
         gap: 1rem;
         }
@@ -379,7 +556,7 @@
         &amp;lt;div slot=&amp;quot;required&amp;quot;&amp;gt;Required content&amp;lt;/div&amp;gt;
         &amp;lt;div slot=&amp;quot;optional&amp;quot;&amp;gt;Optional content - expected: show content with gap&amp;lt;/div&amp;gt;
         &amp;lt;/optional-slot-demo&amp;gt;
-        &amp;lt;pre lang=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;optional-slot-demo&amp;amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;optional-slot-demo&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;required&amp;amp;quot;&amp;amp;gt;Required content&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;optional&amp;amp;quot;&amp;amp;gt;Optional content - expected: show content with gap&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;/optional-slot-demo&amp;amp;gt;
@@ -388,7 +565,7 @@
         &amp;lt;optional-slot-demo&amp;gt;
         &amp;lt;div slot=&amp;quot;required&amp;quot;&amp;gt;Required content&amp;lt;/div&amp;gt;
         &amp;lt;/optional-slot-demo&amp;gt;
-        &amp;lt;pre lang=&amp;quot;html&amp;quot;&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;optional-slot-demo&amp;amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;optional-slot-demo&amp;amp;gt;
         &amp;amp;lt;div slot=&amp;amp;quot;required&amp;amp;quot;&amp;amp;gt;Required content&amp;amp;lt;/div&amp;amp;gt;
         &amp;amp;lt;!-- expected: does not show extra whitespace --&amp;amp;gt;
         &amp;amp;lt;/optional-slot-demo&amp;amp;gt;
@@ -807,7 +984,7 @@
       <content:encoded>
         &amp;lt;p&amp;gt;We rolled out &amp;lt;a href=&amp;quot;https://nerdy.dev/page-and-component-light-dark-strategies&amp;quot;&amp;gt;adaptive &amp;lt;code&amp;gt;light-dark()&amp;lt;/code&amp;gt; support&amp;lt;/a&amp;gt; on our design system themes and it’s been a delightful upgrade. Creating light and dark variable sets isn’t difficult, but delivery has trade-offs. Most apps that do this probably ship both sets of token values in a single stylesheet. That’s fine until you have multiple kilobytes of duplicate definitions. To get around the performance problems we built two separate stylesheets –which is also not great– but my coworker &amp;lt;a href=&amp;quot;https://marchbox.com/&amp;quot;&amp;gt;Zacky&amp;lt;/a&amp;gt; found a good trick with &amp;lt;code&amp;gt;&amp;amp;lt;link disabled&amp;amp;gt;&amp;lt;/code&amp;gt; to make it tolerable. Ultimately, we wanted to offer a single stylesheet for our human (and agent) friends to control theming.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Having &amp;lt;code&amp;gt;light-dark()&amp;lt;/code&amp;gt; makes it trivial to support dual color modes in a single stylesheet and doesn’t add too much weight (0.5kb gzip for ~500 variables). It also gives you the ability to switch themes mid-page.&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;css&amp;quot;&amp;gt;&amp;lt;code&amp;gt;:root {
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:root {
         color-scheme: light dark;
         --bg-color: light-dark(white, black);
         --text-color: light-dark(black: white);
@@ -828,7 +1005,7 @@
         &amp;lt;/p&amp;gt;
         &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
         &amp;lt;p&amp;gt;The goal was to make it so that when the browser switched from light/dark modes, themed elements would switch to their inverse theme. The trick I uncovered was setting the current theme as a CSS variable:&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;css&amp;quot;&amp;gt;&amp;lt;code&amp;gt;:root {
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:root {
         color-scheme: light dark;
         
         /* Initialize the theme variables */
@@ -846,7 +1023,7 @@
         [data-theme=&amp;amp;quot;dark&amp;amp;quot;] { --theme: dark; }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;The reason we use manage  &amp;lt;code&amp;gt;--theme&amp;lt;/code&amp;gt; variable instead of purely &amp;lt;code&amp;gt;color-scheme&amp;lt;/code&amp;gt; is because we can pass that into a &amp;lt;code&amp;gt;style()&amp;lt;/code&amp;gt; query. An that’s the magic that enables inverted themes:&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;css&amp;quot;&amp;gt;&amp;lt;code&amp;gt;/* Add style query magic ✨ */
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* Add style query magic ✨ */
         @container style(--theme: light) {
         [data-theme=&amp;amp;quot;inverted&amp;amp;quot;] {
         --theme: dark;
@@ -870,7 +1047,7 @@
         &amp;lt;p&amp;gt;Given that I know the experience will auto-upgrade for Firefox users at some point this year, I’m prone to wait it out per the rules of progressive enhancement. If it falls back to the current theme, I don’t think the world falls over.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;However, you probably support browsers outside the latest version and what’s acceptable for a fallback depends on your company’s understanding of the eventual consistency of browsers. iOS devices version-locked at Safari 17.4 are of particular concern for me, so I wrote an inverted theme polyfill.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;The CSS style-query-support detection is pretty simple, but quirky.&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;css&amp;quot;&amp;gt;&amp;lt;code&amp;gt;/* Style query support check */
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* Style query support check */
         body {
         --syle-query-support: 0;
         }
@@ -881,7 +1058,7 @@
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;There’s a new &amp;lt;code&amp;gt;@supports at-rule()&amp;lt;/code&amp;gt; function that would be more idiomatic, but &amp;lt;a href=&amp;quot;https://www.bram.us/2026/03/15/at-rule/&amp;quot;&amp;gt;you can’t detect at-rule function support&amp;lt;/a&amp;gt; with &amp;lt;code&amp;gt;at-rule()&amp;lt;/code&amp;gt; so we have to do this variable hack. Ideally we could do this purely in JS with &amp;lt;code&amp;gt;CSS.supports()&amp;lt;/code&amp;gt;, but alas. Booleans in CSS, what could go wrong?&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;That brings us to the JavaScript part which is pretty simple as well but comes with &amp;lt;strong&amp;gt;one big potential tradeoff&amp;lt;/strong&amp;gt;…&amp;lt;/p&amp;gt;
-        &amp;lt;pre lang=&amp;quot;js&amp;quot;&amp;gt;&amp;lt;code&amp;gt;/**
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;/**
         * Polyfill for inverted themes using a `--theme` variable in a style query
         * ⚠️ The use of `getComputedStyle` can trigger layout and style recalcs
         */
@@ -1022,27 +1199,6 @@
         &amp;lt;p&amp;gt;I think history is wrought with examples of this working; Dr. King’s “I have a Dream” speech, the Federalist Papers, David Hasselhoff singing at the Berlin Wall during the height of the Cold War… the list goes on. Few will rise to the level of Ambassador Hasselhoff, but I don’t have to look far to find people around me who have inspired me by writing about the future they want.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;After repeated mass layoffs, &amp;lt;a href=&amp;quot;https://ethanmarcotte.com/&amp;quot;&amp;gt;Ethan Marcotte&amp;lt;/a&amp;gt; identified a problem with the wealth and labor dynamics in the tech industry. While Ethan could have been perfectly happy bitching about it on Twitter, he didn’t do that. Instead, he put hands to keyboard and made a talk, which turned into &amp;lt;a href=&amp;quot;https://ethanmarcotte.com/books/you-deserve-a-tech-union/&amp;quot;&amp;gt;a book&amp;lt;/a&amp;gt;, about what he feels is the time-tested solution to our predicament: Unions. Truthfully, I’m not particularly predispositioned to be pro-union (Texan, etc), but Ethan and I agree on the problem. Seeing Ethan &amp;lt;a href=&amp;quot;https://journal.stuffwithstuff.com/2026/01/24/the-value-of-things/&amp;quot;&amp;gt;spend time&amp;lt;/a&amp;gt; to communicate the problem and explore the solution changed my opinion on unions. And while I certainly still have nuanced questions, Ethan convinced me that collective action is the best leverage workers have against abuses of labor. That wouldn’t have happened without Ethan’s dedication to highlighting the problem &amp;lt;em&amp;gt;and the solution&amp;lt;/em&amp;gt; over many years.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Often people need you to &amp;lt;em&amp;gt;show, not tell&amp;lt;/em&amp;gt; the alternative. You need to paint a picture. Not a full complete picture, but one where a person can paint themselves in it. When people want change and bad change is happening all around them, that’s a hopeless place. Build a raft of opportunity that people can latch onto in the rough open waters, instead of hitting them with spears.&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>I&apos;m swearing off APIs entirely</title>
-      <link>https://daverupert.com/2026/01/hitting-my-api-limits/</link>
-      <guid>https://daverupert.com/2026/01/hitting-my-api-limits/</guid>
-      <pubDate>Mon, 26 Jan 2026 06:27:00 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;I got a lot of ideas for side projects rattling around in the old tin can. As part of my “No new projects” initiative, I’m trying to jump on building prototypes so I can decide if I want to explore ideas more or call it quits. A handful of my ideas are riffs or twists on existing app categories:&amp;lt;/p&amp;gt;
-        &amp;lt;ul&amp;gt;
-        &amp;lt;li&amp;gt;A tennis ranking app… but modern and performant&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;A nearby historical marker app… but with CarPlay support&amp;lt;/li&amp;gt;
-        &amp;lt;li&amp;gt;A nearby real estate listing app… but with CarPlay support&amp;lt;/li&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;p&amp;gt;All three of those have ended unceremoniously at the same dead end: no API access. USTA denied my application for tennis rankings. The aptly named Historical Marker Database site doesn’t have a public API. And you have to be an MLS® Realtor® or Broker to get access to the MLS® listings. Womp womp.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Scraping the data is always an option… but I don’t like the ethics of that and worry about the brittleness of that dependency.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Ugh. I wish I could build these little apps so that tens of people could enjoy them. I’d even be willing to pay a small API access fee ($10/mo?) and run these at a loss but whatever happened to free APIs. When I &amp;lt;a href=&amp;quot;https://github.com/public-api-lists/public-api-lists&amp;quot;&amp;gt;survey the land of public APIs&amp;lt;/a&amp;gt; it feels like we’ve lost a lot since the Web 2.0 days where API access was almost a God-given right.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;To prevent this time loop of disappointment from happening again, I’m swearing off APIs entirely. That’s a hard stance, but I need a backstop at the idea phase to prevent me from wasting limited life force. If I don’t have the data, or can’t generate the data, or it’s not an open protocol… it’s not worth building or even thinking about.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;OAuth apps are a good option and generally the best way to exfiltrate data because it’s tied to a user’s account…. but you still might run into call limits, incomplete endpoints, user-scope limitations, and so on. History also shows us what the future holds. There’s a Tweetbot-style risk when building on a someone else’s platform. Even if your app drives activity to the parent application, your access might get cut because it competes or doesn’t drive stakeholder value. And if the idea isn’t big enough, being “a feature, not a product” is also a bad position to be in, lest you get Sherlock’d.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Where’s that leave me and my pile of side project ideas? Thankfully… in a good place. I can close out these project tabs and free up some much needed Brain RAM. It sounds strange but “No more APIs” makes “Making video games” jump up in the viability rankings for side projects too, because games have closed ecosystems. Or I could spend more time writing shitty sci-fi. Write a serial. Print some zines. Who knows.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If the goal of “No new projects” is to finish more projects than I start, then I have to accept that part of figuring out which ideas to explore means “&amp;lt;a href=&amp;quot;https://www.youtube.com/watch?v=RfiQYRn7fBg&amp;quot;&amp;gt;Nope&amp;lt;/a&amp;gt;” is a potential answer. It’s also not a total loss, I’m learning along the way. For example, &amp;lt;a href=&amp;quot;https://developer.apple.com/download/files/CarPlay-Developer-Guide.pdf&amp;quot;&amp;gt;CarPlay only lets you choose from eight pre-approved templates&amp;lt;/a&amp;gt;. There’s also pre-defined app categories and diverting in the slightest would almost guarantee App Store rejection. That sucks the fun out it… but ayyyy, I’ll probably try again. But now I know the limitation for future projects and its in the limitations where play begins.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
   </channel>
