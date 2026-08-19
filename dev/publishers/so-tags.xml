@@ -4,7 +4,66 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Tue, 18 Aug 2026 16:18:22 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 15:50:27 GMT</lastBuildDate>
+    <item>
+      <title>Vue.js watcher not detecting changes to nested object property</title>
+      <link>https://stackoverflow.com/questions/79996330/vue-js-watcher-not-detecting-changes-to-nested-object-property</link>
+      <guid>https://stackoverflow.com/questions/79996330/vue-js-watcher-not-detecting-changes-to-nested-object-property</guid>
+      <pubDate>Tue, 18 Aug 2026 23:44:17 GMT</pubDate>
+      <content:encoded>
+        &lt;h2&gt;Vue.js watcher not detecting changes to nested object property&lt;/h2&gt;
+        &lt;p&gt;I have a Vue.js component where I need to run a function whenever a property inside an object changes.&lt;/p&gt;
+        &lt;p&gt;My component looks like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;input v-model=&amp;quot;user.name&amp;quot; /&amp;gt;
+        &amp;lt;p&amp;gt;{{ user.name }}&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;script&amp;gt;
+        export default {
+        data() {
+        return {
+        user: {
+        name: &apos;&apos;,
+        email: &apos;&apos;
+        }
+        }
+        },
+        
+        watch: {
+        user(newValue, oldValue) {
+        console.log(&apos;User changed:&apos;, newValue)
+        this.saveUser()
+        }
+        },
+        
+        methods: {
+        saveUser() {
+        console.log(&apos;Saving user...&apos;)
+        }
+        }
+        }
+        &amp;lt;/script&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The &lt;code&gt;user.name&lt;/code&gt; value changes correctly in the template, but the &lt;code&gt;user&lt;/code&gt; watcher does not run when I change the input.&lt;/p&gt;
+        &lt;p&gt;I tried watching the object directly because I want to detect changes to any property inside &lt;code&gt;user&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;What is the correct way to watch nested properties in Vue.js?&lt;/p&gt;
+        &lt;p&gt;Should I use a deep watcher such as:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;watch: {
+        user: {
+        handler(newValue) {
+        this.saveUser()
+        },
+        deep: true
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Are there any performance concerns with using &lt;code&gt;deep: true&lt;/code&gt; if the object contains many nested properties?&lt;/p&gt;
+        &lt;p&gt;What would be the recommended approach for this situation?&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How to test Vue ripple directive has been used?</title>
       <link>https://stackoverflow.com/questions/79989578/how-to-test-vue-ripple-directive-has-been-used</link>
@@ -1561,123 +1620,6 @@
         &amp;lt;/template&amp;gt;
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Now my server returns a plain &lt;code&gt;true&lt;/code&gt; when the submitted String is &lt;code&gt;Admin&lt;/code&gt; and &lt;code&gt;false&lt;/code&gt; otherwise. I checked that the post request actually receives these answers via the browser debugger. However, the error span is never shown. What am I doing wrong?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Fluid colums with fixed header element [closed]</title>
-      <link>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element</link>
-      <guid>https://stackoverflow.com/questions/79893113/fluid-colums-with-fixed-header-element</guid>
-      <pubDate>Fri, 20 Feb 2026 17:11:04 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve got a table with &lt;code&gt;table-layout=&amp;quot;auto&amp;quot;&lt;/code&gt; for autowidth of the columns, and &lt;code&gt;height=400&lt;/code&gt; for the fixed header, but the scroll overflows the header which should not happen.&lt;/p&gt;
-        &lt;p&gt;With &lt;code&gt;table-layout=&amp;quot;fixed&amp;quot;&lt;/code&gt; the scroll will fix, but the columns will not get all the width. It uses Vue3 and the library component element plus.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;template&amp;gt;
-        &amp;lt;el-table
-        height=&amp;quot;400&amp;quot;
-        :data=&amp;quot;internalData&amp;quot;
-        :default-sort=&amp;quot;defaultSort&amp;quot;
-        @sort-change=&amp;quot;$emit(&apos;sort-change&apos;, $event)&amp;quot;
-        style=&amp;quot;width: 100%&amp;quot;
-        border
-        class=&amp;quot;custom-table&amp;quot;
-        table-layout=&amp;quot;fixed&amp;quot;
-        overflow-x=&amp;quot;auto&amp;quot;
-        @row-click=&amp;quot;handleRowClick&amp;quot;
-        &amp;gt;
-        &amp;lt;el-table-column
-        v-for=&amp;quot;col in columns&amp;quot;
-        :key=&amp;quot;col.prop&amp;quot;
-        :prop=&amp;quot;col.prop&amp;quot;
-        :label=&amp;quot;col.label&amp;quot;
-        :width=&amp;quot;col.width&amp;quot;
-        :min-width=&amp;quot;col.minWidth&amp;quot;
-        :sortable=&amp;quot;col.sortable ? &apos;custom&apos; : false&amp;quot;
-        &amp;gt;
-        &amp;lt;/el-table-column&amp;gt;
-        &amp;lt;/el-table&amp;gt;
-        &amp;lt;/template&amp;gt;
-        
-        &amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
-        import { ref, onBeforeMount, watch } from &apos;vue&apos;
-        
-        // Define props and emits (añadí `desync` para debugging)
-        const props = defineProps&amp;lt;{
-        data: Record&amp;lt;string, any&amp;gt;[],
-        columns: any[],
-        desync?: boolean
-        }&amp;gt;()
-        
-        defineEmits([&apos;sort-change&apos;])
-        
-        const handleRowClick = (row: any) =&amp;gt; {
-        console.log(row)
-        }
-        
-        // defaultSort definido antes del render
-        const defaultSort = ref({
-        prop: &apos;id&apos;,
-        order: &apos;ascending&apos; as &apos;ascending&apos; | &apos;descending&apos; | null, // Element Plus usa &apos;ascending&apos;/&apos;descending&apos;
-        })
-        
-        // datos internos que usa la tabla (permite simular desincronía)
-        const internalData = ref&amp;lt;Record&amp;lt;string, any&amp;gt;[]&amp;gt;([])
-        
-        function applySort(arr: Record&amp;lt;string, any&amp;gt;[], sort: { prop?: string; order?: string | null }) {
-        if (!sort?.prop || !sort.order) return
-        const prop = sort.prop
-        const order = sort.order === &apos;ascending&apos; ? 1 : -1
-        arr.sort((a, b) =&amp;gt; {
-        if (a[prop] == null) return 1 * order
-        if (b[prop] == null) return -1 * order
-        if (a[prop] &amp;gt; b[prop]) return 1 * order
-        if (a[prop] &amp;lt; b[prop]) return -1 * order
-        return 0
-        })
-        }
-        
-        function shuffle(arr: Record&amp;lt;string, any&amp;gt;[]) {
-        // Fisher–Yates
-        for (let i = arr.length - 1; i &amp;gt; 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[arr[i], arr[j]] = [arr[j], arr[i]]
-        }
-        }
-        
-        // inicializar antes del primer render
-        onBeforeMount(() =&amp;gt; {
-        internalData.value = props.data ? [...props.data] : []
-        if (props.desync) {
-        // para reproducir el bug: la UI se muestra en orden distinto al sort por defecto
-        shuffle(internalData.value)
-        // mantiene defaultSort para la cabecera pero la lista mostrada está desordenada
-        } else {
-        // aplicar sort por defecto antes del render para evitar flicker
-        applySort(internalData.value, defaultSort.value)
-        }
-        })
-        
-        // si los datos externos cambian, sincronizar respetando el modo desync
-        watch(
-        () =&amp;gt; props.data,
-        (newData) =&amp;gt; {
-        internalData.value = newData ? [...newData] : []
-        if (props.desync) {
-        shuffle(internalData.value)
-        } else {
-        applySort(internalData.value, defaultSort.value)
-        }
-        },
-        { immediate: false }
-        )
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;style scoped&amp;gt;
-        :deep(.cell) {
-        white-space: nowrap !important;
-        }
-        &amp;lt;/style&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;How can I fix it? I need a mix between &lt;code&gt;table-layout=&amp;quot;fixed&amp;quot;&lt;/code&gt; and &lt;code&gt;table-layout=&amp;quot;auto&amp;quot;&lt;/code&gt; for full width columns.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

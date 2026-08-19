@@ -4,7 +4,86 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Tue, 18 Aug 2026 16:18:19 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 15:50:23 GMT</lastBuildDate>
+    <item>
+      <title>Introducing Microlighter</title>
+      <link>https://daverupert.com/2026/08/microlighter/</link>
+      <guid>https://daverupert.com/2026/08/microlighter/</guid>
+      <pubDate>Wed, 19 Aug 2026 15:22:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;I made a smol client-side syntax highlighter that uses the CSS Custom Highlights API called &amp;lt;a href=&amp;quot;https://davatron5000.github.io/microlighter/&amp;quot;&amp;gt;MicroLighter&amp;lt;/a&amp;gt;. I’ll talk about &amp;lt;em&amp;gt;why I made it&amp;lt;/em&amp;gt; in a bit but first I wanted to… &amp;lt;em&amp;gt;ahem&amp;lt;/em&amp;gt;… highlight… some of the features.&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;Zero-dependencies&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;~2kb minifed+gzipped&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Uses CSS &amp;lt;code&amp;gt;::highlight(token-name)&amp;lt;/code&amp;gt;, not spans&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Leverages &amp;lt;a href=&amp;quot;https://macromates.com/manual/en/language_grammars&amp;quot;&amp;gt;Textmate’s language grammars&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Human-readable &amp;lt;code&amp;gt;light-dark()&amp;lt;/code&amp;gt; themes&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;All languages/grammars loaded on-demand&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Moves all non-highlight functionality to a &amp;lt;a href=&amp;quot;https://davatron5000.github.io/microlighter/custom-element.html&amp;quot;&amp;gt;&amp;lt;code&amp;gt;&amp;amp;lt;micro-lighter&amp;amp;gt;&amp;lt;/code&amp;gt; custom element&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;At some point I broke syntax highlighting on my Jekyll blog. I’ve used a handful of syntax highlighters over the years (Highlight.js, PrismJS, Rouge, Shiki, etc, etc) and I’ve felt the trade-offs between different client-side and server-side implementations. Faced with picking another, I knew I wanted to explore &amp;lt;a href=&amp;quot;https://www.bram.us/2024/02/18/custom-highlight-api-for-syntax-highlighting/&amp;quot;&amp;gt;Bramus’s technique of syntax highlighting with the CSS Custom Highlights API&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;There’s some limitations with the CSS &amp;lt;code&amp;gt;::highlight()&amp;lt;/code&amp;gt; pseudo; no italics, no bold, no font swapping – but otherwise it’s pretty cool syntax to idiomatically express “I want to highlight this token” via CSS instead of injecting spans everywhere. Using the Highlight API means I avoid any DOM mutation and the scope of the library shrinks down to: scan code blocks using regex patterns and send &amp;lt;code&amp;gt;CSS.highlights.set(category, textRanges)&amp;lt;/code&amp;gt; to highlight the code blocks.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;I don’t need much syntax highlighting on this site. Not all posts have code and my code samples are a whole fifteen lines long at best. My struggle is that I swap languages often. I’ll do HTML, CSS, and JavaScript all in the same post. A little &amp;lt;code&amp;gt;bash&amp;lt;/code&amp;gt; here, a little &amp;lt;code&amp;gt;ruby&amp;lt;/code&amp;gt; there, some &amp;lt;code&amp;gt;markdown&amp;lt;/code&amp;gt; as a treat. Using so all those languages grew the complexity beyond the limits of my regex-fu, so I decided to lean on Textmate’s established collections of patterns used by VS Code. And before I knew it, my little highlighter could do almost any language.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Knowing I use different languages often, one principle I established was that all language grammars should be auto-loaded on-demand to reduce configuration and bundle size. That way you only pay for what you use.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Inspired by PrismJS’s simplified token categories I flattened down Textmate’s granular token categories to a more human-friendly set, making it easier to style. In addition to that, one enormous nit-pick I have with codeblock styling is that light and dark themes are separate entities, so I merged them into one theme using &amp;lt;code&amp;gt;light-dark()&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The last big opinion I baked in was that I wanted the syntax highlighter to do one job: infer language and highlight code in that language. With that a guideline, I moved all extra functionality (like line-numbers, etc) over to a web component. The vanilla web component adds about ~1 KiB in size, but co-locating UI into a UI primitive like native custom elements feels right and the ShadowDOM encapsulation makes it easy to separate the code from the presentational UI.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Obviously, I’m a web component pervert but it feels like a great separation of concerns versus trying to cram everything into core library.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;try-it-out&amp;quot;&amp;gt;Try it out&amp;lt;a href=&amp;quot;#try-it-out&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Try it out&amp;apos;&amp;quot; data-heading-content=&amp;quot;Try it out&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;To get started on your site, I’d use the self-initializing minified bundle, but I’m also shipping ESM and a web component.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-bash&amp;quot;&amp;gt;npm install microlighter
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;script type=&amp;amp;quot;module&amp;amp;quot; src=&amp;amp;quot;path/to/microlighter/microlighter.min.js&amp;amp;quot;&amp;amp;gt;&amp;amp;lt;/script&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Like I said above, not all my posts have syntax highlighting, so I even wait to import the script unless I know there’s a page with code on it.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;if(document.querySelector(&amp;apos;pre&amp;amp;gt;code&amp;apos;).length) {
+        import(&amp;apos;path/to/microlighter/microlighter.min.js&amp;apos;);
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;You can use the ESM version if you’re going to do something fancy yourself:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;import { highlightAll } from &amp;apos;microlighter&amp;apos;
+        
+        highlightAll({
+        selector: &amp;apos;pre.onlyTheseGetHighlights&amp;apos;
+        })
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And you can also use the web component if you want those extra features I talked about:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;micro-lighter data-syntax-theme=&amp;amp;quot;github&amp;amp;quot; line-numbers controls=&amp;amp;quot;copy&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;pre&amp;amp;gt;&amp;amp;lt;code&amp;amp;gt;Code goes here&amp;amp;lt;/code&amp;amp;gt;&amp;amp;lt;/pre&amp;amp;gt;
+        &amp;amp;lt;/micro-lighter&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Web component classes are pretty extendible too so if I don’t support something you &amp;lt;em&amp;gt;need&amp;lt;/em&amp;gt;, you can “fork” it by extending the base class and adding your own features.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Lastly, you can use one of the pre-supplied themes or roll your own. The basic structure is:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/**
+        * Setup semantic `--syntax-*` tokens 
+        * @value background | foreground | comment | keyword | 
+        * operator |string | constant | function | type | variable |
+        * property | tag | selector | inserted | deleted
+        */
+        [data-syntax-theme=&amp;amp;quot;my-theme-name&amp;amp;quot;] {
+        color-scheme: light dark;
+        
+        /* Code block tokens */
+        --syntax-background: light-dark(#f8f8f8, #3a3a3a);
+        --syntax-foreground: light-dark(#3a3a3a, #f8f8f8);
+        
+        /* Highlight tokens */
+        --syntax-comment: light-dark(#6e7781, #8b949e);
+        --syntax-function: light-dark(#8250df, #d2a8ff);
+        /* ...etc... */
+        }
+        
+        [data-syntax-theme=&amp;amp;quot;my-theme-name&amp;amp;quot;] pre:has(code) {
+        background-color:var(--syntax-background);
+        color:var(--syntax-foreground)
+        }
+        
+        ::highlight(comment) { color: var(--syntax-comment) }
+        ::highlight(function) { color: var(--syntax-function) }
+        /* ...etc... */
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And that’s MicroLighter. If you end up using it and trying it out, let me know what you think.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Shadow-piercing local component variables</title>
       <link>https://daverupert.com/2026/08/how-to-pierce-your-shadow-belly-button/</link>
@@ -1182,23 +1261,6 @@
         &amp;lt;p&amp;gt;Looking ahead, I expect these types of errant conjurations will come under more scrutiny when the free money subsidies run out and consumers inherit the full cost of the models’ mistakes. Supply chain constraints around memory and GPUs are already making compute a scarce resource, but our Gas Towns plunder onward. When the cost of wrong answers goes up and more and more people spend all their monthly credits on hallucinations, that will be a lot of dissatisfied users.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Anyways, all this changes so much. Today it’s skills, before that MCP, before that PRDs, before that prompt engineering… what is it going to be next quarter? And aren’t those all flavors of the same managing context puzzle? Churn, churn, churn, I suppose.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;File under: &amp;lt;code&amp;gt;non-determinism&amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Write about the future you want</title>
-      <link>https://daverupert.com/2026/02/futurescapes/</link>
-      <guid>https://daverupert.com/2026/02/futurescapes/</guid>
-      <pubDate>Wed, 04 Feb 2026 15:45:00 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;There’s a lot that’s not going well; politics, tech bubbles, the economy, and so on. I spend most of my day reading angry tweets and blog posts. There’s a lot to be upset about, so that’s understandable. But in the interest of fostering better discourse, I’d like to offer a challenge that I think the world desperately needs right now: It’s cheap and easy to complain and say “&amp;lt;span data-escaped-char&amp;gt;[&amp;lt;/span&amp;gt;Thing&amp;lt;span data-escaped-char&amp;gt;]&amp;lt;/span&amp;gt; is bad”, but it’s also free to share what you think would be better.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If complaining worked, we would have won the culture war already. We’d have a reformed Elon and the White House wouldn’t be committing crimes against humanity. But that’s not the world we live in. The one we live in is much worse. If you hate the here and now, write about what would be a better future. Write about &amp;lt;em&amp;gt;what’s good&amp;lt;/em&amp;gt; and why &amp;lt;em&amp;gt;more of that good&amp;lt;/em&amp;gt; would &amp;lt;em&amp;gt;be good&amp;lt;/em&amp;gt;.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If you believe the current trend in tech is exploitative, write about tech that isn’t. What impresses you? What compromises did you make? Are you happy? Does giving money to a small bootstrapped company feel ten thousand times better than a large venture-backed company like I imagine? Can you list some of those out for me? Show me where I can throw my dollars.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If you detest content theft at a massive scale, describe a world where copyright matters. Tell me how you’re only going to watch TikToks with royalty free music from now on and not use an ad-blocker. Tell me how you’re going to delete that hard-drive of pirated content. No? Then invent a better copyright system! Talk about the commons and how we should tax people who abuse it by taking more than they give. What does that system look like?&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If you detest the ecological impact of AI data centers, propose an alternative piece of technology that drives shareholder value. Or advocate for a broader, more equitable definition of &amp;lt;a href=&amp;quot;https://www.ibm.com/think/topics/responsible-ai&amp;quot;&amp;gt;Responsible AI&amp;lt;/a&amp;gt;. Don’t let the Effective Altruists define the terms. &amp;lt;a href=&amp;quot;https://dbushell.com/ai/&amp;quot;&amp;gt;Itemize the problems&amp;lt;/a&amp;gt; and then dream up a version that doesn’t have those. List demands. Find levers. Or make the case for how small, local, private, and less energy-intensive models are probably “good enough” for most use cases and we should stop burning barrels of crude and use those instead. If we must throw it away, point people to organizations and political groups working towards that end.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If you believe billionaires are the problem, talk about a world without them. Share how we redistribute a billionaire tax equitably and talk about the impact it has on society. Make a spreadsheet or a chart. Get into numbers. Talk about degrowth. I know that “Line Goes Up” has problems and won’t work forever, but how are my family and I more okay if we undo centuries of continued economic growth and technical acceleration.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;I think history is wrought with examples of this working; Dr. King’s “I have a Dream” speech, the Federalist Papers, David Hasselhoff singing at the Berlin Wall during the height of the Cold War… the list goes on. Few will rise to the level of Ambassador Hasselhoff, but I don’t have to look far to find people around me who have inspired me by writing about the future they want.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;After repeated mass layoffs, &amp;lt;a href=&amp;quot;https://ethanmarcotte.com/&amp;quot;&amp;gt;Ethan Marcotte&amp;lt;/a&amp;gt; identified a problem with the wealth and labor dynamics in the tech industry. While Ethan could have been perfectly happy bitching about it on Twitter, he didn’t do that. Instead, he put hands to keyboard and made a talk, which turned into &amp;lt;a href=&amp;quot;https://ethanmarcotte.com/books/you-deserve-a-tech-union/&amp;quot;&amp;gt;a book&amp;lt;/a&amp;gt;, about what he feels is the time-tested solution to our predicament: Unions. Truthfully, I’m not particularly predispositioned to be pro-union (Texan, etc), but Ethan and I agree on the problem. Seeing Ethan &amp;lt;a href=&amp;quot;https://journal.stuffwithstuff.com/2026/01/24/the-value-of-things/&amp;quot;&amp;gt;spend time&amp;lt;/a&amp;gt; to communicate the problem and explore the solution changed my opinion on unions. And while I certainly still have nuanced questions, Ethan convinced me that collective action is the best leverage workers have against abuses of labor. That wouldn’t have happened without Ethan’s dedication to highlighting the problem &amp;lt;em&amp;gt;and the solution&amp;lt;/em&amp;gt; over many years.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Often people need you to &amp;lt;em&amp;gt;show, not tell&amp;lt;/em&amp;gt; the alternative. You need to paint a picture. Not a full complete picture, but one where a person can paint themselves in it. When people want change and bad change is happening all around them, that’s a hopeless place. Build a raft of opportunity that people can latch onto in the rough open waters, instead of hitting them with spears.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
   </channel>
