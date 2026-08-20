@@ -4,7 +4,340 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 19 Aug 2026 15:50:21 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 20 Aug 2026 15:57:14 GMT</lastBuildDate>
+    <item>
+      <title>A look at the geolocation HTML element and how it works</title>
+      <link>https://piccalil.li/blog/a-look-at-the-geolocation-html-element-and-how-it-works/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/a-look-at-the-geolocation-html-element-and-how-it-works/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 20 Aug 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;The &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; HTML element does exactly what you might think it does. It’s a dedicated element that gets the user’s location, either once or continuously. The options are set using HTML attributes instead of JavaScript, but JavaScript is still needed. However, &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; requires &lt;em&gt;fewer lines&lt;/em&gt; of JavaScript and also offers superior error and permission handling. In fact, the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element started off as an all-purpose &lt;code&gt;&amp;lt;permission&amp;gt;&lt;/code&gt; element, but is now dedicated to handling geolocation.&lt;/p&gt;
+        &lt;p&gt;Fewer lines of code is always a good thing, but it’s the permission prompt that’s key here. When using the aging Geolocation JavaScript API, denying permission at any point can lock the user out with no way to recover unless they change the browser or operating system permissions manually. This can be a painful experience, especially for users that aren’t tech-savvy. Plus, as developers, we have to get the Permissions API involved.&lt;/p&gt;
+        &lt;p&gt;Whereas, the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element offers:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Better error handling, and where applicable, recovery handholding&lt;/li&gt;
+        &lt;li&gt;User-controlled permission prompting, even if the user denied permission previously&lt;/li&gt;
+        &lt;li&gt;Auto-location if the user granted permission previously&lt;/li&gt;
+        &lt;li&gt;A styleable granted state via the &lt;code&gt;:granted&lt;/code&gt; CSS pseudo-class&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; is better in every way except browser support (it requires Chrome 144+), so in this article, I’ll explain how to use it alongside the older current Geolocation JavaScript API so that users get the better experience, if the new element is available.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Requesting the user’s location using &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;The &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element accepts several attributes that largely correspond to the options of the &lt;code&gt;getCurrentPosition()&lt;/code&gt; and &lt;code&gt;watchPosition()&lt;/code&gt; methods of the aging Geolocation API.&lt;/p&gt;
+        &lt;p&gt;Firstly, the &lt;code&gt;accuracymode&lt;/code&gt; attribute accepts two values — &lt;code&gt;approximate&lt;/code&gt; (which is the default value) and &lt;code&gt;precise&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;accuracymode=approximate&lt;/code&gt; is equivalent to the &lt;code&gt;enableHighAccuracy: false&lt;/code&gt; option (again, the default) from the Geolocation API, whereas &lt;code&gt;accuracymode=precise&lt;/code&gt; is equivalent to &lt;code&gt;enableHighAccuracy: true&lt;/code&gt;, which provides a more accurate location if the device is able to get one.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;autolocate&lt;/code&gt; boolean attribute attempts to get the user’s location automatically, assuming that they’ve granted the website permission previously.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;watch&lt;/code&gt; boolean attribute is equivalent to calling the &lt;code&gt;watchPosition()&lt;/code&gt; method instead of the &lt;code&gt;getCurrentPosition()&lt;/code&gt; method. &lt;code&gt;getCurrentPosition()&lt;/code&gt; fetches the user’s location once, whereas &lt;code&gt;watchPosition()&lt;/code&gt; tracks their location over time. Like &lt;code&gt;accuracymode=precise&lt;/code&gt; and &lt;code&gt;enableHighAccuracy: true&lt;/code&gt;, this drains the battery faster.&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;onlocation&lt;/code&gt; event handler attribute can be used to execute JavaScript whenever location data or error information is passed to the browser.&lt;/p&gt;
+        &lt;p&gt;What the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element doesn’t offer, though, is the ability to specify the &lt;code&gt;timeout&lt;/code&gt; (how long the browser should wait for a response) or &lt;code&gt;maximumAge&lt;/code&gt; (how old a cached location can be). Instead the browser handles these as it sees fit, which is actually a good thing, because choosing the right values on a case-by-case basis is a complexity that we just don’t need.&lt;/p&gt;
+        &lt;p&gt;In practice, this is how you might use &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;!-- Precisely autolocate and follow the user --&amp;gt;
+        &amp;lt;geolocation accuracymode=&quot;precise&quot; autolocate watch&amp;gt;
+        &amp;lt;!-- Render this when &amp;lt;geolocation&amp;gt; is unsupported --&amp;gt;
+        &amp;lt;button id=&quot;fallbackButton&quot;&amp;gt;Use precise location&amp;lt;/button&amp;gt;
+        &amp;lt;/geolocation&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That is, of course, not including the JavaScript side of &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; nor the Geolocation (JavaScript) API fallback. If you just want the full code then you’re looking for the &lt;code&gt;getCurrentPosition()&lt;/code&gt; version and &lt;code&gt;watchPosition()&lt;/code&gt; version. Note that geolocation doesn’t work in insecure contexts, so while the logic is sound, the CodePen demos won’t actually work. They’re raw-logic templates anyway, not fully working demonstrations.&lt;/p&gt;
+        &lt;p&gt;Anyway, let’s get into the JavaScript of it all, starting with the JavaScript that sits on the other side of that &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; markup.&lt;/p&gt;
+        &lt;h2&gt;Handling the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; data with JavaScript&lt;/h2&gt;
+        &lt;p&gt;First, we want to make sure that &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; is supported with &lt;code&gt;if (&quot;HTMLGeolocationElement&quot; in window)&lt;/code&gt;. If it is, then we select it with &lt;code&gt;const geoElement = document.querySelector(&quot;geolocation&quot;)&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Unfortunately, we then have to dive into the most complex part of &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; — it’s validity — where the &lt;code&gt;isValid&lt;/code&gt; property returns &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt; and the &lt;code&gt;invalidReason&lt;/code&gt; property returns &lt;code&gt;&quot;&quot;&lt;/code&gt; (an empty string) or an enumerated value stating the reason.&lt;/p&gt;
+        &lt;p&gt;These reasons mostly come down to developer oversight, so users &lt;em&gt;shouldn’t&lt;/em&gt; encounter these ‘blockers’, but if they do, the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; button will be disabled. Here are the scenarios in which that can happen (note that the blockers are ordered by severity, and that &lt;code&gt;invalidReason&lt;/code&gt; only returns the most severe one):&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;illegal_subframe&lt;/code&gt;: the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element is nested within a &lt;code&gt;&amp;lt;fencedframe&amp;gt;&lt;/code&gt; or insecure &lt;code&gt;&amp;lt;iframe&amp;gt;&lt;/code&gt; (the latter of which is why the CodePen demos don’t work)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;unsuccessful_registration&lt;/code&gt;: the page has more than three &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; elements&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;recently_attached&lt;/code&gt;: the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element has only recently been attached to the DOM (this blocker expires fairly quickly)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;intersection_changed&lt;/code&gt;: the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element is moving&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;intersection_out_of_viewport_or_clipped&lt;/code&gt; : the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element isn’t within the viewport fully&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;intersection_occluded_or_distorted&lt;/code&gt;: something is obscuring the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;style_invalid&lt;/code&gt;: the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element is styled in a way that isn’t allowed (more on this later)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As you can see, these blockers are permanently avoidable as long as we catch and fix them. Let’s have a proper look at how &lt;code&gt;invalidReason&lt;/code&gt; reports these blockers, though.&lt;/p&gt;
+        &lt;p&gt;As the JavaScript comment below describes, &lt;code&gt;isValid&lt;/code&gt; always returns &lt;code&gt;false&lt;/code&gt; at first, while &lt;code&gt;invalidReason&lt;/code&gt; returns &lt;code&gt;recently_attached&lt;/code&gt;. This basically disables the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; button for a fraction of a second to prevent clickjacking. That is, unless a blocker of higher severity applies. We don’t actually need the line below, it’s there just to show you how &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; will never be valid when the page loads.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* At first, isValid === false and invalidReason === &quot;recently_attached&quot;
+        unless isValid === false and invalidReason === &quot;a reason of higher severity&quot; */
+        console.warn(`isValid: ${geoElement.isValid}, invalidReason: ${geoElement.invalidReason}`);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; then becomes invalid for a more permanent reason, &lt;code&gt;isValid&lt;/code&gt; will obviously remain &lt;code&gt;false&lt;/code&gt;, so we can’t use the &lt;code&gt;validationstatuschange&lt;/code&gt; event listener here. However, we can wrap the line in &lt;code&gt;setTimeout()&lt;/code&gt; (as below). This will either log a new blocker into the console, or log that &lt;code&gt;isValid&lt;/code&gt; is &lt;code&gt;true&lt;/code&gt; (in which case &lt;code&gt;invalidReason&lt;/code&gt; will be an empty string).&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* After ~300ms, when &amp;lt;geolocation&amp;gt; is no longer ‘recently attached’ (to the DOM)
+        either isValid === true and invalidReason === &quot;&quot; (an empty string)
+        or isValid === false and invalidReason === &quot;the reason with the highest severity&quot; */
+        setTimeout(() =&amp;gt; {
+        console.log(`isValid: ${geoElement.isValid}, invalidReason: ${geoElement.invalidReason}`);
+        }, 300);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If the validation status changes later, &lt;em&gt;then&lt;/em&gt; we can use the &lt;code&gt;validationstatuschange&lt;/code&gt; event listener (again, as below). Note that if there are no persistent blockers, this will fire almost immediately as &lt;code&gt;invalidReason&lt;/code&gt; switches from &lt;code&gt;recently_attached&lt;/code&gt; to an empty string.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* If the validity of &amp;lt;geolocation&amp;gt; changes */
+        geoElement.addEventListener(&quot;validationstatuschange&quot;, () =&amp;gt; {
+        if (geoElement.isValid) {
+        /* &amp;lt;geolocation&amp;gt; is valid (if there aren’t any blockers,
+        it will become valid after it’s no longer ‘recently attached’ */
+        } else {
+        console.error(`&amp;lt;geolocation&amp;gt; invalid: ${geoElement.invalidReason}`);
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now that you know how to debug the validation status and permanently fix any persistent blockers, let’s talk about the &lt;em&gt;permission&lt;/em&gt; status.&lt;/p&gt;
+        &lt;p&gt;We’re given a few properties and events to work with:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;initialPermissionStatus&lt;/code&gt;: a property that returns &lt;code&gt;denied&lt;/code&gt;, &lt;code&gt;granted&lt;/code&gt;, or &lt;code&gt;prompt&lt;/code&gt; (i.e., neither) based on the permission status when the page first loaded&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;permissionStatus&lt;/code&gt;: the &lt;em&gt;current&lt;/em&gt; permission status&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;promptaction&lt;/code&gt;: an event that fires when the user denies or grants permission from the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; permission prompt dialog&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;promptdismiss&lt;/code&gt;: fires when the user dismisses the dialog, in which case the &lt;code&gt;permissionStatus&lt;/code&gt; remains unchanged&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre&gt;&lt;code&gt;/* Determine the initial permission status */
+        if (geoElement.initialPermissionStatus === &quot;denied&quot;) {
+        /* The user previously denied permission */
+        } else if (geoElement.initialPermissionStatus === &quot;granted&quot;) {
+        /* The user previously granted permission */
+        } else if (geoElement.initialPermissionStatus === &quot;prompt&quot;) {
+        /* The user hasn’t made a choice */
+        }
+        
+        /* If the user denies or grants permission */
+        geoElement.addEventListener(&quot;promptaction&quot;, () =&amp;gt; {
+        if (geoElement.permissionStatus === &quot;denied&quot;) {
+        /* The user denied permission */
+        } else if (geoElement.permissionStatus === &quot;granted&quot;) {
+        /* The user granted permission */
+        }
+        });
+        
+        /* If the user dismisses the prompt */
+        geoElement.addEventListener(&quot;promptdismiss&quot;, () =&amp;gt; {
+        if (geoElement.permissionStatus === &quot;denied&quot;) {
+        /* The permission state remained denied */
+        } else if (geoElement.permissionStatus === &quot;granted&quot;) {
+        /* The permission state remained granted */
+        } else if (geoElement.permissionStatus === &quot;prompt&quot;) {
+        /* The permission state remained prompt */
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That being said, I honestly don’t know what we’d need any of that for. If the user previously denied permission, for example, the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; permission prompt dialog would enable the user to recover from that automatically:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/geolocation-1.png&quot; alt=&quot;Two confirmation boxes. One reads &amp;quot;You previously didn&apos;t allow location for this site&amp;quot; and the other reads &amp;quot;To use your location on this site, give Chrome access&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;This is in contrast to the older Geolocation API, which is unlikely to help users recover. In this case we need to read the permission status, manage the state of the component accordingly, and provide recovery instructions so that users can grant access manually, but &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; takes care of all of that.&lt;/p&gt;
+        &lt;p&gt;What you &lt;em&gt;will&lt;/em&gt; need is the new &lt;code&gt;location&lt;/code&gt; event, which fires whenever the browser passes location data (&lt;code&gt;geoElement.position&lt;/code&gt; in this case) or error information (&lt;code&gt;geoElement.error&lt;/code&gt;) to us.&lt;/p&gt;
+        &lt;p&gt;Then, in the event listener callback, assuming that &lt;code&gt;geoElement.position&lt;/code&gt; is truthy, we can access &lt;code&gt;position.coords&lt;/code&gt; and &lt;code&gt;position.timestamp&lt;/code&gt;, synthesizing the location data like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* If the browser passes location data or error information */
+        geoElement.addEventListener(&quot;location&quot;, () =&amp;gt; {
+        /* If location data */
+        if (geoElement.position) {
+        /* Synthesize the data */
+        const {
+        latitude,
+        longitude,
+        altitude,
+        accuracy,
+        altitudeAccuracy,
+        heading,
+        speed
+        } = geoElement.position.coords;
+        
+        const timestamp = geoElement.position.timestamp;
+        } else if (geoElement.error) {
+        /* If error information */
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;However, if &lt;code&gt;geoElement.error&lt;/code&gt; is truthy, we can access &lt;code&gt;error.message&lt;/code&gt; (that’s for us to log into the console) and &lt;code&gt;error.code&lt;/code&gt;, which is much more suitable for error handling.&lt;/p&gt;
+        &lt;p&gt;In short, there are three possible error codes, each with an associated constant so that we don’t need to remember what each error code represents. So &lt;code&gt;1&lt;/code&gt; represents &lt;code&gt;PERMISSION_DENIED&lt;/code&gt;, &lt;code&gt;2&lt;/code&gt; represents &lt;code&gt;POSITION_UNAVAILABLE&lt;/code&gt;, and finally, &lt;code&gt;3&lt;/code&gt; represents &lt;code&gt;TIMEOUT&lt;/code&gt;, and then we just evaluate them like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* If the browser passes location data or error information */
+        geoElement.addEventListener(&quot;location&quot;, () =&amp;gt; {
+        if (geoElement.position) {
+        /* If location data */
+        } else if (geoElement.error) {
+        /* If error information */
+        console.error(`&amp;lt;geolocation&amp;gt; error: ${geoElement.error.message}`);
+        
+        if (geoElement.error.code === geoElement.error.PERMISSION_DENIED) {
+        /* No HTTPS or server misconfiguration */
+        } else if (geoElement.error.code === geoElement.error.POSITION_UNAVAILABLE) {
+        /* No location source (GPS satellite or nearby Wi-Fi network/cellular tower) */
+        } else if (geoElement.error.code === geoElement.error.TIMEOUT) {
+        /* Location source detection or hardware took too long */
+        }
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;code&gt;PERMISSION_DENIED&lt;/code&gt; means that the website isn’t being served over HTTPS (the browser denied permission), or that there’s some kind of server misconfiguration (the server denied permission), but those two errors are permanently fixable and shouldn’t occur in production.&lt;/p&gt;
+        &lt;p&gt;The only way to deny permission (as far as I’m aware) is to block location access from the browser settings, then click on the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; button, then choose to continue denying. In my opinion, that’s not likely to happen and doesn’t warrant an error message anyway. There isn’t a denial mechanism for OS-level blocks so as not to make the impression that the browser can enforce one. In short, I don’t think we need to do anything for &lt;code&gt;PERMISSION_DENIED&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;And to clarify, because &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; is user-invoked, &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; itself never sets the permission status to denied (again, as far as I know).&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;POSITION_UNAVAILABLE&lt;/code&gt; means that the device can’t detect a location source (nearby Wi-Fi networks and cellular towers as well as GPS satellites) to determine the location. Using a VPN or visiting the website via an in-app browser could cause this error too, so this is the trickiest error to convey to users.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;TIMEOUT&lt;/code&gt; means that the location source detection or hardware took too long, and that users should try again.&lt;/p&gt;
+        &lt;p&gt;How you communicate errors to users is totally up to you.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Falling back to the Geolocation JavaScript API&lt;/h2&gt;
+        &lt;p&gt;Ready for round two? Now we’re going to do the same thing but with the aging Geolocation API, which is supported in every browser, but kind of a headache.&lt;/p&gt;
+        &lt;p&gt;This is where we’re at currently:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* If &amp;lt;geolocation&amp;gt; is supported */
+        if (&quot;HTMLGeolocationElement&quot; in window) {
+        /* What we covered in the previous section */
+        } else {
+        /* What we’re focusing on now (the fallback) */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Within that &lt;code&gt;else&lt;/code&gt; block, which runs when &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; isn’t supported, we start off by selecting the fallback button (&lt;code&gt;const fallbackButton = document.querySelector(&quot;#fallbackButton&quot;)&lt;/code&gt;). If you recall, this is nested within &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; so that it’s ignored when &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; &lt;em&gt;is&lt;/em&gt; supported.&lt;/p&gt;
+        &lt;p&gt;After that we create a function (&lt;code&gt;updateState()&lt;/code&gt;) that manages the component state and provides recovery instructions. As arguments we supply the &lt;code&gt;state&lt;/code&gt; as a string (&lt;code&gt;‌granted&lt;/code&gt;, &lt;code&gt;‌prompt&lt;/code&gt;, or &lt;code&gt;‌denied&lt;/code&gt;, corresponding with the &lt;code&gt;permissionStatus&lt;/code&gt;), and optionally, &lt;code&gt;statusMessage&lt;/code&gt;, which’ll be used to convey status messages to the user. I don’t want to make any assumptions about your component, so how you convey the &lt;code&gt;statusMessage&lt;/code&gt; and expand upon &lt;code&gt;updateState()&lt;/code&gt; is up to you.&lt;/p&gt;
+        &lt;p&gt;If &lt;code&gt;state === &quot;denied&quot;&lt;/code&gt;, we disable the button with &lt;code&gt;fallbackButton.disabled = true&lt;/code&gt; and provide some kind of recovery instruction of which should be passed as the second argument of the function. The reason why we disable the button is that &lt;em&gt;this&lt;/em&gt; Geolocation API isn’t user-invoked, so to protect the user from spam requests, the browser can suppress requests and send the API straight to jail without passing go, triggering &lt;code&gt;PERMISSION_DENIED&lt;/code&gt;. Additionally, if we make the API user-invoked (as we have), users can spam the button themselves and basically shadowblock themselves, but disabling the button fixes that.&lt;/p&gt;
+        &lt;p&gt;If &lt;code&gt;state === &quot;granted&quot;&lt;/code&gt; or &lt;code&gt;state === &quot;prompt&quot;&lt;/code&gt;, we can enable the button (&lt;code&gt;fallbackButton.disabled = false&lt;/code&gt;).&lt;/p&gt;
+        &lt;p&gt;Now is a good time to mention that the earlier JavaScript code for the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element works regardless of whether the element has the &lt;code&gt;watch&lt;/code&gt; attribute or not. However, when using this older Geolocation API, there are two additional things that we need to take care of when trying to keep track of the user’s location continuously. The first thing is the watcher ID, which is returned by the &lt;code&gt;watchPosition()&lt;/code&gt; method. Knowing this ID enables us to clear the watcher before registering a new one, which is a must-do for performance reasons.&lt;/p&gt;
+        &lt;p&gt;So we &lt;code&gt;let watcherID = null&lt;/code&gt; for now, and then we create the function that attempts to get the location (&lt;code&gt;getLocation()&lt;/code&gt;), and the first thing that we do within that function, assuming that &lt;code&gt;watcherID !== null&lt;/code&gt; (meaning that it’s been set before), is clear the watcher using &lt;code&gt;navigator.geolocation.clearWatch(watcherID)&lt;/code&gt; and make &lt;code&gt;watcherID = null&lt;/code&gt; again:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* A function for getting the location */
+        const getLocation = () =&amp;gt; {
+        /* If a watcher has already been registered */
+        if (watcherID !== null) {
+        /* Unregister it */
+        navigator.geolocation.clearWatch(watcherID);
+        watcherID = null;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then we disable the button using &lt;code&gt;fallbackButton.disabled = true&lt;/code&gt; to, again, prevent spam clicks. If you want to bake some kind of loading indicator in, feel free to, but &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; doesn’t.&lt;/p&gt;
+        &lt;p&gt;After that we call &lt;code&gt;navigator.geolocation.watchPosition()&lt;/code&gt;, setting &lt;code&gt;watcherID&lt;/code&gt; to the returned watcher ID. This method has three parameters — success, error, and options.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;watcherID = navigator.geolocation.watchPosition(
+        (position) =&amp;gt; {
+        /* Success */
+        },
+        (error) =&amp;gt; {
+        /* Error */
+        },
+        {
+        /* Options */
+        }
+        );
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;For the success callback function we synthesize the location data similarly to last time, then call &lt;code&gt;updateState(&quot;granted&quot;)&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;For the error callback function (optional but highly recommended) we clear the watcher and, again, make &lt;code&gt;watcherID = null&lt;/code&gt;, but otherwise run the same error handling logic that &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; runs. However, there are more circumstances in which the errors can occur.&lt;/p&gt;
+        &lt;p&gt;For example, because &lt;code&gt;watchPosition()&lt;/code&gt; and &lt;code&gt;getCurrentPosition()&lt;/code&gt; aren’t necessarily user-invoked, there are more scenarios in which users are able to deny access, triggering the &lt;code&gt;PERMISSION_DENIED&lt;/code&gt; error. Accordingly, we should call &lt;code&gt;updateState(&quot;denied&quot;, &quot;Permission denied (try this or that)&quot;)&lt;/code&gt;, offering a useful status message and clear recovery instructions.&lt;/p&gt;
+        &lt;p&gt;Similarly, &lt;code&gt;POSITION_UNAVAILABLE&lt;/code&gt; can also be triggered by an OS-level block, since not all web browsers catch this during the permission prompt dialog. &lt;code&gt;updateState(&quot;prompt&quot;, &quot;Position unavailable (try this or that)&quot;)&lt;/code&gt; is what we’re looking for this time.&lt;/p&gt;
+        &lt;p&gt;Finally, another scenario that doesn’t occur with &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; but does with &lt;em&gt;this&lt;/em&gt; Geolocation API, is that if the browser prompts the user to grant permission at the OS-level, but then the user cancels their request, that can trigger the &lt;code&gt;TIMEOUT&lt;/code&gt; error. Either way, call &lt;code&gt;updateState(&quot;prompt&quot;, &quot;Request timed out (try this or that)”)&lt;/code&gt;, once again tweaking it to your liking.&lt;/p&gt;
+        &lt;p&gt;As you can see, the error reporting isn’t the best. Sometimes the error isn’t identified correctly, and even when it is, the error can occur for various reasons, which makes it difficult for us to convey a useful status message and clear recovery instructions. &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; handles this better — the errors are identified correctly, and the nature of &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; ensures that certain errors never occur to begin with. But why the error categories? Why not tell us exactly what went wrong?&lt;/p&gt;
+        &lt;p&gt;Well, the reason is to make fingerprinting more difficult, and while we can totally put in the extra work to pinpoint the exact problem, simply stating what happened and what the user should do next is perfectly fine. Of course, &lt;code&gt;error.message&lt;/code&gt; tells us more than &lt;code&gt;error.code&lt;/code&gt; does, but the messages can be a bit vague and differ in every web browser, so we can’t read them or even output them reliably.&lt;/p&gt;
+        &lt;p&gt;Anyway, the optional third parameter expects an object where we can set:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;enableHighAccuracy&lt;/code&gt;: &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;timeout&lt;/code&gt;: &lt;code&gt;20000&lt;/code&gt; (20 seconds) is reasonable if &lt;code&gt;enableHighAccuracy: true&lt;/code&gt;, &lt;code&gt;3000&lt;/code&gt; - &lt;code&gt;5000&lt;/code&gt; otherwise&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;maximumAge&lt;/code&gt;: &lt;code&gt;0&lt;/code&gt; for turn-by-turn navigation, &lt;code&gt;5000&lt;/code&gt; - &lt;code&gt;10000&lt;/code&gt; (5-10 seconds) for live tracking, &lt;code&gt;300000&lt;/code&gt; - &lt;code&gt;600000&lt;/code&gt; (5-10 minutes) for frequent updates (e.g., weather)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I’d rather that the web browser choose the &lt;code&gt;timeout&lt;/code&gt; and &lt;code&gt;maximumAge&lt;/code&gt; for us, especially considering the impact that they have on the &lt;code&gt;TIMEOUT&lt;/code&gt; error and device battery, but of course, that’s exactly what &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; does.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* Attempt to get the location and store the returned ID */
+        watcherID = navigator.geolocation.watchPosition(
+        /* If location data is passed (like before) */
+        (position) =&amp;gt; {
+        /* Synthesize the data (again, like before) */
+        const {
+        latitude,
+        longitude,
+        altitude,
+        accuracy,
+        altitudeAccuracy,
+        heading,
+        speed
+        } = position.coords;
+        
+        const timestamp = position.timestamp;
+        
+        /* And update the state */
+        updateState(&quot;granted&quot;);
+        },
+        
+        /* If error information is passed (yep, like before) */
+        (error) =&amp;gt; {
+        console.error(`Geolocation error: ${error.message}`);
+        
+        /* Again, unregister the watcher (if necessary) */
+        if (watcherID !== null) {
+        navigator.geolocation.clearWatch(watcherID);
+        watcherID = null;
+        }
+        
+        if (error.code === error.PERMISSION_DENIED) {
+        /* No HTTPS, server misconfiguration, or the user denied access */
+        updateState(&quot;denied&quot;, &quot;Permission denied (try this or that)&quot;);
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+        /* No location source (GPS satellite or nearby Wi-Fi network/cellular tower) or OS-level access */
+        updateState(&quot;prompt&quot;, &quot;Position unavailable (try this or that)&quot;);
+        } else if (error.code === error.TIMEOUT) {
+        /* Location source detection or hardware took too long, or the user canceled their request */
+        updateState(&quot;prompt&quot;, &quot;Request timed out (try this or that)&quot;);
+        }
+        },
+        {
+        enableHighAccuracy: true,
+        timeout: 20000 /* 20 seconds because enableHighAccuracy: true */,
+        maximumAge: 0 /* 0 seconds because we’re demanding high accuracy */
+        }
+        );
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;After that we need to query the permission status using the Permissions API (&lt;code&gt;navigator.permissions.query({ name: &quot;geolocation&quot; }).then((permissionStatus) =&amp;gt; { /* ... */ })&lt;/code&gt;), and then execute all of the aforementioned logic based on that.&lt;/p&gt;
+        &lt;p&gt;If &lt;code&gt;permissionStatus.state === &quot;granted&quot;&lt;/code&gt;, we call &lt;code&gt;getLocation()&lt;/code&gt;, which is essentially what the &lt;code&gt;autolocate&lt;/code&gt; attribute does. If you don’t want autolocation, simply delete this part. If it’s anything else, we basically determine the initial state by calling &lt;code&gt;updateState(permissionStatus.state)&lt;/code&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* Query the permission status */
+        navigator.permissions.query({ name: &quot;geolocation&quot; }).then((permissionStatus) =&amp;gt; {
+        /* Equivalent to the autolocate attribute */
+        if (permissionStatus.state === &quot;granted&quot;) {
+        getLocation();
+        } else {
+        /* React accordingly */
+        updateState(permissionStatus.state);
+        }
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Finally, make the button respond to clicks:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/* If the user clicks the fallback button */
+        fallbackButton.addEventListener(&quot;click&quot;, () =&amp;gt; {
+        getLocation();
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If we only want to get the user’s location once (rather than watch it continuously), these are the modifications that we need to make:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Remove everything related to the &lt;code&gt;watcherID&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;Swap &lt;code&gt;watchPosition()&lt;/code&gt; for &lt;code&gt;getCurrentPosition()&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;Provide different settings for the options parameter&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Note that the &lt;code&gt;change&lt;/code&gt; event, which could help us update the state whenever the user changes their browser-level permission status, doesn’t fire in Safari. Besides, the standard browser behavior is to ask users to refresh the page, so let’s stick with that.&lt;/p&gt;
+        &lt;p&gt;One more thing — I wanted the button to say “Refresh precise location” and “Getting precise location…” at certain points, but &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; doesn’t do this, so I didn’t either. That’s up to you, though.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Styling the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element&lt;/h2&gt;
+        &lt;p&gt;&lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; has a &lt;code&gt;:granted&lt;/code&gt; pseudo-class. If we throw &lt;code&gt;:not(:granted)&lt;/code&gt; into the mix, we can target the prompt/denied states too:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;geolocation {
+        &amp;amp;:granted {
+        /* Permission granted */
+        }
+        
+        &amp;amp;:not(:granted) {
+        /* Permission not granted */
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;With the Geolocation API, we can toggle classes as needed to achieve the same effect, but honestly, I’ve never felt compeled to style such a button in this way. Personally, I’d like to be able to change the icon and text (maybe this is something that you can bake into the &lt;code&gt;updateState()&lt;/code&gt; function), but this is one of the things that the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element outright forbids.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/geolocation-2.png&quot; alt=&quot;A button element labelled &amp;quot;use precise location&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Before we dive into all &lt;em&gt;that&lt;/em&gt;, here’s a rundown of &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; rules stated by Google’s explainer and Mozilla’s explainer:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;There must be sufficient color contrast&lt;/li&gt;
+        &lt;li&gt;The alpha channel must resolve to &lt;code&gt;1&lt;/code&gt; (so no transparency)&lt;/li&gt;
+        &lt;li&gt;The minimum and maximum width, height, and font size must be respected&lt;/li&gt;
+        &lt;li&gt;Negative margins and outline offsets aren’t allowed either&lt;/li&gt;
+        &lt;li&gt;Distortion effects — including linear gradients — are banned&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;It’s also worth noting that some of these rules function like guardrails (for example, you physically can’t style the height above 50px), whereas others cause &lt;code&gt;invalidReason&lt;/code&gt; to return &lt;code&gt;style_invalid&lt;/code&gt; and the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; button to be disabled.&lt;/p&gt;
+        &lt;p&gt;Some of the rules seem to have changed (or are currently bugged). &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; doesn’t respect &lt;code&gt;prefers-color-scheme&lt;/code&gt; either, but it’s a developing feature, so I’m not going to comment on all of that too much. I’ll just state what I do and don’t like:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;I don’t like that the button becomes disabled because of a style (guardrails are better, but I don’t really like either)&lt;/li&gt;
+        &lt;li&gt;I don’t like the forced icon and text, and I’m also not too happy about not being able to use gradients or &lt;code&gt;corner-shape&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;I can make peace with everything else because I’d normally design within those guardrails anyway&lt;/li&gt;
+        &lt;li&gt;The text being localized into different languages is very cool, but it’s a first for web standards and I don’t currently enjoy that it’s a thing for only these permission buttons&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;While I obviously support preventing web authors from tricking users into giving away their location, I think it’d be better if &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; were fully styleable and the permission prompt dialog be ultra clear about what the user is about to commit to.&lt;/p&gt;
+        &lt;p&gt;Even though I can style the background, color, border, border radius, and box shadow how I’d want them (as in the image below, which is most of what I’d want), this feels like a step back towards unstyleable controls. Having said that, this approach means well (&lt;em&gt;extremely&lt;/em&gt; well), so I can’t wait to see where this goes (and frankly, to be able to throw the aging Geolocation API in the bin).&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/geolocation-3.png&quot; alt=&quot;A purple button element with white text, labelled &amp;quot;use precise location&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;h2&gt;What now? What else?&lt;/h2&gt;
+        &lt;p&gt;When all web browsers support &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt;, the user experience and developer experience will improve dramatically.&lt;/p&gt;
+        &lt;p&gt;But that’s not all!&lt;/p&gt;
+        &lt;p&gt;What was once the &lt;code&gt;&amp;lt;permission&amp;gt;&lt;/code&gt; element is now the &lt;code&gt;&amp;lt;geolocation&amp;gt;&lt;/code&gt; element, &lt;code&gt;&amp;lt;install&amp;gt;&lt;/code&gt; element (which facilitates the installation of Progressive Web Apps), &lt;code&gt;&amp;lt;usermedia&amp;gt;&lt;/code&gt; element (which facilitates access to the user’s camera and/or microphone), and &lt;code&gt;&amp;lt;camera&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;microphone&amp;gt;&lt;/code&gt; elements (which facilitates access to them individually).&lt;/p&gt;
+        &lt;p&gt;All of these are being trialed in Chrome as part of a larger initiative to improve the process and experience of requesting permission, which is bloody great, in my opinion.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #194</title>
       <link>https://piccalil.li/the-index/194/?ref=main-rss-feed</link>
@@ -487,34 +820,6 @@
         &lt;h2&gt;Will you be using ::highlight()?&lt;/h2&gt;
         &lt;p&gt;I know for sure I will be using this feature in my work. This article explained highlighting in CSS, the CSS Custom Highlight API, and how &lt;code&gt;::higlight()&lt;/code&gt; works in CSS with a fallback provision, for when JavaScript isn’t available or the browser doesn’t support it.&lt;/p&gt;
         &lt;p&gt;If you’re looking to read up more about the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API&quot;&gt;CSS Custom Highlight API&lt;/a&gt;, MDN has a good guide on the topic for you.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #192</title>
-      <link>https://piccalil.li/the-index/192/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/192/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 31 Jul 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://codepen.io/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;CodePen 2.0 is here&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Hats off to the CodePen team for getting their &lt;em&gt;huge&lt;/em&gt; 2.0 release over the line. The &lt;a href=&quot;https://chriscoyier.net/2026/07/30/codepen-2-0/&quot;&gt;possibilities really are endless&lt;/a&gt; and that&apos;s a great achievement for a team of 5!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://bellkiosk.website/blog/reasons-to-website.html?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;95 reasons for having your own website&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Does exactly what it says on the tin.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://polypane.app/blog/cheatsheets-for-flex-grid-anchor-positioning-and-invoker-commands/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Cheatsheets for flex, grid, anchor positioning and invoker commands&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;These cheatsheets are excellent work from the purveyors of excellent work, over at Polypane.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://aftermath.site/ai-resistance-tips-workforce-llm-workers/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Welcome to the resistance: meet the workers dodging (and sabotaging) their employer&apos;s AI mandates&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Some much needed bravery from workers here. AI is &lt;em&gt;not&lt;/em&gt; inevitable — especially if we fight back!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://remysharp.com/tif/2026-07-24-rescued-pokemon-yellow?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Rescued Pokémon Yellow&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Some delightful physical media restoration for you here.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/create-a-semantic-break-out-button-to-make-an-entire-element-clickable/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Create a semantic breakout button to make an entire element clickable&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://lurkmoophy.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://set.studio?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/set-studio.png&quot; alt=&quot;Design and development partners for brands that adapt fast and thrive.&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;This issue&apos;s sponsor is Set Studio.&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Did you know that we&apos;re the team behind Piccalilli and this newsletter?&lt;/p&gt;
-        &lt;p&gt;We&apos;ve got availability October-onwards for projects and would love to help &lt;em&gt;you&lt;/em&gt; develop web experiences that &lt;strong&gt;actually work for your customers&lt;/strong&gt;. We also have capacity for short-term consultations on design systems and UI.&lt;/p&gt;
-        &lt;p&gt;Our team has over 50 years of combined experience working with clients of all sizes, including huge brands like Google, Harley-Davidson, Oracle and The NHS.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://set.studio?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;Check out our work&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
