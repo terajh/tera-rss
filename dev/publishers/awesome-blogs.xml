@@ -4,19 +4,19 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Fri, 21 Aug 2026 16:16:22 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 22 Aug 2026 15:44:06 GMT</lastBuildDate>
     <item>
       <title>2026년 8월 출간 IT 원서들 기대평</title>
       <link>https://occamsrazr.net/tt/450</link>
       <guid>https://occamsrazr.net/tt/450</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>_Architecture for Flow: Adaptive Systems with Domain-Driven Design, Wardley Mapp...</content:encoded>
     </item>
     <item>
       <title>SMT는 병렬화할 수 없다 — Debezium 바깥에서 순서를 지키며 처리량 올리기</title>
       <link>https://gywn.net/2026/08/debezium-smt-cant-parallelize/</link>
       <guid>https://gywn.net/2026/08/debezium-smt-cant-parallelize/</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;h1 id=&quot;cdc와-debezium&quot;&gt;CDC와 Debezium&lt;/h1&gt;
         &lt;p&gt;서로 다른 종류의 시스템(RDBMS, 검색엔진, 캐시, 다른 서비스의 데이터베이스 등) 간에 데이터를 실시간으로 동기화해야 하는 경우, 원본 데이터베이스를 주기적으로 폴링하는 방식은 확장성과 지연 시간 모두에서 한계가 있습니다. 이 문제를 해결하는 표준적인 방법이 CDC(Change Data Capture)입니다 — 데이터베이스가 남기는 변경 로그를 실시간으로 읽어, 변경 사항을 이벤트로 만들어 필요한 곳에 전달하는 방식입니다. Debezium은 이 CDC를 구현하는 오픈소스 도구 중 가장 널리 쓰이는 것 중 하나이고, 이기종 시스템 간 데이터 동기화 파이프라인의 핵심 구성 요소로 많이 채택되고 있습니다.&lt;/p&gt;
@@ -26,14 +26,14 @@
       <title>대기업에서 신규 서비스 런칭을 경험하기까지</title>
       <link>https://wormwlrm.github.io/2026/08/17/ThingsBook-Launching-Retrospect.html</link>
       <guid>https://wormwlrm.github.io/2026/08/17/ThingsBook-Launching-Retrospect.html</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>북미향 신규 서비스의 초기 멤버로 합류해 설계·개발·출시를 함께한 2년 10개월을 돌아봅니다.</content:encoded>
     </item>
     <item>
       <title>Blog: Jetpack Compose에서 PinnableContainer로 아이템 유지하기</title>
       <link>http://pluu.github.io/blog/android/2026/08/16/pinnable-container/</link>
       <guid>http://pluu.github.io/blog/android/2026/08/16/pinnable-container/</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;LazyColumn에서 UI 상태를 변경(예 : 아이템을 펼치거나 포커스)한 후 스크롤하면, 화면 밖으로 이동한 아이템의 composition이 제거될 수 있습니다. 추가 처리가 없다면 다시 아이템이 노출되었을 때 UI가 초기화되는 문제가 발생합니다.&lt;/p&gt;
         
@@ -503,10 +503,189 @@
       </content:encoded>
     </item>
     <item>
+      <title>Istio의 재시도 정책과 관련 메트릭 살펴보기</title>
+      <link>https://blog.outsider.ne.kr/1810</link>
+      <guid>https://blog.outsider.ne.kr/1810</guid>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;서비스 메시인 Istio에는 요청이 실패했을 때 적용할 재시도 정책을 설정할 수 있다. 과거에는 서비스 디스커버리나 메시 같은 기능을 각 서비스에서 구축했다. 하지만 이 경우 서비스마다 정책과 성숙도에 차이가 난다. 그래서 이제는 대부분 인프라 차원에서 처리하는 쪽으로 움직였다. 물론 인프라는 전체에 적용되는 정책이라 보수적일 수밖에 없다. 따라서 인프라의 기본 설정에 애플리케이션의 미세 조정이 더해져야 한다.&lt;/p&gt;
+        &lt;p&gt;서비스에 문제가 생기면 Istio나 애플리케이션이 재시도한다. 장애가 발생하면 재시도가 장애를 더 악화시키거나 복구 시간을 늘리는 경우도 많으므로 신중하게 다뤄야 한다.&lt;/p&gt;
+        &lt;p&gt;일부 상황에서는 재시도 때문에 요청이 늘어나기도 하고 사용자가 새로고침을 하면서 요청이 늘어나기도 한다. 오랫동안 시스템을 보면서 재시도 정책을 자세히 이해하고 재시도 관련 정보를 더 파악할 방법을 찾고자 테스트해 봤다.&lt;/p&gt;
+        &lt;h2&gt;Istio의 defaultHttpRetryPolicy&lt;/h2&gt;
+        &lt;p&gt;Istio 전역 설정인 MeshConfig에는 재시도 정책을 설정하는 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/istio.mesh.v1alpha1/#MeshConfig-default_http_retry_policy&quot;&gt;defaultHttpRetryPolicy&lt;/a&gt;가 있다.&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;기본 HTTP 재시도 정책을 구성합니다. 다음 오류에 대한 기본 재시도 횟수는 2회로 설정되어 있습니다: &lt;code&gt;connect-failure&lt;/code&gt;, &lt;code&gt;refused-stream&lt;/code&gt;, &lt;code&gt;unavailable&lt;/code&gt;, &lt;code&gt;cancelled&lt;/code&gt;, &lt;code&gt;retriable-status-codes&lt;/code&gt;. 재시도 횟수를 0으로 설정하면 재시도 정책이 전역적으로 비활성화됩니다. 이 설정은 Virtual Service API를 사용하여 호스트별로 재정의할 수 있습니다. 현재 재시도 정책의 설정 중 &lt;code&gt;perTryTimeout&lt;/code&gt;을 제외한 모든 설정을 이 필드를 통해 전역적으로 구성할 수 있습니다.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;위 설명에 나온 대로 이 설정은 Virtual Service의 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRoute-retries&quot;&gt;retries&lt;/a&gt; 필드로 재정의할 수 있다.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRetry&quot;&gt;재시도 설정&lt;/a&gt;은 다음과 같은 형태이다.&lt;/p&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;meshConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;defaultHttpRetryPolicy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;attempts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;retryOn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;connect-failure,refused-stream,unavailable,cancelled,503&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;attempts&lt;/code&gt;는 재시도 횟수다. 여기서 재시도를 2회로 설정했으므로 최초 요청 뒤 두 번 재시도하며, 최대 세 번의 요청이 발생할 수 있다.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;retryOn&lt;/code&gt;은 재시도 조건을 지정한다. 조건은 콤마(,)로 여러 개 지정할 수 있으며, 지정할 수 있는 값은 Envoy의 &lt;a href=&quot;https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on&quot;&gt;retry 정책&lt;/a&gt;과 &lt;a href=&quot;https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-grpc-on&quot;&gt;gRPC retry 정책&lt;/a&gt;을 참고하면 된다.&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;defaultHttpRetryPolicy&lt;/code&gt;라는 이름 때문에 헷갈릴 수 있지만, 이 필드는 HTTP뿐 아니라 gRPC에도 사용한다. 따라서 위 설정에서 &lt;code&gt;connect-failure&lt;/code&gt;는 TCP 연결 실패나 타임아웃을, &lt;code&gt;refused-stream&lt;/code&gt;은 HTTP/2 업스트림이 &lt;code&gt;REFUSED STREAM&lt;/code&gt;로 스트림을 거절한 경우를 가리킨다. &lt;code&gt;unavailable&lt;/code&gt;과 &lt;code&gt;cancelled&lt;/code&gt;는 각각 gRPC의 &lt;code&gt;14 UNAVAILABLE&lt;/code&gt;, &lt;code&gt;1 CANCELLED&lt;/code&gt;가 발생한 경우이며, &lt;code&gt;503&lt;/code&gt;은 HTTP 503 Service Unavailable이 발생한 경우다.&lt;/p&gt;
+        &lt;p&gt;참고로 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/destination-rule/&quot;&gt;Destination Rule&lt;/a&gt;에는 &lt;a href=&quot;https://istio.io/latest/docs/reference/config/networking/destination-rule/#ConnectionPoolSettings-HTTPSettings-max_retries&quot;&gt;maxRetries&lt;/a&gt; 설정이 있는데 이는 특정 시점에 허용하는 최대 재시도 수를 지정한다.&lt;/p&gt;
+        &lt;h2&gt;Retry 데모&lt;/h2&gt;
+        &lt;p&gt;저번에 기능 분석을 하면서 LLM을 이용하니 데모를 잘 만들어줘서 이번에도 비슷한 방식을 이용했다.&lt;/p&gt;
+        &lt;h3&gt;Kubernetes 클러스터 생성&lt;/h3&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ kind create cluster --config kind-config.yaml --wait 5m
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;Creating cluster &lt;span class=&quot;s2&quot;&gt;&amp;#34;istio-retry-lab&amp;#34;&lt;/span&gt; ...
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Ensuring node image &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;kindest/node:v1.36.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; 🖼
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Preparing nodes 📦 📦
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Writing configuration 📜
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Starting control-plane 🕹️
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Installing CNI 🔌
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Installing StorageClass 💾
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Joining worker nodes 🚜
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; ✓ Waiting ≤ 5m0s &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; control-plane &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; Ready ⏳
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; • Ready after 6s 💚
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;Set kubectl context to &lt;span class=&quot;s2&quot;&gt;&amp;#34;kind-istio-retry-lab&amp;#34;&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;You can now use your cluster with:
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;kubectl cluster-info --context kind-istio-retry-lab
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;Not sure what to &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; next? 😅  Check out https://kind.sigs.k8s.io/docs/user/quick-start/
+        &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href=&quot;https://kind.sigs.k8s.io/&quot;&gt;kind&lt;/a&gt;를 이용해서 Kubernetes 클러스터를 생성했다.&lt;/p&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ kubectl get nodes
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;NAME                            STATUS   ROLES           AGE   VERSION
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;istio-retry-lab-control-plane   Ready    control-plane   51s   v1.36.1
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;istio-retry-lab-worker          Ready    &amp;lt;none&amp;gt;          37s   v1.36.1
+        &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;복잡한 설정이 필요한 건 아니라 워커 노드는 1개만 만들었다.&lt;/p&gt;
+        &lt;h3&gt;Istio 설치&lt;/h3&gt;
+        &lt;p&gt;Istio 오퍼레이터를 설정하면서 아까 살펴봤던 &lt;code&gt;defaultHttpRetryPolicy&lt;/code&gt;를 설정했다. 설정하지 않아도 기본 구성이 있지만 여기서는 명시적으로 지정했다.&lt;/p&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;install.istio.io/v1alpha1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;IstioOperator&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;nt&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;meshConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;defaultHttpRetryPolicy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;attempts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;retryOn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;l&quot;&gt;connect-failure,refused-stream,unavailable,cancelled,503&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;defaultConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;proxyStatsMatcher&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;inclusionRegexps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;          &lt;/span&gt;- &lt;span class=&quot;s2&quot;&gt;&amp;#34;.*upstream_rq_retry.*&amp;#34;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;w&quot;&gt;          &lt;/span&gt;- &lt;span class=&quot;s2&quot;&gt;&amp;#34;.*\\.retry\\.upstream_rq_.*&amp;#34;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Istio는 Envoy 통계 일부만 수집한다. &lt;code&gt;proxyStatsMatcher&lt;/code&gt;로 추가 수집할 메트릭을 지정할 수 있다. 요청 통계뿐 아니라 재시도 관련 메트릭도 살펴보고 싶어 수집하도록 설정했다.&lt;/p&gt;
+        &lt;p&gt;Envoy의 &lt;a href=&quot;https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/cluster_manager/cluster_stats&quot;&gt;통계 관련 문서&lt;/a&gt;를 보면 다음과 같은 재시도 관련한 메트릭이 있는데 &lt;code&gt;.*upstream_rq_retry.*&lt;/code&gt;는 이를 잡기 위한 설정이다.&lt;/p&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Name&lt;/th&gt;
+        &lt;th&gt;Type&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;전체 요청 재시도 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry_success&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;요청 재시도 성공 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry_backoff_exponential&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;지수 백오프 전략을 사용한 전체 재시도 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry_backoff_ratelimited&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;rate-limited 백오프 전략을 사용한 전체 재시도 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry_limit_exceeded&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;설정한 최대 재시도 수를 초과해 재시도하지 않은 총 요청 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;upstream_rq_retry_overflow&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Counter&lt;/td&gt;
+        &lt;td&gt;서킷 브레이커나 재시도 예산을 초과해서 재시도되지 않은 요청 수&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;재시도는 요청을 보내는 다운스트림 쪽에서 일어나므로 메트릭도 요청을 보내는 쪽 Envoy에 쌓인다. 위 메트릭에는 다운스트림의 최종 응답에 대한 수만 집계된다. &lt;a href=&quot;https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/cluster_manager/cluster_stats#retry-statistics&quot;&gt;재시도를 유발한 응답에 대한 통계&lt;/a&gt;는 &lt;code&gt;retry.upstream_rq_&amp;lt;*xx&amp;gt;&lt;/code&gt;나 &lt;code&gt;retry.upstream_rq_&amp;lt;*&amp;gt;&lt;/code&gt;에 집계되므로 &lt;code&gt;.*\\.retry\\.upstream_rq_.*&lt;/code&gt; 설정으로 이러한 메트릭을 수집한다. 이번 데모에서는 이 메트릭을 사용하지 않았지만, 재시도가 어떤 상황에서 발생했는지 추적하려면 &lt;code&gt;retry.upstream_rq_&lt;/code&gt; 메트릭이 필요해 보인다. 관련 메트릭은 더 검토해야 한다. 다만 수집에도 비용이 들어 모두 수집하기는 어렵다.&lt;/p&gt;
+        &lt;p&gt;이 설정을 이용해서 Istio 1.30.3을 설치했다.&lt;/p&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ istioctl x precheck
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;✔ No issues found when checking the cluster. Istio is safe to install or upgrade!
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  To get started, check out https://istio.io/latest/docs/setup/getting-started/.
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ istioctl install -f istio-operator.yaml --verify -y
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;   &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;      /&lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;    &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;     / &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;     &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;    /  &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;      &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;   /   &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;       &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  /    &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;        &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt; /     &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;         &lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;/______&lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;__________&lt;span class=&quot;se&quot;&gt;\
+        &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;____________________
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;se&quot;&gt;\_&lt;/span&gt;_       _____/
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;19&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;     &lt;span class=&quot;se&quot;&gt;\_&lt;/span&gt;____/
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;21&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;✔ Istio core installed ⛵️
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;22&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;✔ Istiod installed 🧠
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;23&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;✔ Ingress gateways installed 🛬
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;24&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;✔ Installation &lt;span class=&quot;nb&quot;&gt;complete&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ istioctl version
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;client version: 1.30.3
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;control plane version: 1.30.3
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;data plane version: 1.30.3 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; proxies&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;h3&gt;Retry 동작 확인&lt;/h3&gt;
+        &lt;p&gt;재시도 동작을 추적하기 위해 &lt;code&gt;app-a&lt;/code&gt;, &lt;code&gt;app-b&lt;/code&gt;라는 2개의 앱을 만들었다.
+        &lt;img src=&quot;/uploads/2026/08/14e8a9ad2530_3x.png&quot; alt=&quot;sidecar 없는 visualize에서 app-a 프록시가 최대 2회 재시도해 app-b에 최대 3회 요청한다.&quot;&gt;
+        &lt;code&gt;app-a&lt;/code&gt;에 요청을 보내는 실험을 시작하면 &lt;code&gt;app-a&lt;/code&gt;는 &lt;code&gt;app-b&lt;/code&gt;에 요청을 보내게 되는데 이때 &lt;code&gt;app-b&lt;/code&gt;는 일정 비율로 503을 응답하게 했다.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/be40d8d59f1e_3x.jpg&quot; alt=&quot;Istio Retry Lab에서 요청 수·실행 시간·app-b 503 비율을 설정하고 실험을 시작하는 대시보드.&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;이 테스트를 진행하면서 모니터링할 수 있는 테스트 앱을 따로 만들었다. Prometheus를 연결해 두어서 테스트를 진행하면 각 메트릭을 수집해서 보여준다. 아래는 초당 30 요청에 503 비율을 40%로 설정했다.&lt;/p&gt;
+        &lt;pre class=&quot;chroma&quot;&gt;&lt;code&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 1&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;$ istioctl proxy-config routes app-a-6fbc5db5fb-mm8qb -n retry-lab -o json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;.. | .retryPolicy? // empty&amp;#39;&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 2&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 3&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;retryOn&amp;#34;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;#34;connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes&amp;#34;&lt;/span&gt;,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 4&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;numRetries&amp;#34;&lt;/span&gt;: 2,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 5&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;retryHostPredicate&amp;#34;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 6&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;    &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 7&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;      &lt;span class=&quot;s2&quot;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;#34;envoy.retry_host_predicates.previous_hosts&amp;#34;&lt;/span&gt;,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 8&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;      &lt;span class=&quot;s2&quot;&gt;&amp;#34;typedConfig&amp;#34;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt; 9&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;        &lt;span class=&quot;s2&quot;&gt;&amp;#34;@type&amp;#34;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;#34;type.googleapis.com/envoy.extensions.retry.host.previous_hosts.v3.PreviousHostsPredicate&amp;#34;&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;hostSelectionRetryMaxAttempts&amp;#34;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;#34;5&amp;#34;&lt;/span&gt;,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;retriableStatusCodes&amp;#34;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;    &lt;span class=&quot;m&quot;&gt;503&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;17&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;19&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;retryOn&amp;#34;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;#34;reset-before-request&amp;#34;&lt;/span&gt;,
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;  &lt;span class=&quot;s2&quot;&gt;&amp;#34;numRetries&amp;#34;&lt;/span&gt;: &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;ln&quot;&gt;21&lt;/span&gt;&lt;span class=&quot;cl&quot;&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;실제로 &lt;code&gt;app-a&lt;/code&gt;의 Pod에 적용된 재시도 정책은 위처럼 되어 있다. Istio 설정에서는 없었지만 Envoy에 적용된 추가 설정도 여기서 확인할 수 있다.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;envoy.retry_host_predicates.previous_hosts&lt;/code&gt;는 재시도할 때 가능하면 이전과 같은 호스트는 피하는 설정이다. 여기서는 임의로 오류를 주입했지만 실제 환경에서는 특정 팟에 문제가 생길 수 있으므로 재시도는 가능하면 다른 Pod으로 가는게 안정성 면에서 훨씬 좋다.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;hostSelectionRetryMaxAttempts&lt;/code&gt;는 새로운 엔드 포인트를 찾을 때 host 선택을 최대 5번까지 시도한다. 위에서 다른 호스트를 찾는다고 할 때 가능하면이라고 했는데 Pod이 1개 일수도 있고 다양한 상황에서 무한대로 같은 호스트를 피할 수는 없으니 최대 시도를 5번으로 제한한다.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;reset-before-request&lt;/code&gt;는 아예 연결이 이뤄지지 않아 업스트림에 도달하지도 못한 채 리셋되면 최대 2번 재시도한다.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/a6982bc01137_3x.jpg&quot; alt=&quot;최근 10분간 app-a와 app-b의 요청·오류 응답률 시계열 그래프가 표시된다. 모든 지표가 16시 24분 이후 급증한다.&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;app-a&lt;/code&gt;와 &lt;code&gt;app-b&lt;/code&gt;의 요청 수, 응답 수, 오류 응답 수를 나타낸 그래프다. 재시도가 두 번 더 일어나므로 세 번 모두 503일 때만 최종 오류 응답으로 집계된다. 따라서 &lt;code&gt;app-a&lt;/code&gt;의 총 요청 수 29.98 req/s 가운데 오류 응답은 40%가 아니라 10%에 못 미치는 1.96 req/s가 된다.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/43ebf749f1aa_3x.jpg&quot; alt=&quot;app-a에서 app-b로 보낸 요청의 재시도 수가 초당 약 16회로 증가해 유지된다.&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;app-a&lt;/code&gt;에서 실제로 재시도가 발생한 수이다. 구분해서 볼 수 있는지 제일 궁금했던 메트릭이고, 재시도로 인한 요청 증폭이 발생했을 때 이 메트릭을 활용할 수 있어 보인다.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/48c959c79076_3x.jpg&quot; alt=&quot;Envoy 재시도 지표에서 정상화·3회 실패 요청 수가 증가하며, 재시도 거부 수는 0이다. upstream 시도 증폭 배수는 약 1.5배를 기록한다.&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;재시도를 2번 더 하므로 시나리오를 생각하면 503 -&amp;gt; 200, 503 -&amp;gt; 503 -&amp;gt; 200는 최종적으로 성공이 되고  503 -&amp;gt; 503 -&amp;gt; 503인 경우만 최종적으로 실패가 된다. 재시도 후에 실제로 성공하는지 실패하는지를 알아야 시스템에서 재시도 횟수를 어느 정도로 하는 게 적당한지 판단할 수 있다. 503 -&amp;gt; 200, 503 -&amp;gt; 503 -&amp;gt; 200의 두 케이스도 구분해서 보고 싶었는데 이걸 구분할 수 있는 방법은 찾지 못했다.&lt;/p&gt;
+        &lt;p&gt;이번 테스트는 실제로 무언가를 개선하려는 목적이 아니라, 재시도 동작 방식과 이를 추적하는 메트릭을 확인하려는 목적이었다. 그래서 특별한 결과를 얻지는 못했다. 실제 시스템에 적용하려면 고민해야 할 부분이 더 많기는 하지만, 재시도 관련 메트릭에 어떤 종류가 있는지는 알게 되었다. 이 데모 코드는 &lt;a href=&quot;https://github.com/outsideris/istio-study/tree/main/retries-policy&quot;&gt;GitHub에 올려두었다&lt;/a&gt;.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
       <title>기술 뉴스 #300 : 2026-08-16</title>
       <link>https://blog.outsider.ne.kr/1809</link>
       <guid>https://blog.outsider.ne.kr/1809</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;h2&gt;그 밖의 개발 관련&lt;/h2&gt;
         &lt;ul&gt;
@@ -601,53 +780,10 @@
       </content:encoded>
     </item>
     <item>
-      <title>[Side Project] 코딩 세션을 모아 보는 Agentic Engineering History</title>
-      <link>https://blog.outsider.ne.kr/1808</link>
-      <guid>https://blog.outsider.ne.kr/1808</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;최근 LLM 사용 패턴을 파악해 보려고 &lt;a href=&quot;/1803&quot;&gt;LLM Usage Tracker&lt;/a&gt;를 만들고 나서, 블로그 글을 쓰려다 보니 기록을 보기 어렵다는 생각이 들었다. 아무래도 만드는 중에는 그 과정에 집중하다가, 어느 정도 완료되면(아직 마음의 결정을 하지 못해서 오픈소스로 공개하진 않지만...) 정리해서 개발 과정을 블로그에 남기고 싶다. 그런데 이때 예전 기록을 찾기가 어렵다는 걸 깨달았다.&lt;/p&gt;
-        &lt;p&gt;로컬에 &lt;code&gt;jsonl&lt;/code&gt; 파일로 세션 기록이 남아 있기는 하다. 조사해 보니 Claude Code는 30일 동안 보관하고(설정 가능함) Codex는 따로 정리하지 않아서 계속 쌓인다. 그래서 여길 보면 내용을 알 수 있고, 채팅으로 찾아 달라고 요청하면 잘 찾아주기도 한다. 하지만 커밋하진 않았어도 HTML이나 마크다운으로 정리한 내용, 검토했던 디자인 시안 등 개발 중간 과정을 보면서 글을 쓰고 싶었다. 그런데 없어진 기록이나 파일도 있어서 이런 작업 과정을 어딘가에 저장해 놓고 살펴보고 싶었다.&lt;/p&gt;
-        &lt;p&gt;그래서 Agentic Engineering History를 만들기 시작했다. 사실 사용성이나 활용도 면에서 많이 부족하다고 느껴서 앞으로의 방향성을 고민하고 있는 프로젝트다. 그럼에도 글을 쓰는 건 1차 목표가 끝나서 기록도 남기고 회고하려는 뜻에서다. 또 글을 써야 이 프로젝트를 실제로 써 보면서 사용성을 다시 고민할 수 있다.&lt;/p&gt;
-        &lt;h2&gt;Agentic Engineering History 개발&lt;/h2&gt;
-        &lt;p&gt;Agentic Engineering History는 Claude Code나 Codex 같은 코딩 에이전트의 세션 기록을 모아 두는 서비스다. 내가 LLM한테 뭔가 요청하고 대화하면서 LLM이 작업한 내용을 다 남겨 두고, 나중에 필요할 때 찾아보려고 만들었다.&lt;/p&gt;
-        &lt;p&gt;초기에 이 프로젝트로 하고 싶은 목표를 정하고 기본 골격을 잡기 시작했다. 프로젝트도 만들지만 테스트 목적도 있어서 처음 제안한 스택 위에서 내 취향에 대한 의견을 주면서 맞춰 가는 편이다. 결국 TypeScript에 &lt;a href=&quot;https://oxc.rs/docs/guide/usage/linter.html&quot;&gt;oxlint&lt;/a&gt;, &lt;a href=&quot;https://oxc.rs/docs/guide/usage/formatter&quot;&gt;oxfmt&lt;/a&gt;, &lt;a href=&quot;https://vitest.dev/&quot;&gt;vitest&lt;/a&gt;를 쓰고, CSR을 선호하는 편은 아니라서 &lt;a href=&quot;https://htmx.org/&quot;&gt;htmx&lt;/a&gt;를 써서 하이퍼미디어 방식의 SSR로 구현하도록 스택을 정했다. 한번 써 보고 싶어서 &lt;a href=&quot;https://htmx.org/&quot;&gt;htmx&lt;/a&gt;를 선택했지만, 간단한 서비스이기도 하고 기술적 문제를 같이 고민한 것도 아니라 이걸 써 봤다고 할 수 있나 하는 생각이 들었다.&lt;/p&gt;
-        &lt;p&gt;이 프로젝트를 하던 때는 한창 &lt;a href=&quot;https://addyosmani.com/blog/loop-engineering/&quot;&gt;Loop Engineering&lt;/a&gt;이 유행하던 시기였다. 나는 주로 계속 검토하고 피드백하면서 작업하는 편이라 장기간 작업을 시키는 게 익숙지 않았다. 그래서 시험도 해 볼 겸 그때까지 잡은 방향성을 기준으로 Loop Engineering 자료를 주고 시도해 봤다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/776522968fbe_3x.jpg&quot; alt=&quot;AEH Phase 2~7 완료, 서버 파이프라인과 7개 커밋, 테스트 45개 통과 현황이 정리되어 있다. 이후 collector·렌더·배포 작업이 제시된다.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;Claude Code에서 Opus 4.8을 주로 사용했는데, 어느 정도는 장기간 작업이 돌아갔지만 기대만큼 오래 실행되지는 않고 자주 멈췄다. 다른 프로젝트지만 비슷한 시기에 Codex에서도 &lt;code&gt;/goal&lt;/code&gt;로 시도했는데, 오히려 &lt;a href=&quot;https://x.com/Outsideris/status/2075855728364146907?s=20&quot;&gt;이쪽은 초기 목표를 너무 크게 줘서 그런지 거의 한 달 내내 돌아가서&lt;/a&gt; 느낌이 또 달랐다. 똑같은 방식으로 한 건 아니었지만, 이 차이는 모델보다는 내가 아직 하네스와 계획, 목표 설정에 능숙하지 않아서 생긴 것으로 느껴졌다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/16c2d0c83030_3x.jpg&quot; alt=&quot;Claude가 agent-engineering-history의 Phase 0~11 완료와 세션 수집·저장·조회 E2E 검증, 두 프로젝트 성과를 정리한 메시지.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;Loop Engineering을 내가 잘 못해서 그런지(더 연습하긴 해야 하는데...) 결과는 적당히 만족스러운 수준이라, 그 이후에는 기존처럼 대화하면서 작업했다. 종종 생각하는데, 나는 구체적으로 어떻게 할지 명확히 정해 놓고 하기보다 머릿속의 막연한 생각을 얘기하고 설명하는 쪽이다. 그렇게 만들어진 결과를 보면서 결정하는 편이라 이 방식이 더 맘에 든다.&lt;/p&gt;
-        &lt;p&gt;그동안 안 써 보던 다른 서비스도 써 보자는 생각에 이번에는 &lt;a href=&quot;https://www.cloudflare.com/&quot;&gt;Cloudflare&lt;/a&gt;를 쓰기로 했다. &lt;a href=&quot;https://www.cloudflare.com/products/workers/&quot;&gt;Cloudflare Workers&lt;/a&gt;와 &lt;a href=&quot;https://www.cloudflare.com/products/d1/&quot;&gt;Cloudflare D1&lt;/a&gt;에 배포하도록 작업했고, 클라우드에 배포하므로 인증은 &lt;a href=&quot;https://www.cloudflare.com/products/access/&quot;&gt;Cloudflare Access&lt;/a&gt;로 연결했다. 이후에 써 보니 어차피 작업해 두면 크게 신경 쓸 건 없었다. 다만 Google 로그인은 늘 구글에 로그인되어 있어서 쓰기 편한 데 비해, &lt;a href=&quot;https://www.cloudflare.com/&quot;&gt;Cloudflare&lt;/a&gt;는 로그인해 둘 일이 많지 않다 보니 오히려 그 부분이 불편했다.&lt;/p&gt;
-        &lt;p&gt;얼마 전에 만든 &lt;a href=&quot;/1803&quot;&gt;LLM Usage Tracker&lt;/a&gt;와 데이터를 로컬에서 수집해 원격에서 모아 보여주는 방식이 사실상 똑같아서, 기존과 유사한 구조를 사용했다. 로컬에 Claude Code와 Codex의 세션을 분석하고 수집해서 업로드하는 collector를 만들고, API 키로 원격 서버에 데이터를 계속 보내도록 했다.&lt;/p&gt;
-        &lt;h2&gt;UI&lt;/h2&gt;
-        &lt;p&gt;어느 정도 기능이 만들어지자 이제 UI를 본격적으로 만들기 시작했다. 혼자 사용하는 서비스라서 디자인을 디테일하게 챙기진 않는다. 요즘은 대충 말해도 디자인을 잘 뽑아내다 보니 시안의 초기 느낌만으로 고르고 이후에 개선해 나간다.&lt;/p&gt;
-        &lt;p&gt;시안 A: 미니멀
-        &lt;img src=&quot;/uploads/2026/08/02c6b75d3b0e_3x.jpg&quot; alt=&quot;Agent History의 세션 목록과 대화 상세 화면을 비교한 UI 시안.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;시안 B: 에디토리얼
-        &lt;img src=&quot;/uploads/2026/08/aaee4b554d60_3x.jpg&quot; alt=&quot;Agent History 디자인 시안의 세션 목록과 상세 대화 화면. Claude Code 작업의 스트리밍 파일 처리 요청과 응답이 표시된다.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;시안 C: 터미널
-        &lt;img src=&quot;/uploads/2026/08/435b54d58a86_3x.jpg&quot; alt=&quot;Agent History 디자인 시안 비교 화면에서 세션 목록과 선택한 대화, Bash 명령이 표시된다.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;다 비슷한 느낌이지만(시안을 더 다양하게 받는 방법도 고민해 봐야겠다.) A 미니멀 버전을 선택하고 UI를 사용하면서 불편하다고 생각하는 부분을 계속 개선했다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/5baf262150ad_3x.jpg&quot; alt=&quot;Agentic Engineering History의 Claude Code·Codex 세션 목록과 프로젝트 필터, 세션 검색창.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;세션 목록은 마지막 대화 시간을 기준으로 보이게 했다. 그리고 로컬에서는 정액 요금제를 쓰고 있어서, collector가 세션을 업로드할 때 로컬에서 LLM을 사용해 내용 파악이 쉬운 제목을 붙이도록 했다. 서버에서 하면 더 잘하겠지만 그러면 비싼 API를 써야 해서 어쩔 수 없는 선택이다.&lt;/p&gt;
-        &lt;p&gt;세션의 분량을 파악하기 쉽게 내가 얘기한 채팅과 LLM이 대답한 채팅, 서브에이전트의 채팅을 구분해서 보여준다. 사용한 모델도 쉽게 알아볼 수 있게 했다. Claude Code와 Codex도 계속 기능이 추가되어서 발견할 때마다 반영하고 있다. 다만 프로젝트라는 개념이 엄격하진 않아서 작업 폴더를 기준으로 프로젝트를 인식하도록 했는데, 잘못 판단하는 경우가 꽤 있어서 개선이 필요하다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/35ff5430e73a_3x.jpg&quot; alt=&quot;세션 기록의 아티팩트 표시 요청 아래, Claude가 번들 chip과 우측 rail 구현을 조사하는 명령 기록이 이어진다.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;세션 상세는 채팅과 작업 내용을 쉽게 파악하는 게 목적인데, 양이 워낙 많아서 아직 어렵다. 불필요한 부분은 최대한 접게 했지만 여전히 많아서, 내용을 쉽게 파악하고 필요하면 더 자세히 볼 수 있는 방법을 고민 중이다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/2245e6b688a0_3x.jpg&quot; alt=&quot;Claude 대화 화면 오른쪽 레일에 보라색·갈색 패키지 마커와 선택 아이콘이 표시되어 있다.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;세션 기록과 함께 중간에 생성한 에셋도 관리하는 게 목적이어서, 스샷을 찍거나 나한테 보여준 에셋 파일도 다 남기고 쉽게 볼 수 있게 구성했다. 그럼에도 아직 파악이 어려워서(사실 누락이 있을 수도 있고) 더 나은 방법을 고민 중이다.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;/uploads/2026/08/af0312cd72fb_3x.png&quot; alt=&quot;Hilbert·Chandra·Jason·Kepler 옆의 보라색·갈색 막대가 오른쪽 회색 영역과 주황색 선으로 연결된 그래프.&quot;&gt;&lt;/p&gt;
-        &lt;p&gt;세션의 구성을 쉽게 파악하고 탐색할 수 있도록 화면 우측에 레일 형식의 네비게이션을 구성했다. UI에서 이런 레일 형식의 네비게이션은 개인적으로 좋아하는 편이지만 사실 잘 써 본 적은 없어서 이번에도 시도해 보게 되었다. 한눈에 내가 얼마나 대화했고 그에 따라 코딩 에이전트가 얼마나 대답했는지 파악할 수 있게 했다. 최근엔 코딩 에이전트가 서브에이전트를 많이 사용해서 이 부분을 별도로 분리하고 서브에이전트의 작업도 표시하게 했더니, 저렇게 사람 이름처럼 이름이 붙어서 표시되었다.&lt;/p&gt;
-        &lt;p&gt;내가 말한 부분으로 빠르게 이동하려고 네비게이션 기능도 넣었다. 다만 긴 세션 내용을 한 번에 로딩하지 않고 무한 스크롤로 채워지도록 구성해서, 특정 위치로 한 번에 움직이는 동작이 아직 어색해 고쳐야 한다.&lt;/p&gt;
-        &lt;h2&gt;에필로그&lt;/h2&gt;
-        &lt;p&gt;글 앞에서 말한 대로 이 프로젝트의 방향성은 아직 고민 중이다. 통계용 서비스라는 게 꼭 매일 봐야 의미가 있는 건 아니다. 그래도 현재 버전을 만족스럽게 개선하지 못하고 있어서 뭔가 부족하다는 생각이 든다.&lt;/p&gt;
-        &lt;p&gt;일단 써 봐야 더 개선할 수 있으니, 그사이에 만든 사이드 프로젝트도 하나씩 정리해서 올려 보면서 고민할 생각이다. 이 프로젝트를 거의 만들었을 때쯤 다른 사람한테 &lt;a href=&quot;https://www.agentsview.io/&quot;&gt;AgentsView&lt;/a&gt;를 소개받았다. 훨씬 잘 만든 건 두말할 필요도 없고, &lt;a href=&quot;/1803&quot;&gt;LLM Usage Tracker&lt;/a&gt;와 별도로 만들 게 아니라 합쳤어야 했나 하는 생각도 하고 있다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
       <title>멜로밍 기술 블로그 - tech.meloming.com</title>
       <link>https://dokdo2013.tistory.com/16</link>
       <guid>https://dokdo2013.tistory.com/16</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;멜로밍 서비스를 만들며 겪은 내용을 담은 기술 내용은 멜로밍 Tech Blog에 작성하였습니다.&lt;/p&gt;
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
@@ -664,148 +800,189 @@
       </content:encoded>
     </item>
     <item>
-      <title>[SE-0537] Section Placement Control for Functions</title>
-      <link>https://green1229.tistory.com/633</link>
-      <guid>https://green1229.tistory.com/633</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <title>[SE-0538] Disconnected</title>
+      <link>https://green1229.tistory.com/634</link>
+      <guid>https://green1229.tistory.com/634</guid>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0537 &amp;mdash; 함수를 위한 섹션 배치 제어&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/WnegN/dJMcajwz1YG/GBpQrSQ9jJNtfQdt5UKAek/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/WnegN/dJMcajwz1YG/GBpQrSQ9jJNtfQdt5UKAek/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/WnegN/dJMcajwz1YG/GBpQrSQ9jJNtfQdt5UKAek/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FWnegN%2FdJMcajwz1YG%2FGBpQrSQ9jJNtfQdt5UKAek%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;123123.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0538 &amp;mdash; Disconnected&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;daf.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/boXVpZ/dJMcaikbwB3/RfjEYMeDOuUcniriMKVls0/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/boXVpZ/dJMcaikbwB3/RfjEYMeDOuUcniriMKVls0/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/boXVpZ/dJMcaikbwB3/RfjEYMeDOuUcniriMKVls0/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FboXVpZ%2FdJMcaikbwB3%2FRfjEYMeDOuUcniriMKVls0%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;daf.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
         &lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Intro&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
         &lt;div style=&quot;background: #f2f8ee; border-radius: 10px; padding: 16px 20px; margin: 16px 0;&quot;&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0537&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Author:&lt;/b&gt; Doug Gregor&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Becca Royal-Gordon&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Accepted&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift#89740&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0538&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Author:&lt;/b&gt; Franz Busch&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Holly Borla&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Active review (July 17 - July 31, 2026)&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift#89597&lt;/span&gt;&lt;/p&gt;
         &lt;/div&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0492-section-control.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0492&lt;/a&gt;에서 도입된 &lt;code&gt;@section&lt;/code&gt; 어트리뷰트를 함수에도 붙일 수 있도록 확장하는 제안이에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;임베디드 시스템에서 펌웨어 부팅 코드처럼 바이너리의 특정 섹션에 들어가야 하는 코드가 있을 때 유용합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0414-region-based-isolation.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0414&lt;/a&gt;는 control flow 기반 진단을 활용해서 non-Sendable 값을 isolation 경계 너머로 안전하게 보낼 수 있는지 판단하는 region-based isolation을 도입했어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0430-transferring-parameters-and-results.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0430&lt;/a&gt;은 함수 경계에서 disconnected region에 있어야 하는 값을 명시적으로 표시하는 &lt;code&gt;sending&lt;/code&gt; 파라미터/리턴 어노테이션을 도입했고요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 값의 &lt;b&gt;disconnected 속성을 자료구조나 actor 같은 저장소를 거쳐서도 유지해주는 &lt;code&gt;Disconnected&lt;/code&gt; 타입을 도입&lt;/b&gt;해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;제네릭 타입이 &lt;code&gt;sending&lt;/code&gt; 이펙트를 신경 쓰지 않고도 non-Sendable 값을 isolation region 너머로 안전하게 옮길 수 있게 해줍니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Motivation&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;&lt;code&gt;@section&lt;/code&gt; 어트리뷰트는 특정 엔티티가 오브젝트 파일의 어느 섹션에 배치될지 지정&lt;/b&gt;해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;특히 임베디드 환경에서는 링커나 다른 도구들이 특정 종류의 심볼이 특정 섹션에 있길 기대하는 경우가 많죠. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;E-0492는 전역/static 변수에 대한 &lt;code&gt;@section&lt;/code&gt; 지원을 도입했지만, 함수는 future direction으로 남겨뒀어요.&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;region-based isolation 덕분에 &lt;b&gt;값이 disconnected region에 있으면 isolation 경계를 넘어 non-Sendable 값을 전달할 수 있어요. &lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;SE-0430의 &lt;code&gt;sending&lt;/code&gt; 파라미터/리턴 어노테이션은 함수 경계에서 disconnected 값을 명시적으로 요구할 수 있게 해주지만, 저장 프로퍼티나 컬렉션 타입, 제네릭 컨테이너를 거치면 &lt;code&gt;sending&lt;/code&gt;은 유지되지 않아요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;하지만 함수에도 이 지원이 필요합니다.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;isolation 경계 너머로 처리할 원소를 저장하는 큐 구현을 생각해볼게요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;대표적인 사례가 펌웨어 진입점이나 부팅 스킴인데, startup 코드가 미리 정의된 섹션에 있어야 하는 경우가 많거든요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;autoit&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;// 이 함수의 코드는 커스텀 섹션에 배치됩니다
-        @section(&quot;__TEXT,boot&quot;)
-        func firmwareBootEntrypoint() { ... }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이건 SE-0492의 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0492-section-control.md#section-placement-for-functions&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Future Directions에서도 이미 언급&lt;/a&gt;됐던 내용이에요.&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;가상의 UniqueDeque를 예로 들어봅니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;struct UniqueDeque: ~Copyable {
+        func append(_ element: consuming Element) { ... }
+        func popFirst() -&amp;gt; Element? { ... }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 &lt;code&gt;UniqueDeque&lt;/code&gt;에 non-Sendable한 disconnected 값을 append하고, 나중에 pop할 때 다른 isolation region으로 보내고 싶은 경우가 있을 수 있어요  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;pre class=&quot;arduino&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;var deque = UniqueDeque()
+        deque.append(NonSendable())
+        
+        guard let element = deque.popFirst() else { return }
+        
+        Task {
+        print(element) // Error: Element is assumed to be in the same isolation region as uniqueDeque
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이걸 되게 하려면 &lt;code&gt;append&lt;/code&gt;에서 원소를 consume하고, &lt;code&gt;popFirst&lt;/code&gt;에서 &lt;code&gt;sending&lt;/code&gt;으로 반환해야 해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;하지만 그러면 non-Sendable이지만 &lt;b&gt;disconnected는 아닌&lt;/b&gt; 원소를 저장하고 싶은 다른 중요한 용례에서 이 타입이 크게 제약을 받게 됩니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;근본적인 한계는 &lt;code&gt;sending&lt;/code&gt;이 함수 경계의 속성이지 타입의 속성이 아니라는 점이에요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;UniqueDeque&lt;/code&gt; 같은 제네릭 타입은 저장된 원소가 disconnected 상태를 유지해야 하는지를 조건부로 제어할 수 없어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;append&lt;/code&gt;와 &lt;code&gt;popFirst&lt;/code&gt;를 &lt;code&gt;sending&lt;/code&gt;으로 요구하면 결국 disconnected 값만 &lt;code&gt;UniqueDeque&lt;/code&gt;에 담을 수 있게 되는 셈입니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Proposed Solution&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;일반 함수(&lt;code&gt;func&lt;/code&gt;), 이니셜라이저(&lt;code&gt;init&lt;/code&gt;), deinitializer(&lt;code&gt;deinit&lt;/code&gt;), 클로저, accessor(&lt;code&gt;get&lt;/code&gt;, &lt;code&gt;set&lt;/code&gt; 등)를 포함한 &lt;b&gt;모든 종류의 함수에 &lt;code&gt;@section&lt;/code&gt; 어트리뷰트를 쓸 수 있게 합니다. &lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그리고 어떤 추론 규칙이든 무시하고 플랫폼 기본 섹션을 적용하는 &lt;code&gt;@section(default)&lt;/code&gt; 표기법도 함께 도입해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;disconnected 값을 모델링할 수 있는 새로운 Disconnected 타입을 도입합니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;pre class=&quot;arduino&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;var deque = UniqueDeque&amp;lt;Disconnected&amp;gt;()
+        deque.append(Disconnected(NonSendable()))
+        
+        guard var disconnected = deque.popFirst() else { return }
+        let element = disconnected.take()
+        
+        Task {
+        print(element)
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Disconnected&lt;/code&gt; 타입은 값을 wrap해서 disconnected region에 머물도록 보장해줘요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;take()&lt;/code&gt; 메서드는 &lt;code&gt;Disconnected&lt;/code&gt; wrapper를 consume하고 값을 &lt;code&gt;sending&lt;/code&gt;으로 반환해서 isolation 경계를 넘을 수 있게 해줍니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Detailed Design&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;@section&lt;/code&gt; 어트리뷰트는 어떤 종류의 함수에도 적용할 수 있어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;Disconnected 타입은 타입 시스템을 통해 region isolation을 강제하는 wrapper예요.&lt;/span&gt;&lt;/blockquote&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;문법을 보여주는 몇 가지 예시입니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@section(&quot;__TEXT,boot&quot;)
-        func firmwareBootEntrypoint() { ... }
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Disconnected 타입 정의&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@frozen
+        public struct Disconnected: ~Copyable, Sendable {
+        public init(_ value: consuming sending Value)
         
-        struct MyBootConfig: ~Copyable {
-        @section(&quot;__TEXT,boot&quot;) init() { 
-        registerCallback { @section(&quot;__TEXT,boot&quot;) in 
-        ...
-        }
-        }
+        public consuming func take() -&amp;gt; sending Value
         
-        @section(&quot;__TEXT,boot&quot;) deinit { }
+        @discardableResult
+        public mutating func swap(
+        newValue: consuming sending Value
+        ) -&amp;gt; sending Value
         
-        var bootPhase: Int {
-        @section(&quot;__TEXT,boot&quot;) get { ... }
-        @section(&quot;__TEXT,boot&quot;) set { ... } 
-        }
+        public mutating func withValue(
+        body: (inout sending Value) throws(Failure) -&amp;gt; Return
+        ) throws(Failure) -&amp;gt; Return
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;disconnected region이란?&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;region-based isolation은 프로그램 실행 중 어느 시점에 존재하는 값들을, 어떤 참조가 어떤 저장소에 도달하는지에 따라 isolation region으로 나눕니다. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;어떤 값의 저장소에 다른 region으로부터/다른 region으로의 참조가 전혀 도달하지 않으면, 그 값은 disconnected region에 있는 거예요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이런 값은 actor, Task, 다른 동시성 컨텍스트 등 다른 isolation region으로 옮겨도 안전한데, 옮기는 행위 자체가 데이터 레이스를 만들 수 없기 때문이에요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;실제로 disconnected region은 보통 다음 중 하나에서 생겨요.&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;초기화 인자 자체가 disconnected였던, 새로 생성된 값&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;다른 disconnected 컨테이너에서 막 꺼낸 값&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;함수 경계의 &lt;code&gt;sending&lt;/code&gt; 파라미터 (callee가 disconnected region으로 전달받음)&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;함수의 &lt;code&gt;sending&lt;/code&gt; 리턴 값 (caller가 disconnected region으로 전달받음)&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;disconnected 속성은 보통 &lt;code&gt;sending&lt;/code&gt; 경계에서만 추적돼요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt; &lt;code&gt;Disconnected&amp;lt;Value&amp;gt;&lt;/code&gt;는 그렇지 않았다면 &lt;code&gt;sending&lt;/code&gt; 경계를 벗어나는 순간 region 정보를 잃어버렸을 저장 경계(제네릭 컨테이너, 저장 프로퍼티, 큐)를 거치면서도 이 속성을 유지할 수 있게 해줘요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;연산들&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;값은 &lt;code&gt;init(_:)&lt;/code&gt;을 통해 wrapper 안으로 들어오는데, 이때 &lt;code&gt;sending&lt;/code&gt; 인자가 필요해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;값은 &lt;code&gt;take()&lt;/code&gt;나 &lt;code&gt;swap(newValue:)&lt;/code&gt;를 통해 나가는데, 둘 다 &lt;code&gt;sending Value&lt;/code&gt;를 반환합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt; &lt;code&gt;withValue(body:)&lt;/code&gt;는 wrap된 값을 &lt;code&gt;inout sending Value&lt;/code&gt;로 받는 클로저에 그 자리에서 빌려줘요.&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;모든 연산은 wrapper를 consume하거나, &lt;code&gt;sending&lt;/code&gt; 경계를 통해 wrap된 값을 교체하기 때문에, wrapper의 저장소로 향하는 alias가 transfer보다 오래 살아남을 수 없어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 특성 덕분에 &lt;code&gt;Value&lt;/code&gt; 자체가 &lt;code&gt;Sendable&lt;/code&gt;인지와 무관하게 &lt;code&gt;Disconnected&lt;/code&gt;가 &lt;code&gt;Sendable&lt;/code&gt;을 채택할 수 있는 겁니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;isolation 경계를 넘을 수 있는 값 만들기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;take()&lt;/code&gt;로 wrap된 값을 꺼낼 수 있어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 호출은 wrapper를 consume해서, 그 이후로는 wrapper에 어떤 연산도 할 수 없습니다. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;반환된 값은 disconnected region에 있어서, 같은 표현식 안에서 바로 isolation 경계를 넘어 전달하거나 저장해뒀다가 나중에 전달할 수 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;final class Resource: ~Sendable {}
+        
+        // wrapper는 Disconnected 값을 담고 있던 큐 등에서 꺼낸 것이라,
+        // 그 안의 resource는 이미 주변 컨텍스트와 disconnected된 것으로 알려져 있어요.
+        func process(wrapper: consuming Disconnected) async {
+        let resource = wrapper.take()
+        await Task.detached {
+        use(resource) // OK: &apos;resource&apos;는 disconnected region에 있음
+        }.value
         }&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;변수에 붙이는 &lt;code&gt;@section&lt;/code&gt;과 달리, 제네릭 함수나 제네릭 컨텍스트 안의 함수에 쓰는 데는 아무런 제약이 없어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;모든 함수는 결국 text 섹션에 들어가기 때문이에요.&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그래서 &lt;code&gt;@section&lt;/code&gt;은 타입의 인스턴스 함수에도 적용할 수 있습니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;결과에 disconnected 보장이 없었다면, 캡처된 &lt;code&gt;resource&lt;/code&gt;는 caller의 region에 속한 것으로 간주되어 detached task에서의 캡처가 허용되지 않았을 거예요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;@section&lt;/code&gt; 어트리뷰트는 그 함수뿐 아니라 구현이 함께 만들어내는 관련 함수들에도 적용돼요. &lt;/span&gt;&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예를 들어 &lt;code&gt;async&lt;/code&gt; 함수에 붙이면, 구현이 생성하는 각각의 partial function들도 이 &lt;code&gt;@section&lt;/code&gt;을 따릅니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;마찬가지로 제네릭 함수에 &lt;code&gt;@section&lt;/code&gt;을 붙이면, 컴파일러가 만들어내는 그 제네릭 함수의 모든 specialization에도, 그리고 원본 제네릭 정의에도 적용돼요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;마지막으로 &lt;b&gt;&lt;code&gt;@main&lt;/code&gt; 타입의 &lt;code&gt;main&lt;/code&gt; 함수에 &lt;code&gt;@section&lt;/code&gt;이 있으면, 컴파일러가 만들어내는 실제 &lt;code&gt;main&lt;/code&gt; 진입점에도 같은 섹션이 쓰입니다.&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;;&quot;&gt;&lt;b&gt;accessor, closure, 지역 함수에서의 @section 추론&lt;/b&gt;&lt;/span&gt;&lt;br /&gt;&lt;/span&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;accessor나 closure에 &lt;code&gt;@section&lt;/code&gt;을 명시하지 않으면 다음 규칙으로 추론될 수 있어요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;클로저나 지역 함수는 (있다면) 감싸고 있는 함수로부터 &lt;code&gt;@section&lt;/code&gt;을 추론합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;autoit&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@section(&quot;__TEXT,boot&quot;)
-        func firmwareBootEntrypoint() {
-        func helper() { // @section(&quot;__TEXT,boot&quot;) 추론됨
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;wrap된 값을 제자리에서 교체하기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;swap(newValue:)&lt;/code&gt;로 한 번에 값을 새 값으로 교체할 수 있어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;newValue&lt;/code&gt; 인자는 disconnected region에 있어야 하고, &lt;code&gt;swap&lt;/code&gt;은 이전에 저장돼 있던 값을 반환하는데 이 값도 disconnected region에 있습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;final class Resource: ~Sendable {}
         
-        }
-        
-        registerCallback { // @section(&quot;__TEXT,boot&quot;) 추론됨
-        ...
-        }
+        func swapResources(in wrapper: inout Disconnected) async {
+        let old = wrapper.swap(newValue: Resource())
+        await Task.detached {
+        dispose(old) // OK: &apos;old&apos;는 disconnected region에 있음
+        }.value
         }&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;구현이 합성하는 읽기 전용 접근자(&lt;code&gt;get&lt;/code&gt;, &lt;code&gt;borrow&lt;/code&gt;, &lt;code&gt;yielding borrow&lt;/code&gt; 등)는, 명시적으로 작성된 다른 접근자로부터 &lt;code&gt;@section&lt;/code&gt;을 추론합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;swap의 양방향 모두 disconnected-region 경계를 넘나들어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;새 값은 들어갈 때 disconnected여야 하고, 예전 값은 나올 때 disconnected로 알려집니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;구현이 합성하는 읽기/쓰기 또는 쓰기 접근자(&lt;code&gt;set&lt;/code&gt;, &lt;code&gt;mutate&lt;/code&gt;, &lt;code&gt;yielding mutate&lt;/code&gt;, &lt;code&gt;init&lt;/code&gt;, &lt;code&gt;didSet&lt;/code&gt;, &lt;code&gt;willSet&lt;/code&gt;)도, 명시적으로 작성된 다른 접근자로부터 &lt;code&gt;@section&lt;/code&gt;을 추론합니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;예를 들면 이렇게요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;  var scratchSpace: MutableSpan {
-        @section(&quot;__TEXT,boot&quot;) borrow { ... }
-        // 합성된 &quot;get&quot;이 &apos;borrow&apos;로부터 @section(&quot;__TEXT,boot&quot;)를 추론함
-        
-        @section(&quot;__TEXT,boot&quot;) mutate { ... }
-        // 합성된 &quot;set&quot;이 &apos;mutate&apos;로부터 @section(&quot;__TEXT,boot&quot;)를 추론함 
-        }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;변수에서 그 accessor로는 &lt;code&gt;@section&lt;/code&gt;이 추론되지 않아요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;코드와 데이터는 보통 서로 다른 섹션에 들어가기 때문이에요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;local 타입(과 그 멤버)도 섹션이 추론되지 않습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;@section 추론 억제하기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;default&lt;/code&gt; 키워드를 섹션 값으로 쓰면, 이 선언에는 플랫폼에 맞는 기본 섹션을 쓰라는 뜻이 돼요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그러면 원래 적용됐을 추론 규칙을 모두 무시합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;autoit&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@section(&quot;__TEXT,boot&quot;)
-        func firmwareBootEntrypoint() {
-        @section(default) func helper() { // @section(&quot;__TEXT,boot&quot;) 추론을 억제함
-        
-        }
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;꺼내지 않고 wrap된 값 mutate하기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;값을 꺼내지 않고 임시로 mutable 접근이 필요하면 &lt;code&gt;withValue(body:)&lt;/code&gt;를 쓰면 돼요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;클로저는 값을 &lt;code&gt;inout sending Value&lt;/code&gt;로 전달받고, &lt;code&gt;withValue&lt;/code&gt;는 &lt;code&gt;body&lt;/code&gt;가 반환한 값을 그대로 반환합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;var wrapper = Disconnected([Int]())
+        wrapper.withValue { array in
+        array.append(42)
         }&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;didSet/willSet 제약 완화&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;SE-0492는 &lt;code&gt;@section&lt;/code&gt;이 붙은 변수에 다음 제약을 뒀었어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;inout sending&lt;/code&gt; 파라미터 형태는 보통의 &lt;code&gt;inout&lt;/code&gt;보다 더 많은 것을 의미해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;클로저 안에서는 값을 다른 isolation region으로 옮길 수 있는데, 단 클로저가 반환될 때 wrapper에는 disconnected 값이 남아 있어야 합니다. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;보통은 클로저가 제자리 mutation을 수행하지만, 이 더 관대한 형태 덕분에 &lt;code&gt;withValue&lt;/code&gt;는 값을 다른 isolation region으로 보내고 싶어하는 코드와도 조합될 수 있어요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;그 변수는 프로퍼티 옵저버(didSet, willSet)를 가질 수 없다.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;init(_:)&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;주어진 값을 감싸는 disconnected wrapper를 만들어요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 인자는 호출 시점에 disconnected region에 있어야 하는데, alias가 없는 새로 생성된 값이 이 요구사항을 바로 만족시킵니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;pgsql&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;final class Resource: ~Sendable {}
+        let wrapper = Disconnected(Resource())&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제약은 불필요한 것으로 판단되어 이번 제안에서 없앱니다. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;didSet&lt;/code&gt;이나 &lt;code&gt;willSet&lt;/code&gt;에도 &lt;code&gt;@section&lt;/code&gt;을 붙일 수 있고, 이 값은 구현이 실제로 합성하는 접근자(예: &lt;code&gt;set&lt;/code&gt;)에 대한 추론에 쓰입니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Sendable 채택과 exclusivity&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Disconnected&lt;/code&gt; 타입은 wrap된 값이 disconnected region에 있음을 보장하기 때문에 &lt;code&gt;Sendable&lt;/code&gt;을 채택해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;disconnected region은 isolation 경계를 안전하게 넘을 수 있기 때문에, &lt;code&gt;T&lt;/code&gt;가 &lt;code&gt;Sendable&lt;/code&gt;인지와 무관하게 &lt;code&gt;Disconnected&amp;lt;T&amp;gt;&lt;/code&gt;를 공유하는 게 안전합니다. &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Future Directions&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;데이터와 함수 섹션 어트리뷰트 분리하기&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Swift의 일부 선언은 데이터 심볼과 함수 심볼을 동시에 내보내요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;예를 들어 타입을 정의할 때 메타데이터 심볼(데이터)과 메타데이터 접근자 함수(함수)가 함께 생길 수 있죠. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안도 SE-0492도 타입 정의에 &lt;code&gt;@section&lt;/code&gt;을 허용하진 않지만, 만약 허용한다면 데이터용과 함수용 섹션을 따로 표현할 방법이 필요할 거예요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;더불어 &lt;code&gt;Disconnected&lt;/code&gt;의 모든 메서드는 &lt;code&gt;consuming&lt;/code&gt;이거나 &lt;code&gt;mutating&lt;/code&gt;이라서, 컴파일러가 정적/동적 exclusivity 검사를 강제해서 겹치거나 동시적인 접근을 금지해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 API는 의도적으로 &lt;code&gt;sending&lt;/code&gt; 경계에서의 atomic transfer로만 제한돼요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;init&lt;/code&gt;은 &lt;code&gt;sending&lt;/code&gt; 값을 consume하고, &lt;code&gt;take&lt;/code&gt;는 wrapper를 consume해서 &lt;code&gt;sending&lt;/code&gt; 값을 반환하고, &lt;code&gt;swap&lt;/code&gt;은 wrap된 값을 다른 &lt;code&gt;sending&lt;/code&gt; 값과 교환하고, &lt;code&gt;withValue&lt;/code&gt;는 클로저가 끝날 때 disconnected 값을 남겨야 하는 조건으로 wrap된 값을 &lt;code&gt;inout sending&lt;/code&gt;으로 빌려줘요. &lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;wrap된 값을 consume하거나 교체하지 않고 노출하는 accessor는 없습니다. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;왜 borrow accessor가 무조건적인 &lt;code&gt;Sendable&lt;/code&gt; 채택과 함께라면 안전하지 않은지는 Alternatives Considered 섹션에서 다룹니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;예를 들면 이런 모습일 수 있습니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@section(data: &quot;__DATA,mysection&quot;)
-        @section(function: &quot;__FUNCTION,mysection&quot;)
-        public struct MyStruct { ... }&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;data&lt;/code&gt;도 &lt;code&gt;function&lt;/code&gt;도 지정하지 않은 &lt;code&gt;@section&lt;/code&gt;은, 이 제안과 SE-0492가 다루는 것처럼 데이터/함수 구분이 모호하지 않은 곳에서만 적용될 거예요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;타입 정의, extension, 프로토콜 conformance, 파일 단위 기본값처럼 데이터와 함수 심볼을 동시에 내보내는 새로운 자리들이 이 새 문법을 쓸 수 있게 될 겁니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이 제안이 승인되는 과정에서, 추론을 억제하고 기본 섹션을 지정하는 @section(default) 기능이 새로 도입됐어요.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Disconnected&lt;/code&gt;는 &lt;code&gt;Mutex&lt;/code&gt;, &lt;code&gt;Atomic&lt;/code&gt; 등 표준 라이브러리가 제공하는 isolation 경계를 넘기 위한 다른 primitive들과 함께 &lt;code&gt;Synchronization&lt;/code&gt; 모듈에 자리합니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Conclusion&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;변수에만 적용되던 &lt;code&gt;@section&lt;/code&gt;이 이제 &lt;code&gt;func&lt;/code&gt;, &lt;code&gt;init&lt;/code&gt;, &lt;code&gt;deinit&lt;/code&gt;, 클로저, accessor까지 아우르게 됐어요  &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;특히 감싸는 함수로부터 &lt;code&gt;@section&lt;/code&gt;이 자동으로 추론되는 규칙 덕분에, 펌웨어 부팅 코드처럼 특정 섹션에 몰아넣어야 하는 코드 전체를 일일이 어트리뷰트로 도배하지 않아도 될 것 같아요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;임베디드 환경에서 Swift를 쓰는 개발자들에게 꽤 실용적인 도구가 하나 더 생긴 셈입니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Disconnected&lt;/code&gt;는 &lt;code&gt;sending&lt;/code&gt;이 함수 경계에만 머물던 정보를 저장소를 통과해서도 유지할 수 있게 해줘요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt; non-Sendable 값을 담는 제네릭 컨테이너나 큐를 만들 때, 그 원소가 disconnected인지 아닌지를 타입 하나로 명확히 구분할 수 있게 된 셈이죠. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;init&lt;/code&gt;/&lt;code&gt;take&lt;/code&gt;/&lt;code&gt;swap&lt;/code&gt;/&lt;code&gt;withValue&lt;/code&gt; 모두 &lt;code&gt;sending&lt;/code&gt; 경계에서의 atomic transfer로만 제한된 설계 덕분에, 무조건적인 &lt;code&gt;Sendable&lt;/code&gt; 채택에도 안전성이 깨지지 않는다는 점이 인상적입니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;b&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;figure id=&quot;og_1786745937935&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0537-function-sections.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0537-function-sections.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0537-function-sections.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/bw8GeD/dJMb9efueSx/TECZqY5kb1kkkyCOiEePY0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/brCzKH/dJMb9frVzgx/biA718xCSbOGapEJmoOeP0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0537-function-sections.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0537-function-sections.md&quot;&gt;
-        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/bw8GeD/dJMb9efueSx/TECZqY5kb1kkkyCOiEePY0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/brCzKH/dJMb9frVzgx/biA718xCSbOGapEJmoOeP0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;figure id=&quot;og_1787290188122&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0538-disconnected.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0538-disconnected.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0538-disconnected.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/bXQJAN/dJMb8SpZkr9/h4EYGPXkYIWw7gjtG0l3e1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/b1kbFB/dJMb9cBYUsT/KzjB2j1cFKL9caKgqLdDCk/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0538-disconnected.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0538-disconnected.md&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/bXQJAN/dJMb8SpZkr9/h4EYGPXkYIWw7gjtG0l3e1/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/b1kbFB/dJMb9cBYUsT/KzjB2j1cFKL9caKgqLdDCk/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
         &lt;div class=&quot;og-text&quot;&gt;
-        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0537-function-sections.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0538-disconnected.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
         &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
         &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
         &lt;/div&gt;
@@ -816,21 +993,21 @@
       <title>블로그에 미니게임 만들어 넣기</title>
       <link>https://blog.wonkooklee.com/blog/20260816_01/</link>
       <guid>https://blog.wonkooklee.com/blog/20260816_01/</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>레블 1100 MT 출고 1년을 맞아, 인스타에서 본 장면을 GPT와 나노바나나를 거쳐 블로그 미니게임으로 만든 기록.</content:encoded>
     </item>
     <item>
       <title>Testing Air Canada’s Free and Paid In-Flight Wi-Fi</title>
       <link>https://seapy.com/air-canada-free-inflight-wifi-ai-cli/</link>
       <guid>https://seapy.com/air-canada-free-inflight-wifi-ai-cli/</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded></content:encoded>
     </item>
     <item>
       <title>Blog: Jetpack Compose에서 PinnableContainer로 아이템 유지하기</title>
       <link>http://pluu.github.io/blog/android/2026/08/16/pinnable-container/</link>
       <guid>http://pluu.github.io/blog/android/2026/08/16/pinnable-container/</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;LazyColumn에서 UI 상태를 변경(예 : 아이템을 펼치거나 포커스)한 후 스크롤하면, 화면 밖으로 이동한 아이템의 composition이 제거될 수 있습니다. 추가 처리가 없다면 다시 아이템이 노출되었을 때 UI가 초기화되는 문제가 발생합니다.&lt;/p&gt;
         
@@ -1303,7 +1480,7 @@
       <title>[네트워크] 우리집 컴퓨터는 어떻게 네이버에 연결될까?</title>
       <link>https://mangkyu.tistory.com/473</link>
       <guid>https://mangkyu.tistory.com/473</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
@@ -1500,7 +1677,7 @@
       <title>싱글코어가 필요한 시대</title>
       <link>https://w0nder.land/posts/81-%EC%8B%B1%EA%B8%80%EC%BD%94%EC%96%B4%EA%B0%80%20%ED%95%84%EC%9A%94%ED%95%9C%20%EC%8B%9C%EB%8C%80</link>
       <guid>https://w0nder.land/posts/81-%EC%8B%B1%EA%B8%80%EC%BD%94%EC%96%B4%EA%B0%80%20%ED%95%84%EC%9A%94%ED%95%9C%20%EC%8B%9C%EB%8C%80</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         얼마 전 팀원이 나에게 요즘 어떻게 일하고 있는지, AI를 어떻게 사용하는지 물어봤다. 어떤 식으로 작업을 나누는지, AI에게 어디까지 맡기는지, 어떤 도구를 사용하는지 궁금하다고 했다. 이야기를 하다 보니 자연스럽게 서로의 작업 방식을 비교하게 됐다. 어떤 일을 먼저 보는지, 어디에서 시간을 쓰는지, AI에게 무엇을 맡기는지, 어떤 것은 직접 처리하는지, 결과물을 어떻게 확인하는지까지 하나씩 이야기했다.
         그 팀원은 나보다 대략 여섯 배 정도 많은 토큰을 사용하고 있었다. 여러 가지 최신 기능도 적극적으로 사용하고 있었고, skill을 붙이고 harness를 만들고 agent를 활용하는 등 AI를 자신의 개발 환경에 상당히 깊게 끌어다 쓰고 있었다. 반면 나는 거의 순정에 가까운 방식으로 사용하고 있었다. 팀에서 같이 사용하는 몇 가지 skill이나 PR 자동화 같은 것을 제외하면 특별히 복잡한 환경을 만들어놓고 사용하는 것도 아니었다.
@@ -1543,7 +1720,7 @@
       <title>[Swift] UI 모듈의 공개 인터페이스와 내부 구현 분리하기</title>
       <link>https://minsOne.github.io/swift-ui-module-public-interface-and-internal-implementation</link>
       <guid>https://minsOne.github.io/swift-ui-module-public-interface-and-internal-implementation</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/REC-html40/loose.dtd&quot;&gt;
         &lt;html&gt;&lt;body&gt;
@@ -1664,7 +1841,7 @@
       <title>[Swift] Protocol Extension으로 공통 인터페이스를 도메인에 맞게 처리하기</title>
       <link>https://minsOne.github.io/swift-protocol-extension-domain-interface</link>
       <guid>https://minsOne.github.io/swift-protocol-extension-domain-interface</guid>
-      <pubDate>Fri, 21 Aug 2026 15:28:55 GMT</pubDate>
+      <pubDate>Sat, 22 Aug 2026 15:21:37 GMT</pubDate>
       <content:encoded>
         &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/REC-html40/loose.dtd&quot;&gt;
         &lt;html&gt;&lt;body&gt;
