@@ -4,12 +4,297 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sat, 22 Aug 2026 15:44:10 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 23 Aug 2026 15:43:28 GMT</lastBuildDate>
+    <item>
+      <title>Using the Cursor SDK to Build a Project Documenter</title>
+      <link>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</link>
+      <guid>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</guid>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve shared a few posts recently talking about how I&apos;m using Cursor to learn and employ agentic development. Primarily that work has all been done via our Agent view, but this is just one of the surfaces you can use with the platform. I had a chance recently to try out the SDK and I thought I&apos;d share a little demo I built with it.&lt;/p&gt;
+        &lt;p&gt;First - some explanation would be helpful. You can use Cursor with the desktop application, on the web, via CLI, on iOS, even via API. But the SDK lets you use the platform from your code. There&apos;s an SDK for &lt;a href=&quot;https://cursor.com/docs/sdk/typescript&quot;&gt;TypeScript&lt;/a&gt;, &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;Python&lt;/a&gt;, and a &lt;a href=&quot;https://cursor.com/docs/sdk/bridge&quot;&gt;bridge&lt;/a&gt; that embeds a TypeScript server and lets you use any language. Honestly I&apos;ve never seen that before in a platform and it&apos;s pretty freaking cool. (And... just to remind folks, I do work at Cursor so I&apos;m biased, but that&apos;s absolutely an honest opinion.)&lt;/p&gt;
+        &lt;p&gt;With the SDK, you can do all the things you can usually do with the platform - run prompts in different modes - swap models at will, including the auto router which makes it easier, even kick off agents that run in the cloud. Definitely check the &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;docs&lt;/a&gt; for a full detailed list of what you can do, but it&apos;s basically the platform itself - in your code.&lt;/p&gt;
+        &lt;p&gt;I built a quick demo with the TypeScript SDK, but then switched over to Python as I felt it a bit easier for me to use. The &lt;a href=&quot;https://cursor.com/docs/sdk/python#quick-start&quot;&gt;quickstart&lt;/a&gt; shows how easy it is:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
+        
+        from cursor_sdk import Agent, LocalAgentOptions
+        
+        with Agent.create(
+        model=&amp;quot;composer-2.5&amp;quot;,
+        api_key=&amp;quot;crsr_key&amp;quot;,
+        local=LocalAgentOptions(cwd=os.getcwd()),
+        ) as agent:
+        print(agent.send(&amp;quot;Summarize what this repository does&amp;quot;).text())
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This returns the final result of the prompt, but you also have the ability to get &lt;em&gt;everything&lt;/em&gt; that was generated, so for example, the detailed list of tool calls and such. You can also decide between streaming or just waiting and getting the final result.&lt;/p&gt;
+        &lt;p&gt;All of this just works - which is what you want in a SDK - and the quick start example is one of my favorite things to do with Cursor - basically &amp;quot;what the heck is this repo/set of code doing&amp;quot; - and I thought it would be cool to turn this into a CLI tool.&lt;/p&gt;
+        &lt;p&gt;To be clear, normally I&apos;d use the Cursor Agent window, open the repo or folder, and use Ask mode to describe the project. But if I&apos;m not planning to work with the code later and just want a good explanation, a CLI tool could be useful for this purpose instead.&lt;/p&gt;
+        &lt;p&gt;Of course, the easiest way to build this is to use Cursor itself. I set up a new folder and started a new plan:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;/plan create a Python CLI that makes use of the Cursor SDK. The CLI is a 
+        tool that will scan a code base and generated a detailed report of the 
+        application/code base of the folder being scanned. What it does, what 
+        technologies it use, what frameworks are in place, and so forth.
+        
+        The CLI should support a help command. 
+        The CLI will scan the current directory by default, but supports an 
+        argument to specify a path.
+        The CLI will output Markdown, but an argument allows for a PDF file output.
+        Require a filename to store the result. 
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This created the following plan:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        margin-bottom: 30px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;hr&gt;
+        &lt;p&gt;name: Python SDK CLI
+        overview: Build a greenfield Python CLI (&lt;code&gt;codebase-report&lt;/code&gt;) that uses the Cursor Python SDK’s local agent to analyze a target directory and write a structured Markdown or PDF report to a required output filename.
+        todos:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;id: scaffold
+        content: Create pyproject.toml, package layout, README with install/auth/usage
+        status: completed&lt;/li&gt;
+        &lt;li&gt;id: cli
+        content: &amp;quot;Implement argparse CLI: required --output, optional PATH, --pdf, --help&amp;quot;
+        status: completed&lt;/li&gt;
+        &lt;li&gt;id: scanner
+        content: Implement Agent.prompt local scan with structured Markdown prompt and exit codes
+        status: completed&lt;/li&gt;
+        &lt;li&gt;id: export
+        content: Implement Markdown write and Markdown-to-PDF via markdown + xhtml2pdf
+        status: completed
+        isProject: false&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;hr&gt;
+        &lt;h1 id=&quot;python-cli%3A-codebase-report-via-cursor-sdk&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#python-cli%3A-codebase-report-via-cursor-sdk&quot;&gt;Python CLI: Codebase Report via Cursor SDK&lt;/a&gt;&lt;/h1&gt;
+        &lt;h2 id=&quot;goal&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#goal&quot;&gt;Goal&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ship an installable Python CLI that points a &lt;strong&gt;local&lt;/strong&gt; Cursor agent at a folder, asks it to produce a detailed codebase report, and writes the result to a required output file as &lt;strong&gt;Markdown&lt;/strong&gt; (default) or &lt;strong&gt;PDF&lt;/strong&gt; (&lt;code&gt;--pdf&lt;/code&gt;).&lt;/p&gt;
+        &lt;h2 id=&quot;cli-interface&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#cli-interface&quot;&gt;CLI interface&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Console script: &lt;code&gt;codebase-report&lt;/code&gt;&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;codebase-report --output REPORT.md [PATH]
+        codebase-report --pdf --output REPORT.pdf [PATH]
+        codebase-report --help
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;table&gt;
+        &lt;thead&gt;
+        &lt;tr&gt;
+        &lt;th&gt;Arg&lt;/th&gt;
+        &lt;th&gt;Behavior&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;PATH&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Optional; defaults to current working directory (&lt;code&gt;.&lt;/code&gt;)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;-o&lt;/code&gt; / &lt;code&gt;--output&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;strong&gt;Required&lt;/strong&gt; filename/path for the report&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;--pdf&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Convert agent Markdown to PDF and write that instead of &lt;code&gt;.md&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;&lt;code&gt;-h&lt;/code&gt; / &lt;code&gt;--help&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Standard argparse help (covers the “help command” requirement)&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+        &lt;p&gt;Validation: &lt;code&gt;PATH&lt;/code&gt; must exist and be a directory; refuse missing &lt;code&gt;--output&lt;/code&gt;; exit non-zero on SDK startup vs run failures (see below).&lt;/p&gt;
+        &lt;h2 id=&quot;architecture&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#architecture&quot;&gt;Architecture&lt;/a&gt;&lt;/h2&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;flowchart LR
+        CLI[cli.py argparse] --&amp;gt; Scan[scanner.py Agent.prompt]
+        Scan --&amp;gt; Agent[Local Cursor agent cwd=PATH]
+        Agent --&amp;gt; MD[Markdown text]
+        MD --&amp;gt; Export[export.py]
+        Export --&amp;gt;|default| FileMD[write --output]
+        Export --&amp;gt;|--pdf| FilePDF[MD to HTML to PDF]
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;strong&gt;Runtime choice:&lt;/strong&gt; local agent with &lt;code&gt;LocalAgentOptions(cwd=resolved_path)&lt;/code&gt;. The agent reads the tree on disk; no cloud clone needed.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Invocation pattern:&lt;/strong&gt; one-shot &lt;code&gt;Agent.prompt(...)&lt;/code&gt; (create → run → dispose). No multi-turn, no streaming required for v1; optionally print a short “Scanning…” status to stderr.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Auth:&lt;/strong&gt; &lt;code&gt;CURSOR_API_KEY&lt;/code&gt; from the environment (documented in README). Pass &lt;code&gt;api_key=os.environ[&amp;quot;CURSOR_API_KEY&amp;quot;]&lt;/code&gt; explicitly so a missing key fails clearly.&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Model:&lt;/strong&gt; &lt;code&gt;composer-2.5&lt;/code&gt;.&lt;/p&gt;
+        &lt;h2 id=&quot;project-layout-(greenfield)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#project-layout-(greenfield)&quot;&gt;Project layout (greenfield)&lt;/a&gt;&lt;/h2&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;pyproject.toml          # package + console_scripts entry
+        README.md               # install, CURSOR_API_KEY, usage examples
+        src/codebase_report/
+        __init__.py
+        __main__.py           # python -m codebase_report
+        cli.py                # argparse + main()
+        scanner.py            # Agent.prompt + prompt text + error handling
+        export.py             # write markdown / pdf
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Dependencies in &lt;code&gt;pyproject.toml&lt;/code&gt;:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;cursor-sdk&lt;/code&gt; (Python ≥3.10)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;markdown&lt;/code&gt; + &lt;code&gt;xhtml2pdf&lt;/code&gt; for PDF (pure pip; no system WeasyPrint/Pandoc)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 id=&quot;core-implementation-details&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#core-implementation-details&quot;&gt;Core implementation details&lt;/a&gt;&lt;/h2&gt;
+        &lt;h3 id=&quot;prompt-(scanner.py)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#prompt-(scanner.py)&quot;&gt;Prompt (&lt;code&gt;scanner.py&lt;/code&gt;)&lt;/a&gt;&lt;/h3&gt;
+        &lt;p&gt;Instruct the agent to &lt;strong&gt;explore the codebase&lt;/strong&gt; (read manifests, configs, source layout) and return &lt;strong&gt;only Markdown&lt;/strong&gt; covering at least:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Overview / purpose&lt;/li&gt;
+        &lt;li&gt;Primary languages and runtimes&lt;/li&gt;
+        &lt;li&gt;Frameworks and major libraries&lt;/li&gt;
+        &lt;li&gt;Architecture / top-level structure&lt;/li&gt;
+        &lt;li&gt;Entry points and how to run/build/test (if discoverable)&lt;/li&gt;
+        &lt;li&gt;Notable tooling (CI, linters, package managers)&lt;/li&gt;
+        &lt;li&gt;Anything else material about the app&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Also instruct: do not modify files; do not wrap the whole answer in a single fenced code block. The CLI owns writing the output file from &lt;code&gt;result.result&lt;/code&gt; (or equivalent final text).&lt;/p&gt;
+        &lt;h3 id=&quot;agent-call&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agent-call&quot;&gt;Agent call&lt;/a&gt;&lt;/h3&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from cursor_sdk import Agent, AgentOptions, LocalAgentOptions, CursorAgentError
+        
+        result = Agent.prompt(
+        PROMPT,
+        AgentOptions(
+        api_key=os.environ[&amp;quot;CURSOR_API_KEY&amp;quot;],
+        model=&amp;quot;composer-2.5&amp;quot;,
+        local=LocalAgentOptions(cwd=str(scan_path.resolve())),
+        ),
+        )
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Error handling per SDK guidance:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;CursorAgentError&lt;/code&gt; → stderr + exit &lt;code&gt;1&lt;/code&gt; (auth/config/network; never started)&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;result.status == &amp;quot;error&amp;quot;&lt;/code&gt; → stderr + exit &lt;code&gt;2&lt;/code&gt; (run failed)&lt;/li&gt;
+        &lt;li&gt;success → extract Markdown text, then export&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h3 id=&quot;export-(export.py)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#export-(export.py)&quot;&gt;Export (&lt;code&gt;export.py&lt;/code&gt;)&lt;/a&gt;&lt;/h3&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Markdown:&lt;/strong&gt; write UTF-8 text to &lt;code&gt;--output&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;PDF:&lt;/strong&gt; &lt;code&gt;markdown.markdown(...)&lt;/code&gt; → HTML → &lt;code&gt;xhtml2pdf&lt;/code&gt; → write bytes to &lt;code&gt;--output&lt;/code&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Light post-process: if the agent returns a single outer &lt;code&gt;markdown ... &lt;/code&gt; fence, strip it before writing.&lt;/p&gt;
+        &lt;h2 id=&quot;readme-(minimal)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#readme-(minimal)&quot;&gt;README (minimal)&lt;/a&gt;&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;pip install -e .&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;export CURSOR_API_KEY=...&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;Example scans of &lt;code&gt;.&lt;/code&gt; and an explicit path, Markdown and PDF&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 id=&quot;out-of-scope-for-v1&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#out-of-scope-for-v1&quot;&gt;Out of scope for v1&lt;/a&gt;&lt;/h2&gt;
+        &lt;ul&gt;
+        &lt;li&gt;
+        &lt;p&gt;Cloud agents, resume, streaming UI, interactive REPL&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;Config files / model override flags&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;Uploading or publishing the report&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;By the way, the Architecture was a pretty Mermaid chart that&apos;s not rendering on my blog:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/08/mermaid.png&quot; loading=&quot;lazy&quot; alt=&quot;Mermaid&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;The end result - in terminal I can create a report in either Markdown or PDF. I&apos;ll share a link to the entire thing below, but let&apos;s take a look at the Python file responsible for analyzing the codebase via the Cursor SDK:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;&amp;quot;&amp;quot;&amp;quot;Run a local Cursor agent to produce a codebase Markdown report.&amp;quot;&amp;quot;&amp;quot;
+        
+        from __future__ import annotations
+        
+        import os
+        import sys
+        from pathlib import Path
+        
+        from cursor_sdk import Agent, AgentOptions, CursorAgentError, LocalAgentOptions
+        
+        PROMPT = &amp;quot;&amp;quot;&amp;quot;\
+        Explore this codebase thoroughly (manifests, configs, source layout, docs) and \
+        produce a detailed report about the application.
+        
+        Cover at least:
+        - Overview / purpose of the project
+        - Primary languages and runtimes
+        - Frameworks and major libraries
+        - Architecture and top-level structure
+        - Entry points and how to run, build, and test (if discoverable)
+        - Notable tooling (CI, linters, package managers, etc.)
+        - Anything else material about how the app works
+        
+        Rules:
+        - Do not modify, create, or delete any files.
+        - Return ONLY Markdown for the report (headings, lists, short code snippets as needed).
+        - Do not wrap the entire reply in a single fenced code block.
+        &amp;quot;&amp;quot;&amp;quot;
+        
+        
+        class ScanError(Exception):
+        &amp;quot;&amp;quot;&amp;quot;CLI-facing scan failure with an exit code.&amp;quot;&amp;quot;&amp;quot;
+        
+        def __init__(self, message: str, exit_code: int) -&amp;gt; None:
+        super().__init__(message)
+        self.exit_code = exit_code
+        
+        
+        def _require_api_key() -&amp;gt; str:
+        api_key = os.environ.get(&amp;quot;CURSOR_API_KEY&amp;quot;, &amp;quot;&amp;quot;).strip()
+        if not api_key:
+        raise ScanError(
+        &amp;quot;CURSOR_API_KEY is not set. Export it before running codebase-report.&amp;quot;,
+        exit_code=1,
+        )
+        return api_key
+        
+        
+        def _extract_markdown(result: object) -&amp;gt; str:
+        text = getattr(result, &amp;quot;result&amp;quot;, None)
+        if isinstance(text, str) and text.strip():
+        return text
+        raise ScanError(&amp;quot;Agent finished but returned no report text.&amp;quot;, exit_code=2)
+        
+        
+        def scan_codebase(scan_path: Path) -&amp;gt; str:
+        &amp;quot;&amp;quot;&amp;quot;Analyze *scan_path* with a local Cursor agent and return Markdown.&amp;quot;&amp;quot;&amp;quot;
+        api_key = _require_api_key()
+        cwd = str(scan_path.resolve())
+        
+        print(f&amp;quot;Scanning {cwd} with Cursor agent…&amp;quot;, file=sys.stderr)
+        
+        try:
+        result = Agent.prompt(
+        PROMPT,
+        AgentOptions(
+        api_key=api_key,
+        model=&amp;quot;composer-2.5&amp;quot;,
+        local=LocalAgentOptions(cwd=cwd),
+        ),
+        )
+        except CursorAgentError as err:
+        retryable = getattr(err, &amp;quot;is_retryable&amp;quot;, False)
+        raise ScanError(
+        f&amp;quot;startup failed: {err.message} (retryable={retryable})&amp;quot;,
+        exit_code=1,
+        ) from err
+        
+        status = getattr(result, &amp;quot;status&amp;quot;, None)
+        if status == &amp;quot;error&amp;quot;:
+        run_id = getattr(result, &amp;quot;id&amp;quot;, &amp;quot;unknown&amp;quot;)
+        raise ScanError(f&amp;quot;run failed: {run_id}&amp;quot;, exit_code=2)
+        
+        return _extract_markdown(result)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is pretty robust and the prompt it uses is really well written. (Ok, as a reminder folks, don&apos;t forget prompt writing is still important &lt;em&gt;and&lt;/em&gt; you can cheat at that by asking your AI agent to improve your prompt before you actually run it.)&lt;/p&gt;
+        &lt;p&gt;I did a quick run of this on my blog and got the following:&lt;/p&gt;
+        &lt;iframe src=&quot;https://static.raymondcamden.com/images/2026/08/foo.pdf&quot; width=&quot;100%&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
+        &lt;p&gt;This is a rather simple example, but being able to use the Cursor platform in code like this could be really freaking powerful I think. If you&apos;ve done something like this, I&apos;d love to hear more, share a comment below. You can check out the full code here: &lt;a href=&quot;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&quot;&gt;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>&lt;file-preview&gt; - A simple web component for file previews</title>
       <link>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</link>
       <guid>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This was a &amp;quot;I can&apos;t fall asleep and my mind is wondering&amp;quot; type of idea and honestly, I&apos;m surprised at how good it came out. For a while now I&apos;ve shared demos where a user picks an image and ... something. It doesn&apos;t matter. But I typically add a preview of the image when it&apos;s selected. This works because once the user selects a file on their local system, JavaScript can then access the bits of that file, making it trivial then to render it. The idea I had, late at night, was simple - what if this could be a web component and expanded to cover different file types?&lt;/p&gt;
         &lt;p&gt;In my imagination, it would look something like this in code:&lt;/p&gt;
@@ -64,7 +349,7 @@
       <title>Links For You (8/2/26)</title>
       <link>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</link>
       <guid>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy August folks. Louisiana is celebrating the approach of Fall by gradually increasing the temperatures to roughly that of the surface of the sun. Last night we saw the new Spider-Man, which was really good, although not as fantastic as &amp;quot;No Way Home&amp;quot;. The point of these posts is for me to share content from other folks, but I&apos;ll remind folks of my &lt;a href=&quot;https://youtube.com/user/theraymondcamden&quot;&gt;Youtube channel&lt;/a&gt;. This past week I shared a few new videos demonstrating some cool stuff with Cursor so if you&apos;ve not checked them out yet, give me a quick watch and let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;web-browsing-on-your-gaming-console&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#web-browsing-on-your-gaming-console&quot;&gt;Web browsing on your gaming console&lt;/a&gt;&lt;/h2&gt;
@@ -95,7 +380,7 @@
       <title>Updating my Watch Site for Algolia Support</title>
       <link>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</link>
       <guid>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Alright, so I was supposed to share this a bit quicker, but life, work, etc, kept me busy. I&apos;ve had this particular change up for a few days but I&apos;m just now getting around to blogging about it. What changes?&lt;/p&gt;
         &lt;ul&gt;
@@ -379,7 +664,7 @@
       <title>Building Agentically and Celebrating Watches</title>
       <link>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</link>
       <guid>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared past experiences with vibe coding and it&apos;s been a fascinating way to experiment and build on a small scale, but while it works well for POCs and other small utilities (I won&apos;t say &apos;toys&apos; as I&apos;ve built useful, if small, things now multiple times), it isn&apos;t really a &amp;quot;process&amp;quot; and not one that would work over a project with a longer time frame. This is where &amp;quot;Agentic Development&amp;quot; comes in. It&apos;s not always referred to as such and it&apos;s a huge topic, but let me give you my opinion on it and then demonstrate how I used it to build my newest project, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;agentic-development-in-a-nutshell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agentic-development-in-a-nutshell&quot;&gt;Agentic Development in a Nutshell&lt;/a&gt;&lt;/h2&gt;
@@ -550,7 +835,7 @@
       <title>Copying HTML Tables as Text, Markdown, and CSV</title>
       <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
       <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
         &lt;p&gt;First, I added a table of course:&lt;/p&gt;
@@ -736,7 +1021,7 @@
       <title>Links For You (7/18/26)</title>
       <link>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</link>
       <guid>https://www.raymondcamden.com/2026/07/18/links-for-you-71826</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning, programs. I&apos;m currently at a conference (&lt;a href=&quot;https://www.sqlsatbr.com/&quot;&gt;Day of Data&lt;/a&gt;), but thankfully one just down the road. I&apos;ll be back tonight, and thought I&apos;d take a break between sessions to share some links. I&apos;ll be presenting later today one of my favorite talks, &amp;quot;A Beginner&apos;s Guide to Wrangling Asynchronicity in JavaScript&amp;quot;. I love the talk, but given I&apos;m up against &lt;em&gt;eight&lt;/em&gt; other talks at the same time and I&apos;m not talking AI... well it may be a small personal affair. We shall see.&lt;/p&gt;
         &lt;h2 id=&quot;building-a-blog-with-astro&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#building-a-blog-with-astro&quot;&gt;Building a Blog with Astro&lt;/a&gt;&lt;/h2&gt;
@@ -761,7 +1046,7 @@
       <title>TIL - Algolia Makes Creating an MCP Server Stupid Easy</title>
       <link>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</link>
       <guid>https://www.raymondcamden.com/2026/07/11/til-algolia-makes-creating-an-mcp-server-stupid-easy</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I was chatting with &lt;a href=&quot;https://www.linkedin.com/in/chuckm/&quot;&gt;Chuck Meyer&lt;/a&gt; (devrel for &lt;a href=&quot;https://algolia.com&quot;&gt;Algolia&lt;/a&gt;) and I casually mentioned, &amp;quot;It sure would be cool if Algolia had an easy way to turn my search index into an MCP server.&amp;quot; He promptly responded, &amp;quot;Of course, you complete and utter dufus, which is why we already &lt;em&gt;have&lt;/em&gt; that feature.&amp;quot; (Not an exact quote.) This is &lt;em&gt;exactly&lt;/em&gt; the kind of thing I love to hear. I&apos;ve been using Algolia for my &lt;a href=&quot;/search&quot;&gt;search&lt;/a&gt; here for &lt;em&gt;years&lt;/em&gt; and honestly have not paid much attention to the new additions on their platform. That was a mistake. Let me show you how dang easy they made this.&lt;/p&gt;
         &lt;h2 id=&quot;first---what&apos;s-algolia%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first---what&apos;s-algolia%3F&quot;&gt;First - what&apos;s Algolia?&lt;/a&gt;&lt;/h2&gt;
@@ -938,7 +1223,7 @@
       <title>Turning my Cursor Performance Work into a Repeatable Skill</title>
       <link>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</link>
       <guid>https://www.raymondcamden.com/2026/07/08/turning-cursor-performance-work-repeatable-skill</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Yesterday, I wrote about using Cursor to &lt;a href=&quot;https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance&quot;&gt;review my blog for performance&lt;/a&gt;. Cursor (and again, for full disclosure I work here now ;) did a &lt;em&gt;dang&lt;/em&gt; good job of finding performance issues with my site, handling the huge size and various languages, platforms, and so forth. As I said, it worked well, but I wanted to look into making this more of a repeatable process.&lt;/p&gt;
         &lt;p&gt;I&apos;m saying &amp;quot;repeatable&amp;quot;, not &amp;quot;automated&amp;quot;, on purpose here. I &lt;em&gt;can&lt;/em&gt; automate the process, but a full performance review feels much more like something I should run when I think it makes sense, for example, when I know I&apos;ve tweaked my blog at the &apos;code&apos; level versus writing cat-related blogs. I do plan to look into automations with Cursor later, but for now, what I&apos;ve done is something I&apos;ll run when I think it makes the most sense.&lt;/p&gt;
@@ -1195,7 +1480,7 @@
       <title>Asking Cursor to Review My Blog for Performance</title>
       <link>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</link>
       <guid>https://www.raymondcamden.com/2026/07/07/asking-cursor-to-review-my-blog-for-performance</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
+      <pubDate>Sun, 23 Aug 2026 15:25:23 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I decided to try something interesting. I opened my blog up in Cursor and asked for a basic performance review. That seems like a no-brainer, but keep in mind, my &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023&quot;&gt;blog&apos;s source code&lt;/a&gt; clocks in at near &lt;strong&gt;seven thousand&lt;/strong&gt; files (ignoring &lt;code&gt;node_modules&lt;/code&gt; of course), so this wasn&apos;t some small request.&lt;/p&gt;
         &lt;p&gt;My blog is built with the &lt;a href=&quot;https://www.11ty.dev/&quot;&gt;Eleventy&lt;/a&gt; static site generator. It&apos;s a mix of JavaScript and Markdown primarily, with a &lt;em&gt;huge&lt;/em&gt; portion of the codebase being Markdown and not &apos;code&apos; per se, but me rambling on about cats and Star Wars. There&apos;s also Liquid templates which are parsed into HTML by a JavaScript library. But that doesn&apos;t quite tell the whole story.&lt;/p&gt;
@@ -1516,20 +1801,6 @@
         &lt;/ul&gt;
         &lt;/zero-md&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@tschannik?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Yannik Zimmermann&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/a-cat-that-is-walking-across-a-street-aT432COAiFs?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>My New Role - Helping AI Adoption at Cursor</title>
-      <link>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</link>
-      <guid>https://www.raymondcamden.com/2026/07/06/my-new-role-helping-ai-adoption-at-cursor</guid>
-      <pubDate>Sat, 22 Aug 2026 15:28:31 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This will be a short and sweet post to announce that today is my first day at &lt;a href=&quot;https://cursor.com&quot;&gt;Cursor&lt;/a&gt;!&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/07/happy-dance.gif&quot; loading=&quot;lazy&quot; alt=&quot;Happy Dance&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;I&apos;m starting today as an AI Adoption Engineer, which basically boils down to helping our customers make better use of Cursor and AI in general. If you&apos;ve been visiting my site for a while now, you know I&apos;ve been using AI for quite some time, but more importantly, I&apos;ve also been adopting AI in my own workflows and processes. It takes time and energy but the payoff can be so incredible, and that&apos;s what I get to help our developers with.&lt;/p&gt;
-        &lt;p&gt;Happy Day One!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
