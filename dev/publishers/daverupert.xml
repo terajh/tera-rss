@@ -4,7 +4,7 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Mon, 24 Aug 2026 16:05:13 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2026 16:03:57 GMT</lastBuildDate>
     <item>
       <title>Introducing Microlighter</title>
       <link>https://daverupert.com/2026/08/microlighter/</link>
@@ -90,6 +90,7 @@
       <guid>https://daverupert.com/2026/08/how-to-pierce-your-shadow-belly-button/</guid>
       <pubDate>Mon, 17 Aug 2026 15:14:00 GMT</pubDate>
       <content:encoded>
+        &amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Edit (2026.08.24): Got feedback from the Web Components Community Group that I was mixing up inheritance, specificity, and the cascade and that &amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt; might be a better selector than &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;. I agree with both of those perspectives and I’ve updated this post.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Stuart Robson’s post &amp;lt;a href=&amp;quot;https://www.alwaystwisted.com/articles/extending-design-tokens-with-css-layer&amp;quot;&amp;gt;&amp;lt;em&amp;gt;Solving CSS @layer Ordering in Design Systems with Design Token Metadata&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;, a response to Chris Coyier’s &amp;lt;a href=&amp;quot;https://master.dev/blog/thinking-horizontally-in-css-layer/&amp;quot;&amp;gt;&amp;lt;em&amp;gt;Thinking Horizontally in CSS @layer&amp;lt;/em&amp;gt;&amp;lt;/a&amp;gt;, came to me at a serendipitous time. You know I love a good blog-and-response, but these posts on the topic of lowering the specificity of component-level tokens and scaling that out was a problem I was having with some of my web components.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Their &amp;lt;code&amp;gt;@layer&amp;lt;/code&amp;gt; trick didn’t work for me, but here’s what did…&amp;lt;/p&amp;gt;
         &amp;lt;h2 id=&amp;quot;the-local-component-variable-problem&amp;quot;&amp;gt;The local component variable problem&amp;lt;a href=&amp;quot;#the-local-component-variable-problem&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;The local component variable problem&amp;apos;&amp;quot; data-heading-content=&amp;quot;The local component variable problem&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
@@ -98,7 +99,7 @@
         :root {
         --system-bg: #00f1;
         --system-fg: #000;
-        --system-font: Inter; sans-serif;
+        --system-font: Inter, sans-serif;
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;And then we set up our web component with some local component variables that use design system tokens as defaults.&amp;lt;/p&amp;gt;
@@ -137,25 +138,81 @@
         --card-font: fantasy;
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;Because &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; has more specificity than &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;, that means &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; wins. This confused even me, a &amp;lt;a href=&amp;quot;https://master.dev/courses/web-components/&amp;quot;&amp;gt;web component front-end master&amp;lt;/a&amp;gt;. But &amp;lt;a href=&amp;quot;https://www.bram.us/&amp;quot;&amp;gt;Bramus&amp;lt;/a&amp;gt; from the Chrome team explained it to me as: If you redeclared the variables in a normal div, it wouldn’t be surprising that the values didn’t inherit. Ok. That tracks.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; has the same specificity as &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt; (0,1,0), but because &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; declares the variables directly on the element, it replaces the inherited values. This confused even me, a &amp;lt;a href=&amp;quot;https://master.dev/courses/web-components/&amp;quot;&amp;gt;web component front-end master&amp;lt;/a&amp;gt;&amp;lt;ins&amp;gt;, because there’s a weird styling relationship in how &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; overrides &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;, but classes or an element-selector the Light DOM overrides &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;&amp;lt;/ins&amp;gt;. But &amp;lt;a href=&amp;quot;https://www.bram.us/&amp;quot;&amp;gt;Bramus&amp;lt;/a&amp;gt; from the Chrome team explained it to me as: If you redeclared the variables in a normal div, it wouldn’t be surprising that the values didn’t inherit. Ok, that tracks.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;The canonical way to solve this –of course– is to pull out a bazooka and point it directly at the element:&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works, but... */
         ui-card {
         --card-font: fantasy;
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;This works and I often recommend direct styling the &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; as the primary way to customize web components from the outside.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;But a system is different than laser-guided fixes. Themes should be low-specificity by design. Using an &amp;lt;code&amp;gt;HTMLElement&amp;lt;/code&amp;gt; as a selector is one of the strongest selectors in our CSS toolbox. That means we broke our one rule and if we ever want to change our mind, we’re on a one-way train to &amp;lt;code&amp;gt;!important&amp;lt;/code&amp;gt; town. But –to me– the larger problem is that now our CSS and DOM are super-glued together, which is less ideal compared to a flat list of element-agnostic tokens.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;This works and I often recommend direct styling the element as the primary way to customize web components from the outside.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;But a system is different than laser-guided fixes. Themes should be low-specificity by design. Using an element as a selector is &amp;lt;del&amp;gt;one of the strongest selectors in our CSS toolbox&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;has low specificity but is super specific to that element&amp;lt;/ins&amp;gt;. If we ever want to change our mind, &amp;lt;ins&amp;gt;–say updating the token value in &amp;lt;code&amp;gt;:host(:hover)&amp;lt;/code&amp;gt;–&amp;lt;/ins&amp;gt;, we’re on a one-way train to &amp;lt;code&amp;gt;!important&amp;lt;/code&amp;gt; town. To me, it’s a problem if our CSS and DOM are super-glued together. It’s less ideal compared to a flat list of element-agnostic tokens.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;What if other card-like elements use those tokens? Uh-oh, gotta update the global stylesheet. What if elements in the Light DOM also want to use those tokens? More work. We need a “Set it and forget it” way to handle themes. Also pinning tokens to the custom-element might not always work in nested component scenarios, but that’s a secondary issue.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;There’s a handful of other approaches (see below) to this problem and they all have trade-offs.  I was hoping the &amp;lt;code&amp;gt;@layer&amp;lt;/code&amp;gt; solution would help, but &amp;lt;code&amp;gt;@layer { :host {} }&amp;lt;/code&amp;gt; inside a shadowRoot is still more powerful than &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;. Drat!&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;But is there a low-specificity way to win the specificity war with &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;?&amp;lt;/p&amp;gt;
-        &amp;lt;h2 id=&amp;quot;a-refined-solution-in-defined&amp;quot;&amp;gt;A refined solution in &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;&amp;lt;a href=&amp;quot;#a-refined-solution-in-defined&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;A refined solution in :defined&amp;apos;&amp;quot; data-heading-content=&amp;quot;A refined solution in :defined&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;After throwing every scoping method I could at the wall, I found a decent one-liner that allows us to preserve the inheritance in a way that’s web-component’y:&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;There’s a handful of other approaches (see below) to this problem and they all have trade-offs.  I was hoping the &amp;lt;code&amp;gt;@layer&amp;lt;/code&amp;gt; solution would help, but &amp;lt;code&amp;gt;@layer { :host {} }&amp;lt;/code&amp;gt; inside a shadowRoot is still more &amp;lt;del&amp;gt;powerful&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;local&amp;lt;/ins&amp;gt; than &amp;lt;code&amp;gt;:root&amp;lt;/code&amp;gt;. Drat!&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;But is there a low-specificity way to &amp;lt;del&amp;gt;win the specificity war with&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;override&amp;lt;/ins&amp;gt; &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;?&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;a-refined-solution-in-defined-&amp;quot;&amp;gt;A refined solution in &amp;lt;del&amp;gt;&amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;&amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt;&amp;lt;/ins&amp;gt;&amp;lt;a href=&amp;quot;#a-refined-solution-in-defined-&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;A refined solution in :defined *&amp;apos;&amp;quot; data-heading-content=&amp;quot;A refined solution in :defined *&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;An earlier version of this post recommended &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; as a low-specificity  (0,1,0) way to override &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; from the outside (&amp;lt;em&amp;gt;see below&amp;lt;/em&amp;gt;). I like the visual/syntactic similarities there… but we can go even lower on the specificity power-ranking chart by using &amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt; (0,0,0,0).&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
         :root {
         --system-bg: #00f1;
         --system-fg: #000;
-        --system-font: Inter; sans-serif;
+        --system-font: Inter, sans-serif;
+        }
+        
+        * {
+        --card-bg: #f001;
+        --card-fg: #f00;
+        --card-font: fantasy;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;I hesitate to recommend &amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt; for a three reasons:&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;One time Paul Irish said it had bad performance. This was probably a micro-optimization, but something a design system should think about when making decisions for everyone.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;It broadly applies to every element, but so does &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; (essentially).&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;https://tailwindcss.com/docs/preflight&amp;quot;&amp;gt;Tailwind’s Preflight&amp;lt;/a&amp;gt;&amp;lt;sup class=&amp;quot;footnote-ref&amp;quot;&amp;gt;&amp;lt;a href=&amp;quot;#fn-llmscss&amp;quot; id=&amp;quot;fnref-llmscss&amp;quot; data-footnote-ref&amp;gt;1&amp;lt;/a&amp;gt;&amp;lt;/sup&amp;gt; has &amp;lt;code&amp;gt;* { padding: 0; margin: 0; }&amp;lt;/code&amp;gt; and overrides padding and margin styles on &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;, I dislike that side-effects from &amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt;.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;But –as it happens– that side-effect is the exact behavior we want to make our theme variables work. We &amp;lt;del&amp;gt;ab&amp;lt;/del&amp;gt;use &amp;lt;code&amp;gt;*&amp;lt;/code&amp;gt; to apply our tokens on the Light DOM host element, which beats the interior Shadow DOM &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;live-demo&amp;quot;&amp;gt;Live demo&amp;lt;a href=&amp;quot;#live-demo&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Live demo&amp;apos;&amp;quot; data-heading-content=&amp;quot;Live demo&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;600&amp;quot; data-pen-title=&amp;quot;shadow-piercing local component variables with * selector&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;result&amp;quot; data-slug-hash=&amp;quot;WbRVjKz&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
+        &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/01a01cbe-0967-77e8-8104-7d4fdbb62778&amp;quot;&amp;gt;
+        shadow-piercing local component variables with * selector&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
+        on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;h2 id=&amp;quot;can-future-css-help-us&amp;quot;&amp;gt;Can future CSS help us?&amp;lt;a href=&amp;quot;#can-future-css-help-us&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Can future CSS help us?&amp;apos;&amp;quot; data-heading-content=&amp;quot;Can future CSS help us?&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Bramus told me about one potential future CSS feature that might help &amp;lt;del&amp;gt;this exact situation&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;controlling inheritance inside the shadow root &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;&amp;lt;/ins&amp;gt;, &amp;lt;a href=&amp;quot;https://drafts.csswg.org/css-values-5/#inherit-notation&amp;quot;&amp;gt;the already spec’d out was the &amp;lt;code&amp;gt;inherit()&amp;lt;/code&amp;gt; function&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* ui-card.css */
+        :host {
+        --card-bg: inherit(--card-bg, var(--system-bg));
+        background: var(--card-bg);
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;I like that. That could work. Let’s do that? Ok. We all agree. Ship it. &amp;lt;ins&amp;gt;I’d also love a way to target my custom-elements directly:&amp;lt;/ins&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
+        /* Select only custom-elements */
+        :custom-elements {
+        --card-font: fantasy;
+        ...
+        }
+        
+        /* OR */
+        
+        /* Glob select elements based on an custom-element or class prefix */
+        shadowdom-*,
+        .lightdom-* {
+        --card-font: fantasy;
+        ...
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Either way, that’s the end of my post. If you need your Light DOM and Shadow DOM components to allow for fallbacks, try the original &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; technique below that has a bit more powerful selector. And if you’re curious about other alternatives considered to handle component-level variables, keep reading!&amp;lt;/p&amp;gt;
+        &amp;lt;hr /&amp;gt;
+        &amp;lt;details&amp;gt;
+        &amp;lt;summary&amp;gt;Read original &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; technique&amp;lt;/summary&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
+        :root {
+        --system-bg: #00f1;
+        --system-fg: #000;
+        --system-font: Inter, sans-serif;
         }
         
         :defined {
@@ -164,11 +221,11 @@
         --card-font: fantasy;
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;When you put &amp;lt;code&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;&amp;lt;/code&amp;gt; on the page, it’s an &amp;lt;code&amp;gt;HTMLUnknownElement&amp;lt;/code&amp;gt;. Because HTML is chill, it treats the unknown element as a &amp;lt;code&amp;gt;&amp;amp;lt;span&amp;amp;gt;&amp;lt;/code&amp;gt; with a gigantic typo. The &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; pseudo-state triggers on &amp;lt;code&amp;gt;customElement.define()&amp;lt;/code&amp;gt; and with that small change we’re able to pierce the shadow boundary and win the specificity war because &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; is more powerful than &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;When you put &amp;lt;code&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;&amp;lt;/code&amp;gt; on the page, it’s an &amp;lt;del&amp;gt;&amp;lt;code&amp;gt;HTMLUnknownElement&amp;lt;/code&amp;gt;&amp;lt;/del&amp;gt; Unknown Custom Element&amp;lt;sup class=&amp;quot;footnote-ref&amp;quot;&amp;gt;&amp;lt;a href=&amp;quot;#fn-unknown&amp;quot; id=&amp;quot;fnref-unknown&amp;quot; data-footnote-ref&amp;gt;2&amp;lt;/a&amp;gt;&amp;lt;/sup&amp;gt;. Because HTML is chill, it treats the unknown custom element as a &amp;lt;code&amp;gt;&amp;amp;lt;span&amp;amp;gt;&amp;lt;/code&amp;gt; with a gigantic typo. The &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; pseudo-state triggers on &amp;lt;code&amp;gt;customElement.define()&amp;lt;/code&amp;gt; (or when you use Declarative Shadow DOM) and with that small change we’re able to pierce the shadow boundary and win the specificity war because &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; &amp;lt;ins&amp;gt;apply styles to the host-element from the outside,&amp;lt;/ins&amp;gt; which is more powerful than &amp;lt;code&amp;gt;:host&amp;lt;/code&amp;gt; &amp;lt;ins&amp;gt;from the inside&amp;lt;/ins&amp;gt;.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;But… You know what else gets &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;? All native HTML elements! &amp;lt;code&amp;gt;div:defined&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;video:defined&amp;lt;/code&amp;gt;, and every native element your browser supports also works with &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;That sneaky fact gives us some portability that the &amp;lt;code&amp;gt;ui-card&amp;lt;/code&amp;gt; selector didn’t. If we need to re-use these tokens inside a Light DOM CSS class, we can also support that with &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;That gives us some portability that the &amp;lt;code&amp;gt;ui-card&amp;lt;/code&amp;gt; selector didn’t. If we need to re-use these tokens inside a Light DOM CSS class, we can also support that with &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;.ad-unit-block {
-        /* Local component variables */
+        /* Setup variable fallbacks */
         --card-bg: var(--system-bg);
         --card-fg: var(--system-fg);
         --card-font: var(--system-font);
@@ -180,49 +237,24 @@
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;And that’s pretty handy if your default styles and system overrides need to go more places.&amp;lt;/p&amp;gt;
-        &amp;lt;h2 id=&amp;quot;full-walkthru-demo&amp;quot;&amp;gt;Full walkthru demo&amp;lt;a href=&amp;quot;#full-walkthru-demo&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Full walkthru demo&amp;apos;&amp;quot; data-heading-content=&amp;quot;Full walkthru demo&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;h3 id=&amp;quot;full-walkthru-demo&amp;quot;&amp;gt;Full walkthru demo&amp;lt;a href=&amp;quot;#full-walkthru-demo&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Full walkthru demo&amp;apos;&amp;quot; data-heading-content=&amp;quot;Full walkthru demo&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
         &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;600&amp;quot; data-pen-title=&amp;quot;shadow-piercing local component variables&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;result&amp;quot; data-slug-hash=&amp;quot;emgoBJO&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 600px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
         &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/019fed74-fe7a-71f1-b3f7-a74aadb2b8b4&amp;quot;&amp;gt;
         shadow-piercing local component variables&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
         on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
         &amp;lt;/p&amp;gt;
         &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;h2 id=&amp;quot;one-small-quirk-notdefined-elements&amp;quot;&amp;gt;One small quirk &amp;lt;code&amp;gt;:not(:defined)&amp;lt;/code&amp;gt; elements&amp;lt;a href=&amp;quot;#one-small-quirk-notdefined-elements&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;One small quirk :not(:defined) elements&amp;apos;&amp;quot; data-heading-content=&amp;quot;One small quirk :not(:defined) elements&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;https://www.youtube.com/watch?v=T_WQpYXPPT0&amp;quot;&amp;gt;As Chris and I discovered in a live recording of ShopTalk&amp;lt;/a&amp;gt;, you can run into a weird quirk hanging tokens off &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; if you have strong opinions about &amp;lt;code&amp;gt;:not(:defined)&amp;lt;/code&amp;gt; custom-elements inheriting styles.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If an undefined custom-element has a &amp;lt;code&amp;gt;:defined&amp;lt;/code&amp;gt; parent, variables from the parent will pierce the shadow boundary. There’s two ways that I found to fix this…&amp;lt;/p&amp;gt;
-        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* The not-has-not route */
-        :defined:not(:has(:not(:defined))) {
-        --card-font: fantasy
-        }
-        
-        /* The unset if has-not route */ 
-        :defined {
-        --card-font: fantasy;
-        }
-        
-        :has(:not(:defined)) {
-        --card-font: unset;
-        }
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;I don’t love either of those approaches, so I probably won’t optimize for the “&amp;lt;em&amp;gt;I put a fake undefined element on the page that uses our CSS variables but it must not inherit our CSS variables!&amp;lt;/em&amp;gt;” edge case.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Bramus told me about one potential future option that might help this exact situation, the already spec’d out was the &amp;lt;code&amp;gt;inherit()&amp;lt;/code&amp;gt; function.&amp;lt;/p&amp;gt;
-        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:host {
-        --card-bg: inherit(--card-bg, var(--system-bg));
-        background: var(--card-bg);
-        }
-        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;I like that. That could work. Let’s do that? Ok. We all agree. Ship it.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Either way, that’s the end of my post. If you’re curious about other ways to handle component-level variables, keep reading!&amp;lt;/p&amp;gt;
+        &amp;lt;/details&amp;gt;
         &amp;lt;hr /&amp;gt;
         &amp;lt;h2 id=&amp;quot;alternatives-considered&amp;quot;&amp;gt;Alternatives considered&amp;lt;a href=&amp;quot;#alternatives-considered&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Alternatives considered&amp;apos;&amp;quot; data-heading-content=&amp;quot;Alternatives considered&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
         &amp;lt;p&amp;gt;Below are a handful of different workarounds for local-component variables, each with trade-offs.&amp;lt;/p&amp;gt;
         &amp;lt;h3 id=&amp;quot;make-all-root-overrides-important&amp;quot;&amp;gt;Make all root overrides !important&amp;lt;a href=&amp;quot;#make-all-root-overrides-important&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Make all root overrides !important&amp;apos;&amp;quot; data-heading-content=&amp;quot;Make all root overrides !important&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
-        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works but, too heavy-handed */
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Doesn&amp;apos;t work, also too heavy handed */
         :root {
         --card-font: fantasy!important;
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;This works, but should be the nuclear option for specificity battles. Also makes it more difficult to override later.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;This &amp;lt;del&amp;gt;works&amp;lt;/del&amp;gt; &amp;lt;ins&amp;gt;doesn’t work&amp;lt;/ins&amp;gt;, but should be the nuclear option for specificity battles. Also makes it more difficult to override later.&amp;lt;/p&amp;gt;
         &amp;lt;h3 id=&amp;quot;shipping-all-variables-in-the-theme&amp;quot;&amp;gt;Shipping all variables in the theme&amp;lt;a href=&amp;quot;#shipping-all-variables-in-the-theme&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Shipping all variables in the theme&amp;apos;&amp;quot; data-heading-content=&amp;quot;Shipping all variables in the theme&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css */
         :root {
@@ -239,7 +271,7 @@
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
         &amp;lt;p&amp;gt;This works too. You’ll need to change your &amp;lt;code&amp;gt;&amp;amp;lt;ui-card&amp;amp;gt;&amp;lt;/code&amp;gt; styles to directly access &amp;lt;code&amp;gt;background: var(--card-bg)&amp;lt;/code&amp;gt;. The problem here is that all variables are mandatory and must ship in the theme. Even if a product only uses or customizes just one component, they have to ship all the tokens for every component. And now your theme CSS will be ever-growing at the rate of &amp;lt;code&amp;gt;num_options * num_components&amp;lt;/code&amp;gt;.&amp;lt;/p&amp;gt;
         &amp;lt;h3 id=&amp;quot;optional-variable-fallback-chains-in-shadowroot&amp;quot;&amp;gt;Optional variable fallback chains in shadowRoot&amp;lt;a href=&amp;quot;#optional-variable-fallback-chains-in-shadowroot&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Optional variable fallback chains in shadowRoot&amp;apos;&amp;quot; data-heading-content=&amp;quot;Optional variable fallback chains in shadowRoot&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
-        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works but, can be confusing to CSS learners */
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works, but can be confusing to CSS learners */
         :host {
         font-family: var(--card-font, var(--system-font));
         }
@@ -248,7 +280,7 @@
         &amp;lt;p&amp;gt;In practice though, I find the beauty of the CSS cascade gets lost on a lot of six-figure engineers (&amp;lt;em&amp;gt;waves generally in the direction of Hacker News and popular CSS frameworks&amp;lt;/em&amp;gt;).&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;And this also works less good if you’re going to re-use a local variable token… which leads us to…&amp;lt;/p&amp;gt;
         &amp;lt;h3 id=&amp;quot;private-variables-with-fallback-chains-in-shadowroot&amp;quot;&amp;gt;Private variables with fallback chains in shadowRoot&amp;lt;a href=&amp;quot;#private-variables-with-fallback-chains-in-shadowroot&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Private variables with fallback chains in shadowRoot&amp;apos;&amp;quot; data-heading-content=&amp;quot;Private variables with fallback chains in shadowRoot&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
-        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Work but, too noisy */
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;/* theme.css - Works, but too noisy */
         :host {
         --_card-font: var(--card-font, var(--system-font));
         font-family: var(--_card-font);
@@ -258,7 +290,17 @@
         }
         }
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;This is the fully exploded version of the previous pattern. We can re-use &amp;lt;code&amp;gt;--_card-font&amp;lt;/code&amp;gt; on other elements inside our component. You can do this but it begins explode the surface area of the number of tokens we’re managing inside a component. Fallbacks were confusing enough, now we’re doing fallbacks with aliases. Uf.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;This is the fully exploded version of the previous pattern. We can re-use &amp;lt;code&amp;gt;--_card-font&amp;lt;/code&amp;gt; on other elements inside our component. You can do this but it begins to explode the surface area of the number of tokens we’re managing inside a component. Fallbacks were confusing enough, now we’re doing fallbacks with aliases. Uf.&amp;lt;/p&amp;gt;
+        &amp;lt;section class=&amp;quot;footnotes&amp;quot; data-footnotes&amp;gt;
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li id=&amp;quot;fn-llmscss&amp;quot;&amp;gt;
+        &amp;lt;p&amp;gt;LLMs love to copy Tailwind’s Preflight. &amp;lt;a href=&amp;quot;#fnref-llmscss&amp;quot; class=&amp;quot;footnote-backref&amp;quot; data-footnote-backref data-footnote-backref-idx=&amp;quot;1&amp;quot; aria-label=&amp;quot;Back to reference 1&amp;quot;&amp;gt;↩&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li id=&amp;quot;fn-unknown&amp;quot;&amp;gt;
+        &amp;lt;p&amp;gt;Thanks to &amp;lt;a href=&amp;quot;https://dev.to/dannyengelman/not-a-div-insidein-sightsite-18lj&amp;quot;&amp;gt;Danny Engelman for the correction&amp;lt;/a&amp;gt;. &amp;lt;a href=&amp;quot;#fnref-unknown&amp;quot; class=&amp;quot;footnote-backref&amp;quot; data-footnote-backref data-footnote-backref-idx=&amp;quot;2&amp;quot; aria-label=&amp;quot;Back to reference 2&amp;quot;&amp;gt;↩&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        &amp;lt;/section&amp;gt;
       </content:encoded>
     </item>
     <item>

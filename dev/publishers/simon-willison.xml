@@ -4,7 +4,25 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 24 Aug 2026 16:05:10 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2026 16:03:54 GMT</lastBuildDate>
+    <item>
+      <title>llm-anthropic 0.27</title>
+      <link>https://simonwillison.net/2026/Aug/24/llm-anthropic/</link>
+      <guid>https://simonwillison.net/2026/Aug/24/llm-anthropic/</guid>
+      <pubDate>Mon, 24 Aug 2026 16:27:04 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-anthropic/releases/tag/0.27&quot;&gt;llm-anthropic 0.27&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This release of the Anthropic plugin for &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt; mainly provides compatibility with the recently released &lt;a href=&quot;https://github.com/anthropics/anthropic-sdk-python/releases/tag/v1.0.0&quot;&gt;anthropic v1.0.0&lt;/a&gt; Python library, which switches from &lt;code&gt;httpx&lt;/code&gt; to &lt;a href=&quot;https://github.com/pydantic/httpx2&quot;&gt;httpx2&lt;/a&gt;. OpenAI made the same change in their &lt;a href=&quot;https://github.com/openai/openai-python/releases/tag/v3.0.0&quot;&gt;v3.0.0 release&lt;/a&gt; two weeks ago.&lt;/p&gt;
+        &lt;p&gt;Anthropic provide this &lt;a href=&quot;https://github.com/anthropics/anthropic-sdk-python/blob/v1.0.0/MIGRATION.md&quot;&gt;migration guide&lt;/a&gt; for upgrading to 1.0, so I prompted Fable 5 in Claude Code with:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;Upgrade to anthropic&amp;gt;=1 - read https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/refs/heads/main/MIGRATION.md and get the tests passing&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://github.com/simonw/llm-anthropic/pull/84&quot;&gt;the resulting PR&lt;/a&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/httpx&quot;&gt;httpx&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Your executable is a SQLite database</title>
       <link>https://simonwillison.net/2026/Aug/24/your-executable-is-a-sqlite-database/</link>
@@ -721,48 +739,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/deepseek&quot;&gt;deepseek&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-in-china&quot;&gt;ai-in-china&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>alchemy-utils 0.1a0</title>
-      <link>https://simonwillison.net/2026/Aug/12/alchemy-utils/</link>
-      <guid>https://simonwillison.net/2026/Aug/12/alchemy-utils/</guid>
-      <pubDate>Wed, 12 Aug 2026 19:51:30 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/alchemy-utils/releases/tag/0.1a0&quot;&gt;alchemy-utils 0.1a0&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;I&apos;ve long pondered what a database agnostic version of my &lt;a href=&quot;https://sqlite-utils.datasette.io/&quot;&gt;sqlite-utils&lt;/a&gt; Python library and CLI utility might look like. This morning (literally a shower project) I tasked Codex and GPT-5.6 Sol Ultra with building a prototype:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Do a research spike to see what it would take to build a library with the same core API as SQLite-utils - in particular the insert and upsert and insert_all and upsert_all and create and update methods, and the table introspection stuff - but backed by SQLalchemy so it works for multiple database engines&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Test against PostgreSQL and SQLite and duckdb&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Use ~/dev/sqlite-utils for reference&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Create a git repo for this and commit and early and often - use uv init to start the project - use red/green TDD and pytest, see ~/dev/django-sql-dashboard for one idea as to how the PostgreSQL tests could work&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;It took &lt;a href=&quot;https://gist.github.com/simonw/bd10e4886688e0fd1b833e4afaabf19e&quot;&gt;very few follow-up prompts&lt;/a&gt; to produce this project in a state good enough to release as an alpha.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a one-liner I can use to list the rows in a table in my local PostgreSQL copy of my blog&apos;s database:&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;uvx --with &apos;alchemy-utils[postgresql]&apos; alchemy-utils rows &apos;postgresql+psycopg://simon@localhost:5432/simonwillisonblog&apos;  redirects_redirect&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;The output from that starts like this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;[
-        {
-        &quot;id&quot;: 2328,
-        &quot;domain&quot;: &quot;simonwillison.net&quot;,
-        &quot;path&quot;: &quot;2020/May/21/apple-photos-sqlite/&quot;,
-        &quot;target&quot;: &quot;/2020/May/21/dogsheep-photos/&quot;,
-        &quot;created&quot;: &quot;2020-05-21T13:03:46.591692-07:00&quot;
-        },
-        {
-        &quot;id&quot;: 3,
-        &quot;domain&quot;: &quot;feeds.simonwillison.net&quot;,
-        &quot;path&quot;: &quot;swn-links&quot;,
-        &quot;target&quot;: &quot;https://simonwillison.net/atom/links/&quot;,
-        &quot;created&quot;: &quot;2017-10-01T14:12:54.820729-07:00&quot;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Or if you&apos;d like a DuckDB database with &lt;a href=&quot;https://github.com/simonw/sf-tree-history/blob/main/Street_Tree_List.csv&quot;&gt;every tree in San Francisco&lt;/a&gt;, schema created automatically to match the file:&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;curl &apos;https://raw.githubusercontent.com/simonw/sf-tree-history/refs/heads/main/Street_Tree_List.csv&apos; | uvx --with &apos;alchemy-utils[duckdb]&apos; alchemy-utils insert &apos;duckdb:////tmp/trees.db&apos; trees - --csv&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;(That one took nearly an hour the first time I ran it, so I &lt;a href=&quot;https://github.com/simonw/alchemy-utils/commit/e3b8d03e040867b256aeff7db322a0b0eb1f8b06&quot;&gt;had Codex optimize it&lt;/a&gt; and got it down to around 35 seconds.)&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/databases&quot;&gt;databases&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/postgresql&quot;&gt;postgresql&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sql&quot;&gt;sql&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlalchemy&quot;&gt;sqlalchemy&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/duckdb&quot;&gt;duckdb&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/codex&quot;&gt;codex&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
