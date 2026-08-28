@@ -4,7 +4,188 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 26 Aug 2026 16:41:44 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2026 00:39:09 GMT</lastBuildDate>
+    <item>
+      <title>Personal website redesign project post: A CLI for adding new music to the collection</title>
+      <link>https://piccalil.li/projects/personal-site/10/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/projects/personal-site/10/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 27 Aug 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Right, we are at the end of &lt;em&gt;iteration one&lt;/em&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/projects/personal-site-core-features.jpg&quot; alt=&quot;An Obsidian markdown file called &amp;quot;core features and iterations.&amp;quot; It lists a development roadmap across four iterations, including tasks like &amp;quot;basic shell version of the site,&amp;quot; &amp;quot;look and feel design,&amp;quot; &amp;quot;AT protocol integration,&amp;quot; and &amp;quot;last.fm integration.&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;The last thing to do is to make my life a little easier. Markdown files work perfectly fine for the music collection, but they&apos;re a bit of a &lt;em&gt;faff&lt;/em&gt;. Mostly because I &lt;em&gt;always&lt;/em&gt; forget the front matter structure, so to fix that, I created myself a Command Line Interface (CLI) which is a series of questions, resulting in a new item being added to the collection.&lt;/p&gt;
+        &lt;p&gt;I add &lt;em&gt;a lot&lt;/em&gt; of music to my collection because I&apos;m truly trying to get away from streaming platforms completely, so something that makes the process of keeping it up to date &lt;em&gt;simple&lt;/em&gt; is very much needed.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s break down the tool I built, piece-by-piece.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;import * as p from &apos;@clack/prompts&apos;;
+        import fs from &apos;node:fs&apos;;
+        import path from &apos;node:path&apos;;
+        import { Readable } from &apos;node:stream&apos;;
+        import { finished } from &apos;node:stream/promises&apos;;
+        import slugify from &apos;slugify&apos;;
+        
+        // The root is the current working directory
+        const REPO_ROOT = process.cwd();
+        
+        // Music collection content location
+        const MUSIC_COLLECTION_ROOT = path.join(
+        REPO_ROOT,
+        &apos;apps&apos;,
+        &apos;web&apos;,
+        &apos;src&apos;,
+        &apos;content&apos;,
+        &apos;music-collection&apos;
+        );
+        
+        // For storing the album artwork
+        const ARTWORK_ROOT = path.join(REPO_ROOT, &apos;public&apos;, &apos;images&apos;, &apos;music-collection&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;First up, I&apos;m using &lt;a href=&quot;https://github.com/bombshell-dev/clack&quot;&gt;Clack&lt;/a&gt; to do the heavy lifting for me. It&apos;s a fantastic tool that helps you to create a step-by-step CLI flow, which is exactly what I want. It&apos;ll keep all of the data up to date, so when I get to the end of the flow, I can generate the markdown file with front matter.&lt;/p&gt;
+        &lt;p&gt;This first snippet is mostly me initialising the tools and setting some immovable constants — hence the all caps screaming naming convention.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Generates a nice unique filename for the artwork
+        function generateUniqueFilename(url) {
+        const extension = path.extname(new URL(url).pathname);
+        return `${Date.now()}-${Math.floor(Math.random() * 1000)}${extension}`;
+        }
+        
+        // Downloads the remote artwork and places in ARTWORK_ROOT
+        async function downloadImage(url, filename) {
+        const request = await fetch(url);
+        
+        const filePath = path.resolve(ARTWORK_ROOT, filename);
+        
+        // Flags: if file is already there, this will exit stage left because we&apos;re
+        // in a pickle if a uniquely generated image name is duplicated
+        const fileStream = fs.createWriteStream(filePath, { flags: &apos;wx&apos; });
+        
+        await finished(Readable.fromWeb(request.body).pipe(fileStream));
+        
+        return filePath;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Let&apos;s look at album artwork now. What I want to be able to do is pop a URL as an answer to the artwork question so the system can download it and place a copy in my repository.&lt;/p&gt;
+        &lt;p&gt;For all of that to work, I need to make sure each image file has a unique filename. That&apos;s where the &lt;code&gt;generateUniqueFilename()&lt;/code&gt; function comes in. First, it extracts the image format from the passed &lt;code&gt;url&lt;/code&gt; property. From there, I construct a new string, starting with the date and a random number. Lastly, I stitch the extension back on to the string and job done.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;The &lt;code&gt;downloadImage()&lt;/code&gt; function then grabs the original image and the desired filename. It grabs the image using &lt;code&gt;fetch&lt;/code&gt;, renames it, moves it to the &lt;code&gt;ARTWORK_ROOT&lt;/code&gt; and again, job done.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Takes the front matter and creates a markdown file
+        function createMusicItem(frontMatterTemplate, title) {
+        const slug = slugify(title, {
+        lower: true,
+        });
+        
+        const filePath = path.join(MUSIC_COLLECTION_ROOT, `${slug}.md`);
+        fs.writeFileSync(filePath, frontMatterTemplate);
+        return filePath;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The function name here does a good job of explaining what&apos;s happening. Front matter data is passed in, along with the title of the album. Next, a new &lt;code&gt;slug&lt;/code&gt; is generated from the &lt;code&gt;title&lt;/code&gt;, then a new markdown file is created using the &lt;code&gt;frontMatterTemplate&lt;/code&gt; string, which we&apos;ll cover in a moment.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;
+        async function main() {
+        p.intro(&apos;Let’s add a new item to the music collection&apos;);
+        
+        const musicItem = await p.group(
+        {
+        album: () =&amp;gt;
+        p.text({
+        message: &apos;What’s the album name?&apos;,
+        placeholder: &apos;&apos;,
+        validate: (value) =&amp;gt; {
+        if (!value) return &apos;Album is required!&apos;;
+        },
+        }),
+        artist: () =&amp;gt;
+        p.text({
+        message: &apos;Who is it by?&apos;,
+        placeholder: &apos;&apos;,
+        validate: (value) =&amp;gt; {
+        if (!value) return &apos;Album is required!&apos;;
+        },
+        }),
+        artworkURL: () =&amp;gt;
+        p.text({
+        message: &apos;What’s the artwork URL?&apos;,
+        placeholder: &apos;&apos;,
+        validate: (value) =&amp;gt; {
+        if (!value) return &apos;Album is required!&apos;;
+        },
+        }),
+        formats: () =&amp;gt;
+        p.multiselect({
+        message: &apos;What format(s)?&apos;,
+        options: [
+        { text: &apos;Vinyl&apos;, value: &apos;Vinyl&apos; },
+        { text: &apos;CD&apos;, value: &apos;CD&apos; },
+        { text: &apos;Digital&apos;, value: &apos;Digital&apos; },
+        ],
+        }),
+        isMasterpiece: () =&amp;gt;
+        p.confirm({
+        message: &apos;Is this a masterpiece?&apos;,
+        }),
+        },
+        {
+        onCancel: () =&amp;gt; {
+        p.cancel(&apos;Operation cancelled.&apos;);
+        process.exit(0);
+        },
+        }
+        );
+        
+        // For readers: the rest of the function follows shortly
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;A Big Block Of Code™ was unavoidable here unfortunately, so allow me to explain what&apos;s going on. The &lt;code&gt;p&lt;/code&gt; variable is Clack, and the first thing I&apos;m doing is popping a little message on the screen — &quot;Let’s add a new item to the music collection&quot;. From there, I define a new &lt;a href=&quot;https://bomb.sh/docs/clack/packages/prompts/#group&quot;&gt;group of questions&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;For each of those questions in the group, I&apos;ll get back the response data. Because I&apos;m defining &lt;code&gt;musicItem&lt;/code&gt; as the group, I can get the data out like so: &lt;code&gt;musicItem.title&lt;/code&gt;. That&apos;s very handy indeed! It&apos;s all very similar to the zod stuff we used for the Astro collection earlier in the series too.&lt;/p&gt;
+        &lt;p&gt;With all of the questions in, it&apos;s time to respond to the data I get back.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;
+        // There&apos;s a 0 percent chance I&apos;ll add a top ten like this, so we&apos;re looking
+        // only for the masterpiece tag at this point
+        const tags = musicItem.isMasterpiece ? [&apos;Masterpiece&apos;] : [];
+        
+        // Create a nice unique filename for the art image
+        const artworkFileName = generateUniqueFilename(musicItem.artworkURL);
+        
+        // We&apos;ve got all the data for markdown now, so create that front matter
+        const frontMatterTemplate = `---
+        title: &apos;${musicItem.album}&apos;
+        artist: &apos;${musicItem.artist}&apos;
+        cover: &apos;${artworkFileName}&apos;
+        formats: [&apos;${musicItem.formats.join(&quot;&apos;, &apos;&quot;)}&apos;]
+        tags: [&apos;${tags.join(&quot;&apos;, &apos;&quot;)}&apos;]
+        pubDate: ${new Date().toISOString()}
+        ---
+        `;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As I say in the code comment, I&apos;ll never add a top 10 item like this, so my focus is day-to-day collection additions. I do however have an option to declare an album as a masterpiece, so if the clack answer is &lt;code&gt;true&lt;/code&gt; for &lt;code&gt;isMasterpiece&lt;/code&gt;, I assign &lt;code&gt;[&apos;Masterpiece&apos;]&lt;/code&gt; as the value for &lt;code&gt;tags&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Next, I use the function from earlier to determine an &lt;code&gt;artworkName&lt;/code&gt; and that&apos;s all the data I need to generate a nice block of front matter data.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Wait until the image is ready
+        await downloadImage(musicItem.artworkURL, artworkFileName);
+        
+        // Run the file creator
+        createMusicItem(frontMatterTemplate, musicItem.album);
+        
+        p.outro(&apos;✅ Album added!&apos;);
+        
+        return true;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Lastly, I use the &lt;code&gt;downloadImage&lt;/code&gt; function from earlier and then the &lt;code&gt;createMusicItem&lt;/code&gt; with all of that lovely data. I put a little success message on the screen and &lt;code&gt;return true&lt;/code&gt;. The reason for that is I initialise the &lt;code&gt;main&lt;/code&gt; function like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;main().catch(console.error);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;By returning &lt;code&gt;true&lt;/code&gt;, the process will just end, but by stitching &lt;code&gt;catch&lt;/code&gt; to &lt;code&gt;main()&lt;/code&gt;, if there are errors, I&apos;ll get a log.&lt;/p&gt;
+        &lt;h2&gt;Rigging up the script&lt;/h2&gt;
+        &lt;p&gt;From my command line, I want to be able to run &lt;code&gt;npm run music:add&lt;/code&gt;, not &lt;code&gt;node packages/utils/new-music-collection-item.js&lt;/code&gt;. That&apos;s easy enough to sort though.&lt;/p&gt;
+        &lt;p&gt;I opened up the root &lt;code&gt;package.json&lt;/code&gt; and added the following to the existing &lt;code&gt;&quot;scripts&quot;&lt;/code&gt; property:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&quot;music:add&quot;: &quot;node packages/utils/new-music-collection-item.js&quot;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Job firmly done.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Wrapping up&lt;/h2&gt;
+        &lt;p&gt;That is iteration one &lt;em&gt;done&lt;/em&gt;. Well it&apos;s been &lt;em&gt;done&lt;/em&gt; for a while now, but me writing about iteration one is finally done. Like I mentioned a couple of posts ago, a very weird symptom of this project is that I&apos;ve felt like I can&apos;t progress to iteration two — the actual design work — until iteration one is fully written up. I have no idea why either. Brains are weird, man.&lt;/p&gt;
+        &lt;p&gt;&lt;em&gt;Anyway&lt;/em&gt;, the next post in this series will tackle exactly that: the creative process. This should all time well with the investments we&apos;ve put into our own design system software too, so I&apos;m looking forward to showing you all that. Because I do the production work, &lt;em&gt;then&lt;/em&gt; write about it in this series, expect a bit of a delay now while I actually do the work.&lt;/p&gt;
+        &lt;p&gt;For now, I&apos;ve got a basic UI and a fully functional website. Sure, it&apos;s got a few rough edges, but it&apos;s a website. If you&apos;ve also been in &quot;pause mode&quot; like I have, what I will say is get an ugly version live first — especially if you don&apos;t have a website already. It&apos;s better to have &lt;em&gt;something&lt;/em&gt; than nothing.&lt;/p&gt;
+        &lt;p&gt;Catch you in the next one.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #195</title>
       <link>https://piccalil.li/the-index/195/?ref=main-rss-feed</link>
@@ -692,34 +873,6 @@
         &lt;p&gt;For each of these pages, I&apos;m grabbing the same collection created in the last post. The only difference is the filtering each time, so for this page, I&apos;m first looking for items that contain a &lt;code&gt;topTenOrder&lt;/code&gt; front matter property and also checking to see if they have a &lt;code&gt;&apos;Top 10&apos;&lt;/code&gt; tag. Complex eh? 🤣&lt;/p&gt;
         &lt;p&gt;Then after that, I&apos;m sorting them by that &lt;code&gt;topTenOrder&lt;/code&gt; property to make sure my favourite — &lt;a href=&quot;https://bell.bz/music-collection/the-artist-in-the-ambulance/&quot;&gt;Thrice&apos;s Artist in the Ambulance&lt;/a&gt; — appears &lt;em&gt;first&lt;/em&gt;. After that, it&apos;s a case of passing some data to the &lt;code&gt;MusicCollectionLayout&lt;/code&gt; — which we covered before — and &lt;em&gt;job done&lt;/em&gt;.&lt;/p&gt;
         &lt;p&gt;Let&apos;s put a pin in this now and move on to a little CLI tool I made for adding new items to the collection.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #193</title>
-      <link>https://piccalil.li/the-index/193/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/193/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 07 Aug 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://danq.me/2026/07/09/your-app-could-have-been-a-webpage/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Your ‘App’ could have been a webpage (so I fixed it for you…)&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A thoroughly enjoyable read!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://smoothcss.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;SmoothCSS&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;&lt;a href=&quot;https://piccalil.li/complete-css?utm_medium=author-promo&quot;&gt;Complete CSS&lt;/a&gt; alumni, Rob McCormick, has built a really nice looking design system/CSS framework/UI kit.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://ishadeed.com/article/lh-unit/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The CSS lh unit&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;An extremely useful unit for vertical relative sizing, explained by one of the best in the business at explaining CSS stuff.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://lilypond.ky.fyi/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Astro LilyPond&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Want to render musical notation in Astro? Ky Decker has got you covered.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://dbushell.com/2026/08/07/sublime-text/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;They don’t make ’em like Sublime Text anymore&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;You just can&apos;t beat Sublime text&apos;s ability to be a lightweight, rapid text editor. No others seem to be able to get close either.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/programming-principles-for-self-taught-front-end-developers/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Programming principles for self taught front-end developers&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://sarajoy.dev/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://retcon.app/?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/retcon.png&quot; alt=&quot;Retcon&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;A Mac app for rewriting history faster&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Retcon lets you manipulate Git history, but much faster than in other tools.&lt;/p&gt;
-        &lt;p&gt;As you move and delete and fix-up commits, Retcon tells you about conflicts immediately; you don’t have to wait to find out. And even where there is a conflict, you can keep making changes, on the spot. This completely changes the workflow: you no longer have to spend effort simulating rebases in your head, as you’re preparing them.&lt;/p&gt;
-        &lt;p&gt;If you ever spend time rearranging commits, you’ll appreciate how Retcon makes the task so much nicer, and so much faster.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://retcon.app/?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;Learn more&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

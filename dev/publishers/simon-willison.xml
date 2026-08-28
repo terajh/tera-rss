@@ -4,7 +4,55 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Wed, 26 Aug 2026 16:41:44 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2026 00:39:09 GMT</lastBuildDate>
+    <item>
+      <title>Breaking Claude Code Opus 5 Auto Mode</title>
+      <link>https://simonwillison.net/2026/Aug/27/breaking-claude-code-opus-5-auto-mode/</link>
+      <guid>https://simonwillison.net/2026/Aug/27/breaking-claude-code-opus-5-auto-mode/</guid>
+      <pubDate>Thu, 27 Aug 2026 22:50:25 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://embracethered.com/blog/posts/2026/breaking-claude-code-opus-5-and-automode/&quot;&gt;Breaking Claude Code Opus 5 Auto Mode&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Anthropic are putting a great deal of faith in Claude Code&apos;s auto mode for protecting their coding agent users against prompt injection attacks. They recently &lt;a href=&quot;https://simonwillison.net/2026/Aug/8/auto-mode/&quot;&gt;made that the default&lt;/a&gt; and have made bold claims about its effectiveness.&lt;/p&gt;
+        &lt;p&gt;Johann Rehberger is one of the most credible prompt injection researchers active today. He found an attack against auto mode which he claims works 80% of the time, by tricking Claude Code into downloading and uncompressing a zip archive, then executing code that imports &lt;code&gt;base64&lt;/code&gt; without noticing that this will import and execute a local &lt;code&gt;struct.py&lt;/code&gt; file extracted from the archive.&lt;/p&gt;
+        &lt;p&gt;In a few cases auto mode directly prevented the agent from preventing harmful code from continuing to execute!&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;In a few runs Claude tried to terminate the malware process once it noticed the compromise, but Auto Mode denied the cleanup command.&lt;/p&gt;
+        &lt;p&gt;Claude detects the compromise, but &lt;strong&gt;Auto Mode blocks its cleanup command&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;The safety mechanism itself can become part of the failure. The classifier allowed the creation of the malware process, but then it blocked the command intended to stop it!&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;I agree with Johann&apos;s conclusion here: the only safe way to run agents if there&apos;s any risk of attracting the attention of an adversarial attack is with a sandbox:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Run unattended coding agents in a container, VM or OS sandbox.&lt;/li&gt;
+        &lt;li&gt;Restrict network egress.&lt;/li&gt;
+        &lt;li&gt;Monitor your agents.&lt;/li&gt;
+        &lt;li&gt;Do not expose home directories, SSH keys, cloud credentials,… to the agent runtime. [...]&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/prompt-injection&quot;&gt;prompt-injection&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/johann-rehberger&quot;&gt;johann-rehberger&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Qwen3.8-Flash-Next</title>
+      <link>https://simonwillison.net/2026/Aug/26/qwen38-flash-next/</link>
+      <guid>https://simonwillison.net/2026/Aug/26/qwen38-flash-next/</guid>
+      <pubDate>Wed, 26 Aug 2026 23:52:58 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://qwen.ai/blog?id=qwen3.8-flash-next&quot;&gt;Qwen3.8-Flash-Next&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Another open weights model from Qwen. This one is &quot;a multimodal MoE model that also serves as an early preview of the architecture used in Qwen4&quot;.&lt;/p&gt;
+        &lt;p&gt;It&apos;s pretty big: 125B tokens, but only 6B active which means it gets a significant performance boost.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve been trying it out on a DGX Spark using &lt;a href=&quot;https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF&quot;&gt;these Unsloth quantized models&lt;/a&gt;. I&apos;m still exploring the model - so far I&apos;ve tried the 72.5GB UD-IQ1_S one (producing &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Ff9c69ebdab90d8a45b8de4742cc7b840&quot;&gt;these pelicans&lt;/a&gt;) and the 78.9GB UD-Q2_K_XL (producing &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6ba7cbfc1a9336986703b41f7fccd73a&quot;&gt;these&lt;/a&gt;).&lt;/p&gt;
+        &lt;p&gt;My favorite so far was this xhigh reasoning effort one from UD-Q2_K_XL:&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Flat vector illustration: a white pelican with an orange beak and orange legs rides a red bicycle along a sandy path, a wicker basket on the handlebars holding a blue fish, with green rolling hills, a small tree and bushes, white clouds and a bright yellow sun in a blue sky behind it&quot; src=&quot;https://static.simonwillison.net/static/2026-08-27/IMG_7667.png&quot; /&gt;
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49448210&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/qwen&quot;&gt;qwen&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-in-china&quot;&gt;ai-in-china&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/nvidia-spark&quot;&gt;nvidia-spark&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Quoting Paul Dix</title>
       <link>https://simonwillison.net/2026/Aug/26/paul-dix/</link>
@@ -700,43 +748,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/packaging&quot;&gt;packaging&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/uv&quot;&gt;uv&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>sqlite-utils 4.2</title>
-      <link>https://simonwillison.net/2026/Aug/13/sqlite-utils/</link>
-      <guid>https://simonwillison.net/2026/Aug/13/sqlite-utils/</guid>
-      <pubDate>Thu, 13 Aug 2026 20:11:29 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/sqlite-utils/releases/tag/4.2&quot;&gt;sqlite-utils 4.2&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Lots of improvements in this one relating to the &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/python-api.html#transforming-a-table&quot;&gt;table.transform() feature&lt;/a&gt;, which adds support for complex alter table operations by creating a fresh table, copying across the data and then dropping and replacing the old one.&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;transform()&lt;/code&gt; now preserves a much larger array of edge-case schema definitions, including check constraints, unique constraints and even comments describing the columns.&lt;/p&gt;
-        &lt;p&gt;There are also &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/python-api.html#checks&quot;&gt;new introspection properties&lt;/a&gt; for check constraints, and a whole lot of other smaller changes.&lt;/p&gt;
-        &lt;p&gt;Includes contributions from &lt;a href=&quot;https://github.com/bunlongheng&quot;&gt;Bunlong Heng&lt;/a&gt;, &lt;a href=&quot;https://github.com/ethanhawkes-gif&quot;&gt;ethanhawkes-gif&lt;/a&gt;, &lt;a href=&quot;https://github.com/RamiNoodle733&quot;&gt;Rami Abdelrazzaq&lt;/a&gt;, &lt;a href=&quot;https://github.com/nyxst4ck&quot;&gt;nyxst4ck&lt;/a&gt;, and &lt;a href=&quot;https://github.com/ikatyal2110&quot;&gt;ikatyal2110&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;(It later turned out 4.2 had &lt;a href=&quot;https://github.com/simonw/sqlite-utils/issues/842&quot;&gt;a crashing bug&lt;/a&gt;, fixed in &lt;a href=&quot;https://sqlite-utils.datasette.io/en/stable/changelog.html#v4-2-1&quot;&gt;4.2.1&lt;/a&gt;.)&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/releases&quot;&gt;releases&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite-utils&quot;&gt;sqlite-utils&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm-gemini 0.33</title>
-      <link>https://simonwillison.net/2026/Aug/13/llm-gemini/</link>
-      <guid>https://simonwillison.net/2026/Aug/13/llm-gemini/</guid>
-      <pubDate>Thu, 13 Aug 2026 19:37:34 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-gemini/releases/tag/0.33&quot;&gt;llm-gemini 0.33&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;It&apos;s been a while since the last &lt;code&gt;llm-gemini&lt;/code&gt; release. This version of the plugin adds support for today&apos;s &lt;a href=&quot;https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-3-7-flash/&quot;&gt;Gemini 3.7 Flash&lt;/a&gt; release, plus &lt;code&gt;gemini-3.6-flash&lt;/code&gt;, &lt;code&gt;gemini-3.5-flash-lite&lt;/code&gt; and two embedding models &lt;code&gt;gemini-embedding-2&lt;/code&gt; and &lt;code&gt;gemini-embedding-001&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;The plugin is also upgraded for compatibility with LLM 0.32, which means you can now see reasoning traces and you can also enable server-side tools using this pattern:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;llm -m gemini-3.7-flash -T CodeExecution \
-        &apos;use python to calculate (factorial of 13) * 3&apos;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I had Gemini 3.7 Flash &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer.html#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6779a22d5e7bb6bdf29936f1600a5259&quot;&gt;draw me some pelicans riding bicycles&lt;/a&gt; at high, medium, and low thinking efforts (minimal, which was an option in 3.6 Flash, has been removed in 3.7.) Here&apos;s the high level one, which is pretty great:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;This pelican has  a very cool curved green bicycle, a fish in its basket, a lovely red and white spotted scarf and a captain&apos;s hat&quot; src=&quot;https://static.simonwillison.net/static/2026/gemini-3.7-flash-high-pelican.jpg&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Update 14th August 2026&lt;/strong&gt;: I had originally said that the SVG &lt;a href=&quot;https://static.simonwillison.net/static/2026/broken-pelican-safari.jpg&quot;&gt;rendered incorrectly&lt;/a&gt; in Chrome and Firefox, and blamed Gemini 3.7 Flash for producing invalid SVG. That was entirely incorrect: the rendering glitch was my fault, caused by &lt;a href=&quot;https://github.com/simonw/tools/commit/78fca0e647a9e20eff16900cf4485a6d622087e9&quot;&gt;a bug In my rendering tool&lt;/a&gt;. I&apos;ve now fixed that bug.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/google&quot;&gt;google&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gemini&quot;&gt;gemini&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
