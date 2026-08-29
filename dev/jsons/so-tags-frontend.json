@@ -7,19 +7,6 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "I need something like digital signature [closed]",
-    "partialText": "<p>I'm currently working on athletic competition web application and for referee users there should be a something like digital signature to validate that it's actually the same person who registered as referee and wants to judge athletes records.</p>\n<p>I thought about personal password checking per 1 hour, and saving <code>User Agent</code> . But I'm not sure what's the standard option I can do.</p>\n<p>Stack of project are Laravel, VueJS, and MySQL. I'm not allowed to use external APIs for this.</p>\n<p>Edit: username, password, role (athlete, referee) are stored on database.</p>",
-    "date": "2026-08-27T03:27:25.000Z",
-    "url": "https://stackoverflow.com/questions/79998536/i-need-something-like-digital-signature"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "@revolist/revogrid: Warning \"Defining revo-dropdown element...\" persists despite importing @revolist/revo-dropdown in vue",
     "partialText": "<p>I am using <code>@revolist/revogrid</code> (version <code>x.x.x</code>) with Vue and trying to use a <code>select</code> column editor.</p>\n<p>Even though I have installed and imported <code>@revolist/revo-dropdown</code>, I keep getting this console warning:</p>\n<blockquote>\n<p><em>Defining revo-dropdown element for select column editor. If you are using a framework, consider importing the dropdown component from @revolist/revo-dropdown to avoid this warning and reduce bundle size.</em></p>\n</blockquote>\n<h3>Minimal Reproducible Code</h3>\n<p><strong>Import setup:</strong></p>\n<pre class=\"lang-js prettyprint-override\"><code>import SelectTypePlugin from '@revolist/revogrid-column-select'\nimport '@revolist/revo-dropdown';\n</code></pre>",
     "date": "2026-08-21T03:17:56.000Z",
@@ -388,5 +375,18 @@
     "partialText": "<p>I'm having trouble finding a solution for downloading files on <strong>iPhone Safari</strong>.</p>\n<p>The code I shared is the current function in my application. It downloads the file correctly in <strong>Google Chrome</strong>, but it does not work in <strong>Safari</strong>.</p>\n<p>How can I fix this so the file download works on Safari as well?</p>\n<pre><code>const downloadDocument = async (url) =&gt; {\n  try {\n    const response = await fetch(url)\n    const blob = await response.blob()\n    const blobUrl = window.URL.createObjectURL(blob)\n    const link = document.createElement('a')\n    link.href = blobUrl\n    link.target = '_blank'\n    link.download = url.split('/').pop() || 'document'\n    document.body.appendChild(link)\n    link.click()\n    document.body.removeChild(link)\n    setTimeout(() =&gt; window.URL.revokeObjectURL(blobUrl), 100)\n  } catch (error) {\n    console.error('Error downloading document.:', error)\n    window.open(url, '_blank', 'noopener,noreferrer')\n  }\n}\n</code></pre>",
     "date": "2026-02-24T21:16:14.000Z",
     "url": "https://stackoverflow.com/questions/79895739/file-download-not-working-in-iphone-safari-but-works-in-chrome"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "Can't get svg markup to render as a data uri in an image source [duplicate]",
+    "partialText": "<p>I am attempting to get the google material symbols loaded into a canvas to download them. This is generally straight forward, except the fill property in the font-variation-settings. This I cannot get to work in the canvas. I only saw how to kind of do this through <a href=\"https://stackoverflow.com/questions/65670959/variable-fonts-in-html5-canvas\">this</a> SO post, but this is not working for me.</p>\n<p>My attempt:</p>\n<pre><code>const canvas = document.createElement( &quot;canvas&quot; );\n\nconst svgNS = 'https://www.w3.org/2000/svg';\nconst svg = document.createElementNS( svgNS, &quot;svg&quot; );\n        \nconst style = document.createElementNS( svgNS, &quot;style&quot; );\nstyle.textContent = `@font-face {\n  font-family: 'Material Symbols Outlined';\n  font-style: normal;\n  font-weight: 100 700;\n  src: url('https://fonts.gstatic.com/s/materialsymbolsoutlined/v315/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2') format('woff2'); \n}\n.material-symbols-outlined {\n  font-family: 'Material Symbols Outlined';\n  font-weight: normal;\n  font-style: normal;\n  font-size: 24px;  /* Preferred icon size */\n  display: inline-block;\n  line-height: 1;\n  text-transform: none;\n  letter-spacing: normal;\n  word-wrap: normal;\n  white-space: nowrap;\n  direction: ltr;\n}`;\nsvg.append( style );\n\nconst foreignObject = document.createElementNS( svgNS, &quot;foreignObject&quot; );\nforeignObject.setAttribute( &quot;x&quot;, '0' );\nforeignObject.setAttribute( &quot;y&quot;, '0' );\n\n\nconst clone = icon.cloneNode(true);\nforeignObject.append( clone );\n\nconst { width, height } = icon.getBoundingClientRect();\nforeignObject.setAttribute( &quot;width&quot;, `${width}` );\nforeignObject.setAttribute( &quot;height&quot;, `${height}` );\nsvg.setAttribute( &quot;width&quot;, `${width}` );\nsvg.setAttribute( &quot;height&quot;, `${height}` );\n        \nsvg.append( foreignObject );\n        \nconst svg_markup = new XMLSerializer().serializeToString( svg );\nconst svg_file = new Blob( [ svg_markup ], { type: &quot;image/svg+xml&quot; } );\n        \nObject.assign( canvas, { width, height } );\nconst ctx = canvas.getContext( &quot;2d&quot; );\n\nconst img = new Image();\nimg.onload = () =&gt; {\n  console.log('img loaded');\n};\nimg.onerror = () =&gt; {\n  console.log('image failed to load');\n}\nconst svgURL = 'data:image/svg+xml,' + encodeURIComponent(svg_markup);\nimg.src = svgURL;\n</code></pre>\n<p>No matter what, the img onerror always fires. I can go to the data uri I get and it is valid. the I have even tried turning the turning svg_file blob into a data uri and using that. Same issue, I can go to that data uri, but img always throws an error. I don't get it!</p>\n<p>And of course the onerror for img doesn't give any info on why it failed. There are no errors in the console. It just hits the onerror.</p>\n<p>I tried to simplify it too by just putting the svg markup as the canvas innerHTML, of course that didn't work...</p>\n<p>Wondering if anyone has any clue how I may get the google material symbols to be able to apply the FILL font-variation-setting to render in canvas to download. Just toggling it on the span or parent container doesn't work. Canvas doesn't naturally pick that css attribute up it seems.</p>",
+    "date": "2026-02-24T00:33:15.000Z",
+    "url": "https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source"
   }
 ]
