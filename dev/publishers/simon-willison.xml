@@ -4,7 +4,123 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 31 Aug 2026 21:01:41 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 01 Sep 2026 18:34:25 GMT</lastBuildDate>
+    <item>
+      <title>Quoting Tarn Adams</title>
+      <link>https://simonwillison.net/2026/Sep/1/tarn-adams/</link>
+      <guid>https://simonwillison.net/2026/Sep/1/tarn-adams/</guid>
+      <pubDate>Tue, 01 Sep 2026 17:01:11 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://www.pcgamer.com/gaming-industry/dwarf-fortress-creator-says-the-industrys-in-shambles-over-ai-and-layoff-happy-ceos-everyone-i-know-their-bosses-are-slowly-getting-psychosis/&quot;&gt;&lt;p&gt;They took the letters from me! I have to talk about &lt;em&gt;dwarf behavior&lt;/em&gt; now. I can&apos;t even talk about dwarf AI. It doesn&apos;t exist. It&apos;s &lt;em&gt;dwarf behavior&lt;/em&gt;, and they misbehave sometimes&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.pcgamer.com/gaming-industry/dwarf-fortress-creator-says-the-industrys-in-shambles-over-ai-and-layoff-happy-ceos-everyone-i-know-their-bosses-are-slowly-getting-psychosis/&quot;&gt;Tarn Adams&lt;/a&gt;, co-creator of Dwarf Fortress&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Python 3.15.0 candidate 2 is here!</title>
+      <link>https://simonwillison.net/2026/Sep/1/python-315-rc-2/</link>
+      <guid>https://simonwillison.net/2026/Sep/1/python-315-rc-2/</guid>
+      <pubDate>Tue, 01 Sep 2026 14:59:18 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://discuss.python.org/t/python-3-15-0-candidate-2-is-here/108841&quot;&gt;Python 3.15.0 candidate 2 is here!&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Hugo van Kemenade (release manager for Python 3.14 and 3.15) announces the final release candidate for Python 3.15, scheduled for release in October:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Entering the release candidate phase, only reviewed code changes which are clear bug fixes are allowed between this release candidate and the final release. [...]&lt;/p&gt;
+        &lt;p&gt;We &lt;strong&gt;strongly encourage&lt;/strong&gt; maintainers of third-party Python projects to prepare their projects for 3.15 during this phase, and publish Python 3.15 wheels on PyPI to be ready for the final release of 3.15.0, and to help other projects do their own testing. Any binary wheels built against Python 3.15.0 release candidates &lt;strong&gt;will work&lt;/strong&gt; with future versions of Python 3.15.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Back in 2021 I &lt;a href=&quot;https://simonwillison.net/2021/Oct/9/finding-and-reporting-a-bug/&quot;&gt;found a bug in Python 3.10&lt;/a&gt; by running my test suites against it... but I hadn&apos;t done this during the RC period, so that bug had already shipped! Since then I&apos;ve always paid much closer attention to these RCs.&lt;/p&gt;
+        &lt;p&gt;The new RC isn&apos;t available for GitHub Actions just yet - keep an eye on &lt;a href=&quot;https://github.com/actions/python-versions/releases&quot;&gt;actions/python-versions&lt;/a&gt; for that. For the moment though you can add this to a testing matrix:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-yaml&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-ent&quot;&gt;strategy&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;matrix&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;python-version&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;[&quot;3.14&quot;, &quot;3.15&quot;]&lt;/span&gt;
+        
+        &lt;span class=&quot;pl-ent&quot;&gt;steps&lt;/span&gt;:
+        - &lt;span class=&quot;pl-ent&quot;&gt;uses&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;actions/setup-python@v7&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;with&lt;/span&gt;:
+        &lt;span class=&quot;pl-ent&quot;&gt;python-version&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;${{ matrix.python-version }}&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;allow-prereleases&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;
+        &lt;span class=&quot;pl-ent&quot;&gt;check-latest&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        
+        &lt;p&gt;The &lt;a href=&quot;https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#allow-pre-releases&quot;&gt;allow-prereleases&lt;/a&gt; and &lt;a href=&quot;https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#check-latest-version&quot;&gt;check-latest&lt;/a&gt; flags mean that today this will test against RC1, and when RC2 lands it will automatically switch to that version (and then the stable version once that comes out.)
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://bsky.app/profile/hugovk.dev/post/3muhjndhw322i&quot;&gt;@hugovk.dev&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/github-actions&quot;&gt;github-actions&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Introducing wrapture</title>
+      <link>https://simonwillison.net/2026/Aug/31/introducing-wrapture/</link>
+      <guid>https://simonwillison.net/2026/Aug/31/introducing-wrapture/</guid>
+      <pubDate>Mon, 31 Aug 2026 23:59:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://grahamdumpleton.me/posts/2026/08/introducing-wrapture/&quot;&gt;Introducing wrapture&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        New from Graham Dumpleton (of &lt;a href=&quot;https://pypi.org/project/wrapt/&quot;&gt;wrapt&lt;/a&gt;, mod_wsgi, and New Relic&apos;s Python agent fame), who describes Wrapture as taking the monkeypatching ideas from wrapt and extending them to apply to testing and tracing at the same time.&lt;/p&gt;
+        &lt;p&gt;Wrapture (&lt;a href=&quot;https://wrapture.readthedocs.io/&quot;&gt;full documentation here&lt;/a&gt;) makes it easy to wrap any function or method such that all access can be traced, or can be overridden to return a different value.&lt;/p&gt;
+        &lt;p&gt;It acts as both an alternative to &lt;code&gt;unittest.mock&lt;/code&gt; and a way to implement tracing against an existing project:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Attaching observation to code you do not control, recording what flows through it, and doing so without disturbing the program being watched, is a problem I have never really stopped thinking about.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Wrapture includes &lt;a href=&quot;https://wrapture.readthedocs.io/en/latest/otel-export.html&quot;&gt;OpenTelemetry support&lt;/a&gt; and even has an entirely configuration-based mechanism for adding tracing to an existing Python project, which looks like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-toml&quot;&gt;&lt;pre&gt;&lt;span class=&quot;pl-smi&quot;&gt;capture&lt;/span&gt; = &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;summary&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        
+        [[&lt;span class=&quot;pl-en&quot;&gt;observe&lt;/span&gt;]]
+        &lt;span class=&quot;pl-smi&quot;&gt;target&lt;/span&gt; = &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;domain:Calculator&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-smi&quot;&gt;name&lt;/span&gt; = [&lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;outer&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;inner&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;]
+        
+        [[&lt;span class=&quot;pl-en&quot;&gt;sink&lt;/span&gt;]]
+        &lt;span class=&quot;pl-smi&quot;&gt;type&lt;/span&gt; = &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;jsonlines&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;pl-smi&quot;&gt;path&lt;/span&gt; = &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;trace.jsonl&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;This is still a very young project - just a few weeks old - but it&apos;s off to a very promising start.&lt;/p&gt;
+        &lt;p&gt;Interestingly, this is also Graham&apos;s first attempt at  large entirely agent-driven project:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Every line of code and documentation in wrapture was written by an AI assistant working under my direction. I want to be upfront about that, and equally upfront about what it was not. This was not vibe coding, where a one-shot prompt produces a pile of generated code and the person driving hopes for the best because they lack the knowledge to judge what came back. Vibe coding has earned its bad reputation. I engineered wrapture carefully from the start. I have spent a long time in this particular corner of Python and knew exactly what the result needed to be, and the AI was the means of producing it rather than the source of the design.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;In a follow-up post, &lt;a href=&quot;https://grahamdumpleton.me/posts/2026/09/unit-testing-with-wrapture/&quot;&gt;Unit testing with wrapture&lt;/a&gt;, Graham shows the testing patterns supported by the new library:&lt;/p&gt;
+        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;test_stub_with_wrapture&lt;/span&gt;():
+        &lt;span class=&quot;pl-k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;wrapture&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;binding&lt;/span&gt;(
+        &lt;span class=&quot;pl-v&quot;&gt;Gateway&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;charge&quot;&lt;/span&gt;
+        ).&lt;span class=&quot;pl-c1&quot;&gt;on_call&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;returns&lt;/span&gt;({
+        &lt;span class=&quot;pl-s&quot;&gt;&quot;id&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;stub&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;amount&quot;&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;0&lt;/span&gt;}
+        ):
+        &lt;span class=&quot;pl-k&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;OrderService&lt;/span&gt;().&lt;span class=&quot;pl-c1&quot;&gt;place&lt;/span&gt;(
+        &lt;span class=&quot;pl-c1&quot;&gt;500&lt;/span&gt;
+        )[&lt;span class=&quot;pl-s&quot;&gt;&quot;id&quot;&lt;/span&gt;] &lt;span class=&quot;pl-c1&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;&quot;stub&quot;&lt;/span&gt;&lt;/pre&gt;
+        &lt;p&gt;And this neat example of a test that calls and then modifies the return value from the original method:&lt;/p&gt;
+        &lt;pre&gt;&lt;span class=&quot;pl-k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;test_pinned_result_with_wrapture&lt;/span&gt;():
+        &lt;span class=&quot;pl-s1&quot;&gt;charge&lt;/span&gt; &lt;span class=&quot;pl-c1&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;wrapture&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;binding&lt;/span&gt;(
+        &lt;span class=&quot;pl-v&quot;&gt;Gateway&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;charge&quot;&lt;/span&gt;
+        )
+        &lt;span class=&quot;pl-s1&quot;&gt;charge&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;on_call&lt;/span&gt;.&lt;span class=&quot;pl-c1&quot;&gt;transforms_result&lt;/span&gt;(
+        &lt;span class=&quot;pl-k&quot;&gt;lambda&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;r&lt;/span&gt;: {&lt;span class=&quot;pl-c1&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;pl-s1&quot;&gt;r&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;id&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;ch_TEST&quot;&lt;/span&gt;}
+        )
+        &lt;span class=&quot;pl-k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;charge&lt;/span&gt;:
+        &lt;span class=&quot;pl-k&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;OrderService&lt;/span&gt;().&lt;span class=&quot;pl-c1&quot;&gt;place&lt;/span&gt;(
+        &lt;span class=&quot;pl-c1&quot;&gt;500&lt;/span&gt;
+        ) &lt;span class=&quot;pl-c1&quot;&gt;==&lt;/span&gt; {
+        &lt;span class=&quot;pl-s&quot;&gt;&quot;id&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&quot;ch_TEST&quot;&lt;/span&gt;, &lt;span class=&quot;pl-s&quot;&gt;&quot;amount&quot;&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;500&lt;/span&gt;
+        }&lt;/pre&gt;
+        
+        &lt;p&gt;(In both of these examples the &lt;code&gt;OrderService().place(...)&lt;/code&gt; method calls &lt;code&gt;Gateway().charge(...)&lt;/code&gt;.)
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/graham-dumpleton&quot;&gt;graham-dumpleton&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/monkey-patching&quot;&gt;monkey-patching&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/testing&quot;&gt;testing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pytest&quot;&gt;pytest&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/observability&quot;&gt;observability&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/opentelemetry&quot;&gt;opentelemetry&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting Andrew Digby</title>
+      <link>https://simonwillison.net/2026/Aug/31/andrew-digby/</link>
+      <guid>https://simonwillison.net/2026/Aug/31/andrew-digby/</guid>
+      <pubDate>Mon, 31 Aug 2026 22:25:02 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://bsky.app/profile/digs.bsky.social/post/3mufrrsfhq22r&quot;&gt;&lt;p&gt;325 #kakapo! The chicks from this year&apos;s record breeding season are now juveniles and so have been added to the population. In 1995 there were just 51 kākāpō left. Recovery of critically endangered species &lt;em&gt;is&lt;/em&gt; possible with sustained effort.&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://bsky.app/profile/digs.bsky.social/post/3mufrrsfhq22r&quot;&gt;Andrew Digby&lt;/a&gt;, providing the best news of the year&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/kakapo&quot;&gt;kakapo&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Understanding ChatGPT Work</title>
       <link>https://simonwillison.net/2026/Aug/30/understanding-chatgpt-work/</link>
@@ -686,220 +802,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/amazon&quot;&gt;amazon&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/journalism&quot;&gt;journalism&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/training-data&quot;&gt;training-data&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/404-media&quot;&gt;404-media&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Markdown SVG upgrades</title>
-      <link>https://simonwillison.net/2026/Aug/16/markdown-svg-upgrades/</link>
-      <guid>https://simonwillison.net/2026/Aug/16/markdown-svg-upgrades/</guid>
-      <pubDate>Sun, 16 Aug 2026 23:59:37 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I started building my &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer&quot;&gt;markdown-svg-renderer&lt;/a&gt; tool &lt;a href=&quot;https://tools.simonwillison.net/colophon#markdown-svg-renderer.html&quot;&gt;in May&lt;/a&gt;, but I&apos;ve since added enough features to it that it&apos;s worth talking about here again.&lt;/p&gt;
-        &lt;p&gt;It&apos;s evolved into my ideal tool for sharing Markdown transcripts that include SVG documents. Given my &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle/&quot;&gt;proclivity for drawing pelicans riding bicycles&lt;/a&gt; this is a problem that I needed to solve!&lt;/p&gt;
-        &lt;p&gt;The tool is very simple. Navigate to &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer&quot;&gt;markdown-svg-renderer&lt;/a&gt; in your browser and paste in some Markdown to see it rendered... or save that Markdown to a CORS-friendly URL or a GitHub Gist and paste in a URL to that document.&lt;/p&gt;
-        &lt;p&gt;The URL option will give you a bookmarkable page, for example &lt;a style=&quot;overflow-wrap: anywhere;&quot; href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6f9e48293be5c916652d29f0dc0b0657&quot;&gt;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6f9e48293be5c916652d29f0dc0b0657&lt;/a&gt; - which bakes in the URL to &lt;a href=&quot;https://gist.github.com/simonw/6f9e48293be5c916652d29f0dc0b0657&quot;&gt;this Gist&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;If you visit &lt;a href=&quot;https://gist.github.com/simonw/6f9e48293be5c916652d29f0dc0b0657&quot;&gt;the Gist&lt;/a&gt; you&apos;ll see raw SVG:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;beautiful-circle.md. Here&apos;s a self-contained SVG — a &amp;quot;compass study&amp;quot; of a circle with construction lines, a slowly rotating tick ring, and an orbiting accent dot: a block of SVG code&quot; src=&quot;https://static.simonwillison.net/static/2026/raw-svg.webp&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;In the rendered tool that &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6f9e48293be5c916652d29f0dc0b0657&quot;&gt;looks like this&lt;/a&gt; instead:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;The same text, but now the code block has been replaced by a tabbed panel. The selected tab reads &amp;quot;Rendered&amp;quot; and shows the rendered PNG. The other tabs are PNG, JPEG, MP4, and Code&quot; src=&quot;https://static.simonwillison.net/static/2026/rendered-svg.webp&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;As you can see, that SVG block in the Markdown has been transformed into a rendered SVG (in this case animated) plus several tabs.&lt;/p&gt;
-        &lt;p&gt;The tabs are the really fun bit. The PNG and JPEG tabs render that SVG to those image formats in the browser and lets you copy or download them - useful for sharing on platforms that don&apos;t support SVG directly.&lt;/p&gt;
-        &lt;p&gt;The MP4 tab is &lt;a href=&quot;https://github.com/simonw/tools/commit/73e0327f6df9887ba2a9f9f16a2d06a45451d248&quot;&gt;new today&lt;/a&gt; - it examines the SVG to see if it contains any animations, attempts to guess how long the looped video should be, then renders a whole bunch of frames of the animation and loads 30+MB of &lt;a href=&quot;https://github.com/ffmpegwasm/ffmpeg.wasm&quot;&gt;ffmpeg.wasm&lt;/a&gt; so it can compile those frames into an MP4 video using the full power of FFMPEG compiled to WebAssembly and running in the browser.&lt;/p&gt;
-        &lt;p&gt;Being able to turn an animated SVG into a MP4 again makes it easy to share on platforms that can&apos;t support SVG animation natively. It&apos;s a neat trick!&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/svg&quot;&gt;svg&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/markdown&quot;&gt;markdown&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Qwen 3.8 27B is excellent, but it defaults to wildly overthinking things</title>
-      <link>https://simonwillison.net/2026/Aug/16/qwen-38-27b/</link>
-      <guid>https://simonwillison.net/2026/Aug/16/qwen-38-27b/</guid>
-      <pubDate>Sun, 16 Aug 2026 22:00:39 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Friday&apos;s big release was &lt;a href=&quot;https://huggingface.co/Qwen/Qwen3.8-27B&quot;&gt;Qwen 3.8 27B&lt;/a&gt;, an Apache 2 licensed 27B parameter vision-capable LLM from Alibaba&apos;s Qwen research lab. I&apos;ve been looking forward to this one: 27B is an excellent size for running a model on a reasonably specced laptop, and its predecessor &lt;a href=&quot;https://simonwillison.net/2026/Apr/22/qwen36-27b/&quot;&gt;Qwen 3.6 27B&lt;/a&gt; was impressive.&lt;/p&gt;
-        &lt;p&gt;Qwen&apos;s &lt;a href=&quot;https://huggingface.co/Qwen/Qwen3.8-27B#benchmark-results&quot;&gt;self-reported benchmarks&lt;/a&gt; for this model are eye-opening. They show a boost from both Qwen 3.6 27B &lt;em&gt;and&lt;/em&gt; the closed-weight Qwen 3.7-Plus, which was one of Qwen&apos;s strongest models of any size as recently as &lt;a href=&quot;https://qwen.ai/blog?id=qwen3.7-plus&quot;&gt;May this year&lt;/a&gt;. It will be interesting to hear what independent benchmarks have to say about the model.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve been running the model on two different machines: my 128GB M5 Max MacBook Pro, and an &lt;a href=&quot;https://simonwillison.net/2025/Oct/14/nvidia-dgx-spark/&quot;&gt;NVIDIA DGX Spark&lt;/a&gt;. On both machines I&apos;m running LM Studio and &lt;a href=&quot;https://lmstudio.ai/models/qwen3.8&quot;&gt;their 17GB Q4_K_M quantized build&lt;/a&gt;. I also tried  using &lt;code&gt;llama-server&lt;/code&gt; directly on the Spark.&lt;/p&gt;
-        &lt;h4 id=&quot;the-default-of-extra-high-results-in-spectacular-over-thinking&quot;&gt;The default of extra high results in spectacular over-thinking&lt;/h4&gt;
-        &lt;p&gt;Qwen&apos;s documentation describes the model as defaulting to &lt;code&gt;xhigh&lt;/code&gt; for the reasoning effort, and the LM Studio GGUF I&apos;ve been trying preserves that default:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Qwen3.8 comes with official support for &lt;code&gt;reasoning_effort&lt;/code&gt;, which can be used to adjust reasoning depth and control cost:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;code&gt;xhigh&lt;/code&gt; (default): for complex tasks demanding thorough analysis&lt;/li&gt;
-        &lt;li&gt;
-        &lt;code&gt;medium&lt;/code&gt;: balancing accuracy and speed&lt;/li&gt;
-        &lt;li&gt;
-        &lt;code&gt;low&lt;/code&gt;: efficient reasoning optimizing for speed and cost&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This is a &lt;em&gt;hilarious&lt;/em&gt; default. It&apos;s absolutely not a good way to run the model, especially on consumer hardware. I&apos;ve been finding the results extremely entertaining.&lt;/p&gt;
-        &lt;p&gt;I quickly ran into problems with LM Studio&apos;s default context limit of 8,192 tokens - Qwen was using them all up thinking about even the most mundane of problems. I loaded the model with the full 262,144 maximum context length and that problem went away.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Ffc909bea4fecf752c7bf9bad0e9dbf2a&quot;&gt;the pelican riding a bicycle&lt;/a&gt; SVG I got from my first attempt with that increased context length. It took &lt;strong&gt;21 minutes&lt;/strong&gt; to generate, using 22,276 reasoning tokens to produce 3,223 tokens of output. You can read &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Ffc909bea4fecf752c7bf9bad0e9dbf2a&quot;&gt;the reasoning trace here&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/qwen-thinking-bicycle-27b.jpg&quot; alt=&quot;A very pleasing image of a pelican riding a bicycle. The bicycle is red and has the correct frame shape. The pelican looks like a pelican and has its wing extended to the handlebars.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;This is by far the best pelican SVG I&apos;ve been able to generate with a model that runs on a local machine - and this Qwen is pretty small, just a 17GB file on disk. There&apos;s a lot to like about this:&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;The bicycle frame is the right shape&lt;/li&gt;
-        &lt;li&gt;It has legs on each side of the bike - that&apos;s &lt;em&gt;very&lt;/em&gt; rare&lt;/li&gt;
-        &lt;li&gt;Good, clear pelican pouch&lt;/li&gt;
-        &lt;li&gt;The wings extend to touch the handlebars!&lt;/li&gt;
-        &lt;li&gt;The motion lines are behind, not in front&lt;/li&gt;
-        &lt;li&gt;It has a tasteful background - nice sun, clouds, hill, flowers and grass.&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;Was that worth waiting 21 minutes for? Absolutely not.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s that same prompt run with reasoning turned off - &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F1265cfa8dce2f9ad5eb160792ff45a49&quot;&gt;transcript here&lt;/a&gt;. This one produced &lt;strong&gt;3,715 tokens&lt;/strong&gt; and took 137s - just over two minutes.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/qwen-3.8-27b-no-reasoning-pelican-2.png&quot; alt=&quot;The bicycle frame is a bad shape now. The pelican remains recognizable but has a less obvious pouch. The feet miss the pedal, there is no attempt to hold the handlebars.&quot; style=&quot;max-width: 100%;&quot; /&gt;
-        And just for completeness, I used OpenRouter to run the same prompt through the much larger Qwen 3.8 2.4T-A95B (released &lt;a href=&quot;https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B&quot;&gt;last week&lt;/a&gt;) and got this snazzy &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F557016f0895b2abb4b9957caec781734&quot;&gt;animated SVG&lt;/a&gt;:&lt;/p&gt;
-        &lt;p&gt;&lt;video
-        controls=&quot;controls&quot; loop=&quot;loop•&quot;
-        preload=&quot;none&quot;
-        poster=&quot;https://static.simonwillison.net/static/2026/qwen-animated-first-frame.jpg&quot;
-        width=&quot;720&quot;
-        height=&quot;548&quot;
-        style=&quot;display: block; width: 100%; height: auto;&quot;
-        &gt;
-        &lt;source src=&quot;https://static.simonwillison.net/static/2026/qwen-animated-small.mp4&quot; type=&quot;video/mp4&quot; /&gt;
-        Your browser does not support HTML5 video.
-        &lt;/video&gt;
-        &lt;/p&gt;
-        &lt;p&gt;I said Qwen at xhigh has a tendency to over-think things, but how bad really is it?&lt;/p&gt;
-        &lt;p&gt;I tried a much simpler prompt, again with that default extra high setting:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;draw an svg of a circle&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Qwen&apos;s reasoning trace started like this:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;The user is asking for an SVG drawing of a circle. Simple request — but I want it to be a carefully crafted piece. Let me make something that goes beyond just &lt;code&gt;&amp;lt;circle&amp;gt;&lt;/code&gt;: a single self-contained SVG file with character — maybe a geometric &quot;circle study,&quot; with subtle animation, layered rings, and a distinctive palette.&lt;/p&gt;
-        &lt;p&gt;Keep the scope right: they asked for an SVG of a circle. So the core is a circle. But I can add craft: concentric guide circles (like a compass/geometry drawing), tick marks, a soft gradient fill on the main circle, restrained ambient motion (a slowly rotating dashed ring, pulsing glow). Respect prefers-reduced-motion? That&apos;s more for CSS; SVG SMIL or CSS inside SVG will do.&lt;/p&gt;
-        &lt;p&gt;Palette options: deep teal ink on warm paper? Or bold vermilion circle on off-white with navy construction lines — Bauhaus/compass-drawing vibe. Let me go with a &quot;geometric study&quot; look: cool slate background, or bright paper white? Paper white is fine if it&apos;s not the cream-and-terracotta combo. [...]&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Several minutes later it &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer#url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6f9e48293be5c916652d29f0dc0b0657&quot;&gt;produced&lt;/a&gt; this &lt;em&gt;absolutely beautiful&lt;/em&gt; animated circle, which was entirely not what I had asked for!&lt;/p&gt;
-        &lt;p&gt;&lt;video
-        controls=&quot;controls&quot; loop=&quot;loop&quot;
-        preload=&quot;none&quot;
-        poster=&quot;https://static.simonwillison.net/static/2026/circle-web-first-frame.jpg&quot;
-        width=&quot;1078&quot;
-        height=&quot;1080&quot;
-        style=&quot;display: block; width: 100%; height: auto;&quot;
-        &gt;
-        &lt;source src=&quot;https://static.simonwillison.net/static/2026/circle-web.mp4&quot; type=&quot;video/mp4&quot; /&gt;
-        Your browser does not support HTML5 video.
-        &lt;/video&gt;
-        &lt;/p&gt;
-        My strong recommendation: ignore that default. Run Qwen 3.8 27B on low or even no reasoning levels at first. It&apos;s a great model, but wow that default setting is a bad place to start.
-        &lt;h4 id=&quot;it-s-very-good-at-bounding-boxes&quot;&gt;It&apos;s very good at bounding boxes&lt;/h4&gt;
-        &lt;p&gt;A fun way to test a vision model is to see how well it can return bounding boxes around items in a photograph. I&apos;ve seen previous Qwen models deal well with this, so I decided to put it to the test drawing bounding boxes around some pelicans.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve seen asking for 0-1000 scale produce good results in the past. I tried this:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm -a https://static.inaturalist.org/photos/714731804/large.jpg \
-        -m lmstudio/qwen/qwen3.8-27b \
-        &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;Return JSON bounding boxes for the pelicans in this photo, 0-1000 scale for each dimension&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/a05cc78b2061555bd61d3bb9686e689f&quot;&gt;the reasoning trace&lt;/a&gt;, which produced this:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-json&quot;&gt;&lt;pre&gt;[
-        {&lt;span class=&quot;pl-ent&quot;&gt;&quot;bbox_2d&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-c1&quot;&gt;195&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;290&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;370&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;780&lt;/span&gt;], &lt;span class=&quot;pl-ent&quot;&gt;&quot;label&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;pelicans&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;},
-        {&lt;span class=&quot;pl-ent&quot;&gt;&quot;bbox_2d&quot;&lt;/span&gt;: [&lt;span class=&quot;pl-c1&quot;&gt;445&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;320&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;675&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;850&lt;/span&gt;], &lt;span class=&quot;pl-ent&quot;&gt;&quot;label&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;pelicans&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;}
-        ]&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;This is &lt;em&gt;such a good match&lt;/em&gt;. Here are those boxes rendered on top of the photo:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/qwen-over-engineered-bbox.webp&quot; alt=&quot;A photograph of two pelicans on a rocky outcrop, with three other smaller birds. The pelicans both have bounding boxes exactly surrounding them, each with a label that says pelican.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;building-a-tool-to-label-bounding-boxes&quot;&gt;Building a tool to label bounding boxes&lt;/h4&gt;
-        &lt;p&gt;That visualization of the bounding boxes was taken using a new custom tool that I had Qwen 3.8 27B build for me, running offline on my laptop.&lt;/p&gt;
-        &lt;p&gt;I forgot to dial down the thinking effort so it was &lt;em&gt;massively over-engineered&lt;/em&gt;, but it did manage to produce &lt;a href=&quot;https://static.simonwillison.net/static/2026/qwen-over-thinking-bbox.html&quot;&gt;this full interface&lt;/a&gt; from &lt;a href=&quot;https://gist.github.com/simonw/121ad098860028b2fab603fa12da1fd9&quot;&gt;this single prompt&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;pre&gt;&lt;code&gt;[
-        {&quot;bbox_2d&quot;: [195, 290, 370, 780], &quot;label&quot;: &quot;pelicans&quot;},
-        {&quot;bbox_2d&quot;: [445, 320, 675, 850], &quot;label&quot;: &quot;pelicans&quot;}
-        ]
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;code&gt;Build an HTML page which has an input box for accepting the URL to an image and a textarea for accepting the above style of JSON.&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;It appends the image to the page, measures its width and height, then treats the coords in the bbox_2d as scaled from 0-1000 and scales them against the actual width and height, then it renders labelled boxes over the image.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This screenshot shows one of the features I did &lt;em&gt;not&lt;/em&gt; ask for - a demo scene, for if you don&apos;t have a photograph to test the tool with:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/qwen-full-ui-with-pelicans.webp&quot; alt=&quot;Screenshot of bbox·lab, a dark-themed web tool that overlays object-detection bounding boxes on an image, with an input panel on the left and a stage on the right showing two labeled boxes around stylized pelicans in a sunset illustration. Header: bbox·lab — normalized 0–1000 coords → pixel overlay; status indicator: RENDERED · 2 BOXES. Panel 01 INPUT (URL + detections) contains an IMAGE URL field reading data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+, a DETECTIONS — JSON textarea reading  {&amp;quot;bbox_2d&amp;quot;: 195, 290, 370, 780, &amp;quot;label&amp;quot;: &amp;quot;pelicans&amp;quot;}, {&amp;quot;bbox_2d&amp;quot;: 445, 320, 675, 850, &amp;quot;label&amp;quot;: &amp;quot;pelicans&amp;quot;} , an orange RENDER BOXES button, and dashed boxes labeled DEMO SCENE and CLEAR. Panel 03 STAGE header: display 661 × 661 px · 1 unit = 0.661px x 0.661px · nat 1000×1000. The stage shows a flat-style illustration of two dark pelican silhouettes with orange beaks standing in calm water against an orange-to-purple sunset sky with a pale yellow sun and distant birds; an orange bounding box labeled 1 · pelicans surrounds the left pelican and a cyan bounding box labeled 2 · pelicans surrounds the right pelican. Footer: move the cursor over the image to read grid coords; boxes map 0–1000 → displayed px.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Here&apos;s the relevant segment of the thinking trace, where it decided to draw its own pelicans purely because I had used the label &quot;pelicans&quot; in the example JSON I gave it in the prompt:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Also a &quot;load sample&quot; that uses a known image? Can&apos;t depend on external images, but… the image URL input is user-provided; I could add a &quot;try with sample&quot; button [...] Hmm, I can draw a simple scene on canvas, export it as a data URL, and load it into the image — that&apos;s self-contained and demo-able! [...] But the user&apos;s coords are for an actual pelican image; a generated placeholder can still demo the scaling. Generate a 1000x1000 placeholder: gradient water + two blob-like &quot;pelican&quot; silhouettes placed at the given bboxes (using the same scale — cute: silhouettes at the exact 0-1000 positions, showing the boxes align). This makes for a fun, self-contained demo. Keep it simple: sky gradient, sun, water, two pelican-ish shapes (ellipse body, circle head, beak). Place at bbox centers.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;(I&apos;m slightly nervous that models around the world might have a bias towards drawing pelicans at any chance they can get, brought on by nearly two years of exposure to my own stupid benchmark.)&lt;/p&gt;
-        &lt;p&gt;Is all that over-thinking necessary? Maybe it is, at least a bit. I tried with reasoning turned off and got &lt;a href=&quot;https://static.simonwillison.net/static/2026/qwen-no-thinking-bbox.html&quot;&gt;this version&lt;/a&gt;, (&lt;a href=&quot;https://gist.github.com/simonw/8e78b1c64d9a56d08eedb954aa9445ee&quot;&gt;transcript here&lt;/a&gt;), which nearly works but shows the boxes in the wrong place:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/qwen-no-reasoning-bug.webp&quot; alt=&quot;BBox Studio screenshot - a solid UI but the yellow and green boxes do not cover the pelicans.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;So without reasoning it didn&apos;t quite one-shot a working tool. I&apos;m sure it could get there with some follow-up prompts, but this is a good example of how reasoning can make a difference.&lt;/p&gt;
-        &lt;h4 id=&quot;yes-it-can-drive-coding-agents&quot;&gt;Yes, it can drive coding agents&lt;/h4&gt;
-        &lt;p&gt;One of the biggest questions around local models is whether or not they have enough horsepower to successfully run a coding agent loop. Coding agents require long context, strong code generation support and reliable tool-calling. On paper Qwen 3.8 27B has all three of these, so is it up to the task?&lt;/p&gt;
-        &lt;p&gt;My initial experiments with &lt;a href=&quot;https://pi.dev/&quot;&gt;Pi&lt;/a&gt; have been very promising. I chose Pi because it has a shorter system prompt than most other options, making it a better fit for trying out smaller models.&lt;/p&gt;
-        &lt;p&gt;I configured Pi to use Qwen 3.8 27B running in LM Studio on the Spark (shared via &lt;code&gt;tailscale serve&lt;/code&gt;) by adding this to &lt;code&gt;~/.pi/agent/models.json&lt;/code&gt;:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-json&quot;&gt;&lt;pre&gt;{
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;providers&quot;&lt;/span&gt;: {
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;spark&quot;&lt;/span&gt;: {
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;baseUrl&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;https://spark-18b3.tail68a31.ts.net/v1&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;,
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;api&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;openai-responses&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;,
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;apiKey&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;dummy&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;,
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;models&quot;&lt;/span&gt;: [
-        {
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;id&quot;&lt;/span&gt;: &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;qwen3.8-27b&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;,
-        &lt;span class=&quot;pl-ent&quot;&gt;&quot;reasoning&quot;&lt;/span&gt;: &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;
-        }
-        ]
-        }
-        }
-        }&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;Then ran &lt;code&gt;pi --provider spark --model qwen3.8-27b&lt;/code&gt; in my &lt;code&gt;~/dev/datasette&lt;/code&gt; folder and prompted:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;how does auth work?&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;After a sequence of reasoning and tool calls that accessed a bunch of different files it produced &lt;a href=&quot;https://gist.github.com/simonw/6693d74a6bd45f641d43ceb9961dd95f#core-idea-actors--plugins-no-built-in-user-accounts&quot;&gt;this reply&lt;/a&gt;, which is very solid.&lt;/p&gt;
-        &lt;p&gt;Just one problem: I wanted to share that transcript. So I pointed Pi and Qwen 3.8 27B at the JSONL transcript file in &lt;code&gt;~/.pi/agent/sessions/--Users-simon-Dropbox-dev-datasette--&lt;/code&gt; and prompted:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Write Python code to convert this jsonl to markdown&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;And it built and tested this &lt;a href=&quot;https://github.com/simonw/tools/blob/main/python/pi_jsonl_to_md.py&quot;&gt;pi_jsonl_to_md.py&lt;/a&gt;, which did exactly what I needed. Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/491e55ac9d741202ea0af5d9d93775d4&quot;&gt;that session transcript&lt;/a&gt;, published using the tool that it created.&lt;/p&gt;
-        &lt;h4 id=&quot;the-quest-for-speed&quot;&gt;The quest for speed&lt;/h4&gt;
-        &lt;p&gt;So far this is all looking &lt;em&gt;very&lt;/em&gt; promising. We have a 17GB model that runs on high-end consumer hardware and can write code, drive tools, annotate images and generally do everything that I need from an LLM for getting real work done.&lt;/p&gt;
-        &lt;p&gt;There&apos;s one very significant catch: it feels slow - especially when it starts over-thinking, but even without that it&apos;s not particularly sprightly.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve been getting around 15-30 tokens a second from LM Studio. That&apos;s not terrible, but it&apos;s slow enough that it&apos;s going to be hard to win me away from hosted API models, which can return results a whole lot faster. Artificial Analysis &lt;a href=&quot;https://artificialanalysis.ai/models#speed&quot;&gt;track token speed&lt;/a&gt; and show OpenAI 5.6 Sol at 74 tokens/second and 5.6 Luna at an impressive 184/second.&lt;/p&gt;
-        &lt;p&gt;The good news is that the community have been exploring ways to speed things up since the model was first released two days ago.&lt;/p&gt;
-        &lt;p&gt;One of the most promising optimizations is baked into the model itself. Qwen supports &lt;a href=&quot;https://sebastianraschka.com/llm-architecture-gallery/mtp/&quot;&gt;Multi-Token Prediction&lt;/a&gt;, an architecture trick where a cheaper mechanism guesses several tokens ahead and the main model can then quickly verify if the guesses were correct. This can have quite a dramatic effect on inference performance.&lt;/p&gt;
-        &lt;p&gt;Based on &lt;a href=&quot;https://twitter.com/ggerganov/status/2088340681701925253&quot;&gt;this tweet&lt;/a&gt; from &lt;code&gt;llama.cpp&lt;/code&gt; creator Georgi Gerganov I tried running the model with MTP like this on the Spark:&lt;/p&gt;
-        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llama serve \
-        -hf  ggml-org/Qwen3.8-27B-GGUF:Q4_K_M \
-        -hfd ggml-org/Qwen3.8-27B-GGUF:Q4_0 \
-        --spec-default \
-        --spec-type draft-mtp \
-        --reasoning-preserve&lt;/pre&gt;&lt;/div&gt;
-        &lt;p&gt;And sure enough, this gave me a significant boost. I had GPT-5.6 in Codex run &lt;a href=&quot;https://gist.github.com/simonw/b08c7eb9c126c806ba8987e269ea736b&quot;&gt;a comparative benchmark on the Spark&lt;/a&gt; and the &lt;code&gt;--spec-type draft-mtp&lt;/code&gt; server outperformed the LM Studio default GGUF by around 72%.&lt;/p&gt;
-        &lt;p&gt;I expect we&apos;ll see a whole lot more innovation around serving this model faster over the next few weeks. The MLX community likely have some tricks brewing as well.&lt;/p&gt;
-        &lt;h4 id=&quot;some-observations&quot;&gt;Some observations&lt;/h4&gt;
-        &lt;p&gt;The fact that a 17GB file can do all of this stuff on my home machines is a &lt;em&gt;miracle&lt;/em&gt;. Once again, I&apos;m delighted and amazed at how much progress local models have made this year. A year ago this would have been competitive with the best and most expensive of the proprietary models - today it can run on a capable laptop.&lt;/p&gt;
-        &lt;p&gt;The only thing holding this back from being a daily driver is performance. It feels pretty slow on both the M5 Mac and the DGX Spark. That&apos;s the catch with these dense (non-Mixture-of-Experts) models - they require a whole lot of memory bandwidth to perform well, and neither of the machines I have access to are top performers in that regard.&lt;/p&gt;
-        &lt;p&gt;The most important thing about Qwen 3.8 27B is &lt;strong&gt;what it demonstrates&lt;/strong&gt;. We can have an open weights general purpose model with a long context, effective tool calling, strong vision ability, and competent code generation, and we can fit the whole thing in just a 17GB file.&lt;/p&gt;
-        &lt;p&gt;The models at this size continue to get better at an impressive rate. We don&apos;t need to spend half a million dollars on datacenter-class hardware just to run a competent model.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/local-llms&quot;&gt;local-llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/qwen&quot;&gt;qwen&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-reasoning&quot;&gt;llm-reasoning&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llama-cpp&quot;&gt;llama-cpp&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/lm-studio&quot;&gt;lm-studio&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-in-china&quot;&gt;ai-in-china&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/nvidia-spark&quot;&gt;nvidia-spark&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pi&quot;&gt;pi&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Dario Amodei</title>
-      <link>https://simonwillison.net/2026/Aug/16/dario-amodei/</link>
-      <guid>https://simonwillison.net/2026/Aug/16/dario-amodei/</guid>
-      <pubDate>Sun, 16 Aug 2026 15:05:36 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://twitter.com/darioamodei/status/2088758819304443967&quot;&gt;&lt;p&gt;I do agree that the public has a negative view of AI (and that this is a big problem), but I don’t think it is primarily caused by me or any other AI leader warning about AI’s risks.  I think it is fundamentally a crisis of trust.  I think that ordinary people don’t trust companies, governments, or the tech industry and always suspect that we are cooking up some new way to screw them over.  The causes of this go back decades and AI is just the latest iteration of it.  I don’t think that a glitzy marketing campaign with a positive spin (which some have advocated that Anthropic do) is the way to win back that trust — at this point, saying that AI will cure cancer is more a cliche than it is inspiring, and most people think it is deceptive.  The thing that will work is &lt;em&gt;actually curing cancer&lt;/em&gt;.  I think by far the most accurate criticism of AI companies including Anthropic is that we haven’t yet delivered on our big promises to benefit the world.  That is totally on us, and I think it’s the criticism you should be making, instead of all this stuff about messaging and marketing.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/darioamodei/status/2088758819304443967&quot;&gt;Dario Amodei&lt;/a&gt;&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-backlash&quot;&gt;ai-backlash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>CORS Chat</title>
-      <link>https://simonwillison.net/2026/Aug/15/cors-chat/</link>
-      <guid>https://simonwillison.net/2026/Aug/15/cors-chat/</guid>
-      <pubDate>Sat, 15 Aug 2026 14:49:54 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/cors-chat&quot;&gt;CORS Chat&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;I built this today (&lt;a href=&quot;https://gist.github.com/simonw/92a1d97773744b45bf259e003013cf36&quot;&gt;with GPT-5.6-Sol xhigh&lt;/a&gt;) to help test Qwen 3.8 27B running in LM Studio on both my M5 MacBook Pro and an NVIDIA DGX Spark.&lt;/p&gt;
-        &lt;p&gt;It provides a web UI for exercising an OpenAI-Responses-compatible chat endpoint. I&apos;ve tried it against LM Studio with the &lt;code&gt;--cors&lt;/code&gt; option and OpenRouter, and both work fine.&lt;/p&gt;
-        &lt;p&gt;Conversations are persisted in the browser and can be exported as copy-pasted JSON. One fun detail is that it notices SVG images that are being generated and progressively renders them in the chat while the tokens are still streaming in.&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;Alt text generated by Qwen-3.8 27B: Screenshot of the CORS Chat web interface. The left sidebar lists three saved conversations, with &amp;quot;render an svg of five intersecting squares&amp;quot; selected. The main panel shows a chat with the qwen3.8‑27b model: the user asked &amp;quot;render an svg of five intersecting squares. don&apos;t overthink this,&amp;quot; followed by the model&apos;s reasoning trace describing the design (five semi‑transparent squares rotated around a common center on a dark background). Below is an SVG preview pane displaying five overlapping, semi‑transparent colored squares—pink, blue, green, yellow, and purple—with white outlines, rotated at different angles to form a starburst pattern on a dark navy background. Top controls include endpoint/model selectors and a &amp;quot;New chat&amp;quot; button; the bottom has a message input and a &amp;quot;Send&amp;quot; button.&quot; src=&quot;https://static.simonwillison.net/static/2026/cors-chat.webp&quot; /&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/svg&quot;&gt;svg&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/cors&quot;&gt;cors&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openrouter&quot;&gt;openrouter&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/lm-studio&quot;&gt;lm-studio&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
