@@ -4,7 +4,79 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Fri, 04 Sep 2026 18:25:23 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 05 Sep 2026 17:31:32 GMT</lastBuildDate>
+    <item>
+      <title>TransitionGroup smooth move causing container height to decrease</title>
+      <link>https://stackoverflow.com/questions/80000933/transitiongroup-smooth-move-causing-container-height-to-decrease</link>
+      <guid>https://stackoverflow.com/questions/80000933/transitiongroup-smooth-move-causing-container-height-to-decrease</guid>
+      <pubDate>Sat, 05 Sep 2026 06:11:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Here&apos;s what my code looks like at the moment (&lt;a href=&quot;https://play.vuejs.org/#eNp9VGtv0zAU/StXQdq6R5OOAUIhm3hNCIQAjcGXpUJe4qZeE9uyna5T1f/OsdPnGJMmzb73nJNzj13Po3dax9OWR2mU2cII7chy1+rzXIpGK+NoToaPaEEjoxraB3Q/l7kslLSOhOONpTOP6F0PD1blojXL4gC1XLKy7GGx+y+Xo1YWTihJoULzXFKnGE9Z3fJYt3bcg1a3PToCabHDs3dM90Q5W3FH5Hd0fkYD2tsjv852FGsuKzemPp0sKUTXW/1rMIbH2wxfoSM6GQ4x0ENoaPwDHw69MIziL0u6TJEmNsDpmjmOHVGmz78qwxsS2rZNlvjEQ/3KMGmFn++TUa0mx6qzPCrFNI+oqJm12CFmx4TkBjXJGo6Sd5FHQRoigNO0P1IGnZ5vwaYsOZISsjMMZjrh92vmWntHCFJWMyTt7mv/lYaZSsi+kDW+niLmlwM9A3o+D6q0WGBkEJbDBIGb1jkc1tuiFsUEGt2peTfhIMD+pbOkQ20++3+WZ3xUdwh3h5MlGLqLNnmQ4SraRyLPkq1TwTYMimVqlMLd97R+v2wN82IpPbdvlpcwXp9BhyqFhcx9SpUR5RoUQgn9G1ZMKpiRZUrPiqIAhGgZp1M6pddIMhTd2nzaTbZB0ZSZ3sbPAXFm+XGHGnNRjd1TiCCMO9E8Clp5Tg7pkjdqysmNhSUmSxwt3bb4Xd8pM7F0mCwHS0fCWNcvxqIuuyG35xl0grgPIdLoOHIWmY1EFd9aJfHgBIq/zI0WNTfftTeDi5mufpt5xOpa3X0JNWfa1SDgjHkxeaR+a3EbUyx+GG65mfI8WvcczHHXtS9+fuMzrNfNRpVtDfQTzUtuVd16jx3sPc4Strdwwe3n8GwKWV3Zi5njOMrlUN5oeBoCPo/wlH54YvSN3dP4xepJQYp/nP3NjVdFhK/iQXwaLf4CwIDxGQ==&quot; rel=&quot;nofollow noreferrer&quot;&gt;playground&lt;/a&gt;):&lt;/p&gt;
+        &lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;&amp;lt;script setup&amp;gt;
+        import { ref } from &apos;vue&apos;
+        
+        const items = ref([])
+        const cur = ref(0)
+        
+        add()
+        add()
+        add()
+        
+        function add() {
+        items.value.push(cur.value++)
+        }
+        
+        function swap(idx) {
+        if (idx &amp;gt;= 0 &amp;amp;&amp;amp; idx &amp;lt; items.value.length - 1) {
+        [items.value[idx], items.value[idx + 1]] = [items.value[idx + 1], items.value[idx]]
+        }
+        }
+        &amp;lt;/script&amp;gt;
+        
+        &amp;lt;template&amp;gt;
+        &amp;lt;p&amp;gt;Lorem ipsum&amp;lt;/p&amp;gt;
+        
+        &amp;lt;TransitionGroup tag=&amp;quot;div&amp;quot; class=&amp;quot;container&amp;quot; name=&amp;quot;item&amp;quot;&amp;gt;
+        &amp;lt;div v-for=&amp;quot;(item, index) in items&amp;quot; :key=&amp;quot;item&amp;quot; class=&amp;quot;item&amp;quot;&amp;gt;
+        &amp;lt;span style=&amp;quot;margin-inline: 0 50px&amp;quot;&amp;gt;{{ item }}&amp;lt;/span&amp;gt;
+        
+        &amp;lt;button @click=&amp;quot;swap(index - 1)&amp;quot;&amp;gt;Up&amp;lt;/button&amp;gt;
+        &amp;lt;button @click=&amp;quot;swap(index)&amp;quot;&amp;gt;Down&amp;lt;/button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/TransitionGroup&amp;gt;
+        
+        &amp;lt;p&amp;gt;Lorem ipsum&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        
+        &amp;lt;style&amp;gt;
+        :root {
+        --duration: 2s;
+        }
+        
+        .container {
+        display: grid;
+        }
+        
+        .item {
+        background: #ccc;
+        margin-top: 80px;
+        transition:
+        margin-top var(--duration) ease,
+        height var(--duration) ease,
+        transform var(--duration) ease;
+        }
+        
+        /* Remove this and it just works */
+        .item:first-child {
+        margin-top: 0;
+        }
+        &amp;lt;/style&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Swapping items 2 and 3 works fine, but swapping 1 and 2 cause the container&apos;s height to be reduced before gradually growing back, as if for a moment it forgot that there was a &lt;code&gt;margin-top&lt;/code&gt; gap.&lt;/p&gt;
+        &lt;p&gt;I asked an AI and it said this is due to &lt;a href=&quot;https://aerotwist.com/blog/flip-your-animations/&quot; rel=&quot;nofollow noreferrer&quot;&gt;a technique called FLIP&lt;/a&gt;. Arcording to the article, the animation only takes place after the two elements have been swapped in the DOM, but I&apos;m not sure what happens next. If item 1 is at item 2&apos;s place and vice versa, then where is item 1&apos;s &lt;code&gt;margin-top&lt;/code&gt;, now that it is the second child? If it simply hasn&apos;t transitioned from &lt;code&gt;0&lt;/code&gt; to &lt;code&gt;80px&lt;/code&gt; yet, then in the same time span shouldn&apos;t item 2&apos;s &lt;code&gt;margin-top&lt;/code&gt; have transitioned from &lt;code&gt;80px&lt;/code&gt; to &lt;code&gt;0&lt;/code&gt;?&lt;/p&gt;
+        &lt;p&gt;I know it would have worked if the last CSS rule wasn&apos;t included, but this is for a library and I don&apos;t want to make too many assumptions. Also, the library supports adding and removing, so grid gaps are out of the question. What would be a simple solution? I&apos;m fine with both CSS and JS, but the simpler the better.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>@revolist/revogrid: Warning &quot;Defining revo-dropdown element...&quot; persists despite importing @revolist/revo-dropdown in vue</title>
       <link>https://stackoverflow.com/questions/79996958/revolist-revogrid-warning-defining-revo-dropdown-element-persists-despite</link>
@@ -1528,79 +1600,6 @@
         }
         }
         &lt;/code&gt;&lt;/pre&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Can&apos;t get svg markup to render as a data uri in an image source [duplicate]</title>
-      <link>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</link>
-      <guid>https://stackoverflow.com/questions/79895068/cant-get-svg-markup-to-render-as-a-data-uri-in-an-image-source</guid>
-      <pubDate>Tue, 24 Feb 2026 00:33:15 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I am attempting to get the google material symbols loaded into a canvas to download them. This is generally straight forward, except the fill property in the font-variation-settings. This I cannot get to work in the canvas. I only saw how to kind of do this through &lt;a href=&quot;https://stackoverflow.com/questions/65670959/variable-fonts-in-html5-canvas&quot;&gt;this&lt;/a&gt; SO post, but this is not working for me.&lt;/p&gt;
-        &lt;p&gt;My attempt:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;const canvas = document.createElement( &amp;quot;canvas&amp;quot; );
-        
-        const svgNS = &apos;https://www.w3.org/2000/svg&apos;;
-        const svg = document.createElementNS( svgNS, &amp;quot;svg&amp;quot; );
-        
-        const style = document.createElementNS( svgNS, &amp;quot;style&amp;quot; );
-        style.textContent = `@font-face {
-        font-family: &apos;Material Symbols Outlined&apos;;
-        font-style: normal;
-        font-weight: 100 700;
-        src: url(&apos;https://fonts.gstatic.com/s/materialsymbolsoutlined/v315/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2&apos;) format(&apos;woff2&apos;); 
-        }
-        .material-symbols-outlined {
-        font-family: &apos;Material Symbols Outlined&apos;;
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px;  /* Preferred icon size */
-        display: inline-block;
-        line-height: 1;
-        text-transform: none;
-        letter-spacing: normal;
-        word-wrap: normal;
-        white-space: nowrap;
-        direction: ltr;
-        }`;
-        svg.append( style );
-        
-        const foreignObject = document.createElementNS( svgNS, &amp;quot;foreignObject&amp;quot; );
-        foreignObject.setAttribute( &amp;quot;x&amp;quot;, &apos;0&apos; );
-        foreignObject.setAttribute( &amp;quot;y&amp;quot;, &apos;0&apos; );
-        
-        
-        const clone = icon.cloneNode(true);
-        foreignObject.append( clone );
-        
-        const { width, height } = icon.getBoundingClientRect();
-        foreignObject.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
-        foreignObject.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
-        svg.setAttribute( &amp;quot;width&amp;quot;, `${width}` );
-        svg.setAttribute( &amp;quot;height&amp;quot;, `${height}` );
-        
-        svg.append( foreignObject );
-        
-        const svg_markup = new XMLSerializer().serializeToString( svg );
-        const svg_file = new Blob( [ svg_markup ], { type: &amp;quot;image/svg+xml&amp;quot; } );
-        
-        Object.assign( canvas, { width, height } );
-        const ctx = canvas.getContext( &amp;quot;2d&amp;quot; );
-        
-        const img = new Image();
-        img.onload = () =&amp;gt; {
-        console.log(&apos;img loaded&apos;);
-        };
-        img.onerror = () =&amp;gt; {
-        console.log(&apos;image failed to load&apos;);
-        }
-        const svgURL = &apos;data:image/svg+xml,&apos; + encodeURIComponent(svg_markup);
-        img.src = svgURL;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;No matter what, the img onerror always fires. I can go to the data uri I get and it is valid. the I have even tried turning the turning svg_file blob into a data uri and using that. Same issue, I can go to that data uri, but img always throws an error. I don&apos;t get it!&lt;/p&gt;
-        &lt;p&gt;And of course the onerror for img doesn&apos;t give any info on why it failed. There are no errors in the console. It just hits the onerror.&lt;/p&gt;
-        &lt;p&gt;I tried to simplify it too by just putting the svg markup as the canvas innerHTML, of course that didn&apos;t work...&lt;/p&gt;
-        &lt;p&gt;Wondering if anyone has any clue how I may get the google material symbols to be able to apply the FILL font-variation-setting to render in canvas to download. Just toggling it on the span or parent container doesn&apos;t work. Canvas doesn&apos;t naturally pick that css attribute up it seems.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
