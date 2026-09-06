@@ -4,12 +4,49 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sat, 05 Sep 2026 17:31:21 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 06 Sep 2026 17:54:12 GMT</lastBuildDate>
+    <item>
+      <title>Building a Document Q&amp;A System with On-Device AI</title>
+      <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
+      <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
+        &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The demo is built from a few different things:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;First, I&apos;m making use of the &lt;strong&gt;incredibly excellent&lt;/strong&gt; &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library by Harsh Ankur. This library can take any Office document, or PDF, or ODT, or CSV, and so on, and creates a parsed version you can do nearly anything with. For me, the most important feature is the ability to convert the file into Markdown which can then be used with AI.&lt;/li&gt;
+        &lt;li&gt;Next, it makes use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/summarizer-api&quot;&gt;Summarizer API&lt;/a&gt; which - you guessed it - provides summaries of textual input.&lt;/li&gt;
+        &lt;li&gt;Finally, it makes use of Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/prompt-api&quot;&gt;Prompt API&lt;/a&gt; to let you ask questions about the input.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The web app itself is a simple Vite app using vanilla JavaScript. I used my AI agent to set up the application and create the design and there was quite a bit of back and forth to get things locked down, but the end result is pretty cool I think.&lt;/p&gt;
+        &lt;h2 id=&quot;the-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-app&quot;&gt;The App&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, I&apos;m obviously going to link to it, and the source, too, but I thought I&apos;d share a few screenshots for people who may be on Safari, or maybe reading this on iOS where Chrome is locked down to the Safari engine.&lt;/p&gt;
+        &lt;p&gt;On opening the app, you get a three panel UI. The left side is for selecting and previewing the document. The upper right is for the summary. The rest of the right column is for Q and A:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/dqa1.png&quot; loading=&quot;lazy&quot; alt=&quot;Initial view&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I selected my &lt;a href=&quot;/resume&quot;&gt;resume&lt;/a&gt; and after a few seconds, I get a summary. Now - I should clarify - the reason it works fast for me is that Chrome has already downloaded the roughly 4 gig model. That&apos;s absolutely &lt;em&gt;not&lt;/em&gt; insignificant. But it&apos;s also a model shared by the browser for &lt;em&gt;any&lt;/em&gt; web site making use of these APIs so it&apos;s not something a user has to download again and again.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the summary that was displayed:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/dqa2.png&quot; loading=&quot;lazy&quot; alt=&quot;Summary&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This is &lt;em&gt;nearly&lt;/em&gt; perfect. For some reason it thinks I worked at Microsoft and as far as I know I only mention Microsoft once in the resume and it&apos;s in regard to work done at Webflow.&lt;/p&gt;
+        &lt;p&gt;But that brings up a great first use of the Q and A - I specifically asked if Ray worked at Microsoft and I got the proper response:&lt;/p&gt;
+        &lt;p&gt;&amp;quot;The provided document does not mention Ray Camden working at Microsoft.&amp;quot;&lt;/p&gt;
+        &lt;p&gt;I asked a followup question about PHP and I liked the response:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/dqa3.png&quot; loading=&quot;lazy&quot; alt=&quot;Q and A example&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Honestly that&apos;s a pretty deep answer and kind of impressive I think.&lt;/p&gt;
+        &lt;p&gt;Anyway, if you like this, and are using an up to date Chrome (on desktop or Android), you can check it out here: &lt;a href=&quot;https://document-question-answer.netlify.app/&quot;&gt;https://document-question-answer.netlify.app/&lt;/a&gt;. You can peruse the source up here: &lt;a href=&quot;https://github.com/cfjedimaster/doc_qa&quot;&gt;https://github.com/cfjedimaster/doc_qa&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -35,7 +72,7 @@
       <title>Weather Nerd? Check out My OSX Radar Widget</title>
       <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
       <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
         &lt;p&gt;
@@ -50,7 +87,7 @@
       <title>Like LEGO? Got a Mac? Get My Screensaver</title>
       <link>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</link>
       <guid>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning my fabulous readers. This will be a quick post as I just wanted to share something cool I built with Cursor over the past couple of days - a LEGO screensaver. I&apos;m a huge fan of &amp;quot;show me something random from something I like&amp;quot; and have built multiple bots in that vein. I recently discovered &lt;a href=&quot;https://rebrickable.com/downloads/&quot;&gt;Rebrickable&apos;s LEGO datasets&lt;/a&gt; which contains a CSV file of LEGO sets. The data looks like so:&lt;/p&gt;
         &lt;pre&gt;&lt;code&gt;set_num,name,year,theme_id,num_parts,img_url
@@ -75,7 +112,7 @@
       <title>Links For You (8/23/26)</title>
       <link>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</link>
       <guid>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. Once again, I&apos;m a bit behind on these posts, but I just got back from two weeks of travel and I&apos;m so happy to be home for a while. My last trip was pretty stressful. On the way out, our plane blew a tire (or tires) which required an emergency landing in Dallas (which is where we were scheduled to stop anyway). Everything ended up fine, but as I said, stressful. Then coming home we were &lt;em&gt;minutes&lt;/em&gt; from our destination when the pilot had to turn around due to storms. You can actually see exactly where in the route where they said NOPE:&lt;/p&gt;
         &lt;p&gt;
@@ -105,7 +142,7 @@
       <title>Using the Cursor SDK to Build a Project Documenter</title>
       <link>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</link>
       <guid>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared a few posts recently talking about how I&apos;m using Cursor to learn and employ agentic development. Primarily that work has all been done via our Agent view, but this is just one of the surfaces you can use with the platform. I had a chance recently to try out the SDK and I thought I&apos;d share a little demo I built with it.&lt;/p&gt;
         &lt;p&gt;First - some explanation would be helpful. You can use Cursor with the desktop application, on the web, via CLI, on iOS, even via API. But the SDK lets you use the platform from your code. There&apos;s an SDK for &lt;a href=&quot;https://cursor.com/docs/sdk/typescript&quot;&gt;TypeScript&lt;/a&gt;, &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;Python&lt;/a&gt;, and a &lt;a href=&quot;https://cursor.com/docs/sdk/bridge&quot;&gt;bridge&lt;/a&gt; that embeds a TypeScript server and lets you use any language. Honestly I&apos;ve never seen that before in a platform and it&apos;s pretty freaking cool. (And... just to remind folks, I do work at Cursor so I&apos;m biased, but that&apos;s absolutely an honest opinion.)&lt;/p&gt;
@@ -390,7 +427,7 @@
       <title>&lt;file-preview&gt; - A simple web component for file previews</title>
       <link>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</link>
       <guid>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This was a &amp;quot;I can&apos;t fall asleep and my mind is wondering&amp;quot; type of idea and honestly, I&apos;m surprised at how good it came out. For a while now I&apos;ve shared demos where a user picks an image and ... something. It doesn&apos;t matter. But I typically add a preview of the image when it&apos;s selected. This works because once the user selects a file on their local system, JavaScript can then access the bits of that file, making it trivial then to render it. The idea I had, late at night, was simple - what if this could be a web component and expanded to cover different file types?&lt;/p&gt;
         &lt;p&gt;In my imagination, it would look something like this in code:&lt;/p&gt;
@@ -445,7 +482,7 @@
       <title>Links For You (8/2/26)</title>
       <link>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</link>
       <guid>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy August folks. Louisiana is celebrating the approach of Fall by gradually increasing the temperatures to roughly that of the surface of the sun. Last night we saw the new Spider-Man, which was really good, although not as fantastic as &amp;quot;No Way Home&amp;quot;. The point of these posts is for me to share content from other folks, but I&apos;ll remind folks of my &lt;a href=&quot;https://youtube.com/user/theraymondcamden&quot;&gt;Youtube channel&lt;/a&gt;. This past week I shared a few new videos demonstrating some cool stuff with Cursor so if you&apos;ve not checked them out yet, give me a quick watch and let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;web-browsing-on-your-gaming-console&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#web-browsing-on-your-gaming-console&quot;&gt;Web browsing on your gaming console&lt;/a&gt;&lt;/h2&gt;
@@ -476,7 +513,7 @@
       <title>Updating my Watch Site for Algolia Support</title>
       <link>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</link>
       <guid>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Alright, so I was supposed to share this a bit quicker, but life, work, etc, kept me busy. I&apos;ve had this particular change up for a few days but I&apos;m just now getting around to blogging about it. What changes?&lt;/p&gt;
         &lt;ul&gt;
@@ -760,7 +797,7 @@
       <title>Building Agentically and Celebrating Watches</title>
       <link>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</link>
       <guid>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
+      <pubDate>Sun, 06 Sep 2026 17:36:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared past experiences with vibe coding and it&apos;s been a fascinating way to experiment and build on a small scale, but while it works well for POCs and other small utilities (I won&apos;t say &apos;toys&apos; as I&apos;ve built useful, if small, things now multiple times), it isn&apos;t really a &amp;quot;process&amp;quot; and not one that would work over a project with a longer time frame. This is where &amp;quot;Agentic Development&amp;quot; comes in. It&apos;s not always referred to as such and it&apos;s a huge topic, but let me give you my opinion on it and then demonstrate how I used it to build my newest project, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;.&lt;/p&gt;
         &lt;h2 id=&quot;agentic-development-in-a-nutshell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agentic-development-in-a-nutshell&quot;&gt;Agentic Development in a Nutshell&lt;/a&gt;&lt;/h2&gt;
@@ -925,192 +962,6 @@
         &lt;/ul&gt;
         &lt;h2 id=&quot;what&apos;s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-next&quot;&gt;What&apos;s Next&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;I hope this made sense and I hope the power and flexibility of how I built it is clear. As I mentioned, I&apos;ve already done improvements, but I want to cover that in the next blog post. You can find the site here, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;https://iwatchwatches.netlify.app/&lt;/a&gt;. I may spring for a real domain later. You can find the code here, &lt;a href=&quot;https://github.com/cfjedimaster/iwatchwatches&quot;&gt;https://github.com/cfjedimaster/iwatchwatches&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Copying HTML Tables as Text, Markdown, and CSV</title>
-      <link>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</link>
-      <guid>https://www.raymondcamden.com/2026/07/20/copying-html-tables-as-text-markdown-and-csv</guid>
-      <pubDate>Sat, 05 Sep 2026 17:14:04 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Earlier today and in a non web-related conversation, I saw someone talk about copying tabular data into different formats, like plain text and CSV. It got me thinking - this could be a useful feature for web sites and surely something pretty trivial to do in JavaScript. So I whipped up a quick demo.&lt;/p&gt;
-        &lt;p&gt;First, I added a table of course:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;table id=&amp;quot;table1&amp;quot;&amp;gt;
-        &amp;lt;thead&amp;gt;
-        &amp;lt;tr&amp;gt;
-        &amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;DOB&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;Gender&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;Breed&amp;lt;/th&amp;gt;
-        &amp;lt;/tr&amp;gt;
-        &amp;lt;/thead&amp;gt;
-        &amp;lt;tbody&amp;gt;
-        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Whiskers&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2019-03-14&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Male&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Maine Coon&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
-        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Luna&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2020-07-22&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Siamese&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
-        &amp;lt;!-- bunch more rows --&amp;gt;
-        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Nala&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2022-04-18&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Persian&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;
-        &amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;Molly&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;2022-01-11&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Female&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;LaPerm&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;				
-        &amp;lt;/tbody&amp;gt;
-        &amp;lt;/table&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Alright, so to enable this feature, I thought data attributes might be nice. This would let you use it on anything, a button, a link, image, etc. The data attribute would be responsible for pointing to the table (via an id) and specifying a format. Here&apos;s an example:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!-- data-copy defaults to text --&amp;gt;
-        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot;&amp;gt;Copy as Text&amp;lt;/a&amp;gt; ~ 
-        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot; data-copy=&amp;quot;md&amp;quot;&amp;gt;Copy as Markdown&amp;lt;/a&amp;gt; ~
-        &amp;lt;a href=&amp;quot;&amp;quot; data-table=&amp;quot;table1&amp;quot; data-copy=&amp;quot;csv&amp;quot;&amp;gt;Copy as CSV&amp;lt;/a&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Now all I need to do is wire it up to code that looks for &lt;code&gt;data-table&lt;/code&gt; and adds the appropriate handlers. The first part is trivial:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const links = document.querySelectorAll(&apos;*[data-table]&apos;);
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Note that while I named the variable &lt;code&gt;links&lt;/code&gt;, you can still use this with buttons or images.&lt;/p&gt;
-        &lt;p&gt;I loop over each match and first get the table referenced, throwing an error in console if it doesn&apos;t exist:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;links.forEach(l =&amp;gt; {
-        let table = document.querySelector(`#${l.dataset.table}`);
-        if(!table) {
-        console.error(`Unable to connect to table with id ${l.dataset.table}`);
-        return;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Next, I check the type, defaulting to text:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let type = l.dataset.copy || &apos;text&apos;;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The final bit is to assign the click handler:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;l.addEventListener(&apos;click&apos;, async e =&amp;gt; {
-        e.preventDefault();
-        console.log(`about to copy table ${table.id} to ${type}`);
-        let data = getRawData(table);
-        let formattedData = formatData(data, type);
-        await navigator.clipboard.writeText(formattedData);
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;For each, I get the raw data from the HTML table, convert it to the right format, and then write to the clipboard. (Check out my &lt;a href=&quot;https://master.dev/blog/writing-to-the-clipboard-in-javascript/&quot;&gt;article&lt;/a&gt; on working with the clipboard in JavaScript.)&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;getRawData&lt;/code&gt; just iterates through the table&apos;s DOM creating a 2D array:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const getRawData = t =&amp;gt; {
-        let data = [];
-        t.querySelectorAll(&apos;tr&apos;).forEach(r =&amp;gt; {
-        let row = [];
-        r.querySelectorAll(&apos;th, td&apos;).forEach(d =&amp;gt; {
-        row.push(d.innerText);
-        });
-        data.push(row);
-        });
-        return data;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;code&gt;formatData&lt;/code&gt; is a bit more complex and I used AI to help me with each of the main sections. I added support for plain text, Markdown, and CSV:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const formatData = (data,type) =&amp;gt; {
-        let numCols, colWidths, lines, buildRow, buildDivider;
-        
-        switch(type) {
-        case &amp;quot;text&amp;quot;: 
-        
-        numCols = Math.max(...data.map(r =&amp;gt; r.length));
-        // Compute max width for each column
-        colWidths = Array(numCols).fill(0);
-        for (const row of data) {
-        for (let i = 0; i &amp;lt; numCols; i++) {
-        const cell = row[i] !== undefined ? String(row[i]) : &apos;&apos;;
-        colWidths[i] = Math.max(colWidths[i], cell.length);
-        }
-        }
-        
-        buildDivider = () =&amp;gt;
-        &apos;+&apos; + colWidths.map(w =&amp;gt; &apos;-&apos;.repeat(w + 2)).join(&apos;+&apos;) + &apos;+&apos;;
-        
-        buildRow = (row) =&amp;gt;
-        &apos;|&apos; + colWidths.map((w, i) =&amp;gt; {
-        const cell = row[i] !== undefined ? String(row[i]) : &apos;&apos;;
-        return &apos; &apos; + cell.padEnd(w) + &apos; &apos;;
-        }).join(&apos;|&apos;) + &apos;|&apos;;
-        
-        lines = [];
-        lines.push(buildDivider());
-        lines.push(buildRow(data[0])); // treat first row as header
-        lines.push(buildDivider());
-        for (let i = 1; i &amp;lt; data.length; i++) {
-        lines.push(buildRow(data[i]));
-        }
-        lines.push(buildDivider());
-        
-        return lines.join(&apos;\n&apos;);
-        
-        case &amp;quot;md&amp;quot;:
-        case &amp;quot;markdown&amp;quot;: 
-        numCols = Math.max(...data.map(r =&amp;gt; r.length));
-        
-        buildRow = (row) =&amp;gt;
-        &apos;| &apos; + Array.from({ length: numCols }, (_, i) =&amp;gt;
-        row[i] !== undefined ? String(row[i]) : &apos;&apos;
-        ).join(&apos; | &apos;) + &apos; |&apos;;
-        
-        lines = [];
-        lines.push(buildRow(data[0])); // header
-        lines.push(&apos;| &apos; + Array(numCols).fill(&apos;---&apos;).join(&apos; | &apos;) + &apos; |&apos;);
-        for (let i = 1; i &amp;lt; data.length; i++) {
-        lines.push(buildRow(data[i]));
-        }
-        
-        return lines.join(&apos;\n&apos;);
-        
-        case &amp;quot;csv&amp;quot;: 
-        const escapeCell = (value) =&amp;gt; {
-        const str = value !== undefined &amp;amp;&amp;amp; value !== null ? String(value) : &apos;&apos;;
-        // Quote if it contains comma, quote, or newline
-        if (/[&amp;quot;,\n\r]/.test(str)) {
-        return &apos;&amp;quot;&apos; + str.replace(/&amp;quot;/g, &apos;&amp;quot;&amp;quot;&apos;) + &apos;&amp;quot;&apos;;
-        }
-        return str;
-        };
-        
-        return data.map(row =&amp;gt; row.map(escapeCell).join(&apos;,&apos;)).join(&apos;\n&apos;);
-        
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;With my test table (and I&apos;m stripping out a bit here for brevity), here&apos;s the plain text version:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;+----------+------------+--------+----------------------+
-        | Name     | DOB        | Gender | Breed                |
-        +----------+------------+--------+----------------------+
-        | Whiskers | 2019-03-14 | Male   | Maine Coon           |
-        | Luna     | 2020-07-22 | Female | Siamese              |
-        | Oliver   | 2018-11-05 | Male   | British Shorthair    |
-        | Max      | 2019-06-25 | Male   | Sphynx               |
-        | Stella   | 2021-05-04 | Female | American Curl        |
-        | Rocky    | 2018-09-20 | Male   | Burmese              |
-        | Molly    | 2022-01-11 | Female | LaPerm               |
-        +----------+------------+--------+----------------------+
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Here&apos;s the Markdown:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;| Name | DOB | Gender | Breed |
-        | --- | --- | --- | --- |
-        | Whiskers | 2019-03-14 | Male | Maine Coon |
-        | Luna | 2020-07-22 | Female | Siamese |
-        | Oliver | 2018-11-05 | Male | British Shorthair |
-        | Max | 2019-06-25 | Male | Sphynx |
-        | Stella | 2021-05-04 | Female | American Curl |
-        | Rocky | 2018-09-20 | Male | Burmese |
-        | Molly | 2022-01-11 | Female | LaPerm |
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And here&apos;s CSV:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;Name,DOB,Gender,Breed
-        Whiskers,2019-03-14,Male,Maine Coon
-        Luna,2020-07-22,Female,Siamese
-        Oliver,2018-11-05,Male,British Shorthair
-        Max,2019-06-25,Male,Sphynx
-        Stella,2021-05-04,Female,American Curl
-        Rocky,2018-09-20,Male,Burmese
-        Molly,2022-01-11,Female,LaPerm
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I wrapped this all up in a function that you could add to your page. After adding it, don&apos;t forget to actually add the links/button/etc to enable it.&lt;/p&gt;
-        &lt;p&gt;There&apos;s two issues with my code that come to mind, and I&apos;d love people to comment in with their ideas. First, both the text and Markdown assume the first row is a header. In theory that might not always be accurate. I could update the code to see if the first cell in the first row is &lt;code&gt;th&lt;/code&gt; versus &lt;code&gt;td&lt;/code&gt;, but that kinda feels like overkill.&lt;/p&gt;
-        &lt;p&gt;The second issue that comes to mind is user feedback. Usually these types of things will provide some kind of visual feedback (&amp;quot;Data copied!&amp;quot;). My code does not. I honestly don&apos;t quite know how I&apos;d do that. Perhaps a data attribute that would replace the text (assuming it&apos;s a link or button) temporarily? I&apos;m not sure.&lt;/p&gt;
-        &lt;p&gt;If you&apos;ve got ideas, leave me a comment below. Here&apos;s the demo:&lt;/p&gt;
-        &lt;p class=&quot;codepen&quot; data-height=&quot;500&quot; data-pen-title=&quot;Copy Table As (2)&quot; data-version=&quot;2&quot; data-default-tab=&quot;result&quot; data-slug-hash=&quot;xbgJOyP&quot; data-user=&quot;cfjedimaster&quot; style=&quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&quot;&gt;
-        &lt;span&gt;See the Pen &lt;a href=&quot;https://codepen.io/editor/cfjedimaster/pen/019f80d2-42ea-7545-83bb-8f112023abce&quot;&gt;
-        Copy Table As (2)&lt;/a&gt; by Raymond Camden (&lt;a href=&quot;https://codepen.io/cfjedimaster&quot;&gt;@cfjedimaster&lt;/a&gt;)
-        on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/span&gt;
-        &lt;/p&gt;
-        &lt;script async src=&quot;https://public.codepenassets.com/embed/index.js&quot;&gt;&lt;/script&gt;
       </content:encoded>
     </item>
   </channel>
