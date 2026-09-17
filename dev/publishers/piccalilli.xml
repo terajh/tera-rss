@@ -4,7 +4,135 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 16 Sep 2026 19:03:58 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 19:12:10 GMT</lastBuildDate>
+    <item>
+      <title>A decent custom checkbox pattern for until ::checkmark is ready</title>
+      <link>https://piccalil.li/blog/a-decent-custom-checkbox-for-until-checkmark-is-ready/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/a-decent-custom-checkbox-for-until-checkmark-is-ready/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 17 Sep 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Now that we can better customise &lt;code&gt;&amp;lt;select&amp;gt;&lt;/code&gt; elements, it&apos;s only natural to side-eye other form &lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt; types that have caused us visual headaches.&lt;/p&gt;
+        &lt;p&gt;Sure, we should be applying the &lt;em&gt;lightest&lt;/em&gt; of touches to form elements, especially, but even with a bit of visual-massaging, checkboxes are limited, aside from a bit of &lt;code&gt;accent-color&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/pvebLwo/01786b2d24fcc35066571a56df54c09f&quot;&gt;Standard checkbox with accent colour&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;There is a brighter future incoming, if you&apos;re to read the &lt;a href=&quot;https://www.w3.org/TR/css-forms-1/#checkmark&quot;&gt;spec&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;The ::checkmark pseudo-element represents an indicator of whether the item is checked, and is present on checkboxes, radios, and option elements.&lt;/p&gt;
+        &lt;p&gt;— &lt;a href=&quot;https://www.w3.org/TR/css-forms-1/#checkmark&quot;&gt;W3C forms level 1&lt;/a&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Match that with &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/appearance#formal_syntax&quot;&gt;&lt;code&gt;appearance: base&lt;/code&gt;&lt;/a&gt;, which is also incoming, and we&apos;re looking at this sort of CSS:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;input[type=&quot;checkbox&quot;] {
+        appearance: base;
+        }
+        
+        input[type=&quot;checkbox&quot;]::checkmark {
+        content: url(&quot;data:image/svg+xml,%3Csvg aria-hidden=&apos;true&apos; focusable=&apos;false&apos; width=&apos;24&apos; height=&apos;24&apos; viewBox=&apos;0 0 24 24&apos; xmlns=&apos;http://www.w3.org/2000/svg&apos;%3E %3Cpath fill=&apos;none&apos; stroke=&apos;currentColor&apos; stroke-linecap=&apos;round&apos; stroke-linejoin=&apos;round&apos; stroke-width=&apos;2&apos; d=&apos;m5 12l5 5L20 7&apos; /%3E %3C/svg%3E&quot;);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;We&apos;re miles off from that capability yet — it doesn&apos;t look like any browser is working on it —  so allow me to show you how to build a nice custom checkbox pattern for until we have the browser capabilities we&apos;re after.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;HTML first, always&lt;/h2&gt;
+        &lt;p&gt;It&apos;s always right to start with some good quality markup:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;label for=&quot;custom-checkbox&quot; class=&quot;checkbox&quot;&amp;gt;
+        &amp;lt;span class=&quot;checkbox__box&quot;&amp;gt;
+        &amp;lt;input type=&quot;checkbox&quot; name=&quot;custom-checkbox&quot; id=&quot;custom-checkbox&quot; value=&quot;Some value that this control toggles&quot;&amp;gt;
+        &amp;lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&amp;gt;
+        &amp;lt;path fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;2&quot; d=&quot;m5 12l5 5L20 7&quot; /&amp;gt;
+        &amp;lt;/svg&amp;gt;
+        &amp;lt;/span&amp;gt;
+        &amp;lt;span&amp;gt;A long label for this checkbox to make sure we get a nice wrapping behaviour&amp;lt;/span&amp;gt;
+        &amp;lt;/label&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The markup is pretty straightforward here. Inside the parent &lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt; — which is linked to the input both by being a parent &lt;em&gt;and&lt;/em&gt; the &lt;code&gt;for&lt;/code&gt;/&lt;code&gt;id&lt;/code&gt; attributes — we have a container for the input and icon, along with a text label.&lt;/p&gt;
+        &lt;p&gt;The reason I&apos;m using &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; elements here is because aside from the input/SVG only &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#phrasing_content&quot;&gt;phrasing content&lt;/a&gt; is permitted. I don&apos;t think a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; would do any harm here, but it&apos;s best to do things right.&lt;/p&gt;
+        &lt;p&gt;On the SVG checkmark element, there&apos;s an &lt;code&gt;aria-hidden=&quot;true&quot;&lt;/code&gt; attribute. This stops the SVG — a visual element — getting in the way for assistive technology. I&apos;ve also added &lt;code&gt;focusable=&quot;false&quot;&lt;/code&gt;. This is actually a relic from the Internet Explorer days hell, but I keep it on visual only icons, just in case.&lt;/p&gt;
+        &lt;p&gt;Right, we&apos;re in good shape. Let&apos;s make it look good.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Some CSS&lt;/h2&gt;
+        &lt;p&gt;The first thing to do is layout:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.checkbox {
+        display: flex;
+        align-items: baseline;
+        gap: 1em;
+        text-wrap: balance;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Flex is more than capable here. I like to align on the baseline in this sort of context because as the viewport gets small and the text wraps, we don&apos;t want a vertically centered layout. It looks rubbish!&lt;/p&gt;
+        &lt;p&gt;Speaking of balance, I&apos;m using &lt;code&gt;text-wrap: balance&lt;/code&gt; here for the same compressed viewport context and dealing with wrapping text. Keeping a consistent edge (rag) is extra important for small microcopy, such as labels.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s tackle the input itself.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.checkbox input {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        appearance: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 0.2em; /* This is so the focus ring has a matching radius to the visual box */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;We&apos;ve got to be &lt;em&gt;really&lt;/em&gt; careful here because we don&apos;t want to mess up the focusability of our element. Combining &lt;code&gt;appearance: none&lt;/code&gt; and absolute positioning, our element is still there, but its no longer in the way, &lt;em&gt;visually&lt;/em&gt;. It can still receive focus and will present a focus ring, which is exactly what we need!&lt;/p&gt;
+        &lt;p&gt;Let&apos;s tackle the &quot;box&quot; part, which is also this &lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;&apos;s parent.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.checkbox__box {
+        position: relative;
+        background: transparent;
+        color: currentcolor;
+        border: 1px solid;
+        width: 1.4em;
+        height: 1.4em;
+        transform: translateY(0.75ex);
+        flex-shrink: 0;
+        border-radius: 0.2em;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;A lot of this is self explanatory but I&apos;ll pick up the key parts:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;I&apos;m using &lt;code&gt;position: relative&lt;/code&gt; so the &lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt; stays inside this box&lt;/li&gt;
+        &lt;li&gt;The &lt;code&gt;transform&lt;/code&gt; rule is a &lt;em&gt;bit&lt;/em&gt; of a magic-number but because it&apos;s a relative &lt;a href=&quot;https://every-layout.dev/rudiments/units/&quot;&gt;&lt;code&gt;ex&lt;/code&gt;
+        unit&lt;/a&gt;, it scales quite nicely, regardless of parent font size. Most importantly the &lt;code&gt;ex&lt;/code&gt; enhances that &lt;code&gt;baseline&lt;/code&gt; alignment &lt;em&gt;and&lt;/em&gt; fixes the initial alignment of the &lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;I really like how &lt;a href=&quot;https://ishadeed.com/article/aligning-list-icons/&quot;&gt;Ahmad Shadeed approaches this&lt;/a&gt; too. That&apos;s the beauty of CSS: there&apos;s plenty of ways to do things well! &lt;/p&gt;
+        &lt;p&gt;Let&apos;s deal with the SVG checkmark next:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.checkbox__box svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        display: none;
+        width: 1em;
+        height: 1em;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I guess I could use &lt;a href=&quot;https://piccalil.li/blog/getting-started-with-css-custom-properties/&quot;&gt;logical properties&lt;/a&gt; here, but we&apos;re positioning an icon in a box, so the &quot;old&quot; way works perfectly well.&lt;/p&gt;
+        &lt;p&gt;The idea here is to visually hide the checkmark when the checkbox isn&apos;t checked and show it when it is. We&apos;ll deal with that CSS next.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        This is a situation that very few people will likely find themselves in. What I&apos;d recommend is having a couple of SVG elements that get toggled in that context. 
+        &lt;/div&gt;
+        &lt;pre&gt;&lt;code&gt;.checkbox__box:has(input:checked) {
+        background: white;
+        }
+        
+        .checkbox__box input:checked + svg {
+        display: block;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;We&apos;re in checked state territory here. I&apos;m setting a white background using &lt;code&gt;:has()&lt;/code&gt; which is &lt;em&gt;yet another&lt;/em&gt; &lt;a href=&quot;https://piccalil.li/blog/some-little-ways-im-using-css-has-in-the-real-world/&quot;&gt;useful use-case&lt;/a&gt; for this endlessly handy addition to CSS.&lt;/p&gt;
+        &lt;p&gt;The following block of CSS uses a traditional next sibling selector to show the SVG element when the input is checked. You could use &lt;code&gt;:has()&lt;/code&gt; here too, if you&apos;re feeling fancy.&lt;/p&gt;
+        &lt;p&gt;With all of that CSS in place, we&apos;re looking good.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/MYpeyGd/f1c611739fe7d2308ca6102877c53711&quot;&gt;Custom checkbox&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;This approach could also work for radio buttons&lt;/h2&gt;
+        &lt;p&gt;There&apos;s nothing stopping you using this approach for radio buttons. Check out this demo where I&apos;m using a circle icon instead of a checkmark. It works well!&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/XJMKKep/edef02c55d0d972b66682ee3443858bb&quot;&gt;Custom radio buttons&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;The em units usage allows this whole component to scale&lt;/h2&gt;
+        &lt;p&gt;The eagle eyed amongst us will have noticed that aside from the &lt;code&gt;transform&lt;/code&gt; rules, I&apos;ve consistently use &lt;code&gt;em&lt;/code&gt; units. The reason for this is so our checkbox can scale with no other intervention.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/QwpEmZw/df33cad21fa4c40a91912bb559886c1b&quot;&gt;Custom checkbox - massive edition&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;The only change here, versus the first demo is a &lt;code&gt;font-size&lt;/code&gt; declaration on the &lt;code&gt;.checkbox&lt;/code&gt; component.&lt;/p&gt;
+        &lt;p&gt;A handy pattern, right?&lt;/p&gt;
+        &lt;hr /&gt;
+        &lt;p&gt;A big thanks to &lt;a href=&quot;https://jakearchibald.com/&quot;&gt;Jake Archibald&lt;/a&gt; and &lt;a href=&quot;https://heydonworks.com/&quot;&gt;Heydon Pickering&lt;/a&gt; for checking my homework.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #197</title>
       <link>https://piccalil.li/the-index/197/?ref=main-rss-feed</link>
@@ -264,33 +392,6 @@
         &lt;p&gt;&lt;em&gt;Anyway&lt;/em&gt;, the next post in this series will tackle exactly that: the creative process. This should all time well with the investments we&apos;ve put into our own design system software too, so I&apos;m looking forward to showing you all that. Because I do the production work, &lt;em&gt;then&lt;/em&gt; write about it in this series, expect a bit of a delay now while I actually do the work.&lt;/p&gt;
         &lt;p&gt;For now, I&apos;ve got a basic UI and a fully functional website. Sure, it&apos;s got a few rough edges, but it&apos;s a website. If you&apos;ve also been in &quot;pause mode&quot; like I have, what I will say is get an ugly version live first — especially if you don&apos;t have a website already. It&apos;s better to have &lt;em&gt;something&lt;/em&gt; than nothing.&lt;/p&gt;
         &lt;p&gt;Catch you in the next one.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #195</title>
-      <link>https://piccalil.li/the-index/195/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/195/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 21 Aug 2026 10:50:00 GMT</pubDate>
-      <content:encoded>
-        &lt;h2&gt;&lt;a href=&quot;https://bulleted.app/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Bulleted&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This is the stuff that&apos;s exciting about the AT protocol. Not the &quot;new twitter&quot; bullshit, but the endless possibilities that this technology opens up. It&apos;s using the &lt;a href=&quot;https://atproto.com/blog/atproto-spaces-alpha&quot;&gt;fancy new private data stuff&lt;/a&gt; too.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://www.bram.us/2026/08/20/the-future-of-css-target-multiple-classes-with-the-class-prefix-selector/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The future of CSS: target multiple classes with the class prefix selector&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;As Bramus says in the article, we can sort of do this already, but those substring selectors don&apos;t perform well. This new method is a very good improvement!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://dbushell.com/2026/08/20/ruminations-on-notifications/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Ruminations on notifications&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A good write-up on how annoying and harmful notifications are.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://chrisburnell.com/html-can-do-that/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;HTML can do that&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;So much good stuff has arrived in HTML that gives us rich functionality for free and Chris helpfully breaks that down for us.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://daverupert.com/2026/08/microlighter/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Introducing Microlighter&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;An extremely lightweight syntax highlighter using the new &lt;code&gt;::highlight()&lt;/code&gt; functionality? Yes please!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/why-im-excited-about-text-box-trim-as-a-designer/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Why I’m excited about text-box-trim as a designer&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://rwblickhan.org/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://piccalil.li/courses?utm_source=the-index&amp;utm_campaign=next-level-2026&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/next-level-event-newsletter.png&quot; alt=&quot;Save 20% on all courses&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Take your career to the next level by taking our premium courses and save 20%&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;Use the code &lt;code&gt;NEXTLEVEL&lt;/code&gt; at checkout to get our courses for only &lt;strong&gt;£199.20&lt;/strong&gt;.&lt;/p&gt;
-        &lt;p&gt;By taking our courses, you’re supporting independent publishing, rooted in doing right for workers in design, development and leadership.&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://piccalil.li/courses?utm_source=the-index&amp;utm_campaign=next-level-2026&quot;&gt;Take your career to the next level&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
