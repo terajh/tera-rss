@@ -4,12 +4,357 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Fri, 18 Sep 2026 18:25:43 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2026 18:09:45 GMT</lastBuildDate>
+    <item>
+      <title>It&apos;s only a decade late, I&apos;ll learn TypeScript!</title>
+      <link>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</link>
+      <guid>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</guid>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve been a bit worried lately. Of course, my friends will tell you that&apos;s my norm. But more specifically, I&apos;ve been worried about my coding skills. As I use AI to generate more and more code, and it does that job well, I kinda miss actually &lt;em&gt;writing&lt;/em&gt; code. I&apos;ve also had a bit of writer&apos;s block in terms of &lt;em&gt;topics&lt;/em&gt; to cover, and especially in the area of the web platform. A few days ago it occurred to me - I&apos;ve never &lt;em&gt;really&lt;/em&gt; dug into &lt;a href=&quot;https://www.typescriptlang.org/&quot;&gt;TypeScript&lt;/a&gt;. Sure, I&apos;ve used it, many times, in the fourteen or so years it&apos;s been out, but many times I kinda guess at what I&apos;m doing and it was never my default for projects. Partly that&apos;s due to my philosophy of avoiding a build step in my projects and just KISS in general.&lt;/p&gt;
+        &lt;p&gt;But as I said - the inspiration hit me this past week and I thought I&apos;d do some digging. Here&apos;s a few initial thoughts and experiments. Oh, and I still used AI a bit and I&apos;ll explain exactly how in the post below.&lt;/p&gt;
+        &lt;h2 id=&quot;typescript-via-vite&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#typescript-via-vite&quot;&gt;TypeScript via Vite&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Working with TypeScript can be as simple as &lt;code&gt;npm i -g typescript&lt;/code&gt; and then &lt;code&gt;tsc somefile.ts&lt;/code&gt;. I decided to use &lt;a href=&quot;https://vite.dev/&quot;&gt;Vite&lt;/a&gt; instead as it&apos;s focused on web projects and most of my development involves web projects. I assume most of my readers know of Vite, but if you somehow have managed to avoid hearing about it or using it yet, it is a &lt;em&gt;lightning&lt;/em&gt; quick build tool for web projects. By &amp;quot;lightning quick&amp;quot; I mean that I still remember the first time I used it thinking it had failed to actually do anything - that&apos;s how quick it works.&lt;/p&gt;
+        &lt;p&gt;I also appreciated the fact that Vite&apos;s CLI supports a &lt;a href=&quot;https://stackblitz.com/edit/vitejs-vite-rnustopr?file=index.html&amp;amp;terminal=dev&quot;&gt;&lt;code&gt;vanilla-ts&lt;/code&gt;&lt;/a&gt; scaffold that is really lightweight. On the other hand, I&apos;m not necessarily a fan of what it actually shows as it feels a bit like bad practice, specifically an index file with just one div:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!doctype html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+        &amp;lt;link rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/svg+xml&amp;quot; href=&amp;quot;/favicon.svg&amp;quot; /&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot; /&amp;gt;
+        &amp;lt;title&amp;gt;Vite + TS&amp;lt;/title&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        &amp;lt;div id=&amp;quot;app&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;script type=&amp;quot;module&amp;quot; src=&amp;quot;/src/main.ts&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then injects a bunch of HTML in main.ts:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import &apos;./style.css&apos;
+        import heroImg from &apos;./assets/hero.png&apos;
+        import typescriptLogo from &apos;./assets/typescript.svg&apos;
+        import viteLogo from &apos;./assets/vite.svg&apos;
+        import { setupCounter } from &apos;./counter.ts&apos;
+        
+        document.querySelector&amp;lt;HTMLDivElement&amp;gt;(&apos;#app&apos;)!.innerHTML = `
+        &amp;lt;section id=&amp;quot;center&amp;quot;&amp;gt;
+        &amp;lt;div class=&amp;quot;hero&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;${heroImg}&amp;quot; class=&amp;quot;base&amp;quot; width=&amp;quot;170&amp;quot; height=&amp;quot;179&amp;quot;&amp;gt;
+        &amp;lt;img src=&amp;quot;${typescriptLogo}&amp;quot; class=&amp;quot;framework&amp;quot; alt=&amp;quot;TypeScript logo&amp;quot;/&amp;gt;
+        &amp;lt;img src=&amp;quot;${viteLogo}&amp;quot; class=&amp;quot;vite&amp;quot; alt=&amp;quot;Vite logo&amp;quot; /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;h1&amp;gt;Get started&amp;lt;/h1&amp;gt;
+        &amp;lt;p&amp;gt;Edit &amp;lt;code&amp;gt;src/main.ts&amp;lt;/code&amp;gt; and save to test &amp;lt;code&amp;gt;HMR&amp;lt;/code&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;button id=&amp;quot;counter&amp;quot; type=&amp;quot;button&amp;quot; class=&amp;quot;counter&amp;quot;&amp;gt;&amp;lt;/button&amp;gt;
+        &amp;lt;/section&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;ticks&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        
+        &amp;lt;section id=&amp;quot;next-steps&amp;quot;&amp;gt;
+        &amp;lt;div id=&amp;quot;docs&amp;quot;&amp;gt;
+        &amp;lt;svg class=&amp;quot;icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#documentation-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;
+        &amp;lt;h2&amp;gt;Documentation&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Your questions, answered&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;a href=&amp;quot;https://vite.dev/&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;
+        &amp;lt;img class=&amp;quot;logo&amp;quot; src=&amp;quot;${viteLogo}&amp;quot; alt=&amp;quot;&amp;quot; /&amp;gt;
+        Explore Vite
+        &amp;lt;/a&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;a href=&amp;quot;https://www.typescriptlang.org&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;
+        &amp;lt;img class=&amp;quot;button-icon&amp;quot; src=&amp;quot;${typescriptLogo}&amp;quot; alt=&amp;quot;&amp;quot;&amp;gt;
+        Learn more
+        &amp;lt;/a&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div id=&amp;quot;social&amp;quot;&amp;gt;
+        &amp;lt;svg class=&amp;quot;icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#social-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;
+        &amp;lt;h2&amp;gt;Connect with us&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Join the Vite community&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;https://github.com/vitejs/vite&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;&amp;lt;svg class=&amp;quot;button-icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#github-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;GitHub&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;https://chat.vite.dev/&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;&amp;lt;svg class=&amp;quot;button-icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#discord-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;Discord&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;https://x.com/vite_js&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;&amp;lt;svg class=&amp;quot;button-icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#x-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;X.com&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;https://bsky.app/profile/vite.dev&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;&amp;lt;svg class=&amp;quot;button-icon&amp;quot; role=&amp;quot;presentation&amp;quot; aria-hidden=&amp;quot;true&amp;quot;&amp;gt;&amp;lt;use href=&amp;quot;/icons.svg#bluesky-icon&amp;quot;&amp;gt;&amp;lt;/use&amp;gt;&amp;lt;/svg&amp;gt;Bluesky&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/section&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;ticks&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;section id=&amp;quot;spacer&amp;quot;&amp;gt;&amp;lt;/section&amp;gt;
+        `
+        
+        setupCounter(document.querySelector&amp;lt;HTMLButtonElement&amp;gt;(&apos;#counter&apos;)!)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;m probably being &lt;em&gt;real&lt;/em&gt; nit picky here, but having 99% of the HTML for something in JavaScript versus HTML that gets enhanced feels off to me. But again - I&apos;m being picky, and the actual code spit out is pretty minimal. (I could go on for ages about what&apos;s &amp;quot;appropriate&amp;quot; for scaffolded projects and such. Give me a soap box and I&apos;ll tell you more.)&lt;/p&gt;
+        &lt;p&gt;So yeah, that&apos;s how I started. I pretty much nuked most of the code in main.ts and simplified even more.&lt;/p&gt;
+        &lt;p&gt;I mentioned earlier I still used a bit of AI in my exploration, and one example was to help clarify things a bit. For example, my very high level basic understanding of TypeScript basically came down to type annotations like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let name:string = &amp;quot;Ray&amp;quot;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This line in the sample code confused me:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;document.querySelector&amp;lt;HTMLDivElement&amp;gt;(&apos;#app&apos;)!.innerHTML = `
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;So I simply asked Claude to explain it:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;The &amp;lt;HTMLDivElement&amp;gt; (generic type argument)
+        
+        By default, querySelector returns Element | null. Element is a very generic type — 
+        TypeScript doesn&apos;t know whether it&apos;s a div, an input, an SVG circle, etc. That 
+        matters because different elements have different properties: Element doesn&apos;t 
+        have .value, for example, but HTMLInputElement does.
+        
+        Writing querySelector&amp;lt;HTMLDivElement&amp;gt;(&apos;#app&apos;) tells TypeScript: &amp;quot;trust me, the 
+        thing this selector finds is a div.&amp;quot; So the return type becomes 
+        HTMLDivElement | null instead of Element | null, and you get proper autocomplete 
+        and type checking for div-specific properties.
+        
+        Like the !, this is a compile-time-only assertion — TypeScript doesn&apos;t verify 
+        it. If #app were actually a &amp;lt;span&amp;gt;, the code would still compile and run; you&apos;d 
+        just have a lying type.
+        
+        Fun fact: in this particular line the generic is technically unnecessary, since 
+        .innerHTML exists on Element anyway. It&apos;s there mostly out of habit/convention 
+        (this looks like the Vite starter template). It becomes genuinely useful when 
+        you need element-specific properties like .value, .src, or .checked.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Cool. And this is something I&apos;ve really liked about AI in the past. I feel like my question, a particular syntax being used, wouldn&apos;t Google well and AI tools do a better job of getting to the right answer.&lt;/p&gt;
+        &lt;p&gt;At this point, I felt ready to write something.&lt;/p&gt;
+        &lt;h2 id=&quot;actually%2C-let&apos;s-not-build-for-the-web...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#actually%2C-let&apos;s-not-build-for-the-web...&quot;&gt;Actually, let&apos;s not build for the web...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So when I figured out a good simple thing to build, I realized I didn&apos;t actually &lt;em&gt;need&lt;/em&gt; a web UI for it, at least not initially, so I did a quick pivot and looked up info on &lt;a href=&quot;https://vitest.dev/&quot;&gt;vitest&lt;/a&gt;, a &amp;quot;Vite-native&amp;quot; testing framework. I actually don&apos;t have a huge amount of experience with unit tests as so much of my work is educational, demo based, and such, that tests aren&apos;t really required. That being said, I&apos;ve written them, I&apos;m familiar with Jest (which vitest is compatible with), so it seemed like an easy win.&lt;/p&gt;
+        &lt;p&gt;I did a quick &lt;code&gt;npm i -D vitest&lt;/code&gt; and added this to my &lt;code&gt;package.json&lt;/code&gt; scripts block: &lt;code&gt;&amp;quot;test&amp;quot;: &amp;quot;vitest&amp;quot;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;This let me run &lt;code&gt;npm run test&lt;/code&gt; in my terminal and get immediate feedback on what I was writing.&lt;/p&gt;
+        &lt;h2 id=&quot;roll-the-dice...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#roll-the-dice...&quot;&gt;Roll the dice...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;About five years ago, I thought it would be fun, and surely pretty simple, to build an RPG in Vue.js (here&apos;s the first entry: &lt;a href=&quot;https://www.raymondcamden.com/2020/07/17/testing-vuejs-application-files-that-arent-components&quot;&gt;&amp;quot;Testing Vue.js Application Files That Aren&apos;t Components&amp;quot;&lt;/a&gt;. I never finished that project, but I don&apos;t care - it was fun to work on.&lt;/p&gt;
+        &lt;p&gt;As part of that project, I built a simple &amp;quot;dice&amp;quot; utility that supported typical D&amp;amp;D dice rolls of the form: xDy. This translates to roll a Y-sided dice X times. It can get fancy too, so &lt;code&gt;2d6+2&lt;/code&gt; means roll a six sided die two times and then add two tp the final result. (You could imagine a scenario where a player is attempting to do something they are talented at, so the &lt;code&gt;+2&lt;/code&gt; represents a bonus to their chance to do the thing.)&lt;/p&gt;
+        &lt;p&gt;The code for that looked like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export const dice = {
+        
+        roll(style) {
+        let bonus=0, total=0;
+        if(style.indexOf(&apos;+&apos;) &amp;gt; -1) {
+        [style, bonus] = style.split(&apos;+&apos;);
+        } 
+        
+        let [rolls, sided] = style.split(&apos;d&apos;);
+        
+        //console.log(rolls, sided);
+        for(let i=0;i&amp;lt;rolls;i++) {
+        total += getRandomIntInclusive(1, sided);
+        }
+        total += parseInt(bonus);
+        return total;
+        }
+        }
+        
+        function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I thought a good first test would be to attempt to rewrite this in a TypeScript file. I actually broke it out into two files, one for the roll action and a &apos;util&apos; one for the random number selection.&lt;/p&gt;
+        &lt;p&gt;I&apos;ll share the utility function first as it was the simplest change:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export function getRandomInt(min: number, max: number): number {
+        min = Math.ceil(min)
+        max = Math.floor(max)
+        return Math.floor(Math.random() * (max - min + 1)) + min
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This was really simple - just adding types to my arguments and result. I also removed &lt;code&gt;inclusive&lt;/code&gt; from the name as I never see myself needing a non-inclusive random number selection.&lt;/p&gt;
+        &lt;p&gt;The test for this was pretty simple too:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { describe, it, expect } from &apos;vitest&apos;
+        import { getRandomInt } from &apos;./utils&apos;
+        
+        describe(&apos;getRandomInt&apos;, () =&amp;gt; {
+        it(&apos;returns a number between min and max&apos;, () =&amp;gt; {
+        const min = 1;
+        const max = 2;
+        const randomInt = getRandomInt(min, max);
+        expect(randomInt).toBeGreaterThanOrEqual(min);
+        expect(randomInt).toBeLessThanOrEqual(max);
+        })
+        
+        it(&apos;returns an integer&apos;, () =&amp;gt; {
+        const randomInt = getRandomInt(1, 10);
+        expect(Number.isInteger(randomInt)).toBe(true);
+        })
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I discovered &lt;em&gt;after&lt;/em&gt; writing this that you can actually screw with &lt;code&gt;Math.random()&lt;/code&gt; which is cool af as the kids say, so I may return to this. But now let&apos;s turn to the dice stuff which got REALLY complicated, but in a fun way.&lt;/p&gt;
+        &lt;p&gt;My first version went a bit like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { getRandomInt } from &apos;./utils.ts&apos;;
+        
+        export const dice = {
+        
+        /*
+        xdy
+        
+        x rolls of a y sided dice
+        
+        xdy+n
+        xdy
+        
+        x rolls of a y side dice + n
+        */
+        roll(styleInput: string): number {
+        let bonus:number=0, total:number=0;
+        let bonusStr:string=&apos;&apos;;
+        let style = &apos;&apos;;
+        
+        if(styleInput.indexOf(&apos;+&apos;) &amp;gt; -1) {
+        [style, bonusStr] = styleInput.split(&apos;+&apos;);
+        bonus = Number(bonusStr);
+        } else style = styleInput;
+        
+        const [rollsStr, sidedStr] = style.split(&apos;d&apos;);
+        const rolls = Number(rollsStr);
+        const sided = Number(sidedStr);
+        
+        //console.log(rolls, sided);
+        for(let i=0;i&amp;lt;rolls;i++) {
+        total += getRandomInt(1, sided);
+        }
+        
+        total += Number(bonus);
+        return total;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And you&apos;ll notice it&apos;s a bit longer than the original version, and I don&apos;t mean more characters, I expected that, but some things took me a bit by surprise. Take this (original) line:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let [rolls, sided] = style.split(&apos;d&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My original code just coerced &lt;code&gt;rolls&lt;/code&gt; into a number, which is bad, but I tried this and it didn&apos;t work:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let [rolls:number, sided: number] = style.split(&apos;d&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which is obvious - the result of the string split function is strings. What didn&apos;t occur to me at the time was to chain to &lt;code&gt;map&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let [rolls, sided] = s.split(&apos;d&apos;).map(Number);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Live and learn, right? I built some basic tests for that and was curious what else I could do. I turned to my AI agent (Claude in this case) and just asked what other &apos;dice format&apos; options were available, and was pleasantly surprised to discover quite a few. In particular I thought these made sense:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Keep highest, lowest, using KH or KL. So for example, &lt;code&gt;3D6KH1&lt;/code&gt; means roll a six sided die three times, keep the highest one.&lt;/li&gt;
+        &lt;li&gt;Given a dice string input, what&apos;s the lowest value, and what&apos;s the highest value?&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;At this point, I decided to let AI help me write a bit of the code and handle updating the library to be a bit more flexible. The final result supports all of the above:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { getRandomInt } from &apos;./utils.ts&apos;;
+        
+        const VALID_ROLL_REGEX =
+        /^(\d*)d(\d+)(?:(kh|kl|dh|dl)(\d+))?([+-]\d+)?$/i;
+        
+        function validRoll(style: string): boolean {
+        return VALID_ROLL_REGEX.test(style);
+        }
+        
+        function parseRoll(styleInput: string) {
+        if (!validRoll(styleInput)) {
+        throw new Error(`Invalid dice roll style: ${styleInput}`);
+        }
+        
+        const match = styleInput.match(VALID_ROLL_REGEX)!;
+        
+        return {
+        rolls: match[1] ? Number(match[1]) : 1,
+        sided: Number(match[2]),
+        keepMode: match[3]?.toLowerCase(),
+        keepCount: match[4] ? Number(match[4]) : 0,
+        bonus: match[5] ? Number(match[5]) : 0,
+        };
+        }
+        
+        function applyKeepDrop(
+        dice: number[],
+        keepMode: string | undefined,
+        keepCount: number,
+        ): number[] {
+        if (!keepMode || keepCount === 0) {
+        return dice;
+        }
+        
+        dice.sort((a, b) =&amp;gt; a - b);
+        
+        switch (keepMode) {
+        case &apos;kh&apos;:
+        return dice.slice(-keepCount);
+        case &apos;kl&apos;:
+        return dice.slice(0, keepCount);
+        case &apos;dh&apos;:
+        return dice.slice(0, -keepCount);
+        case &apos;dl&apos;:
+        return dice.slice(keepCount);
+        default:
+        return dice;
+        }
+        }
+        
+        export function roll(styleInput: string): number {
+        const { rolls, sided, keepMode, keepCount, bonus } =
+        parseRoll(styleInput);
+        
+        const dice: number[] = [];
+        
+        for (let i = 0; i &amp;lt; rolls; i++) {
+        dice.push(getRandomInt(1, sided));
+        }
+        
+        const total = applyKeepDrop(dice, keepMode, keepCount)
+        .reduce((sum, die) =&amp;gt; sum + die, 0);
+        
+        return total + bonus;
+        }
+        
+        export function rollWithAdvantage(styleInput: string): number {
+        return Math.max(roll(styleInput), roll(styleInput));
+        }
+        
+        export function rollWithDisadvantage(styleInput: string): number {
+        return Math.min(roll(styleInput), roll(styleInput));
+        }
+        
+        export function minRoll(styleInput: string): number {
+        const { rolls, keepMode, keepCount, bonus } = parseRoll(styleInput);
+        const dice = Array(rolls).fill(1);
+        
+        return applyKeepDrop(dice, keepMode, keepCount)
+        .reduce((sum, die) =&amp;gt; sum + die, 0) + bonus;
+        }
+        
+        export function maxRoll(styleInput: string): number {
+        const { rolls, sided, keepMode, keepCount, bonus } =
+        parseRoll(styleInput);
+        const dice = Array(rolls).fill(sided);
+        
+        return applyKeepDrop(dice, keepMode, keepCount)
+        .reduce((sum, die) =&amp;gt; sum + die, 0) + bonus;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I won&apos;t share the entire test file (don&apos;t worry, I&apos;ll link to the repo in a bit), but as I mentioned above, you can actually &amp;quot;hack&amp;quot; random and that&apos;s really freaking sweet. For example, here is a test for rolls where you drop the lowest value:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;it(&apos;handles drop lowest&apos;, () =&amp;gt; {
+        const spy = vi.spyOn(Math, &apos;random&apos;)
+        .mockReturnValueOnce(0.1)  // first roll → low
+        .mockReturnValueOnce(0.9);  // second roll → high
+        
+        const result = roll(&apos;2d6dl1&apos;);
+        expect(result).toBe(6);
+        
+        spy.mockRestore();
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Looking at it just now I see the second mock isn&apos;t needed - I&apos;ll fix that (eventually, honest) - but you get the idea.&lt;/p&gt;
+        &lt;h2 id=&quot;the-bits%2C-and-nothing-but-the-bits...&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-bits%2C-and-nothing-but-the-bits...&quot;&gt;The bits, and nothing but the bits...&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So this isn&apos;t a &amp;quot;real&amp;quot; project, but I loved getting my feet wet in TypeScript and - tbh - just writing some darn code. The repo is here: https://github.com/cfjedimaster/typescript-stuff/tree/main/vite-one&lt;/p&gt;
+        &lt;p&gt;I&apos;ve already got an idea for a next project, one that will actually have a web presence, so I&apos;ll share that when I get the time.&lt;/p&gt;
+        &lt;p&gt;And this is where you come in. I&apos;d be willing to bet 99% of you are writing TypeScript daily and have plenty of comments - so let me know. Just be gentle. Please.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building a Document Q&amp;A System with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
         &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
@@ -46,7 +391,7 @@
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -72,7 +417,7 @@
       <title>Weather Nerd? Check out My OSX Radar Widget</title>
       <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
       <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
         &lt;p&gt;
@@ -87,7 +432,7 @@
       <title>Like LEGO? Got a Mac? Get My Screensaver</title>
       <link>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</link>
       <guid>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning my fabulous readers. This will be a quick post as I just wanted to share something cool I built with Cursor over the past couple of days - a LEGO screensaver. I&apos;m a huge fan of &amp;quot;show me something random from something I like&amp;quot; and have built multiple bots in that vein. I recently discovered &lt;a href=&quot;https://rebrickable.com/downloads/&quot;&gt;Rebrickable&apos;s LEGO datasets&lt;/a&gt; which contains a CSV file of LEGO sets. The data looks like so:&lt;/p&gt;
         &lt;pre&gt;&lt;code&gt;set_num,name,year,theme_id,num_parts,img_url
@@ -112,7 +457,7 @@
       <title>Links For You (8/23/26)</title>
       <link>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</link>
       <guid>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. Once again, I&apos;m a bit behind on these posts, but I just got back from two weeks of travel and I&apos;m so happy to be home for a while. My last trip was pretty stressful. On the way out, our plane blew a tire (or tires) which required an emergency landing in Dallas (which is where we were scheduled to stop anyway). Everything ended up fine, but as I said, stressful. Then coming home we were &lt;em&gt;minutes&lt;/em&gt; from our destination when the pilot had to turn around due to storms. You can actually see exactly where in the route where they said NOPE:&lt;/p&gt;
         &lt;p&gt;
@@ -142,7 +487,7 @@
       <title>Using the Cursor SDK to Build a Project Documenter</title>
       <link>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</link>
       <guid>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared a few posts recently talking about how I&apos;m using Cursor to learn and employ agentic development. Primarily that work has all been done via our Agent view, but this is just one of the surfaces you can use with the platform. I had a chance recently to try out the SDK and I thought I&apos;d share a little demo I built with it.&lt;/p&gt;
         &lt;p&gt;First - some explanation would be helpful. You can use Cursor with the desktop application, on the web, via CLI, on iOS, even via API. But the SDK lets you use the platform from your code. There&apos;s an SDK for &lt;a href=&quot;https://cursor.com/docs/sdk/typescript&quot;&gt;TypeScript&lt;/a&gt;, &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;Python&lt;/a&gt;, and a &lt;a href=&quot;https://cursor.com/docs/sdk/bridge&quot;&gt;bridge&lt;/a&gt; that embeds a TypeScript server and lets you use any language. Honestly I&apos;ve never seen that before in a platform and it&apos;s pretty freaking cool. (And... just to remind folks, I do work at Cursor so I&apos;m biased, but that&apos;s absolutely an honest opinion.)&lt;/p&gt;
@@ -427,7 +772,7 @@
       <title>&lt;file-preview&gt; - A simple web component for file previews</title>
       <link>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</link>
       <guid>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This was a &amp;quot;I can&apos;t fall asleep and my mind is wondering&amp;quot; type of idea and honestly, I&apos;m surprised at how good it came out. For a while now I&apos;ve shared demos where a user picks an image and ... something. It doesn&apos;t matter. But I typically add a preview of the image when it&apos;s selected. This works because once the user selects a file on their local system, JavaScript can then access the bits of that file, making it trivial then to render it. The idea I had, late at night, was simple - what if this could be a web component and expanded to cover different file types?&lt;/p&gt;
         &lt;p&gt;In my imagination, it would look something like this in code:&lt;/p&gt;
@@ -482,7 +827,7 @@
       <title>Links For You (8/2/26)</title>
       <link>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</link>
       <guid>https://www.raymondcamden.com/2026/08/02/links-for-you-8226</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy August folks. Louisiana is celebrating the approach of Fall by gradually increasing the temperatures to roughly that of the surface of the sun. Last night we saw the new Spider-Man, which was really good, although not as fantastic as &amp;quot;No Way Home&amp;quot;. The point of these posts is for me to share content from other folks, but I&apos;ll remind folks of my &lt;a href=&quot;https://youtube.com/user/theraymondcamden&quot;&gt;Youtube channel&lt;/a&gt;. This past week I shared a few new videos demonstrating some cool stuff with Cursor so if you&apos;ve not checked them out yet, give me a quick watch and let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;web-browsing-on-your-gaming-console&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#web-browsing-on-your-gaming-console&quot;&gt;Web browsing on your gaming console&lt;/a&gt;&lt;/h2&gt;
@@ -513,7 +858,7 @@
       <title>Updating my Watch Site for Algolia Support</title>
       <link>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</link>
       <guid>https://www.raymondcamden.com/2026/07/29/updating-my-watch-site-for-algolia-support</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
+      <pubDate>Sat, 19 Sep 2026 17:51:50 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Alright, so I was supposed to share this a bit quicker, but life, work, etc, kept me busy. I&apos;ve had this particular change up for a few days but I&apos;m just now getting around to blogging about it. What changes?&lt;/p&gt;
         &lt;ul&gt;
@@ -791,177 +1136,6 @@
         &lt;p&gt;If you want to see everything behind the aggregator, you can check out the repo here: &lt;a href=&quot;https://github.com/cfjedimaster/iwatchwatches&quot;&gt;https://github.com/cfjedimaster/iwatchwatches&lt;/a&gt;. Note that the readme was updated by Cursor and it did a dang good job. It handled updating the configuration as well as the &lt;code&gt;Changes&lt;/code&gt; section.&lt;/p&gt;
         &lt;p&gt;The next change will be somewhat larger - a web based interface to add new feeds to the site - behind authentication of course.&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@shahrukh_rehman1?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Shahrukh Rehman&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/silver-and-black-chronograph-watch-05IxAEjVNl0?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Building Agentically and Celebrating Watches</title>
-      <link>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</link>
-      <guid>https://www.raymondcamden.com/2026/07/24/building-agentically-and-celebrating-watches</guid>
-      <pubDate>Fri, 18 Sep 2026 18:09:52 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve shared past experiences with vibe coding and it&apos;s been a fascinating way to experiment and build on a small scale, but while it works well for POCs and other small utilities (I won&apos;t say &apos;toys&apos; as I&apos;ve built useful, if small, things now multiple times), it isn&apos;t really a &amp;quot;process&amp;quot; and not one that would work over a project with a longer time frame. This is where &amp;quot;Agentic Development&amp;quot; comes in. It&apos;s not always referred to as such and it&apos;s a huge topic, but let me give you my opinion on it and then demonstrate how I used it to build my newest project, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;I Watch Watches&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;agentic-development-in-a-nutshell&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agentic-development-in-a-nutshell&quot;&gt;Agentic Development in a Nutshell&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Vibe coding is traditionally defined by a quick prompt passed to an AI agent. There may be a few rounds of changes afterwards, but the process is relatively simple and straightforward. Acceptable for a team of one and smaller projects, but not necessarily a &amp;quot;real&amp;quot; enterprise/larger environment.&lt;/p&gt;
-        &lt;p&gt;Agentic development integrates your AI agent or harness across an entire development process. Broadly speaking it entails:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;A planning stage where you may start with a prompt, but the agent doesn&apos;t write any code, but instead creates a plan. That plan is shared with you and you have the opportunity to adjust as you see fit. Add something, remove something, tweak something, this is where you and the agent agree on not just what is being done, but how. For developers who worry about AI taking your job, this is where your experience comes into play. I &lt;em&gt;always&lt;/em&gt; validate that the plan makes sense and is building how I (or my organization) would build.&lt;/li&gt;
-        &lt;li&gt;An implementation phase where the AI agent takes over - but even here the process can be far different from simple vibe coding. A good harness (like Cursor!) will let you define rules (&amp;quot;always do X&amp;quot;) as well as skills (&amp;quot;when doing Y, here is how we do it&amp;quot;) which lets you give firm guardrails for how code will be generated. This is especially useful in cases where you are working on a team within a large codebase and need to ensure you follow the established procedures for that project.&lt;/li&gt;
-        &lt;li&gt;Validation is also part of the process. A good agent/harness will not just build something but also validate that it actually worked. This could also be combined with creating tests to cover new features.&lt;/li&gt;
-        &lt;li&gt;On top of validating the change worked, you can also add an additional level of verification, so for example, when a PR is submitted, you can use an agent (at Cursor this is Bugbot, but of course other options exist).&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;That&apos;s a pretty high level overview, but the end result is that you&apos;ve got AI agents working for you in a &lt;em&gt;much&lt;/em&gt; more controlled, and reliable way. Honestly it&apos;s already changed how I do a lot of my work even in cases where I&apos;ve written every bit of code. Having the agent there to help validate and check what I&apos;ve done is like having a virtual intern who never complains.&lt;/p&gt;
-        &lt;p&gt;So, how about an example?&lt;/p&gt;
-        &lt;h2 id=&quot;watches-are-my-bling&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#watches-are-my-bling&quot;&gt;Watches are my bling&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I&apos;ve been a huge fan of watches for pretty much all my life. I remember Swatches as a kid (I literally just signed up for a pre-order for a new one) and as I got older, I started collecting more and more watches and finding myself stopping at jewelry stores just to peruse their collections. I&apos;ve got some cheap ones, some expensive ones, and some weird ones, but I love them all.&lt;/p&gt;
-        &lt;p&gt;This is my current favorite and I&apos;ve got it on right now: &lt;a href=&quot;https://www.camdenwatchcompany.com/products/no253mementomorirosegold&quot;&gt;Memento Mori Rose&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/07/watch.png&quot; loading=&quot;lazy&quot; alt=&quot;Memento Mori&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Yes, this is a Camden watch, and the name initially caught my attention, but their collection is incredible (I have two). Even better, they literally check the timezone of where their watches are being shipped and will set the watch to the appropriate time.&lt;/p&gt;
-        &lt;p&gt;My typical way of discovering new watches is either seeing it on a person or seeing it on Facebook. Shockingly, if you Like a few watch ads, you end up seeing a lot more, and honestly I&apos;m fine with that. (Facebook is where I first saw the Camden Watch company.) A few days ago it finally clicked that there&apos;s probably a decent amount of watch blogs out there, why not start aggregating them so I can see watches my own way - in my own app.&lt;/p&gt;
-        &lt;h2 id=&quot;how-i-started&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#how-i-started&quot;&gt;How I Started&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;So obviously I&apos;m using Cursor (where I work, just as a reminder!) and it&apos;s got a dedicated &lt;a href=&quot;https://cursor.com/docs/agent/plan-mode&quot;&gt;Plan mode&lt;/a&gt;. I switched to that and started off with this prompt:&lt;/p&gt;
-        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
-        &lt;zero-md&gt;
-        &lt;template data-append&gt;
-        &lt;style&gt;
-        .markdown-body {
-        padding: 20px;
-        margin-bottom: 30px;
-        }
-        &lt;/style&gt;
-        &lt;/template&gt;
-        &lt;script type=&quot;text/markdown&quot;&gt;
-        &lt;p&gt;I want to build an RSS aggregator dedicated to watches. This is for consumers, people who love watches. The stack should be:&lt;/p&gt;
-        &lt;p&gt;Netlify for hosting
-        Netlify Database to store a table of feeds (name of site, url to site, rss url to site) and a table of feed items. That table drives the UI and is also used to recognized new versus existing feed items.
-        Astro 7.x (latest Astro)
-        Front end code should be minimal as it&apos;s just rendering database items, but if any code is needed, use vanilla JS or Alpine.js if the code gets complex (again, i tshouldn&apos;t)&lt;/p&gt;
-        &lt;p&gt;the app right now will one public page, the main page showing feed items aggregated. generally an aggregator is a list of links with title, time posted, the blog name, and a brief synopsis. that would be ok, but im kinda open to other UX options - perhaps a Card list of items in rows left to right (to the edge of screen of course)&lt;/p&gt;
-        &lt;p&gt;we also need a way to search + perhaps a filtering by tag system, although i checked two feeds and both didnt have categories or tags - so lets assume just search&lt;/p&gt;
-        &lt;p&gt;i will provide (at the very end of this prompt) a JSON list of feeds to begin with. (adding, editing, and deleting feeds is a V2 issue)&lt;/p&gt;
-        &lt;p&gt;design wise, i like dark, but lets support light/dark mode and store the preference in local storage so it persists&lt;/p&gt;
-        &lt;p&gt;feeds are driven by a serverless function. Astro supports API routes and in theory i could build a cron job, but lets use a Netlify Serverless function that has a CRON schedule (once a day i think) is fine. that function gets all the feeds, gets each item, and uses the item url as a unique identifier in the database to recognize if it needs to add an item&lt;/p&gt;
-        &lt;p&gt;i believe that&apos;s it. ask your follow up questions and also i want to see 2 to 3 design mocks for the front end before you begin&lt;/p&gt;
-        &lt;/script&gt;
-        &lt;/zero-md&gt;
-        &lt;p&gt;My stack was Astro, on Netlify, using their built-in database support, which is not something I&apos;ve actually used before. Note I gave direction on how aggregation should occur, specifically Netlify CRON-based serverless functions.&lt;/p&gt;
-        &lt;p&gt;When I submitted this, I got a few follow-up questions including my mocks. At some point (honestly I can&apos;t find it now), I directed Cursor to &lt;em&gt;not&lt;/em&gt; implement search for now. (If you visit the site today, search &lt;em&gt;does&lt;/em&gt; work, but that was a second session which I&apos;ll turn into a second post.) I also said I wanted pagination with ten items per page, but I told Cursor to ensure that number was easily configurable. I&apos;d say the follow-up questions and back and forth was probably about ten more minutes of work. When done, this plan was created. Note that the links below won&apos;t work as they are local to my project. They absolutely did work post creation which was super helpful to verify how things were done.&lt;/p&gt;
-        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
-        &lt;zero-md&gt;
-        &lt;template data-append&gt;
-        &lt;style&gt;
-        .markdown-body {
-        padding: 20px;
-        margin-bottom: 30px;
-        }
-        &lt;/style&gt;
-        &lt;/template&gt;
-        &lt;script type=&quot;text/markdown&quot;&gt;
-        &lt;h1 id=&quot;build-i-watch-watches&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#build-i-watch-watches&quot;&gt;Build I Watch Watches&lt;/a&gt;&lt;/h1&gt;
-        &lt;h2 id=&quot;foundation-and-database&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#foundation-and-database&quot;&gt;Foundation and database&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Scaffold Astro 7 with the Netlify adapter and server rendering in &lt;a href=&quot;astro.config.mjs&quot;&gt;&lt;code&gt;astro.config.mjs&lt;/code&gt;&lt;/a&gt;; add Netlify Database, Drizzle beta packages, and RSS/Atom parsing dependencies.&lt;/li&gt;
-        &lt;li&gt;Define &lt;code&gt;feeds&lt;/code&gt; and &lt;code&gt;feed_items&lt;/code&gt; schemas in &lt;a href=&quot;src/db/schema.ts&quot;&gt;&lt;code&gt;src/db/schema.ts&lt;/code&gt;&lt;/a&gt;. Enforce uniqueness on feed URLs and article URLs, relate items to feeds, and index publication time for newest-first rendering.&lt;/li&gt;
-        &lt;li&gt;Add a generated migration under &lt;a href=&quot;drizzle/&quot;&gt;&lt;code&gt;drizzle/&lt;/code&gt;&lt;/a&gt; that creates both tables and seeds the six supplied feeds. Netlify will apply hosted migrations during deploy; local setup will use the Netlify Database CLI.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;daily-feed-ingestion&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#daily-feed-ingestion&quot;&gt;Daily feed ingestion&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Implement &lt;a href=&quot;netlify/functions/update-feeds.ts&quot;&gt;&lt;code&gt;netlify/functions/update-feeds.ts&lt;/code&gt;&lt;/a&gt; using the modern Netlify scheduled-function API with &lt;code&gt;schedule: &amp;quot;@daily&amp;quot;&lt;/code&gt;.&lt;/li&gt;
-        &lt;li&gt;Fetch the six feeds concurrently, parse both RSS and Atom, normalize title/link/date/synopsis, extract an image from common enclosure/media/content fields, and insert new items with an article-URL conflict guard.&lt;/li&gt;
-        &lt;li&gt;Isolate failures per feed with &lt;code&gt;Promise.allSettled&lt;/code&gt;, log feed-level outcomes, and keep execution within the scheduled function’s 30-second limit.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;public-astro-page&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#public-astro-page&quot;&gt;Public Astro page&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Define &lt;code&gt;ITEMS_PER_PAGE = 10&lt;/code&gt; in &lt;a href=&quot;src/config.ts&quot;&gt;&lt;code&gt;src/config.ts&lt;/code&gt;&lt;/a&gt; so the page size can be changed in one place after reviewing live data.&lt;/li&gt;
-        &lt;li&gt;Query feed items server-side in &lt;a href=&quot;src/pages/index.astro&quot;&gt;&lt;code&gt;src/pages/index.astro&lt;/code&gt;&lt;/a&gt; using a validated &lt;code&gt;?page=&lt;/code&gt; parameter, a total-count query, and database &lt;code&gt;LIMIT&lt;/code&gt;/&lt;code&gt;OFFSET&lt;/code&gt;; join source names and links, then render the first item on each page as the featured story and the other nine as a responsive magazine card grid matching Mock 2.&lt;/li&gt;
-        &lt;li&gt;Add semantic previous/next and numbered pagination controls, preserving a canonical first-page URL and returning an empty/not-found state for page numbers beyond the available results.&lt;/li&gt;
-        &lt;li&gt;Create small reusable Astro components under &lt;a href=&quot;src/components/&quot;&gt;&lt;code&gt;src/components/&lt;/code&gt;&lt;/a&gt; for the header, featured article, and article cards, including graceful image fallbacks and semantic external links.&lt;/li&gt;
-        &lt;li&gt;Add global responsive styling in &lt;a href=&quot;src/styles/global.css&quot;&gt;&lt;code&gt;src/styles/global.css&lt;/code&gt;&lt;/a&gt;: refined serif headings, sans-serif metadata, dark graphite/gold default styling, a complete light theme, and mobile/tablet layouts.&lt;/li&gt;
-        &lt;li&gt;Add minimal vanilla JavaScript for a no-flash theme preference stored in &lt;code&gt;localStorage&lt;/code&gt;. Render the search field as a clearly disabled/non-operational control ready for later Algolia wiring.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;configuration-and-verification&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#configuration-and-verification&quot;&gt;Configuration and verification&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;p&gt;Configure Netlify build/function settings in &lt;a href=&quot;netlify.toml&quot;&gt;&lt;code&gt;netlify.toml&lt;/code&gt;&lt;/a&gt;, document local database initialization, migrations, feed refresh, and deployment in &lt;a href=&quot;README.md&quot;&gt;&lt;code&gt;README.md&lt;/code&gt;&lt;/a&gt;, and ensure &lt;a href=&quot;.gitignore&quot;&gt;&lt;code&gt;.gitignore&lt;/code&gt;&lt;/a&gt; excludes &lt;code&gt;.netlify&lt;/code&gt; and local artifacts.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;Verify Astro type checking/build, migration validity, pagination boundaries and configurable page size, both theme states, responsive layouts, empty database behavior, malformed feed handling, and idempotent duplicate ingestion.&lt;/p&gt;
-        &lt;/script&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/zero-md&gt;
-        &lt;p&gt;I told Cursor to execute and it went to work. When it was done, I got this:&lt;/p&gt;
-        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
-        &lt;zero-md&gt;
-        &lt;template data-append&gt;
-        &lt;style&gt;
-        .markdown-body {
-        padding: 20px;
-        margin-bottom: 30px;
-        }
-        &lt;/style&gt;
-        &lt;/template&gt;
-        &lt;script type=&quot;text/markdown&quot;&gt;
-        &lt;h2 id=&quot;assistant&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#assistant&quot;&gt;Assistant&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I Watch Watches is built and passing &lt;code&gt;astro build&lt;/code&gt; / &lt;code&gt;astro check&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;What’s in place&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Astro 7 SSR + Netlify adapter&lt;/li&gt;
-        &lt;li&gt;Netlify Database schema (&lt;code&gt;feeds&lt;/code&gt;, &lt;code&gt;feed_items&lt;/code&gt;) with migrations + seed of your 6 feeds&lt;/li&gt;
-        &lt;li&gt;Daily scheduled function at &lt;code&gt;netlify/functions/update-feeds.ts&lt;/code&gt; (&lt;code&gt;@daily&lt;/code&gt;), unique on article URL&lt;/li&gt;
-        &lt;li&gt;Mock 2 UI: featured story + card grid, light/dark via &lt;code&gt;localStorage&lt;/code&gt;, disabled search placeholder&lt;/li&gt;
-        &lt;li&gt;Pagination at 10/page via &lt;code&gt;ITEMS_PER_PAGE&lt;/code&gt; in &lt;a href=&quot;src/config.ts&quot;&gt;&lt;code&gt;src/config.ts&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;&lt;strong&gt;To run locally&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;npx netlify database init --yes   # if not already set up
-        npm run db:migrate
-        npx netlify dev
-        curl http://localhost:8888/.netlify/functions/update-feeds
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;After deploy, trigger that function once so the first articles land before the daily cron.&lt;/p&gt;
-        &lt;/script&gt;
-        &lt;/zero-md&gt;
-        &lt;p&gt;I love, love, love how it ended with clear instructions on how to test myself, specifically the Netlify CLI database stuff that I&apos;d never used before. And I knew how to run a Netlify serverless function already, but the &lt;code&gt;curl&lt;/code&gt; command was a handy reminder. (As an FYI, a CRON serverless function for Netlify &lt;em&gt;can&lt;/em&gt; be called via HTTP locally, but not in production. That&apos;s handy!)&lt;/p&gt;
-        &lt;p&gt;At this point I was able to test and it worked perfectly... almost. One blog&apos;s items were returning broken images. I asked Cursor about that:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;it looks like the media for ablogtowatch all return broken images. investigate why
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And here&apos;s the response. Honestly, I do not think I could have figured this out on my own:&lt;/p&gt;
-        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
-        &lt;zero-md&gt;
-        &lt;template data-append&gt;
-        &lt;style&gt;
-        .markdown-body {
-        padding: 20px;
-        margin-bottom: 30px;
-        }
-        &lt;/style&gt;
-        &lt;/template&gt;
-        &lt;script type=&quot;text/markdown&quot;&gt;
-        &lt;p&gt;Found it: aBlogtoWatch&apos;s image server uses referer-based hotlink protection.&lt;/p&gt;
-        &lt;p&gt;The feed parsing is fine — we extract a valid URL like &lt;code&gt;https://www.ablogtowatch.com/wp-content/uploads/2026/07/CronusArt-RT06-SP-FI-768x346.jpg&lt;/code&gt; from the &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; inside &lt;code&gt;content:encoded&lt;/code&gt;. The URL itself works. What breaks is loading it from &lt;em&gt;our&lt;/em&gt; page. Test results against that exact URL:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;No &lt;code&gt;Referer&lt;/code&gt; header → &lt;strong&gt;200&lt;/strong&gt;, image served&lt;/li&gt;
-        &lt;li&gt;Browser user agent, no referer → &lt;strong&gt;200&lt;/strong&gt;&lt;/li&gt;
-        &lt;li&gt;Browser user agent + cross-site &lt;code&gt;Referer&lt;/code&gt; (what a browser sends when our page embeds their image) → &lt;strong&gt;403&lt;/strong&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;So the CDN in front of aBlogtoWatch rejects any image request whose referer isn&apos;t their own site. Hodinkee, Fratello, etc. don&apos;t do this, which is why only aBlogtoWatch cards show broken images.&lt;/p&gt;
-        &lt;p&gt;Two ways to fix it:&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;&lt;strong&gt;Add &lt;code&gt;referrerpolicy=&amp;quot;no-referrer&amp;quot;&lt;/code&gt; to the &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; tags&lt;/strong&gt; in &lt;code&gt;ArticleCard.astro&lt;/code&gt; and &lt;code&gt;FeaturedArticle.astro&lt;/code&gt;. The browser then omits the referer entirely, and their server returns 200 (confirmed above). One-line change, no infrastructure.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;Proxy through Netlify Image CDN&lt;/strong&gt; (&lt;code&gt;/.netlify/images?url=...&lt;/code&gt; with their domain in the remote-images allowlist). More robust — also normalizes sizes and formats — but the fetch originates from Netlify with no referer anyway, so it solves the same problem with more moving parts.&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;Option 1 is the fix I&apos;d make; want me to apply it?&lt;/p&gt;
-        &lt;/script&gt;
-        &lt;/zero-md&gt;
-        &lt;p&gt;I selected the first option and let Cursor implement it.&lt;/p&gt;
-        &lt;p&gt;After this, I made a few more changes:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Initially the footer just repeated the title. I had it link to my blog instead.&lt;/li&gt;
-        &lt;li&gt;Cursor can generate favicons, so I asked for three options and picked one. When I did, Cursor went ahead and wired it into the HTML.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;what&apos;s-next&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-next&quot;&gt;What&apos;s Next&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;I hope this made sense and I hope the power and flexibility of how I built it is clear. As I mentioned, I&apos;ve already done improvements, but I want to cover that in the next blog post. You can find the site here, &lt;a href=&quot;https://iwatchwatches.netlify.app/&quot;&gt;https://iwatchwatches.netlify.app/&lt;/a&gt;. I may spring for a real domain later. You can find the code here, &lt;a href=&quot;https://github.com/cfjedimaster/iwatchwatches&quot;&gt;https://github.com/cfjedimaster/iwatchwatches&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
