@@ -4,7 +4,131 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 21 Sep 2026 20:19:14 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 22 Sep 2026 18:55:56 GMT</lastBuildDate>
+    <item>
+      <title>Quoting @therealcornpop</title>
+      <link>https://simonwillison.net/2026/Sep/22/therealcornpop/</link>
+      <guid>https://simonwillison.net/2026/Sep/22/therealcornpop/</guid>
+      <pubDate>Tue, 22 Sep 2026 18:03:21 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://www.tiktok.com/@therealcornpop/video/7687243097801051422&quot;&gt;&lt;p&gt;Hey, you know it&apos;s like super obvious if you&apos;re using AI to write your scripts for TikTok and YouTube, right? [...] It&apos;s not just the general AI-isms of &quot;it&apos;s not X, it&apos;s Y&quot;, or the rule of three, or the really weird broken staccato-like way of writing where you just say a lot of things with all these punctuation marks. and it sounds really deep, but it&apos;s not.&lt;/p&gt;
+        &lt;p&gt;It&apos;s the lack of &lt;em&gt;anything&lt;/em&gt;. It&apos;s the lack of a definitive sort of spear of your voice. It&apos;s the fact I can tell you don&apos;t have opinions about the thing that you&apos;re talking about.&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.tiktok.com/@therealcornpop/video/7687243097801051422&quot;&gt;@therealcornpop&lt;/a&gt;, on TikTok&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/tiktok&quot;&gt;tiktok&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm-typesafe 0.1a0</title>
+      <link>https://simonwillison.net/2026/Sep/22/llm-typesafe/</link>
+      <guid>https://simonwillison.net/2026/Sep/22/llm-typesafe/</guid>
+      <pubDate>Tue, 22 Sep 2026 15:54:16 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-typesafe/releases/tag/0.1a0&quot;&gt;llm-typesafe 0.1a0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I built this new plugin for &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt; to add support for &lt;a href=&quot;https://simonwillison.net/2026/Sep/21/jev/&quot;&gt;TypeSafe AI&apos;s new Jev model&lt;/a&gt;. Install it like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm install llm-typesafe
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Then set an API key (&lt;a href=&quot;https://console.typesafe.ai/&quot;&gt;get one here&lt;/a&gt;, the waitlist seems to move pretty fast):&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm keys set typesafe
+        # Paste key
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And now you can ask yes/no &quot;noul&quot; questions like this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm -m jev &apos;Please refund my last payment.&apos; \
+        -s &apos;Does this message explicitly request a refund?&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Output:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;{&quot;type&quot;: &quot;noul&quot;, &quot;noul&quot;: 0.99}
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Or choice questions like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;cat message.txt &lt;span class=&quot;pl-k&quot;&gt;|&lt;/span&gt; llm -m jev \
+        -s &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;Which team should handle this message? If billing and technical issues both occur, choose billing.&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; \
+        -o answer_type choice \
+        -o criteria &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;billing&quot;:&quot;Charges, invoices, payments, or refunds&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;technical&quot;:&quot;Problems installing or using the product&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;other&quot;:&quot;Neither category fits&quot;&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;  }&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;Or scoring questions like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;cat report.txt &lt;span class=&quot;pl-k&quot;&gt;|&lt;/span&gt; llm -m jev \
+        -s &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;How reproducible is the problem described in this report?&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; \
+        -o answer_type score \
+        -o criteria &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;[&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;No reproduction instructions&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;Some instructions, but important steps are missing&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;Complete steps with expected and actual results&quot;&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;  ]&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;See &lt;a href=&quot;https://github.com/simonw/llm-typesafe/blob/main/README.md&quot;&gt;the README&lt;/a&gt; for more details.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jev&quot;&gt;jev&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Jev introduces a new shape of LLM - System One, aka Decision Models</title>
+      <link>https://simonwillison.net/2026/Sep/21/jev/</link>
+      <guid>https://simonwillison.net/2026/Sep/21/jev/</guid>
+      <pubDate>Mon, 21 Sep 2026 23:09:20 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Last week &lt;a href=&quot;https://typesafe.ai/&quot;&gt;TypeSafe AI&lt;/a&gt; unveiled &lt;a href=&quot;https://typesafe.ai/blog/introducing-system-one-models-and-jev&quot;&gt;Jev&lt;/a&gt;, their first example of a new category of model that they are calling &quot;System One models&quot; (I&apos;m with Maggie Appleton, I think &quot;decision models&quot; is &lt;a href=&quot;https://twitter.com/Mappletons/status/2101560333441610133&quot;&gt;a better name&lt;/a&gt; for these). Jev is an interesting variant on the usual LLM format: it still accepts text inputs, but instead of text output it returns floating point numbers corresponding to categories, yes/no questions, ratings, and associated confidence scores.&lt;/p&gt;
+        &lt;p&gt;TypeSafe describe Jev like this:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Think of Jev as a frontier-intelligence function call: unstructured state in, typed probabilistic decisions out.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;It&apos;s also very fast, and &lt;em&gt;really cheap&lt;/em&gt;. Regular LLMs &lt;a href=&quot;https://www.llm-prices.com&quot;&gt;are priced&lt;/a&gt; in terms of input and output tokens, with output generally charged at significantly higher rates. Jev charges only for input - output is free - and the input price of their first model is $0.042 per million tokens - cheaper even than OpenAI&apos;s &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-5-nano&quot;&gt;GPT-5 Nano&lt;/a&gt; ($0.05/million).&lt;/p&gt;
+        &lt;p&gt;Jev lets you ask questions about text or semi-structured data. You compose a &quot;state&quot; object containing a string, array of strings, or set of name-value pairs - this might describe an article, or a customer, or any other kind of record. You then send that to their API with one or more questions, and get a reply back for each.&lt;/p&gt;
+        &lt;p&gt;You can ask three kinds of questions:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Yes/No questions, which Jev calls &quot;Noul&quot; questions - their CEO &lt;a href=&quot;https://news.ycombinator.com/item?id=49717558#49718407&quot;&gt;confirmed on Hacker News&lt;/a&gt; that this is short for Bernoulli, from the &lt;a href=&quot;https://en.wikipedia.org/wiki/Bernoulli_distribution&quot;&gt;Bernoulli distribution&lt;/a&gt;. You pose a statement and get back a floating point number between 0 and 1 for how confident the model is that the statement is true.&lt;/li&gt;
+        &lt;li&gt;Choice questions, where the model picks one from a set of provided options - actually a confidence score plus a probability distribution across all of the options.&lt;/li&gt;
+        &lt;li&gt;Score questions, where you provide sequence of numeric levels with descriptions and it provides a floating point score somewhere along that range.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The Jev API can accept a single document (&quot;state&quot;) and as many questions as you can cram into the context window. Questions are evaluated in parallel, so sending many questions should take a similar time to sending just one.&lt;/p&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://docs.typesafe.ai/model-jaggedness/jev-1.13&quot;&gt;Jev 1.13 jaggedness&lt;/a&gt; documentation offers useful guidance as to Jev&apos;s strengths and weaknesses. It&apos;s currently not great with numbers, dates, or &quot;adversarial content&quot;.&lt;/p&gt;
+        &lt;p&gt;I think the &lt;strong&gt;decision model&lt;/strong&gt; framing is useful for understanding where to use Jev. It&apos;s great for anything that can be expressed as a classification task - think spam detection, suggesting labels, prioritization and ranking.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve also been experimenting with it for search reranking, where you fetch 100 likely matches using an inexpensive algorithm like BM25, then have Jev score those 100 candidates for relevance against the original query.&lt;/p&gt;
+        &lt;h4 id=&quot;black-boxes-are-back-in-fashion&quot;&gt;Black boxes are back in fashion&lt;/h4&gt;
+        &lt;p&gt;Something I&apos;ve found a little uncomfortable about Jev is how it very much represents a regression even further towards black box machine learning systems.&lt;/p&gt;
+        &lt;p&gt;LLMs are black boxes already - you can ask them to justify their decisions, but you can&apos;t guarantee that what they say is useful or accurate.&lt;/p&gt;
+        &lt;p&gt;Jev doesn&apos;t even give you that: put in all the text you want, the only thing you&apos;re going to get back is a floating point number. If Jev marks something as spam, which content signals tipped it off?&lt;/p&gt;
+        &lt;p&gt;This also means that concerns about bias should be front and center. I really hope nobody uses Jev to rank job applicants - that floating point number could conceal all manner of unseen bias baked into the models, and experimentally picking that bias apart is going to be a tricky business.&lt;/p&gt;
+        &lt;p&gt;(I tried one experiment where I had Jev score every city in the San Francisco Bay Area on a yes/no answer to whether they were a &quot;Good city?&quot; - it rated &lt;a href=&quot;https://en.wikipedia.org/wiki/Cupertino,_California&quot;&gt;Cupertino&lt;/a&gt; top and &lt;a href=&quot;https://en.wikipedia.org/wiki/East_Palo_Alto,_California&quot;&gt;East Palo Alto&lt;/a&gt; bottom. Huh.)&lt;/p&gt;
+        &lt;p&gt;In practice, this all means that evals and structured experiments are even more important than they are for regular LLM projects. Thankfully, Jev is so cheap that running hundreds or even thousands of experimental prompts through it costs just a few cents.&lt;/p&gt;
+        &lt;h4 id=&quot;unconventional-uses-for-jev&quot;&gt;Unconventional uses for Jev&lt;/h4&gt;
+        &lt;p&gt;It&apos;s been really fun watching the wider community come up with potential use-cases for Jev over the past few days. Here are some creative ones that caught my eye:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;
+        &lt;a href=&quot;https://github.com/kyle-pena-nlp/jevchat/&quot;&gt;jevchat&lt;/a&gt; by Kyle Pena turns Jev into a (terrible) chat model. &quot;At every step it asks Jev one question: Given the user&apos;s question and the reply written so far, which symbol comes next?&quot;. &lt;a href=&quot;https://news.ycombinator.com/item?id=49778162#49778423&quot;&gt;ericpruitt on Hacker News&lt;/a&gt;: &quot;It&apos;s the digital equivalent of Morty speaking with the death crystal&quot;.&lt;/li&gt;
+        &lt;li&gt;
+        &lt;a href=&quot;https://github.com/f/jev-leftpad&quot;&gt;jev-leftpad&lt;/a&gt; by Fatih Kadir Akın implements &lt;a href=&quot;https://www.npmjs.com/package/left-pad&quot;&gt;left-pad&lt;/a&gt; with the prompt &quot;How many spaces are needed before value to reach targetLength?&quot; and &lt;a href=&quot;https://github.com/f/jev-leftpad/blob/4f405354de756cc372826d19aa8dfbee2b675778/src/index.js#L9-L30&quot;&gt;a choice query&lt;/a&gt; allowing options from &quot;0 spaces are needed&quot; to &quot;10 spaces are needed&quot;.&lt;/li&gt;
+        &lt;li&gt;
+        &lt;a href=&quot;https://gist.github.com/cablehead/bdf9ad946ceb26d9008976e49c9bfbbb&quot;&gt;jev-2048&lt;/a&gt; by Andy Gayton uses Jev to play &lt;a href=&quot;https://simple-jev.featherless.ai/cool-demo/2048/&quot;&gt;the 2048 sliding puzzle game&lt;/a&gt;.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h4 id=&quot;open-weight-recreations&quot;&gt;Open weight recreations&lt;/h4&gt;
+        &lt;p&gt;There&apos;s also been a flurry of projects attempting to create a model like Jev using on top of open weight models. &lt;a href=&quot;https://github.com/jaredpalmer/kev&quot;&gt;Kev&lt;/a&gt; is one interesting example, using Qwen 3.5 to produce 0.8B, 4B, and 9B models. Here&apos;s the &lt;a href=&quot;https://news.ycombinator.com/item?id=49783999&quot;&gt;accompanying Hacker News thread&lt;/a&gt;, where someone linked to a &lt;a href=&quot;https://benchmarkheaven.com/jev-models&quot;&gt;JevBench&lt;/a&gt; benchmark that has already cropped up to compare &quot;Jev-class decision models&quot;.&lt;/p&gt;
+        &lt;p&gt;Given Jev was released just under a week ago, the amount of activity around it is extremely impressive.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/evals&quot;&gt;evals&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-bias&quot;&gt;ai-bias&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jev&quot;&gt;jev&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Cloudflare Python Workers are now generally available</title>
+      <link>https://simonwillison.net/2026/Sep/21/cloudflare-python-worker/</link>
+      <guid>https://simonwillison.net/2026/Sep/21/cloudflare-python-worker/</guid>
+      <pubDate>Mon, 21 Sep 2026 22:25:44 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://blog.cloudflare.com/python-workers-ga/&quot;&gt;Cloudflare Python Workers are now generally available&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        After a two year preview, Cloudflare&apos;s support for running Python code in their server-side Workers platform is now stable: &quot;Python is now a first-class, fully supported language on the Cloudflare Developer Platform&quot;.&lt;/p&gt;
+        &lt;p&gt;A neat thing about this is how it works. Cloudflare are running Python compiled to WebAssembly via Pyodide in their V8-based &lt;a href=&quot;https://github.com/cloudflare/workerd&quot;&gt;workerd&lt;/a&gt; runtime.&lt;/p&gt;
+        &lt;p&gt;This comes with some limitations, &lt;a href=&quot;https://developers.cloudflare.com/workers/languages/python/stdlib/&quot;&gt;documented here&lt;/a&gt; - most notably both &lt;code&gt;multiprocessing&lt;/code&gt; and &lt;code&gt;threading&lt;/code&gt; are non-functional in the WebAssembly VM.&lt;/p&gt;
+        &lt;p&gt;One particularly interesting detail of this is the local development environment story - their &lt;a href=&quot;https://developers.cloudflare.com/workers/languages/python/#the-pywrangler-cli-tool&quot;&gt;pywrangler&lt;/a&gt; development tool (confusingly packaged as &lt;a href=&quot;https://pypi.org/project/workers-py/&quot;&gt;workers-py&lt;/a&gt; on PyPI) runs a full local simulation of their stack, including executing code with Pyodide in WebAssembly in V8 in a 123MB &lt;code&gt;workerd&lt;/code&gt; binary, which for me ended up in &lt;code&gt;node_modules/@cloudflare/workerd-darwin-arm64/bin/workerd&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Python Workers represent a significant investment in the wider Python ecosystem by Cloudflare. The release announcement is credited to Gyeongjae Choi, Dominik Picheta, and Hood Chatham - Gyeongjae and Hood are both Pyodide core maintainers.
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49787142&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/cloudflare&quot;&gt;cloudflare&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pyodide&quot;&gt;pyodide&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Quoting voxium</title>
       <link>https://simonwillison.net/2026/Sep/20/voxium/</link>
@@ -504,93 +628,6 @@
         &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://www.nytimes.com/2026/09/12/opinion/ai-software-coding-apps.html&quot;&gt;Paul Ford&lt;/a&gt;, A.I. Was Supposed to Give Us New Killer Apps. What Happened?&lt;/p&gt;
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/paul-ford&quot;&gt;paul-ford&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/deep-blue&quot;&gt;deep-blue&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>OpenAI agents attacked RubyGems back in May</title>
-      <link>https://simonwillison.net/2026/Sep/12/openai-agents-rubygems/</link>
-      <guid>https://simonwillison.net/2026/Sep/12/openai-agents-rubygems/</guid>
-      <pubDate>Sat, 12 Sep 2026 00:42:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;a href=&quot;https://www.rubyhack.ai/&quot;&gt;OpenAI agents carried out an undisclosed attack on RubyGems&lt;/a&gt; is a new bombshell report from Spencer Kitts, Thomas Larsen, and Sydney Von Arx - three of the four authors of the &lt;a href=&quot;https://collusion.wiki/&quot;&gt;report on the agent attack on disused wikis&lt;/a&gt; (&lt;a href=&quot;https://simonwillison.net/2026/Sep/4/rogue-agent-wikis/&quot;&gt;previously&lt;/a&gt;) last week.&lt;/p&gt;
-        &lt;p&gt;This time they&apos;re noting that it looks very likely that an OpenAI agent swarm was behind an attack against the RubyGems package repository first reported on May 12th &lt;a href=&quot;https://twitter.com/maciejmensfeld/status/2054164602577940619&quot;&gt;by Maciej Mensfeld of the RubyGems security team&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;We&apos;re dealing with a major malicious attack on @rubygems right now. Signups are paused for the time being.&lt;/p&gt;
-        &lt;p&gt;Hundreds of packages involved - mostly targeting us, but some carrying exploits. The team has been on this for hours. More details to follow once we&apos;re through it.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Those packages turned out to carry some very suspicious patterns:&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;Many of them included &quot;oai&quot; in their name, or the author field, or the fake email address they provided.&lt;/li&gt;
-        &lt;li&gt;The files they were accessing were similar in character to the files retrieved by the wiki agents, using similar tricks (r.jina.ai) - and OpenAI have confirmed the wiki agents were theirs.&lt;/li&gt;
-        &lt;li&gt;The code in the packages appeared to be LLM-authored.&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;I find point 2 the most convincing, given what we learned from the wiki attack when it was analyzed in September.&lt;/p&gt;
-        &lt;p&gt;Many of the packages were exploiting the &lt;a href=&quot;https://rubydoc.info/&quot;&gt;RubyDoc.info&lt;/a&gt; documentation build process to exfiltrate (public) data from UK government websites, presumably as part of an information gathering task similar to the research tasks processed by the wiki-exploiting agents. We know this because one agent helpfully left a comment:&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;# malicious crawler/exfil for Southwark Jan 2026 docs via rubydoc.info worker&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;They also attempted to steal API keys via an exploit that &lt;a href=&quot;https://blog.rubygems.org/2026/07/22/security-advisory-legacy-api-key-leak.html&quot;&gt;was patched over two months later&lt;/a&gt; - it&apos;s not clear if those attempts were successful.&lt;/p&gt;
-        &lt;p&gt;The thing that bothers me most about this incident is that the authors report that OpenAI had not disclosed to RubyGems that they were responsible for the attack prior to now. If that&apos;s true there are two options:&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;After the Hugging Face and Wiki attacks OpenAI were still unable to review their previous logs and determine that they had previously attacked RubyGems.&lt;/li&gt;
-        &lt;li&gt;They knew about the attack on RubyGems and made the decision &lt;em&gt;not&lt;/em&gt; to reach out to the RubyGems team about it.&lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;Both of these are bad!&lt;/p&gt;
-        &lt;p&gt;Given this incident, the &lt;a href=&quot;https://simonwillison.net/2026/Jul/22/openai-cyberattack/&quot;&gt;Hugging Face situation&lt;/a&gt;, and the Wiki attack, the obvious question right now is &lt;em&gt;how many more incidents&lt;/em&gt; like this are out there waiting to be discovered?&lt;/p&gt;
-        
-        &lt;h4 id=&quot;update-14th-september-2026&quot;&gt;Update 14th September 2026&lt;/h4&gt;
-        &lt;p&gt;OpenAI have updated their page about &lt;a href=&quot;https://openai.com/hugging-face-incident-and-misalignment/&quot;&gt;The Hugging Face incident and other third-party impact from misaligned models&lt;/a&gt; to mention the RubyGems incident:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;em&gt;&lt;strong&gt;September 11, 2026: We are investigating new claims from a report that our AI agents carried out activity on RubyGems in May 2026.&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
-        &lt;p&gt;Based on our review, our agents used the RubyGems platform to access the internet to carry out benign tasks and retrieve public information. Based on our review to date, we have not been able to verify the specific claims of our models uploading malicious packages detailed in the report. We’ll continue to investigate and share findings as part of our broader review of agent activity during training and evaluation.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I find it &lt;em&gt;very&lt;/em&gt; unlikely that the various &lt;code&gt;oai...&lt;/code&gt; packages published to RubyGems were not part of this same incident, but I look forward to reading their full findings once those are published.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ruby&quot;&gt;ruby&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/supply-chain&quot;&gt;supply-chain&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/accidental-cyberattacks&quot;&gt;accidental-cyberattacks&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>So you want to use OpenRouter?</title>
-      <link>https://simonwillison.net/2026/Sep/11/so-you-want-to-use-openrouter/</link>
-      <guid>https://simonwillison.net/2026/Sep/11/so-you-want-to-use-openrouter/</guid>
-      <pubDate>Fri, 11 Sep 2026 22:49:18 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://mmoustafa.com/blog/so-you-want-to-use-openrouter/&quot;&gt;So you want to use OpenRouter?&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        One of OpenRouter&apos;s selling points is that it &quot;handles fallbacks automatically and picks the most cost-effective option for each request&quot;, so you can call a single API endpoint for a model and get routed to the best available backend provider.&lt;/p&gt;
-        &lt;p&gt;Mohamed Moustafa points out a whole set of ways that this can cause you problems. Different providers run different serving software with different optimizations and settings, which means that the same OpenRouter endpoint can serve model requests that behave in different ways.&lt;/p&gt;
-        &lt;p&gt;Some providers even lack vision capability for vision models, and the way the reasoning effort option is processed can differ as well.&lt;/p&gt;
-        &lt;p&gt;Thankfully you can control which provider is routed to using &lt;a href=&quot;https://openrouter.ai/docs/guides/routing/provider-selection#allowing-only-specific-providers&quot;&gt;the provider.only option&lt;/a&gt;. The &lt;a href=&quot;https://openrouter.ai/docs/api/api-reference/endpoints/list-all-endpoints-for-a-model&quot;&gt;/endpoints method&lt;/a&gt; returns the list of available providers for a specific model ID.
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=49621546&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openrouter&quot;&gt;openrouter&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Boris Cherny</title>
-      <link>https://simonwillison.net/2026/Sep/11/boris-cherny/</link>
-      <guid>https://simonwillison.net/2026/Sep/11/boris-cherny/</guid>
-      <pubDate>Fri, 11 Sep 2026 17:47:11 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://twitter.com/bcherny/status/2098217573276131577&quot;&gt;&lt;p&gt;Production code written by Claude should have a higher bar than if it was written by a human. At Anthropic, we have many guardrails in place to make sure this is happening: lots of lint rules, lots of tests, Claude-driven end to end tests, Claude-powered fuzzers running daily, automated code reviews and security reviews, automated code refactoring, and so on. Without these, you can end up with a mess that is hard to maintain down the line.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/bcherny/status/2098217573276131577&quot;&gt;Boris Cherny&lt;/a&gt;&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-assisted-programming&quot;&gt;ai-assisted-programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/boris-cherny&quot;&gt;boris-cherny&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Feeling sad about AI</title>
-      <link>https://simonwillison.net/2026/Sep/11/feeling-sad-about-ai/</link>
-      <guid>https://simonwillison.net/2026/Sep/11/feeling-sad-about-ai/</guid>
-      <pubDate>Fri, 11 Sep 2026 17:28:37 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;a href=&quot;https://news.ycombinator.com/item?id=49661506#49662090&quot;&gt;My comment&lt;/a&gt; on &lt;a href=&quot;https://news.ycombinator.com/item?id=49661506&quot;&gt;Feeling sad about AI&lt;/a&gt; &amp;mdash; Hacker News.&lt;/p&gt;&lt;p&gt;I&apos;m not sure how useful it is to say this, but I think a lot of people (myself included, a few years ago now) have been through this moment of existential crisis and come out the other side.&lt;/p&gt;
-        &lt;p&gt;The initial reaction, when some coding agent does a piece of work that would have taken you a week in an hour and does it &lt;em&gt;well&lt;/em&gt;, is to be very disheartened by it.&lt;/p&gt;
-        &lt;p&gt;Once you come to terms with the idea that translating an exact specification into decent code isn&apos;t a unique skill any more, you can start looking at the larger set of problems that you face as a software engineer and realize that there is &lt;em&gt;so much left&lt;/em&gt;, and your existing skill and experience mean you can master these new tools, provide value, and execute at a level far greater than anyone who is just getting started building software using agents without any of your depth.&lt;/p&gt;
-        &lt;p&gt;If you don&apos;t want your profession to change at all then you&apos;re going to have a tough time with this - but that&apos;s surely been true for the history of software engineering? Has there ever been any stability to the tools and language we use beyond about a five year time horizon?&lt;/p&gt;
-        &lt;p&gt;These changes are happening a bit faster, but if you chose software development as a passion you&apos;ve opted into pretty frequent radical change from the start.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/deep-blue&quot;&gt;deep-blue&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
