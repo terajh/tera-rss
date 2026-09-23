@@ -4,7 +4,39 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Tue, 22 Sep 2026 18:55:56 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 23 Sep 2026 19:36:58 GMT</lastBuildDate>
+    <item>
+      <title>Stop buttons triggering zoom when they’re double tapped</title>
+      <link>https://piccalil.li/blog/stop-buttons-triggering-zoom-when-theyre-double-tapped/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/stop-buttons-triggering-zoom-when-theyre-double-tapped/?ref=main-rss-feed</guid>
+      <pubDate>Wed, 23 Sep 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I stumbled across &lt;a href=&quot;https://bsky.app/profile/renderg.host/post/3mvipol2rzk2m&quot;&gt;this great project&lt;/a&gt; by &lt;a href=&quot;https://renderg.host/&quot;&gt;Barry Prendergast&lt;/a&gt;. It&apos;s a web-based radio player with a &lt;em&gt;lush&lt;/em&gt; UI. On mobile I spotted that as I was rapidly flicking through the stations to find one that was on air, the browser was zooming in and out.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a screen clip:&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;Watch the &lt;a href=&quot;https://iframe.mediadelivery.net/embed/468647/040189f2-c87a-4fda-a3bf-c65bf2254edb?autoplay=false&amp;amp;loop=false&amp;amp;muted=false&amp;amp;preload=true&amp;amp;responsive=true&quot;&gt;video&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;I thought this behaviour was related to their viewport meta tag setup, but they have that set up perfectly:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now, you could prevent the zooming by adding &lt;code&gt;, maximum-scale=1.0, user-scalable=no&lt;/code&gt; to the &lt;code&gt;content&lt;/code&gt; attribute, but &lt;strong&gt;don&apos;t do that&lt;/strong&gt; because it prevents zooming at all, which is a &lt;a href=&quot;https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html&quot;&gt;WCAG violation&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;What&apos;s actually happening here is the browser is responding to the double tap gesture, which in the case of Safari on iOS, zooms into the button element I&apos;m tapping. Luckily there&apos;s a CSS one-liner for us that gets the job done.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.button {
+        touch-action: manipulation;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As per &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/touch-action&quot;&gt;MDN&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Enable panning and pinch zoom gestures, but disable additional non-standard gestures such as double-tap to zoom. Disabling double-tap to zoom removes the need for browsers to delay the generation of &lt;strong&gt;click&lt;/strong&gt; events when the user taps the screen. This is an alias for &quot;&lt;strong&gt;pan-x pan-y pinch-zoom&lt;/strong&gt;&quot; (which, for compatibility, is itself still valid).&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Let&apos;s see it in action. First, here&apos;s a couple of buttons without &lt;code&gt;touch-action&lt;/code&gt;. Try rapidly tapping on your phone/touch device:&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/emvBdae/c0ed51c7ebc182fe12fec6967a92c584&quot;&gt;Buttons without touch-action applied&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://cdpn.io/pen/debug/emvBdae/c0ed51c7ebc182fe12fec6967a92c584&quot;&gt;This link&lt;/a&gt; has no CodePen framing to make that easier for you&lt;/p&gt;
+        &lt;p&gt;Here are the same buttons &lt;em&gt;with&lt;/em&gt; &lt;code&gt;touch-action&lt;/code&gt; applied:&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/myWOrzY/1c43253e5ffc8a38d68dd7fc42cccf7a&quot;&gt;Buttons with touch-action applied&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Again, &lt;a href=&quot;https://cdpn.io/pen/debug/myWOrzY/1c43253e5ffc8a38d68dd7fc42cccf7a&quot;&gt;here&apos;s a frameless version&lt;/a&gt; for you&lt;/p&gt;
+        &lt;p&gt;Handy!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #198</title>
       <link>https://piccalil.li/the-index/198/?ref=main-rss-feed</link>
@@ -210,33 +242,6 @@
         &lt;li&gt;&lt;a href=&quot;https://piccalil.li/blog/we-made-an-email-template-to-help-convince-your-boss-to-pay-for-mindful-design/&quot;&gt;Mindful Design&lt;/a&gt;&lt;/li&gt;
         &lt;/ol&gt;
         &lt;p&gt;&lt;a href=&quot;https://piccalil.li/courses/?utm_source=piccalilli-link&amp;utm_campaign=price-fall-2026&quot;&gt;Check it out!&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>The Index: Issue #196</title>
-      <link>https://piccalil.li/the-index/196/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/the-index/196/?ref=main-rss-feed</guid>
-      <pubDate>Fri, 28 Aug 2026 09:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Before we get into this week&apos;s links, I just thought I&apos;d let you know we&apos;re having a summer break next week, so the next issue won&apos;t be with you until September 11!&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://midnightvinylclub.com/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Midnight Vinyl Club&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A handy service that helps you explore music and find the best prices for vinyl.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://elliotjaystocks.com/blog/spotify?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;The search for a Spotify alternative&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;There are so many better options than Spotify for music and Elliot helpfully breaks plenty of options for you.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://michellebarker.co.uk/writing/little-websites-everywhere/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;Little websites everywhere&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;This is a great piece. As we see it, the web — at large — always  wins and those green shoots will come.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://reelswap.net/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;ReelSwap&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;A really cool service for cataloging physical media. The bookshelves are really nicely done too.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://www.keithcirkel.co.uk/wire-loop/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;WireLoop&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;An extremely satisfying web-based game.&lt;/p&gt;
-        &lt;h2&gt;&lt;a href=&quot;https://piccalil.li/blog/nan-the-not-a-number-number-that-isnt-nan/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;NaN, the not-a-number number that isn’t NaN&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Here&apos;s one from the &lt;a href=&quot;https://piccalil.li/blog/&quot;&gt;Piccalilli archives&lt;/a&gt; that you might have missed to wrap up this issue.&lt;/p&gt;
-        &lt;hr /&gt;
-        &lt;p&gt;P.S. &lt;a href=&quot;https://www.ysabella.me/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;this is a good website&lt;/a&gt; from &lt;a href=&quot;https://personalsit.es/?utm_source=the-index&amp;amp;utm_medium=newsletter&quot;&gt;personalsit.es&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;p&gt;There&apos;s no sponsor this week so I thought I&apos;d use this slot to give a pep talk to those who are feeling incredibly beaten down by the industry right now (including myself).&lt;/p&gt;
-        &lt;p&gt;We &lt;em&gt;will&lt;/em&gt; win in the end. It might not feel like winning at first, but the current direction of travel is &lt;em&gt;not&lt;/em&gt; inevitable.&lt;/p&gt;
-        &lt;p&gt;We &lt;em&gt;do&lt;/em&gt; have to fight back though, so don&apos;t let the bastards grind you down. We need you!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
