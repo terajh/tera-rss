@@ -4,12 +4,260 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 27 Sep 2026 19:43:47 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 28 Sep 2026 21:29:06 GMT</lastBuildDate>
+    <item>
+      <title>A Simple Weather App in TypeScript</title>
+      <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
+      <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
+        &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
+        &lt;p&gt;If you actually want to see this - you can head over to &lt;a href=&quot;https://weather-app-ts-vite-alpine.netlify.app/&quot;&gt;https://weather-app-ts-vite-alpine.netlify.app/&lt;/a&gt;. The complete source may be found here: &lt;a href=&quot;https://github.com/cfjedimaster/typescript-stuff/tree/main/weather-demo&quot;&gt;https://github.com/cfjedimaster/typescript-stuff/tree/main/weather-demo&lt;/a&gt;. Now let me dig into what I discovered while building it.&lt;/p&gt;
+        &lt;h2 id=&quot;the-one-thing&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-one-thing&quot;&gt;The One Thing&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Let me start off with what I think is the biggest thing that clicked with me. While building out the various parts and using (at least some) of the TypeScript features, I immediately ran into probably the biggest win - immediate feedback in my editor when I had screwed things up. And yea, I know that&apos;s something TypeScript provided since day one, but it&apos;s also a bit different to kind of see it in action while building the app. Especially since I had two or three times when I had to refactor how I was doing things. Having the types in place (specifically for my remote API calls) helped keep things in order across the different moving parts.&lt;/p&gt;
+        &lt;p&gt;I also found myself being forced to think more about how those parts interacted. So for example, a wrapper to my geocoding service - I instinctively knew what I had wanted - but having it spelled out in code actually made me see possible issues - modify my approach - and so forth - all earlier than I would have in my usual development process.&lt;/p&gt;
+        &lt;p&gt;Again - this wasn&apos;t necessarily a surprise to me. This all fell in line with what I knew about TypeScript and what I had expected. But never having built an app from scratch with TypeScript before it still felt pretty cool to actually see all this play out.&lt;/p&gt;
+        &lt;h2 id=&quot;the-architecture&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-architecture&quot;&gt;The Architecture&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;It feels a bit silly to talk about the architecture of such a small little app, but this is how I built out the parts.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Once again, I used Vite.&lt;/li&gt;
+        &lt;li&gt;On top of that, I used Alpine.js. In case you missed it, my &lt;a href=&quot;https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript&quot;&gt;last blog post&lt;/a&gt; discussed how to do this.&lt;/li&gt;
+        &lt;li&gt;The main page handles displaying the &apos;weather cards&apos; along with a simple form to add new locations.&lt;/li&gt;
+        &lt;li&gt;When a location is entered, I use the excellent &lt;a href=&quot;https://www.geocod.io/&quot;&gt;Geocodio&lt;/a&gt; API to translate it into longitude and latitude.&lt;/li&gt;
+        &lt;li&gt;With that information, I use the &lt;a href=&quot;https://pirateweather.net/&quot;&gt;Pirate Weather&lt;/a&gt; API to get the forecast.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;h2 id=&quot;the-ui&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-ui&quot;&gt;The UI&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;As mentioned above, this was a Vite and Alpine app, but I also decided to try adding a UI library in as well. I picked &lt;a href=&quot;https://webawesome.com/&quot;&gt;Web Awesome&lt;/a&gt; primarily for the Card element. I&apos;ve used this library in the past (when it was called Shoelace) and I really like it, especially as it uses web components. They also make it easy to only import what you need.&lt;/p&gt;
+        &lt;p&gt;In my &lt;code&gt;main.ts&lt;/code&gt;, this came down to:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import &apos;@awesome.me/webawesome/dist/styles/webawesome.css&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/card/card.js&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/input/input.js&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/button/button.js&apos;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;With this in place, it was a simple matter to use the components. As an example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div class=&amp;quot;wa-flank:end wa-gap-xs&amp;quot;&amp;gt;
+        &amp;lt;wa-input placeholder=&amp;quot;New Location (America, Canada, Mexico, UK only)&amp;quot; x-model=&amp;quot;newLocation&amp;quot;&amp;gt;&amp;lt;/wa-input&amp;gt;
+        &amp;lt;wa-button variant=&amp;quot;brand&amp;quot; @click=&amp;quot;addLocation(newLocation)&amp;quot;&amp;gt;Add&amp;lt;/wa-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Make note of the classes on the &lt;code&gt;div&lt;/code&gt; tag there. That comes from Web Awesome&apos;s various utility classes and this was a place where I leaned on my AI tool to help.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s the entirety of the main HTML page which shows you both Web Awesome in play as well as my Alpine directives:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!doctype html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot; class=&amp;quot;wa-dark&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+        &amp;lt;link rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/svg+xml&amp;quot; href=&amp;quot;/favicon.svg&amp;quot; /&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot; /&amp;gt;
+        &amp;lt;title&amp;gt;Weather Demo&amp;lt;/title&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        &amp;lt;div x-data=&amp;quot;app&amp;quot; class=&amp;quot;container wa-stack&amp;quot;&amp;gt;
+        
+        &amp;lt;header&amp;gt;
+        &amp;lt;h1&amp;gt;Weather Demo&amp;lt;/h1&amp;gt;
+        &amp;lt;/header&amp;gt;
+        
+        &amp;lt;template x-if=&amp;quot;locations.length === 0&amp;quot;&amp;gt; 
+        &amp;lt;p&amp;gt;No locations added yet. Add a location to get started.&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;div class=&amp;quot;wa-grid wa-gap-1&amp;quot; style=&amp;quot;--min-column-size: 30ch;&amp;quot;&amp;gt;
+        &amp;lt;template x-for=&amp;quot;(location,index) in locations&amp;quot; :key=&amp;quot;location.name&amp;quot;&amp;gt;
+        &amp;lt;wa-card class=&amp;quot;card-basic&amp;quot; &amp;gt;
+        &amp;lt;h3 slot=&amp;quot;header&amp;quot; x-text=&amp;quot;location.name&amp;quot;&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;wa-button appearance=&amp;quot;plain&amp;quot; @click=&amp;quot;removeLocation(index)&amp;quot; slot=&amp;quot;header-actions&amp;quot;&amp;gt;
+        &amp;lt;wa-icon name=&amp;quot;trash&amp;quot; variant=&amp;quot;solid&amp;quot; label=&amp;quot;Delete&amp;quot;&amp;gt;&amp;lt;/wa-icon&amp;gt;
+        &amp;lt;/wa-button&amp;gt;
+        &amp;lt;template x-if=&amp;quot;location.weather&amp;quot;&amp;gt;
+        &amp;lt;p x-html=&amp;quot;`Temperature: ${location.weather.temperature}°F&amp;lt;br/&amp;gt;Condition: ${location.weather.summary}&amp;lt;br&amp;gt;Low: ${location.weather.low}°F&amp;lt;br/&amp;gt;High: ${location.weather.high}°F`&amp;quot;&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;template x-if=&amp;quot;!location.weather&amp;quot;&amp;gt;
+        &amp;lt;p&amp;gt;Loading weather data...&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/wa-card&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;div class=&amp;quot;wa-flank:end wa-gap-xs&amp;quot;&amp;gt;
+        &amp;lt;wa-input placeholder=&amp;quot;New Location (America, Canada, Mexico, UK only)&amp;quot; x-model=&amp;quot;newLocation&amp;quot;&amp;gt;&amp;lt;/wa-input&amp;gt;
+        &amp;lt;wa-button variant=&amp;quot;brand&amp;quot; @click=&amp;quot;addLocation(newLocation)&amp;quot;&amp;gt;Add&amp;lt;/wa-button&amp;gt;
+        &amp;lt;/div&amp;gt;
+        
+        &amp;lt;/div&amp;gt;
+        &amp;lt;script type=&amp;quot;module&amp;quot; src=&amp;quot;/src/main.ts&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2 id=&quot;the-three-%22services%22&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-three-%22services%22&quot;&gt;The Three &amp;quot;Services&amp;quot;&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I&apos;m using &amp;quot;services&amp;quot; in quotes there as it feels a bit overly dramatic to name it as such, but I broke out three parts into their own files - one for geocoding, one for the weather, and one for storage. Let&apos;s start with storage first.&lt;/p&gt;
+        &lt;p&gt;This file wraps the calls to LocalStorage and in theory - I could easily switch out to IndexedDB in the future - but I&apos;d have to mark the functions &lt;code&gt;async&lt;/code&gt; of course:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import type { SavedLocation } from &apos;./types&apos;;
+        
+        // This is where it&apos;s stored in localStorage. 
+        const KEY = &apos;weather-locations&apos;;
+        
+        // Type guard: checks at runtime that an unknown value really is a SavedLocation.
+        // localStorage can contain anything (old versions of your app, manual edits),
+        // so we validate instead of trusting it.
+        // Ray, in case you forget, the value is means that if the function returns true, 
+        // it&apos;s ok for TS to consider the value as of type SavedLocation
+        function isSavedLocation(value: unknown): value is SavedLocation {
+        if (typeof value !== &apos;object&apos; || value === null) return false;
+        const v = value as Record&amp;lt;string, unknown&amp;gt;;
+        return (
+        typeof v.name === &apos;string&apos; &amp;amp;&amp;amp;
+        typeof v.longitude === &apos;number&apos; &amp;amp;&amp;amp;
+        typeof v.latitude === &apos;number&apos;
+        );
+        }
+        
+        export function getLocations(): SavedLocation[] {
+        const locations = localStorage.getItem(KEY);
+        if(!locations) return [];
+        
+        const parsed = JSON.parse(locations);
+        return Array.isArray(parsed) ? parsed.filter(isSavedLocation) : [];
+        }
+        
+        export function addLocation(location: SavedLocation): void {
+        const locations = getLocations();
+        locations.push(location);
+        localStorage.setItem(KEY, JSON.stringify(locations));
+        }
+        
+        export function removeLocation(index: number): void {
+        const locations = getLocations();
+        locations.splice(index, 1);
+        localStorage.setItem(KEY, JSON.stringify(locations));
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The first thing you see on top is importing a type that defines what a &apos;stored location&apos; is in terms of my application. From that file, here is the definition:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;export type SavedLocation = {
+        name: string;
+        longitude: number;
+        latitude: number, 
+        weather?: WeatherData;
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This should mostly make sense - the name comes from the user, the longitude and latitude from the geocoding service.&lt;/p&gt;
+        &lt;p&gt;The weather part actually comes &lt;em&gt;after&lt;/em&gt; the app loads in the existing values from local storage and hits the weather API. There&apos;s a part of me that looks at that and thinks maybe I should have a type for the &amp;quot;stored&amp;quot; value and one for the &amp;quot;live&amp;quot; value. I also think I could possibly cache the weather so that on reload it&apos;s quicker, but weather data is the kind of thing that gets stale pretty quickly.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s that file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import type { WeatherData } from &apos;./types&apos;;
+        
+        const KEY = import.meta.env.VITE_PIRATE_KEY as string;
+        
+        export async function getWeather(lat: number, lng: number): Promise&amp;lt;WeatherData&amp;gt; {
+        const req = await fetch(`https://api.pirateweather.net/forecast/${KEY}/${lat},${lng}?units=us&amp;amp;exclude=minutely,hourly,alerts,flags`);
+        const res = await req.json();
+        
+        return {
+        summary: res.currently.summary,
+        temperature: res.currently.temperature,
+        low: res.daily.data[0].temperatureLow,
+        high: res.daily.data[0].temperatureHigh
+        };
+        
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And here&apos;s the type:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;export type WeatherData = {
+        summary: string;
+        temperature: number;
+        low: number;
+        high: number;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Finally, here&apos;s the geocoding wrapper:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import type { GeoCodedLocation } from &apos;./types&apos;;
+        
+        // Only the fields we use from Geocodio&apos;s &amp;quot;simple&amp;quot; format
+        type GeocodioSimpleResponse = {
+        lat?: number;
+        lng?: number;
+        };
+        
+        const KEY = import.meta.env.VITE_GEOCODIO_KEY as string;
+        
+        export async function geoCode(location: string): Promise&amp;lt;GeoCodedLocation&amp;gt; {
+        const req = await fetch(`https://api.geocod.io/v1.7/geocode?q=${encodeURIComponent(location)}&amp;amp;format=simple&amp;amp;api_key=${KEY}`);
+        const res = (await req.json()) as GeocodioSimpleResponse;
+        
+        if(!res || !res.lat || !res.lng) {
+        throw new Error(&apos;No results&apos;);
+        }
+        
+        return { lat: res.lat, lng: res.lng };
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You&apos;ll notice I do the HTTP call slightly different here. I&apos;ve got an inline type here that defines what is being used from Geocodio. I&apos;ll be honest and say I want to think about these two approaches and figure out when I should use each. I mean, when you look at &lt;code&gt;GeoCodedLocation&lt;/code&gt;:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;export type GeoCodedLocation = {
+        lat: number;
+        lng: number;
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I honestly don&apos;t get the point of the inline type as well. I was having AI help me a bit, so it&apos;s on me to nail down if this makes sense in the context of the file. I&apos;ll be returning to that soon.&lt;/p&gt;
+        &lt;h2 id=&quot;the-core-app&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-core-app&quot;&gt;The Core App&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Now let&apos;s put it together with my core file - which is mainly Alpine.js specific:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import Alpine from &apos;alpinejs&apos;;
+        
+        import &apos;@awesome.me/webawesome/dist/styles/webawesome.css&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/card/card.js&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/input/input.js&apos;;
+        import &apos;@awesome.me/webawesome/dist/components/button/button.js&apos;;
+        import &apos;./style.css&apos;;
+        
+        import type { SavedLocation } from &apos;./types&apos;;
+        import { getLocations, addLocation, removeLocation } from &apos;./storage&apos;;
+        import { getWeather } from &apos;./weather&apos;;
+        import { geoCode } from &apos;./geocode&apos;;
+        
+        Alpine.data(&apos;app&apos;, () =&amp;gt; ({
+        locations: [] as SavedLocation[],
+        newLocation: &apos;&apos;,
+        init() {
+        this.locations = getLocations();
+        if(this.locations.length &amp;gt; 0) {
+        this.hydrateWeather();
+        }
+        },
+        async addLocation(location: string) {
+        if(!location) return;
+        const geo = await geoCode(location);
+        const newLoc: SavedLocation = { name: location, longitude: geo.lng, latitude: geo.lat };
+        this.locations.push(newLoc);
+        // just noticed my method is addLocation as is the imported one. works but - eww. 
+        addLocation(newLoc);
+        this.newLocation = &apos;&apos;;
+        // in theory it is wasteful to hydrate ALL of them, but it&apos;s a super quick call
+        this.hydrateWeather();
+        }, 
+        removeLocation(index: number) {
+        this.locations.splice(index, 1);
+        // same issue with naming - advice?
+        removeLocation(index);
+        },
+        async hydrateWeather() {
+        for(const loc of this.locations) {
+        const weather = await getWeather(loc.latitude, loc.longitude);
+        loc.weather = weather;
+        }
+        }
+        }));
+        
+        Alpine.start();
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;If you actually took the time to read all that, you can see I wrote a few questions to myself. By accident, I ended up having Alpine methods with the same name as methods in my services, and that &lt;em&gt;really&lt;/em&gt; bugs me... but it also works... so... yeah. It&apos;s kinda clear that &lt;code&gt;this.something&lt;/code&gt; is Alpine and &lt;code&gt;something&lt;/code&gt; is being imported in, but I still don&apos;t care for that. How would you rename things? (And I&apos;d assume the rename would be on the Alpine side.)&lt;/p&gt;
+        &lt;p&gt;I also notice a few lines where I didn&apos;t define my type. A quick search shows that by adding &lt;code&gt;strict:true&lt;/code&gt; to my &lt;code&gt;tsconfig.json&lt;/code&gt; would fix that. I know in the past I&apos;ve seen that in projects and it&apos;s annoyed the heck out of me, so I get why Vite&apos;s scaffold doesn&apos;t include it, but for my next project, I&apos;m going to turn that on so I can be a bit more precise in my learning with TypeScript.&lt;/p&gt;
+        &lt;h2 id=&quot;your-turn!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#your-turn!&quot;&gt;Your Turn!&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, I know blogging is dead (again) and no humans read these posts again, but if you are reading this, and know TypeScript well, I&apos;d &lt;strong&gt;love&lt;/strong&gt; any and all feedback! Give me a comment below and help me keep learning this.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@patrickian4?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Patrick Fore&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/black-corona-typewriter-on-brown-wood-planks-0gkw_9fy0eQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>A Simple Alpine.js Template with Vite and TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
@@ -107,7 +355,7 @@
       <title>Links For You (9/20/26)</title>
       <link>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</link>
       <guid>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Football is Back&amp;quot; season to those of you who celebrate. I&apos;m currently watching my Saints take on the Ravens (who are also a favorite of mine) and hoping for our first win. The last few weeks have been incredibly busy (I feel like I always say that, sorry) with a trip for work that then morphed into a short vacation with my wife and I which included my first Blizzcon (which is freaking cool as hell) and our first visit to Disneyland. (We&apos;ve been to Disney World a few times.) I think we both agreed that Disney World is cooler, but the crowds and - most importantly - the weather - was much better in California.&lt;/p&gt;
         &lt;p&gt;
@@ -144,7 +392,7 @@
       <title>It&apos;s only a decade late, I&apos;ll learn TypeScript!</title>
       <link>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a bit worried lately. Of course, my friends will tell you that&apos;s my norm. But more specifically, I&apos;ve been worried about my coding skills. As I use AI to generate more and more code, and it does that job well, I kinda miss actually &lt;em&gt;writing&lt;/em&gt; code. I&apos;ve also had a bit of writer&apos;s block in terms of &lt;em&gt;topics&lt;/em&gt; to cover, and especially in the area of the web platform. A few days ago it occurred to me - I&apos;ve never &lt;em&gt;really&lt;/em&gt; dug into &lt;a href=&quot;https://www.typescriptlang.org/&quot;&gt;TypeScript&lt;/a&gt;. Sure, I&apos;ve used it, many times, in the fourteen or so years it&apos;s been out, but many times I kinda guess at what I&apos;m doing and it was never my default for projects. Partly that&apos;s due to my philosophy of avoiding a build step in my projects and just KISS in general.&lt;/p&gt;
         &lt;p&gt;But as I said - the inspiration hit me this past week and I thought I&apos;d do some digging. Here&apos;s a few initial thoughts and experiments. Oh, and I still used AI a bit and I&apos;ll explain exactly how in the post below.&lt;/p&gt;
@@ -489,7 +737,7 @@
       <title>Building a Document Q&amp;A System with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
         &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
@@ -526,7 +774,7 @@
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -552,7 +800,7 @@
       <title>Weather Nerd? Check out My OSX Radar Widget</title>
       <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
       <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
         &lt;p&gt;
@@ -567,7 +815,7 @@
       <title>Like LEGO? Got a Mac? Get My Screensaver</title>
       <link>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</link>
       <guid>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning my fabulous readers. This will be a quick post as I just wanted to share something cool I built with Cursor over the past couple of days - a LEGO screensaver. I&apos;m a huge fan of &amp;quot;show me something random from something I like&amp;quot; and have built multiple bots in that vein. I recently discovered &lt;a href=&quot;https://rebrickable.com/downloads/&quot;&gt;Rebrickable&apos;s LEGO datasets&lt;/a&gt; which contains a CSV file of LEGO sets. The data looks like so:&lt;/p&gt;
         &lt;pre&gt;&lt;code&gt;set_num,name,year,theme_id,num_parts,img_url
@@ -592,7 +840,7 @@
       <title>Links For You (8/23/26)</title>
       <link>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</link>
       <guid>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. Once again, I&apos;m a bit behind on these posts, but I just got back from two weeks of travel and I&apos;m so happy to be home for a while. My last trip was pretty stressful. On the way out, our plane blew a tire (or tires) which required an emergency landing in Dallas (which is where we were scheduled to stop anyway). Everything ended up fine, but as I said, stressful. Then coming home we were &lt;em&gt;minutes&lt;/em&gt; from our destination when the pilot had to turn around due to storms. You can actually see exactly where in the route where they said NOPE:&lt;/p&gt;
         &lt;p&gt;
@@ -622,7 +870,7 @@
       <title>Using the Cursor SDK to Build a Project Documenter</title>
       <link>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</link>
       <guid>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
+      <pubDate>Mon, 28 Sep 2026 21:10:32 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve shared a few posts recently talking about how I&apos;m using Cursor to learn and employ agentic development. Primarily that work has all been done via our Agent view, but this is just one of the surfaces you can use with the platform. I had a chance recently to try out the SDK and I thought I&apos;d share a little demo I built with it.&lt;/p&gt;
         &lt;p&gt;First - some explanation would be helpful. You can use Cursor with the desktop application, on the web, via CLI, on iOS, even via API. But the SDK lets you use the platform from your code. There&apos;s an SDK for &lt;a href=&quot;https://cursor.com/docs/sdk/typescript&quot;&gt;TypeScript&lt;/a&gt;, &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;Python&lt;/a&gt;, and a &lt;a href=&quot;https://cursor.com/docs/sdk/bridge&quot;&gt;bridge&lt;/a&gt; that embeds a TypeScript server and lets you use any language. Honestly I&apos;ve never seen that before in a platform and it&apos;s pretty freaking cool. (And... just to remind folks, I do work at Cursor so I&apos;m biased, but that&apos;s absolutely an honest opinion.)&lt;/p&gt;
@@ -901,61 +1149,6 @@
         &lt;p&gt;I did a quick run of this on my blog and got the following:&lt;/p&gt;
         &lt;iframe src=&quot;https://static.raymondcamden.com/images/2026/08/foo.pdf&quot; width=&quot;100%&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
         &lt;p&gt;This is a rather simple example, but being able to use the Cursor platform in code like this could be really freaking powerful I think. If you&apos;ve done something like this, I&apos;d love to hear more, share a comment below. You can check out the full code here: &lt;a href=&quot;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&quot;&gt;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>&lt;file-preview&gt; - A simple web component for file previews</title>
-      <link>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</link>
-      <guid>https://www.raymondcamden.com/2026/08/11/file-preview-a-simple-web-component-for-file-previews</guid>
-      <pubDate>Sun, 27 Sep 2026 19:04:55 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This was a &amp;quot;I can&apos;t fall asleep and my mind is wondering&amp;quot; type of idea and honestly, I&apos;m surprised at how good it came out. For a while now I&apos;ve shared demos where a user picks an image and ... something. It doesn&apos;t matter. But I typically add a preview of the image when it&apos;s selected. This works because once the user selects a file on their local system, JavaScript can then access the bits of that file, making it trivial then to render it. The idea I had, late at night, was simple - what if this could be a web component and expanded to cover different file types?&lt;/p&gt;
-        &lt;p&gt;In my imagination, it would look something like this in code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;form&amp;gt;
-        &amp;lt;!-- various other form things --&amp;gt;
-        &amp;lt;label for=&amp;quot;upload&amp;quot;&amp;gt;Select a file: &amp;lt;/label&amp;gt;
-        &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;upload&amp;quot; name=&amp;quot;upload&amp;quot;&amp;gt;
-        &amp;lt;file-preview file-id=&amp;quot;upload&amp;quot;&amp;gt;&amp;lt;/file-preview&amp;gt;
-        &amp;lt;/form&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The component takes one attribute, &lt;code&gt;file-id&lt;/code&gt;, which points to the ID value of the field to monitor. As for preview support, I figured I could cover these:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Images (of course)&lt;/li&gt;
-        &lt;li&gt;HTML, .txt&lt;/li&gt;
-        &lt;li&gt;Markdown (after converting to HTML)&lt;/li&gt;
-        &lt;li&gt;Office docs (Using the excellent &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library)&lt;/li&gt;
-        &lt;li&gt;PDF (ditto)&lt;/li&gt;
-        &lt;li&gt;Audio and Video (using the browser&apos;s built-in support)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;And more. I decided to let Cursor take a swing at this, so I started with this prompt:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;I want to create a web component that does the following:
-        
-        It&apos;s tied to a input[type=file] control. When the user selects a file, it attempts to preview it. 
-        
-        It looks like so: &amp;lt;file-preview file-id=&amp;quot;id of file field&amp;quot;&amp;gt;&amp;lt;/file-preview&amp;gt;
-        
-        The user would position/size it with CSS as they see fit. The component would support previews for:
-        
-        * Office docs and PDFs via https://officeparser.harshankur.com/. This will be lazy loaded when a matching file type is selected. It will render the HTML version
-        * HTML docs - as is.
-        * Markdown - parse to HTML via the `marked` library and render the HTML
-        * Images - render as usual
-        * Video and Audio - create a new instance of &amp;lt;video&amp;gt; or &amp;lt;audio&amp;gt; so the user could click play to preview
-        
-        Anything else I&apos;m missing?
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Cursor came back with a bunch of suggestions, including supporting text type documents (JSON, txt, etc) and said it should handle noting when the associated file field was reset.&lt;/p&gt;
-        &lt;p&gt;And that was pretty much it. In the first iteration there was a bug with the iframe it used to render a PDF. This was due to the iframe&apos;s &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox&quot;&gt;sandbox&lt;/a&gt; value and easily corrected.&lt;/p&gt;
-        &lt;p&gt;Cursor&apos;s agent also built a good demo (&lt;a href=&quot;https://cfjedimaster.github.io/file-preview/index.html&quot;&gt;https://cfjedimaster.github.io/file-preview/index.html&lt;/a&gt;) but it was focused on the component, and not a &amp;quot;real&amp;quot; form.&lt;/p&gt;
-        &lt;p&gt;I returned to Cursor with this prompt:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;the demo you built in index.html is ok, but the idea here was to 
-        include the web component in a form. make a new file, demo.html, 
-        and have a few form fields in it, one of which is the file 
-        preview. just have it post to nothing that&apos;s fine
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;And that created a better demo (imo!):&lt;/p&gt;
-        &lt;iframe src=&quot;https://cfjedimaster.github.io/file-preview/demo.html&quot; style=&quot;width:100%; height: 600px&quot;&gt;&lt;/iframe&gt;
-        &lt;p&gt;You can see the full code at the repo here: &lt;a href=&quot;https://github.com/cfjedimaster/file-preview&quot;&gt;https://github.com/cfjedimaster/file-preview&lt;/a&gt;. If enough people ask (ok, let&apos;s say 2), I&apos;ll put this up on NPM for easier installation.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
