@@ -4,12 +4,147 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Fri, 02 Oct 2026 20:10:37 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 03 Oct 2026 19:24:16 GMT</lastBuildDate>
+    <item>
+      <title>A Not-So-Simple RSS App in TypeScript</title>
+      <link>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</link>
+      <guid>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</guid>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Ok, I lie, this demo is also pretty simple, but I wanted to break the pattern of the last few posts and at least pretend this example is a bit more complex. As I try to find excuses to write more TypeScript, I thought a great example of that would be a simple RSS aggregator. You hit the site, tell it the feeds you care about, and it renders a date sorted list of entries.&lt;/p&gt;
+        &lt;p&gt;Because RSS typically can&apos;t be parsed in client-side JavaScript (don&apos;t know why? ask me below!) so I&apos;d have to make use of a serverless function to proxy the calls (and at the same time, handle turning the XML into JSON).&lt;/p&gt;
+        &lt;p&gt;Now, to be fair, I had built nearly the same thing back in February: &lt;a href=&quot;https://www.raymondcamden.com/2026/02/02/building-an-rss-aggregator-with-astro&quot;&gt;Building an RSS Aggregator with Astro
+        &lt;/a&gt;. This let me crib a bit of the work already done.&lt;/p&gt;
+        &lt;p&gt;For this one, my stack was:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Vite for the build process&lt;/li&gt;
+        &lt;li&gt;Alpine on the front end&lt;/li&gt;
+        &lt;li&gt;TypeScript, as much as possible&lt;/li&gt;
+        &lt;li&gt;Hosting on Netlify to make the serverless function easier to do&lt;/li&gt;
+        &lt;li&gt;WebAwesome, which I&apos;ve used in the previous ones, for the UI&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;You can test this yourself here: &lt;a href=&quot;https://ts-rss-vite.netlify.app/&quot;&gt;https://ts-rss-vite.netlify.app/&lt;/a&gt;. The full source is here: &lt;a href=&quot;https://github.com/cfjedimaster/typescript-stuff/tree/main/rss-reader-1&quot;&gt;https://github.com/cfjedimaster/typescript-stuff/tree/main/rss-reader-1&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;I figure yall have seen a few of these posts already, so let me focus on sharing the interesting stuff.&lt;/p&gt;
+        &lt;h2 id=&quot;run-typescript-checking&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#run-typescript-checking&quot;&gt;Run TypeScript Checking&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I mentioned in my &lt;a href=&quot;https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript&quot;&gt;last post&lt;/a&gt; that when Vite would reload, it wasn&apos;t running the TypeScript checker. It only did this when a build was run. Enabling this checking while in dev mode took two steps.&lt;/p&gt;
+        &lt;p&gt;First, simply add &lt;code&gt;&amp;quot;strict&amp;quot;: true,&lt;/code&gt; to &lt;code&gt;tsconfig.json&lt;/code&gt;. Funny enough, in years past I can remember removing this when I was trying to get something working in a TypeScript app and I was too lazy to learn or figure it out.&lt;/p&gt;
+        &lt;p&gt;Second, I had to add &lt;a href=&quot;https://www.npmjs.com/package/vite-plugin-checker&quot;&gt;vite-plugin-checker&lt;/a&gt; to the app and modify &lt;code&gt;vite.config.ts&lt;/code&gt;.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { defineConfig } from &apos;vite&apos;;
+        import checker from &apos;vite-plugin-checker&apos;;
+        
+        export default defineConfig({
+        plugins: [checker({ typescript: true })],
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This file doesn&apos;t exist by default so it was a net new file for the app. As soon as I did that, if I screwed something up on purpose (ahem, I only make mistakes on purpose), I saw errors in my terminal when Vite was running.&lt;/p&gt;
+        &lt;h2 id=&quot;the-serverless-function&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-serverless-function&quot;&gt;The Serverless Function&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;For the backend, I used the &lt;code&gt;ntl&lt;/code&gt; CLI (this is Netlify&apos;s CLI tool) to scaffold a function, which helpfully includes a TypeScript option. For the most part, the code here is a simpler version of what I had done for the Astro site, specifically I didn&apos;t bother with BLOB caching. Anyway, here&apos;s that function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import Parser from &apos;rss-parser&apos;;
+        import type { Context } from &apos;@netlify/functions&apos;;
+        
+        type FeedItem = {
+        title: string;
+        link: string;
+        pubDate: string;
+        content: string;
+        feedTitle: string;
+        };
+        
+        export default async (request: Request, context: Context) =&amp;gt; {
+        if (request.method !== &apos;POST&apos;) {
+        return new Response(&apos;Method not allowed&apos;, {
+        status: 405,
+        headers: { Allow: &apos;POST&apos; },
+        })
+        }
+        
+        try {
+        const body: unknown = await request.json()
+        const parser = new Parser();
+        
+        if (
+        typeof body !== &apos;object&apos; ||
+        body === null ||
+        !(&apos;feeds&apos; in body) ||
+        !Array.isArray(body.feeds)
+        ) {
+        return new Response(&apos;Request body must include a feeds array&apos;, {
+        status: 400,
+        })
+        }
+        console.log(&apos;Parsing feeds:&apos;, body.feeds);
+        
+        let reqs: Promise&amp;lt;any&amp;gt;[] = [];
+        let items: FeedItem[] = [];
+        
+        for(const feed of body.feeds) {
+        reqs.push(parser.parseURL(feed.url));
+        }
+        
+        const results = await Promise.allSettled(reqs);
+        for (const result of results) {
+        if (result.status === &apos;fulfilled&apos;) {
+        const feed = result.value;
+        console.log(`Fetched feed: ${feed.title} with ${feed.items.length} items.`);
+        let newItems:any[] = [];
+        feed.items.forEach(item =&amp;gt; {
+        /*
+        will use content as a grab all for different fields
+        for example, netlify had summary, not content
+        */
+        let content = item.contentSnippet || item.summary || item.content || &apos;&apos;;
+        newItems.push({
+        title: item.title,
+        link: item.link,
+        content: content,
+        pubDate: item.pubDate,
+        feedTitle: feed.title
+        });
+        });
+        
+        items.push(...newItems);
+        
+        } else {
+        console.error(&apos;Error fetching/parsing feed:&apos;, result.reason);
+        }
+        }
+        
+        // now sort items by pubDate descending
+        items.sort((a, b) =&amp;gt; new Date(b.pubDate) - new Date(a.pubDate));
+        
+        return new Response(JSON.stringify(items), {
+        status: 200,
+        headers: {
+        &amp;quot;Content-Type&amp;quot;: &amp;quot;application/json&amp;quot;,
+        },
+        });
+        
+        } catch(e) {
+        console.log(e);
+        return new Response(&apos;Request body must be valid JSON&apos;, {
+        status: 400,
+        })
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is all pretty simple but I liked having the ability to create a custom type for my results.&lt;/p&gt;
+        &lt;p&gt;I did run into an error after I created the function - and it&apos;s one I&apos;ve seen twice now. Something in what the Netlify CLI does breaks some dependencies and my app fails to run at all. I passed the error to Claude and what it said was:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;The most likely cause is that adding the Netlify function pulled in an older 
+        typescript that&apos;s now being resolved instead of your project&apos;s version. This 
+        usually happens when a netlify/functions package has its own package.json, 
+        or when netlify-cli or the functions bundler is running an older tsc from a 
+        different node_modules.
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Its suggested fix, &lt;code&gt;npm i -D typescript@latest&lt;/code&gt;, was enough to correct it. I definitely won&apos;t forget this when it happens again.&lt;/p&gt;
+        &lt;h2 id=&quot;what&apos;s-next%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what&apos;s-next%3F&quot;&gt;What&apos;s Next?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;This has been so fun, at least for me. I&apos;ve got my next two ideas ready! (Well, in my head at least. ;)&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>A Simple Weather App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
         &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
@@ -257,7 +392,7 @@
       <title>A Simple Alpine.js Template with Vite and TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
@@ -355,7 +490,7 @@
       <title>Links For You (9/20/26)</title>
       <link>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</link>
       <guid>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Football is Back&amp;quot; season to those of you who celebrate. I&apos;m currently watching my Saints take on the Ravens (who are also a favorite of mine) and hoping for our first win. The last few weeks have been incredibly busy (I feel like I always say that, sorry) with a trip for work that then morphed into a short vacation with my wife and I which included my first Blizzcon (which is freaking cool as hell) and our first visit to Disneyland. (We&apos;ve been to Disney World a few times.) I think we both agreed that Disney World is cooler, but the crowds and - most importantly - the weather - was much better in California.&lt;/p&gt;
         &lt;p&gt;
@@ -392,7 +527,7 @@
       <title>It&apos;s only a decade late, I&apos;ll learn TypeScript!</title>
       <link>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a bit worried lately. Of course, my friends will tell you that&apos;s my norm. But more specifically, I&apos;ve been worried about my coding skills. As I use AI to generate more and more code, and it does that job well, I kinda miss actually &lt;em&gt;writing&lt;/em&gt; code. I&apos;ve also had a bit of writer&apos;s block in terms of &lt;em&gt;topics&lt;/em&gt; to cover, and especially in the area of the web platform. A few days ago it occurred to me - I&apos;ve never &lt;em&gt;really&lt;/em&gt; dug into &lt;a href=&quot;https://www.typescriptlang.org/&quot;&gt;TypeScript&lt;/a&gt;. Sure, I&apos;ve used it, many times, in the fourteen or so years it&apos;s been out, but many times I kinda guess at what I&apos;m doing and it was never my default for projects. Partly that&apos;s due to my philosophy of avoiding a build step in my projects and just KISS in general.&lt;/p&gt;
         &lt;p&gt;But as I said - the inspiration hit me this past week and I thought I&apos;d do some digging. Here&apos;s a few initial thoughts and experiments. Oh, and I still used AI a bit and I&apos;ll explain exactly how in the post below.&lt;/p&gt;
@@ -737,7 +872,7 @@
       <title>Building a Document Q&amp;A System with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
         &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
@@ -774,7 +909,7 @@
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -800,7 +935,7 @@
       <title>Weather Nerd? Check out My OSX Radar Widget</title>
       <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
       <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
         &lt;p&gt;
@@ -815,7 +950,7 @@
       <title>Like LEGO? Got a Mac? Get My Screensaver</title>
       <link>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</link>
       <guid>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Good morning my fabulous readers. This will be a quick post as I just wanted to share something cool I built with Cursor over the past couple of days - a LEGO screensaver. I&apos;m a huge fan of &amp;quot;show me something random from something I like&amp;quot; and have built multiple bots in that vein. I recently discovered &lt;a href=&quot;https://rebrickable.com/downloads/&quot;&gt;Rebrickable&apos;s LEGO datasets&lt;/a&gt; which contains a CSV file of LEGO sets. The data looks like so:&lt;/p&gt;
         &lt;pre&gt;&lt;code&gt;set_num,name,year,theme_id,num_parts,img_url
@@ -840,7 +975,7 @@
       <title>Links For You (8/23/26)</title>
       <link>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</link>
       <guid>https://www.raymondcamden.com/2026/08/23/links-for-you-82326</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:43:16 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Greetings, programs. Once again, I&apos;m a bit behind on these posts, but I just got back from two weeks of travel and I&apos;m so happy to be home for a while. My last trip was pretty stressful. On the way out, our plane blew a tire (or tires) which required an emergency landing in Dallas (which is where we were scheduled to stop anyway). Everything ended up fine, but as I said, stressful. Then coming home we were &lt;em&gt;minutes&lt;/em&gt; from our destination when the pilot had to turn around due to storms. You can actually see exactly where in the route where they said NOPE:&lt;/p&gt;
         &lt;p&gt;
@@ -864,291 +999,6 @@
         &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
         &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
         &lt;p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Using the Cursor SDK to Build a Project Documenter</title>
-      <link>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</link>
-      <guid>https://www.raymondcamden.com/2026/08/22/using-the-cursor-sdk-to-build-a-project-documenter</guid>
-      <pubDate>Fri, 02 Oct 2026 19:52:14 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve shared a few posts recently talking about how I&apos;m using Cursor to learn and employ agentic development. Primarily that work has all been done via our Agent view, but this is just one of the surfaces you can use with the platform. I had a chance recently to try out the SDK and I thought I&apos;d share a little demo I built with it.&lt;/p&gt;
-        &lt;p&gt;First - some explanation would be helpful. You can use Cursor with the desktop application, on the web, via CLI, on iOS, even via API. But the SDK lets you use the platform from your code. There&apos;s an SDK for &lt;a href=&quot;https://cursor.com/docs/sdk/typescript&quot;&gt;TypeScript&lt;/a&gt;, &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;Python&lt;/a&gt;, and a &lt;a href=&quot;https://cursor.com/docs/sdk/bridge&quot;&gt;bridge&lt;/a&gt; that embeds a TypeScript server and lets you use any language. Honestly I&apos;ve never seen that before in a platform and it&apos;s pretty freaking cool. (And... just to remind folks, I do work at Cursor so I&apos;m biased, but that&apos;s absolutely an honest opinion.)&lt;/p&gt;
-        &lt;p&gt;With the SDK, you can do all the things you can usually do with the platform - run prompts in different modes - swap models at will, including the auto router which makes it easier, even kick off agents that run in the cloud. Definitely check the &lt;a href=&quot;https://cursor.com/docs/sdk/python&quot;&gt;docs&lt;/a&gt; for a full detailed list of what you can do, but it&apos;s basically the platform itself - in your code.&lt;/p&gt;
-        &lt;p&gt;I built a quick demo with the TypeScript SDK, but then switched over to Python as I felt it a bit easier for me to use. The &lt;a href=&quot;https://cursor.com/docs/sdk/python#quick-start&quot;&gt;quickstart&lt;/a&gt; shows how easy it is:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
-        
-        from cursor_sdk import Agent, LocalAgentOptions
-        
-        with Agent.create(
-        model=&amp;quot;composer-2.5&amp;quot;,
-        api_key=&amp;quot;crsr_key&amp;quot;,
-        local=LocalAgentOptions(cwd=os.getcwd()),
-        ) as agent:
-        print(agent.send(&amp;quot;Summarize what this repository does&amp;quot;).text())
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This returns the final result of the prompt, but you also have the ability to get &lt;em&gt;everything&lt;/em&gt; that was generated, so for example, the detailed list of tool calls and such. You can also decide between streaming or just waiting and getting the final result.&lt;/p&gt;
-        &lt;p&gt;All of this just works - which is what you want in a SDK - and the quick start example is one of my favorite things to do with Cursor - basically &amp;quot;what the heck is this repo/set of code doing&amp;quot; - and I thought it would be cool to turn this into a CLI tool.&lt;/p&gt;
-        &lt;p&gt;To be clear, normally I&apos;d use the Cursor Agent window, open the repo or folder, and use Ask mode to describe the project. But if I&apos;m not planning to work with the code later and just want a good explanation, a CLI tool could be useful for this purpose instead.&lt;/p&gt;
-        &lt;p&gt;Of course, the easiest way to build this is to use Cursor itself. I set up a new folder and started a new plan:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;/plan create a Python CLI that makes use of the Cursor SDK. The CLI is a 
-        tool that will scan a code base and generated a detailed report of the 
-        application/code base of the folder being scanned. What it does, what 
-        technologies it use, what frameworks are in place, and so forth.
-        
-        The CLI should support a help command. 
-        The CLI will scan the current directory by default, but supports an 
-        argument to specify a path.
-        The CLI will output Markdown, but an argument allows for a PDF file output.
-        Require a filename to store the result. 
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This created the following plan:&lt;/p&gt;
-        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
-        &lt;zero-md&gt;
-        &lt;template data-append&gt;
-        &lt;style&gt;
-        .markdown-body {
-        padding: 20px;
-        margin-bottom: 30px;
-        }
-        &lt;/style&gt;
-        &lt;/template&gt;
-        &lt;script type=&quot;text/markdown&quot;&gt;
-        &lt;hr&gt;
-        &lt;p&gt;name: Python SDK CLI
-        overview: Build a greenfield Python CLI (&lt;code&gt;codebase-report&lt;/code&gt;) that uses the Cursor Python SDK’s local agent to analyze a target directory and write a structured Markdown or PDF report to a required output filename.
-        todos:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;id: scaffold
-        content: Create pyproject.toml, package layout, README with install/auth/usage
-        status: completed&lt;/li&gt;
-        &lt;li&gt;id: cli
-        content: &amp;quot;Implement argparse CLI: required --output, optional PATH, --pdf, --help&amp;quot;
-        status: completed&lt;/li&gt;
-        &lt;li&gt;id: scanner
-        content: Implement Agent.prompt local scan with structured Markdown prompt and exit codes
-        status: completed&lt;/li&gt;
-        &lt;li&gt;id: export
-        content: Implement Markdown write and Markdown-to-PDF via markdown + xhtml2pdf
-        status: completed
-        isProject: false&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;hr&gt;
-        &lt;h1 id=&quot;python-cli%3A-codebase-report-via-cursor-sdk&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#python-cli%3A-codebase-report-via-cursor-sdk&quot;&gt;Python CLI: Codebase Report via Cursor SDK&lt;/a&gt;&lt;/h1&gt;
-        &lt;h2 id=&quot;goal&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#goal&quot;&gt;Goal&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ship an installable Python CLI that points a &lt;strong&gt;local&lt;/strong&gt; Cursor agent at a folder, asks it to produce a detailed codebase report, and writes the result to a required output file as &lt;strong&gt;Markdown&lt;/strong&gt; (default) or &lt;strong&gt;PDF&lt;/strong&gt; (&lt;code&gt;--pdf&lt;/code&gt;).&lt;/p&gt;
-        &lt;h2 id=&quot;cli-interface&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#cli-interface&quot;&gt;CLI interface&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Console script: &lt;code&gt;codebase-report&lt;/code&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;codebase-report --output REPORT.md [PATH]
-        codebase-report --pdf --output REPORT.pdf [PATH]
-        codebase-report --help
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;table&gt;
-        &lt;thead&gt;
-        &lt;tr&gt;
-        &lt;th&gt;Arg&lt;/th&gt;
-        &lt;th&gt;Behavior&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td&gt;&lt;code&gt;PATH&lt;/code&gt;&lt;/td&gt;
-        &lt;td&gt;Optional; defaults to current working directory (&lt;code&gt;.&lt;/code&gt;)&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;&lt;code&gt;-o&lt;/code&gt; / &lt;code&gt;--output&lt;/code&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;strong&gt;Required&lt;/strong&gt; filename/path for the report&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;&lt;code&gt;--pdf&lt;/code&gt;&lt;/td&gt;
-        &lt;td&gt;Convert agent Markdown to PDF and write that instead of &lt;code&gt;.md&lt;/code&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;&lt;code&gt;-h&lt;/code&gt; / &lt;code&gt;--help&lt;/code&gt;&lt;/td&gt;
-        &lt;td&gt;Standard argparse help (covers the “help command” requirement)&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p&gt;Validation: &lt;code&gt;PATH&lt;/code&gt; must exist and be a directory; refuse missing &lt;code&gt;--output&lt;/code&gt;; exit non-zero on SDK startup vs run failures (see below).&lt;/p&gt;
-        &lt;h2 id=&quot;architecture&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#architecture&quot;&gt;Architecture&lt;/a&gt;&lt;/h2&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;flowchart LR
-        CLI[cli.py argparse] --&amp;gt; Scan[scanner.py Agent.prompt]
-        Scan --&amp;gt; Agent[Local Cursor agent cwd=PATH]
-        Agent --&amp;gt; MD[Markdown text]
-        MD --&amp;gt; Export[export.py]
-        Export --&amp;gt;|default| FileMD[write --output]
-        Export --&amp;gt;|--pdf| FilePDF[MD to HTML to PDF]
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;&lt;strong&gt;Runtime choice:&lt;/strong&gt; local agent with &lt;code&gt;LocalAgentOptions(cwd=resolved_path)&lt;/code&gt;. The agent reads the tree on disk; no cloud clone needed.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Invocation pattern:&lt;/strong&gt; one-shot &lt;code&gt;Agent.prompt(...)&lt;/code&gt; (create → run → dispose). No multi-turn, no streaming required for v1; optionally print a short “Scanning…” status to stderr.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Auth:&lt;/strong&gt; &lt;code&gt;CURSOR_API_KEY&lt;/code&gt; from the environment (documented in README). Pass &lt;code&gt;api_key=os.environ[&amp;quot;CURSOR_API_KEY&amp;quot;]&lt;/code&gt; explicitly so a missing key fails clearly.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Model:&lt;/strong&gt; &lt;code&gt;composer-2.5&lt;/code&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;project-layout-(greenfield)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#project-layout-(greenfield)&quot;&gt;Project layout (greenfield)&lt;/a&gt;&lt;/h2&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;pyproject.toml          # package + console_scripts entry
-        README.md               # install, CURSOR_API_KEY, usage examples
-        src/codebase_report/
-        __init__.py
-        __main__.py           # python -m codebase_report
-        cli.py                # argparse + main()
-        scanner.py            # Agent.prompt + prompt text + error handling
-        export.py             # write markdown / pdf
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Dependencies in &lt;code&gt;pyproject.toml&lt;/code&gt;:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;cursor-sdk&lt;/code&gt; (Python ≥3.10)&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;markdown&lt;/code&gt; + &lt;code&gt;xhtml2pdf&lt;/code&gt; for PDF (pure pip; no system WeasyPrint/Pandoc)&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;core-implementation-details&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#core-implementation-details&quot;&gt;Core implementation details&lt;/a&gt;&lt;/h2&gt;
-        &lt;h3 id=&quot;prompt-(scanner.py)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#prompt-(scanner.py)&quot;&gt;Prompt (&lt;code&gt;scanner.py&lt;/code&gt;)&lt;/a&gt;&lt;/h3&gt;
-        &lt;p&gt;Instruct the agent to &lt;strong&gt;explore the codebase&lt;/strong&gt; (read manifests, configs, source layout) and return &lt;strong&gt;only Markdown&lt;/strong&gt; covering at least:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Overview / purpose&lt;/li&gt;
-        &lt;li&gt;Primary languages and runtimes&lt;/li&gt;
-        &lt;li&gt;Frameworks and major libraries&lt;/li&gt;
-        &lt;li&gt;Architecture / top-level structure&lt;/li&gt;
-        &lt;li&gt;Entry points and how to run/build/test (if discoverable)&lt;/li&gt;
-        &lt;li&gt;Notable tooling (CI, linters, package managers)&lt;/li&gt;
-        &lt;li&gt;Anything else material about the app&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Also instruct: do not modify files; do not wrap the whole answer in a single fenced code block. The CLI owns writing the output file from &lt;code&gt;result.result&lt;/code&gt; (or equivalent final text).&lt;/p&gt;
-        &lt;h3 id=&quot;agent-call&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#agent-call&quot;&gt;Agent call&lt;/a&gt;&lt;/h3&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from cursor_sdk import Agent, AgentOptions, LocalAgentOptions, CursorAgentError
-        
-        result = Agent.prompt(
-        PROMPT,
-        AgentOptions(
-        api_key=os.environ[&amp;quot;CURSOR_API_KEY&amp;quot;],
-        model=&amp;quot;composer-2.5&amp;quot;,
-        local=LocalAgentOptions(cwd=str(scan_path.resolve())),
-        ),
-        )
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Error handling per SDK guidance:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;CursorAgentError&lt;/code&gt; → stderr + exit &lt;code&gt;1&lt;/code&gt; (auth/config/network; never started)&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;result.status == &amp;quot;error&amp;quot;&lt;/code&gt; → stderr + exit &lt;code&gt;2&lt;/code&gt; (run failed)&lt;/li&gt;
-        &lt;li&gt;success → extract Markdown text, then export&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h3 id=&quot;export-(export.py)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#export-(export.py)&quot;&gt;Export (&lt;code&gt;export.py&lt;/code&gt;)&lt;/a&gt;&lt;/h3&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;Markdown:&lt;/strong&gt; write UTF-8 text to &lt;code&gt;--output&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;PDF:&lt;/strong&gt; &lt;code&gt;markdown.markdown(...)&lt;/code&gt; → HTML → &lt;code&gt;xhtml2pdf&lt;/code&gt; → write bytes to &lt;code&gt;--output&lt;/code&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Light post-process: if the agent returns a single outer &lt;code&gt;markdown ... &lt;/code&gt; fence, strip it before writing.&lt;/p&gt;
-        &lt;h2 id=&quot;readme-(minimal)&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#readme-(minimal)&quot;&gt;README (minimal)&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;code&gt;pip install -e .&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;code&gt;export CURSOR_API_KEY=...&lt;/code&gt;&lt;/li&gt;
-        &lt;li&gt;Example scans of &lt;code&gt;.&lt;/code&gt; and an explicit path, Markdown and PDF&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;out-of-scope-for-v1&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#out-of-scope-for-v1&quot;&gt;Out of scope for v1&lt;/a&gt;&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;p&gt;Cloud agents, resume, streaming UI, interactive REPL&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;Config files / model override flags&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-        &lt;p&gt;Uploading or publishing the report&lt;/p&gt;
-        &lt;/script&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/zero-md&gt;
-        &lt;p&gt;By the way, the Architecture was a pretty Mermaid chart that&apos;s not rendering on my blog:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/08/mermaid.png&quot; loading=&quot;lazy&quot; alt=&quot;Mermaid&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;The end result - in terminal I can create a report in either Markdown or PDF. I&apos;ll share a link to the entire thing below, but let&apos;s take a look at the Python file responsible for analyzing the codebase via the Cursor SDK:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;&amp;quot;&amp;quot;&amp;quot;Run a local Cursor agent to produce a codebase Markdown report.&amp;quot;&amp;quot;&amp;quot;
-        
-        from __future__ import annotations
-        
-        import os
-        import sys
-        from pathlib import Path
-        
-        from cursor_sdk import Agent, AgentOptions, CursorAgentError, LocalAgentOptions
-        
-        PROMPT = &amp;quot;&amp;quot;&amp;quot;\
-        Explore this codebase thoroughly (manifests, configs, source layout, docs) and \
-        produce a detailed report about the application.
-        
-        Cover at least:
-        - Overview / purpose of the project
-        - Primary languages and runtimes
-        - Frameworks and major libraries
-        - Architecture and top-level structure
-        - Entry points and how to run, build, and test (if discoverable)
-        - Notable tooling (CI, linters, package managers, etc.)
-        - Anything else material about how the app works
-        
-        Rules:
-        - Do not modify, create, or delete any files.
-        - Return ONLY Markdown for the report (headings, lists, short code snippets as needed).
-        - Do not wrap the entire reply in a single fenced code block.
-        &amp;quot;&amp;quot;&amp;quot;
-        
-        
-        class ScanError(Exception):
-        &amp;quot;&amp;quot;&amp;quot;CLI-facing scan failure with an exit code.&amp;quot;&amp;quot;&amp;quot;
-        
-        def __init__(self, message: str, exit_code: int) -&amp;gt; None:
-        super().__init__(message)
-        self.exit_code = exit_code
-        
-        
-        def _require_api_key() -&amp;gt; str:
-        api_key = os.environ.get(&amp;quot;CURSOR_API_KEY&amp;quot;, &amp;quot;&amp;quot;).strip()
-        if not api_key:
-        raise ScanError(
-        &amp;quot;CURSOR_API_KEY is not set. Export it before running codebase-report.&amp;quot;,
-        exit_code=1,
-        )
-        return api_key
-        
-        
-        def _extract_markdown(result: object) -&amp;gt; str:
-        text = getattr(result, &amp;quot;result&amp;quot;, None)
-        if isinstance(text, str) and text.strip():
-        return text
-        raise ScanError(&amp;quot;Agent finished but returned no report text.&amp;quot;, exit_code=2)
-        
-        
-        def scan_codebase(scan_path: Path) -&amp;gt; str:
-        &amp;quot;&amp;quot;&amp;quot;Analyze *scan_path* with a local Cursor agent and return Markdown.&amp;quot;&amp;quot;&amp;quot;
-        api_key = _require_api_key()
-        cwd = str(scan_path.resolve())
-        
-        print(f&amp;quot;Scanning {cwd} with Cursor agent…&amp;quot;, file=sys.stderr)
-        
-        try:
-        result = Agent.prompt(
-        PROMPT,
-        AgentOptions(
-        api_key=api_key,
-        model=&amp;quot;composer-2.5&amp;quot;,
-        local=LocalAgentOptions(cwd=cwd),
-        ),
-        )
-        except CursorAgentError as err:
-        retryable = getattr(err, &amp;quot;is_retryable&amp;quot;, False)
-        raise ScanError(
-        f&amp;quot;startup failed: {err.message} (retryable={retryable})&amp;quot;,
-        exit_code=1,
-        ) from err
-        
-        status = getattr(result, &amp;quot;status&amp;quot;, None)
-        if status == &amp;quot;error&amp;quot;:
-        run_id = getattr(result, &amp;quot;id&amp;quot;, &amp;quot;unknown&amp;quot;)
-        raise ScanError(f&amp;quot;run failed: {run_id}&amp;quot;, exit_code=2)
-        
-        return _extract_markdown(result)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This is pretty robust and the prompt it uses is really well written. (Ok, as a reminder folks, don&apos;t forget prompt writing is still important &lt;em&gt;and&lt;/em&gt; you can cheat at that by asking your AI agent to improve your prompt before you actually run it.)&lt;/p&gt;
-        &lt;p&gt;I did a quick run of this on my blog and got the following:&lt;/p&gt;
-        &lt;iframe src=&quot;https://static.raymondcamden.com/images/2026/08/foo.pdf&quot; width=&quot;100%&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
-        &lt;p&gt;This is a rather simple example, but being able to use the Cursor platform in code like this could be really freaking powerful I think. If you&apos;ve done something like this, I&apos;d love to hear more, share a comment below. You can check out the full code here: &lt;a href=&quot;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&quot;&gt;https://github.com/cfjedimaster/cursor_python_sdk_cli_demo&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

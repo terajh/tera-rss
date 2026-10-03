@@ -4,15 +4,15 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Fri, 02 Oct 2026 20:10:37 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 03 Oct 2026 19:24:16 GMT</lastBuildDate>
     <item>
-      <title>누가 종속 소리를 내었는가 - 바이브 코딩 시대의 인프라에 대한 고찰</title>
-      <link>https://roboco.io/posts/vibe-coding-infrastructure-lock-in/</link>
-      <guid>https://roboco.io/posts/vibe-coding-infrastructure-lock-in/</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
+      <title>AI 네이티브 시대의 ‘일머리’ 있는 사람을 뽑는 법</title>
+      <link>https://roboco.io/posts/ai-era-hiring-strategy/</link>
+      <guid>https://roboco.io/posts/ai-era-hiring-strategy/</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
-        &lt;p&gt;“누가 종속 소리를 내었는가!”&lt;/p&gt;
+        &lt;p&gt;일머리는 모호한 일을 실행 가능한 일로 바꾸고, 결과까지 책임지는 능력이다.&lt;/p&gt;
         &lt;/blockquote&gt;
         &lt;figure&gt;&lt;img src=&quot;https://roboco.io/posts/images/Dohyun.png&quot;&gt;&lt;figcaption&gt;
         &lt;h4&gt;정도현 - 로보코 수석 컨설턴트&lt;/h4&gt;
@@ -20,211 +20,15 @@
         &lt;/figure&gt;
         
         &lt;hr&gt;
-        &lt;p&gt;2026년에도 온프레미스를 선호하는 사람은 많다. 장비를 직접 다루고, 모든 층을 통제하며 운영하는 일이 즐겁다면 이해한다. 지연 시간, 기존 설비와의 연결, 규제 때문에 자체 환경이 필요한 경우도 있다. 다만 “클라우드를 쓰면 종속되니까”라는 말은 납득하기 어렵다. &lt;strong&gt;클라우드간 또는 온프라미스로의 이전 비용은 바이브 코딩의 등장으로 크게 줄어 들었다. 반면 설비 및, 장비, 전문 운영 인력에 묶이는 비용은 여전히 남는다.&lt;/strong&gt; 어느쪽이 진정한 종속인가?&lt;/p&gt;
-        &lt;h2 id=&quot;tldr&quot;&gt;TL;DR&lt;/h2&gt;
-        &lt;ul&gt;
-        &lt;li&gt;바이브 코딩으로 클라우드 마이그레이션의 노동 비용은 이미 크게 줄었다. 모델과 에이전트가 발전하면 앞으로 더 줄어들 것이라고 본다.&lt;/li&gt;
-        &lt;li&gt;온프래미스는 훨씬 더 심히다. 데이터센터를 위한 부동산, 설비, 장비에 더불어 운영인력도 필요하다.&lt;/li&gt;
-        &lt;li&gt;클라우드 상에서 운영하는 Kubernetes는 데이턴센터는 필요 없지만 운영을 위한 전문 인력을 고용해야 한다. 이것 또한 종속이다.&lt;/li&gt;
-        &lt;li&gt;GPU 기반 고성능 컴퓨팅과 LLM 서비스가 빠르게 바뀌는 상황에서 클라우드는 장비를 사지 않고 새 기술을 시험할 수 있게 해 첨단 기술의 진입장벽을 낮춘다.&lt;/li&gt;
-        &lt;li&gt;바이브 코딩이 개발의 뉴노멀로 자리 잡으면, 구현과 테스트가 까다로워 기피되던 서버리스 같은 클라우드 네이티브 아키텍처가 더 많이 선택될 것이다.&lt;/li&gt;
-        &lt;li&gt;로보코는 현행 문서와 테스트를 정비하고 작은 서비스부터 이전한 뒤, 마련한 테스트·문서로 성공을 확인하고 그 절차를 규칙·스킬로 만드는 방식을 제안한다.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h2 id=&quot;1-종속성을-다시-정의할-때&quot;&gt;1. 종속성을 다시 정의할 때&lt;/h2&gt;
-        &lt;p&gt;클라우드 종속(vendor lock-in)을 말할 때 보통 한 공급자의 관리형 서비스와 API에 깊이 의존하는 상태를 떠올린다. 다른 환경으로 옮기려면 애플리케이션과 데이터를 바꿔야 하니, 공급자를 쉽게 교체할 수 없다는 뜻이다. NIST도 이식성을 다른 환경으로 애플리케이션과 데이터를 &lt;strong&gt;수용할 만한 비용으로&lt;/strong&gt; 옮길 수 있는 능력으로 설명한다.&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote-ref&quot; role=&quot;doc-noteref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+        &lt;p&gt;최근 동료와 바이브 코딩 도입 이후 실무자들의 생산성에 차이를 만드는 요소들에 관해 이야기했다. 같은 AI 도구를 활용해도 왜 사람마다 만들어내는 결과가 다를까. 그 차이를 하나씩 짚어가다 보니, 결국 ‘&lt;strong&gt;일머리&lt;/strong&gt;’라는 단어로 설명할 수 있다는 결론에 다다랐다.&lt;/p&gt;
+        &lt;p&gt;그런데 막상 일머리가 무엇인지 정의해보니 흥미로운 점을 발견했다. 업무의 목적과 맥락을 파악하고, 모호한 문제를 구조화하고, 우선순위를 정해 실행한 뒤, 결과를 확인하고 개선하는 능력. 개발자들이 소프트웨어를 만들며 해오던 일과 정확히 맞아떨어졌다.&lt;/p&gt;
       </content:encoded>
-    </item>
-    <item>
-      <title>Firebat F1 미니PC - 35W 전력제한 바이오스 설정</title>
-      <link>https://sunyzero.tistory.com/330</link>
-      <guid>https://sunyzero.tistory.com/330</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Firebat F1 7640HS, 24GB RAM, 512GB SSD 제품의 35W 전력제한을 BIOS에서 설정하는 방법에 대한 글이다. 35W로 전력을 제한하는 이유는 발열 때문이다. Firebat F1은 발열을 해소하는데 매우 어려운 구조적 문제가 있어서 원래 설정대로 사용하면 60도를 가볍게 터치하고, 그 이상으로도 튀는 문제가 생긴다. 특히 상단에 열이 빠져나갈 구멍이 없어서 지속적으로 열이 쌓이면 문제가 생길 것 같았다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;0. 제품 개요&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;해당 제품은 &lt;span style=&quot;color: #006dd7;&quot;&gt;Firebat F1, 7640HS, LPDDR5 5500MHz 24GB, 512GB NVMe SSD&lt;/span&gt; (firebat 제품)을 장착한 제품으로 세금 포함해서 47만원 조금 안되는 가격에 구입하였다. 이 제품은 장점은 24GB라는 메모리 용량에 있다. 내장 GPU를 사용하는 미니PC들은 보통 RAM에서 2~4GB정도를 내장 GPU의 그래픽에 사용하기 때문에 16GB 메모리를 장착한 경우에는 실제 사용가능한 메모리가 12~14로 줄어드는 부분이 있다. 하지만 이렇게 24GB를 사용하는 시스템은 4GB 정도를 iGPU용으로 전용해도 20GB가 남기 때문에 Youtube를 보면서, 프로그래밍을 하고, 문서작업을 해도 무리없이 사용할 수 있다. 단점은 LPDDR5은 메인보드에 납땜으로 부착되는 형태라서 메모리의 교체가 불가능해진다. 만일 메모리가 고장나면 매우 높은 확률로 고철이 되거나 RMS를 보내거나, 아님 전문 사설 수리점에 가야 될 수 있다. 물론 메모리는 왠만하면 고장이 안나므로 초기 불량이 아니면 큰 걱정할 필요는 없다. 그럼에도 불구하고 높은 열을 지속해서 주면 메모리 납땜이 약한 부분이 떨어지거나 문제가 생길 수는 있다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;00-firebat_f1_24G-512GB.png&quot; data-origin-width=&quot;757&quot; data-origin-height=&quot;701&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/djAtLD/dJMcadp5obW/ZojUDyU88mdsqqNmch6fnk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/djAtLD/dJMcadp5obW/ZojUDyU88mdsqqNmch6fnk/img.png&quot; data-alt=&quot;Firebat F1 7640HS 24GB LPDDR5 512GB SSD&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/djAtLD/dJMcadp5obW/ZojUDyU88mdsqqNmch6fnk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdjAtLD%2FdJMcadp5obW%2FZojUDyU88mdsqqNmch6fnk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;757&quot; height=&quot;701&quot; data-filename=&quot;00-firebat_f1_24G-512GB.png&quot; data-origin-width=&quot;757&quot; data-origin-height=&quot;701&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 7640HS 24GB LPDDR5 512GB SSD&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;참고로 이 제품에 들어있는 LPDDR5 메모리의 클럭이 &lt;span style=&quot;color: #0593d3;&quot;&gt;5500MHz&lt;/span&gt;인데, 내가 알기론 5500MHz 클럭의 제품은 주로 스마트폰에 들어가는 것으로 알고 있다. 따라서 스마트폰용으로 들어갈 메모리를 가져오거나 혹은 재생해서 사용하는게 아닌가 싶다. 특히 5500MHz LPDDR5는 최소 3~4년 전에 주로 사용하던 스펙으로 기억하는데 그렇다면 재고나 재생 메모리라는 생각이 좀 강하게 드는 편이다. 최근 대부분의 랩탑의 LPDDR5는 6400MHz이나 7~8000MHz이 넘는 스펙을 사용하고 있는 면에서 더 그런 생각이 든다. 아마도 단가를 낮출 수 있었던 것이 이런 요인이 아닌가 생각된다. 24GB RAM에 512GB SSD를 사용하고 50만원도 안되게 팔려면 이 방법이 최선이었을 것이다. 그리고 미니PC는 속도를 높여봐야 어차피 발열도 같이 늘어나서 문제가 되니까 Firebat F1같은 작은 제품은 낮은 클럭을 쓰는게 오히려 좋을 수 있다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Firebat F1 제품을 뜯는 방법은 조심하기만 하면 매우 쉬운 편이다. 하단의 4개의 나사를 풀고 헤라를 이용해서 옆을 살짝 벌려주면 하판 검은색 플라스틱이 툭 빠진다. 이때 옆의 전원 케이블과 WIFI 안테나를 조심해야 한다. 그리고 은색의 상판도 양옆 부분에 끼워져 있는데 헤라를 넣어서 살살 벌리면 툭하고 빠진다. 케이블들은 약하기 때문에 조심스러운 성격이 아니라면 괜히 분해하지 않는 것을 권장한다. 사실 분해해도 별다른 것도 없다. 본인이 분해한 이유는 WIFI 칩셋이 &lt;span style=&quot;color: #ee2323;&quot;&gt;realtek&lt;/span&gt; 제품이 들어있는데, 이게 그닥 좋은 편은 아니라서 &lt;span style=&quot;color: #006dd7;&quot;&gt;Intel AX210&lt;/span&gt;으로 변경하기 위해서 분해했다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;먼저 이 제품의 메인보드 스펙을 CPU-Z로 확인한 것은 다음과 같다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;01-firebat_f1-cpu-z-mainboard.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/sSwrR/dJMcab0fWj3/vUfrLkEKy6jwiubBMakhgK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/sSwrR/dJMcab0fWj3/vUfrLkEKy6jwiubBMakhgK/img.png&quot; data-alt=&quot;Firebat F1 - mainboard - A3TS-F&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/sSwrR/dJMcab0fWj3/vUfrLkEKy6jwiubBMakhgK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FsSwrR%2FdJMcab0fWj3%2FvUfrLkEKy6jwiubBMakhgK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;604&quot; height=&quot;603&quot; data-filename=&quot;01-firebat_f1-cpu-z-mainboard.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - mainboard - A3TS-F&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;메인보드의 BIOS는 AMI이고, 현재 바이오스 버전의 날짜는 2026년 4월 8일자이다. 찾아보니까 새로운 바이오스가 없는 것으로 봐서 이게 최신 바이오스인것 같다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;02-firebat_f1-cpu-z-memory.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/CDcDL/dJMcahsCV6C/uAi4WGKnhXycpfyc8YWtoK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/CDcDL/dJMcahsCV6C/uAi4WGKnhXycpfyc8YWtoK/img.png&quot; data-alt=&quot;Firebat F1 - Memory - LPDDR5&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/CDcDL/dJMcahsCV6C/uAi4WGKnhXycpfyc8YWtoK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FCDcDL%2FdJMcahsCV6C%2FuAi4WGKnhXycpfyc8YWtoK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;604&quot; height=&quot;603&quot; data-filename=&quot;02-firebat_f1-cpu-z-memory.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - Memory - LPDDR5&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;메모리는 LPDDR5 24GB인데 4개가 들어있으므로 6GB짜리 4개임을 알 수 있다. 그리고 CL 15 제품이 들어있다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;03-firebat_f1-cpu-z-memory-spd.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/caDnWQ/dJMcabyZU9q/N4dEml9JXKFiqg3RQbXKMk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/caDnWQ/dJMcabyZU9q/N4dEml9JXKFiqg3RQbXKMk/img.png&quot; data-alt=&quot;Firebat F1 - Memory SPD module&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/caDnWQ/dJMcabyZU9q/N4dEml9JXKFiqg3RQbXKMk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcaDnWQ%2FdJMcabyZU9q%2FN4dEml9JXKFiqg3RQbXKMk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;604&quot; height=&quot;603&quot; data-filename=&quot;03-firebat_f1-cpu-z-memory-spd.png&quot; data-origin-width=&quot;604&quot; data-origin-height=&quot;603&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - Memory SPD module&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;메모리 모듈은 &lt;span style=&quot;color: #009a87;&quot;&gt;LPDDR5 5500MHz Samsung 6GB&lt;/span&gt; 제품이다. 비어있는 정보가 많은 것으로 봐서 아무래도 재생 메모리가 아닌가 의심이 된다. 사실 재생메모리여도 삼성, SK하이닉스, 마이크론 같은 메이저 업체의 칩은 별 문제가 없는 편이다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;1. 프로세서 개요&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;이 제품에 들어있는 AMD 7640HS APU 프로세서의 주요 특징은 다음과 같다.[1]&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%;&quot; border=&quot;1&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;이름&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;AMD Ryzen5 7640HS&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;아키텍처&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Zen4&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;CPU Cores, Threads&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;6&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;SMT threads 12&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Base Clock&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&lt;span style=&quot;background-color: #f6e199;&quot;&gt;4300MHz&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;기본 클럭이 높은 편이라 발열이 심하다.&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Boost Clock&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&lt;span style=&quot;background-color: #ffc9af;&quot;&gt;5000MHz&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Cache (L1, L2, L3)&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;384KB, 6MB, 16MB&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;L2가 코어당 1MB로 늘었다.&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;TDP 전력 설정&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;35~54W&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;USB4 40Gbps&amp;nbsp;&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;2 lanes&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;USB 3.2 Gen2 10Gbps&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;2 lanes&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;PCIe&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;4.0&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Memory channels&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;2&amp;nbsp;&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;dual channel&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;GPU&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Radeon 760M&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;이 제품은 기본 클럭이 4.3GHz로 높은 편이다. 게다가 부스트 클럭은 5.0GHz로 매우 높다. 따라서 부스트가 터질때는 매우 빠르게 60~70도까지 치솟는다. 이런 높은 열은 미니PC의 급사망의 원인이 되므로, 많은 사람들은 커스텀 모드킷으로 개조된 케이스를 달기도 한다. 하지만 본인은 이걸로 게임을 하는게 아니라 그냥 문서 작업하고 유튜브 보는 용도라 차라리 전력 제한을 걸어서 발열을 낮추는 방법을 사용하기로 했다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;2. 바이오스의 전력 제한 설정&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;바이오스는 부팅할 때 Del 키를 누르면 되는데, 혹시라도 윈도11로 그냥 부팅되어버린다면 powershell을 &lt;span style=&quot;color: #ee2323;&quot;&gt;관리자 모드&lt;/span&gt;로 실행한 뒤에 아래 명령어로 쉽게 바이오스로 들어갈 수 있다. 아래 옵션에서 r은 reboot, fw는 firmware, t는 timeout을 의미한다. 즉 재부팅하면서 firmware로 들어가고, 지금 당장 실행하라는 뜻이다.&lt;/p&gt;
-        &lt;pre id=&quot;code_1790424989400&quot; class=&quot;shell&quot; data-ke-language=&quot;shell&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;shutdown /r /fw /t 0&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;간혹 shutdown 명령이 실패하는 경우가 있는데, 그럴 때는 다시 한번 명령하면 성공할 것이다. 이전에 내린 명령어는 위 화살표키를 누르면 바로 볼 수 있다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;2.1. 바이오스 메인 화면 : BIOS MAIN&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;바이오스 메인 화면에 보면 바이오스 버전 및 각종 정보가 보인다. 그냥 한번 봐두자. 현재 본인이 가진 바이오스의 core version은 5.29이고 EC Firmware는 2.05버전으로 보인다. 빌드 날짜는 아까 CPU-Z에서 본 것처럼 2026.04.08일자이다. 하단에 Memory Information을 보면 LPDDR5 24576MB가 들어있음을 볼 수 있다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;resize_11-firebat_f1-bios-main.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/ycZeZ/dJMb992lWqc/gOnqD7bBDNIrQlw39KFnMk/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/ycZeZ/dJMb992lWqc/gOnqD7bBDNIrQlw39KFnMk/img.jpg&quot; data-alt=&quot;Firebat F1 BIOS main menu&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/ycZeZ/dJMb992lWqc/gOnqD7bBDNIrQlw39KFnMk/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FycZeZ%2FdJMb992lWqc%2FgOnqD7bBDNIrQlw39KFnMk%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;resize_11-firebat_f1-bios-main.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 BIOS main menu&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;2.2. 바이오스 어드밴스드 : BIOS ADVANCED&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;오른쪽 화살표로 Advanced 메뉴로 이동한다. 여기서 &quot;&lt;span style=&quot;background-color: #9feec3;&quot;&gt;CTRL-F1&lt;/span&gt;&quot; 키를 누르면 hidden menu를 볼 수 있게 해준다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;resize_12-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/ejBwZN/dJMcacR8NEf/zzOib5Yniaer4dhSGnOVa1/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/ejBwZN/dJMcacR8NEf/zzOib5Yniaer4dhSGnOVa1/img.jpg&quot; data-alt=&quot;Firebat F1 BIOS Hidden Menu&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/ejBwZN/dJMcacR8NEf/zzOib5Yniaer4dhSGnOVa1/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FejBwZN%2FdJMcacR8NEf%2FzzOib5Yniaer4dhSGnOVa1%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;resize_12-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 BIOS Hidden Menu&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;히든 메뉴 중에 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;AMD CBS(Common BIOS Setting)&lt;/span&gt;을 들어간다. 보통 AMD는 CBS 설정에서 전력 제한(Power Limit)을 설정할 수 있게 해준다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h4 data-ke-size=&quot;size20&quot;&gt;2.2.1. AMD CBS - CPU Common Options, SMU Common Options&lt;/h4&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;AMD CBS 메뉴 아래에는 여러가지 설정이 있는데, 2가지만 수정할 것이며 &quot;&lt;span style=&quot;color: #8a3db6;&quot;&gt;CPU Common Options&lt;/span&gt;&quot;과 &quot;&lt;span style=&quot;color: #009a87;&quot;&gt;SMU Common Options&lt;/span&gt;&quot;이다.&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;CPU Common Options에는 Boost 기능 설정이 있는데 이걸 Disabled로 변경할 것이고,&amp;nbsp; SMU(System Management Unit) Common Options에는 전력을 제한하는 System configuration을 35W로 변경할 것이다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;resize_13-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/vSZOk/dJMcabFJSBN/1PN8i3cQ1axEciCmorUG4K/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/vSZOk/dJMcabFJSBN/1PN8i3cQ1axEciCmorUG4K/img.jpg&quot; data-alt=&quot;Firebat F1 - Advanced - AMD CBS&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/vSZOk/dJMcabFJSBN/1PN8i3cQ1axEciCmorUG4K/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FvSZOk%2FdJMcabFJSBN%2F1PN8i3cQ1axEciCmorUG4K%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;resize_13-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - Advanced - AMD CBS&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;먼저 CPU Common Options로 들어가보면 아래와 같이 &quot;&lt;span style=&quot;background-color: #99cefa;&quot;&gt;Core Performance Boost&lt;/span&gt;&quot;가 있는데 이것을 &quot;&lt;span style=&quot;color: #ee2323;&quot;&gt;Disabled&lt;/span&gt;&quot;로 변경한다. 이렇게 하면 5GHz의 부스트를 끄게 된다. 사실 이 부스트를 켜봐야 아주 짧은 시간동안 5GHz를 쓸 수 있는데, 이게 발열을 급격하게 높이는 주범이므로 되도록이면 끄는게 좋다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;resize_15-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS-cpu-common-1.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/JigcV/dJMcajcKigx/zrJcDERktEo7Hz5FeIKpW0/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/JigcV/dJMcajcKigx/zrJcDERktEo7Hz5FeIKpW0/img.jpg&quot; data-alt=&quot;Firebat F1 - CPU Common options - Core performance boost&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/JigcV/dJMcajcKigx/zrJcDERktEo7Hz5FeIKpW0/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FJigcV%2FdJMcajcKigx%2FzrJcDERktEo7Hz5FeIKpW0%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;resize_15-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS-cpu-common-1.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - CPU Common options - Core performance boost&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;그 다음에 SMU Common options로 들어가보면 아래처럼 &quot;&lt;span style=&quot;background-color: #9feec3;&quot;&gt;System Configurtion&lt;/span&gt;&quot; 항목이 있는데 이 부분을 &lt;span style=&quot;background-color: #f6e199;&quot;&gt;Auto&lt;/span&gt;에서 &lt;span style=&quot;background-color: #ffc1c8;&quot;&gt;35W&lt;/span&gt;로 변경해주면 된다. 검색해보니 다른 제품 중에 28W로 해도 된다는 사람도 있었는데, AMD 공식 문서에도 최소 값이 35W라고 쓰여있으므로 되도록이면 35W로 해주는게 좋다고 생각되었다. 괜히 과도하게 이상한 값을 사용하면 꼭 문제가 생겼기 때문에 되도록이면 안전한 값을 사용하도록 한다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;resize_14-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS-smu-common-35W.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/o9ir9/dJMcadDrmKd/bnWJWiP1GsiUhUmfvjoDE1/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/o9ir9/dJMcadDrmKd/bnWJWiP1GsiUhUmfvjoDE1/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/o9ir9/dJMcadDrmKd/bnWJWiP1GsiUhUmfvjoDE1/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fo9ir9%2FdJMcadDrmKd%2FbnWJWiP1GsiUhUmfvjoDE1%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;resize_14-firebat_f1-bios-advanced-ctrl-f1-hiddenmenu-CBS-smu-common-35W.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;이제 BIOS의 값을 저장하고 재부팅을 하기 위해 Save and Reset 같은 메뉴를 찾아서 실행한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;3. 윈11의 전원 설정 - powercfg.cpl&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;윈11에서도 설정을 하나 해줘야 한다. 먼저 35W를 설정하기 이전에는 뭐 하는게 없어도 60도 이상을 훌쩍 넘었다. 아무것도 안해도 클럭은 아래처럼 4787.7MHz를 찍고 있었으며 이것 때문에 온도가 계속 튀었다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;21-hwmonitor-auto.png&quot; data-origin-width=&quot;772&quot; data-origin-height=&quot;1138&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/p709T/dJMcafuFGvX/66ZA6agwoloKK6akR6KHtK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/p709T/dJMcafuFGvX/66ZA6agwoloKK6akR6KHtK/img.png&quot; data-alt=&quot;Firebat F1 default settings - HWMonitor&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/p709T/dJMcafuFGvX/66ZA6agwoloKK6akR6KHtK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fp709T%2FdJMcafuFGvX%2F66ZA6agwoloKK6akR6KHtK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;772&quot; height=&quot;1138&quot; data-filename=&quot;21-hwmonitor-auto.png&quot; data-origin-width=&quot;772&quot; data-origin-height=&quot;1138&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 default settings - HWMonitor&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;이걸 35W, Core performance boost = disabled로 변경하면 아래와 같이 온도가 착해진다. CPU-Z에서도 TDP가 35W로 변경된 것을 볼 수 있다. 그리고 화룡정점으로 윈11 전원 관리 옵션 설정을 변경하기 위해 &quot;Win + R&quot;키를 누르고 &lt;span style=&quot;background-color: #ffc1c8;&quot;&gt;powercfg.cpl&lt;/span&gt; 을 실행시킨 다. 그리고나서 &quot;&lt;span style=&quot;background-color: #9feec3;&quot;&gt;설정 변경&lt;/span&gt;&quot;으로 들어가서 &quot;&lt;span style=&quot;background-color: #f6e199;&quot;&gt;고급 전원 관리 옵션 설정 변경&lt;/span&gt;&quot;으로 클릭하면 &quot;&lt;b&gt;&lt;span style=&quot;color: #ee2323;&quot;&gt;최대 프로세서 상태&lt;/span&gt;&lt;/b&gt;&quot;가 나오는데 이걸 &lt;b&gt;&lt;span style=&quot;color: #ee2323;&quot;&gt;80%&lt;/span&gt;&lt;/b&gt;로 낮추면 &lt;span style=&quot;color: #ee2323;&quot;&gt;3800MHz&lt;/span&gt; 대역으로 작동하면서 온도가 50도 언저리에서 유지된다. 이렇게 해도 미니PC 상판을 만져보면 약간 미지근한 수준이므로 Firebat F1의 구조적 방열 문제는 어쩔 수 없는 것 같다. 나중에 스마트스토어의 &lt;span style=&quot;background-color: #f6e199;&quot;&gt;미니기어&lt;/span&gt; 같은 곳에서 모드킷이 나오면 변경하는 것이 좋을지도 모른다.[2]&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;22-hwmonitor-35W 80 percent.png&quot; data-origin-width=&quot;1378&quot; data-origin-height=&quot;1125&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/coVSwt/dJMcacxYc0M/ogDxTxRF6O4wGQUKnk26vk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/coVSwt/dJMcacxYc0M/ogDxTxRF6O4wGQUKnk26vk/img.png&quot; data-alt=&quot;Firebat F1 - 35W system configuration - Core performance boost off - HWmonitor&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/coVSwt/dJMcacxYc0M/ogDxTxRF6O4wGQUKnk26vk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcoVSwt%2FdJMcacxYc0M%2FogDxTxRF6O4wGQUKnk26vk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1378&quot; height=&quot;1125&quot; data-filename=&quot;22-hwmonitor-35W 80 percent.png&quot; data-origin-width=&quot;1378&quot; data-origin-height=&quot;1125&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 - 35W system configuration - Core performance boost off - HWmonitor&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;4. 바이오스 초기화 방법&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Firebat F1 바이오스의 메뉴를 이것저것 만지다가 갑자기 부팅이 안되는 불상사가 생겼다. 보통의 PC는 BIOS Reset 기능을 하는 jumper가 있기 때문에 뜯어서 봤는데 한참을 봐도 그런 기능은 없어 보였다. 그래서 아래와 같이 배터리를 분리했다. 배터리를 분리한 상태로 수십분을 둔 다음에 다시 연결했다. 그리고 한참을 기다렸더니 드디어 부팅이 되었다. 즉시 Restore factory default values 같은 메뉴를 찾아서 원상복구 한뒤에 다시 재부팅해서 정상 부팅되는 것을 확인하고, 배터리를 연결 후 조립을 했다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;30-firebat_f1-battery_connector-unplugged.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/cd6Fk2/dJMcabyZVGu/zYCEIInUl6tkHsfkJzVKIK/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/cd6Fk2/dJMcabyZVGu/zYCEIInUl6tkHsfkJzVKIK/img.jpg&quot; data-alt=&quot;Firebat F1 unplug the mainboard battery connector&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/cd6Fk2/dJMcabyZVGu/zYCEIInUl6tkHsfkJzVKIK/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fcd6Fk2%2FdJMcabyZVGu%2FzYCEIInUl6tkHsfkJzVKIK%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1000&quot; height=&quot;750&quot; data-filename=&quot;30-firebat_f1-battery_connector-unplugged.jpg&quot; data-origin-width=&quot;1000&quot; data-origin-height=&quot;750&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Firebat F1 unplug the mainboard battery connector&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;혹시라도 본인과 같은 실수를 하는 사람이 있을지 몰라서 바이오스 초기화 방법까지 적어뒀다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;5. 레퍼런스 참고&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[1] AMD 7640HS, &lt;a href=&quot;https://www.amd.com/ko/products/processors/laptop/ryzen/7000-series/amd-ryzen-5-7640hs.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://www.amd.com/ko/products/processors/laptop/ryzen/7000-series/amd-ryzen-5-7640hs.html&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[2] 미니기어 스마트스토어, &lt;a href=&quot;https://smartstore.naver.com/minigear&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://smartstore.naver.com/minigear&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;6. 히스토리&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;2026.09.26 글을 처음으로 릴리즈&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>제목 없음</title>
-      <link>https://tensorflow.blog/2026/10/01/book-roadmap/</link>
-      <guid>https://tensorflow.blog/2026/10/01/book-roadmap/</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded></content:encoded>
-    </item>
-    <item>
-      <title>혼자 공부하는 머신러닝+딥러닝 개정판이 출간되었습니다!</title>
-      <link>https://tensorflow.blog/2026/10/01/%ed%98%bc%ec%9e%90-%ea%b3%b5%eb%b6%80%ed%95%98%eb%8a%94-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d%eb%94%a5%eb%9f%ac%eb%8b%9d-%ea%b0%9c%ec%a0%95%ed%8c%90%ec%9d%b4-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</link>
-      <guid>https://tensorflow.blog/2026/10/01/%ed%98%bc%ec%9e%90-%ea%b3%b5%eb%b6%80%ed%95%98%eb%8a%94-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d%eb%94%a5%eb%9f%ac%eb%8b%9d-%ea%b0%9c%ec%a0%95%ed%8c%90%ec%9d%b4-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded></content:encoded>
-    </item>
-    <item>
-      <title>“핸즈온 머신러닝 with 사이킷런, 파이토치”가 출간되었습니다!</title>
-      <link>https://tensorflow.blog/2026/10/01/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-with-%ec%82%ac%ec%9d%b4%ed%82%b7%eb%9f%b0-%ed%8c%8c%ec%9d%b4%ed%86%a0%ec%b9%98%ea%b0%80-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</link>
-      <guid>https://tensorflow.blog/2026/10/01/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-with-%ec%82%ac%ec%9d%b4%ed%82%b7%eb%9f%b0-%ed%8c%8c%ec%9d%b4%ed%86%a0%ec%b9%98%ea%b0%80-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded>오렐리앙 제롱의 베스트 셀러 &amp;#60;핸즈온 머신러닝 with 사이킷런, 파이토치&amp;#62;가 출간되었습니다! 기존에 &amp;#60;핸즈온 머신러닝 3판&amp;#62;과 비교해 보면 주로 딥러닝 파트가 바뀌었습니다. 책 제목에서 알 수 있듯이 텐서플로+케라스 조합을 사용했던 기존 코드와 설명을 파이토치로 바꾸었습니다. 단순히 코드와 설명을 바꾼 것뿐만 아니라 많은 내용이 추가되었습니다. 특히 대규모 언어 모델에 대한 장을 크게 늘렸고, 미세 튜닝은 물론 비전, 멀티 [&amp;#8230;]</content:encoded>
-    </item>
-    <item>
-      <title>소프트웨어 개발을 공학으로 만드는 것</title>
-      <link>https://parksb.github.io/article/44.html</link>
-      <guid>https://parksb.github.io/article/44.html</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded>KO | EN | Discussions on HN 소프트웨어를 만드는 직업에는 여러 이름이 있다. 개발자라는 이름이 가장 흔하고, 프로그래머라는 이름은 중립적이면서 약간은 전통적인 느낌을 준다. 코더는 말 그대로 코딩하는 사람을 의미하는 이름이지만, 소프트웨어 개발에 수반되는 수많은 과정에서 수동적인 코드 작성만을 담당한다는 뉘앙스로 인해 멸칭으로 쓰이기도 한다. 그리고 그 반대편에는 소프트웨어 엔지니어가 있다. 소프트웨어 엔지니어라는 이름은 사뭇 다른 느낌을 준다. 왠지 모르게 코더보다 전문적일 것 같고, 어째서인지 프로그래머보다...</content:encoded>
     </item>
     <item>
       <title>기술 뉴스 #303 : 2026-10-01</title>
       <link>https://blog.outsider.ne.kr/1813</link>
       <guid>https://blog.outsider.ne.kr/1813</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
       <content:encoded>
         &lt;h2&gt;웹개발 관련&lt;/h2&gt;
         &lt;ul&gt;
@@ -322,168 +126,383 @@
       </content:encoded>
     </item>
     <item>
-      <title>회사의 비누를 만드는 사람들</title>
-      <link>https://jojoldu.tistory.com/886</link>
-      <guid>https://jojoldu.tistory.com/886</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;요즘 판교 일대를 걷다 보면 여러 현수막을 보게 된다.&lt;br&gt;회사마다 개발자의 역할을 어떻게 생각하는지 엿볼 수 있다.  &lt;/p&gt;
-        &lt;p&gt;AI가 코드를 작성하는데, 개발자만 꼭 개발을 해야 하느냐, 개발자가 꼭 개발만 해야 하느냐는 이야기가 많다.&lt;br&gt;직접 문제를 풀던 시간은 줄고, AI에게 일을 시키고 결과만 넘기는 사람이 된 것 같다는 개발자분들도 많다.&lt;/p&gt;
-        &lt;p&gt;AI로 바이브 코딩을 하면서 개발자가 아닌 사람들도 업무에 쓸 프로그램을 직접 만들 수 있게 됐다.&lt;br&gt;앞으로 이렇게 만드는 사람은 더 많아질 거고, 그만큼 사고도 생길 거다.&lt;br&gt;혼자 쓰려고 만든 프로그램에서 회사 정보가 밖으로 샐 수도 있고, 데이터를 고치다가 원래대로 돌리지 못할 수도 있다.&lt;br&gt;그렇다고 다시 개발자만 프로그램을 만들게 하기는 어려울 것 같다.&lt;br&gt;직접 만들어 쓰는 게 얼마나 편한지, 누군가가 해줄 때까지 기다리지 않아도 된다는 게 얼마나 편한지 이미 대부분 경험했으니까.  &lt;/p&gt;
-        &lt;p&gt;예전엔 어렵던 일을 도구 덕분에 누구나 할 수 있게 된 건 이번이 처음이 아니다.&lt;br&gt;손 위생이 자리 잡기 전에는 병원에서 수술을 받는 일 자체가 위험했다.&lt;br&gt;1860년대 영국 글래스고의 한 병원에서는 팔다리를 절단한 환자의 절반 가까이가 감염으로 목숨을 잃었다.&lt;br&gt;손과 상처를 소독하기 시작하자 그 비율은 15%까지 떨어졌다.&lt;br&gt;지금은 손 씻기를 가르치는 것만으로 설사병에 걸리는 사람이 23-40% 줄어든다고 한다.&lt;br&gt;전문가가 아니어도 비누 하나로 감염을 꽤 막을 수 있다.&lt;/p&gt;
-        &lt;p&gt;그렇다면 비누가 흔해진 뒤로 위생과 감염을 다루는 사람들의 일은 줄었을까.&lt;br&gt;영국에서 비누는 무거운 세금 때문에 한때 마음껏 쓰기 어려운 물건이었다.&lt;br&gt;비누세가 없어지자 비누 산업이 빠르게 커졌다.&lt;br&gt;그 뒤 아버지의 식료품 가게에서 일하던 윌리엄 레버는 비누를 무게로 달아 파는 대신 한 장씩 잘라 포장해서 팔기 시작했다.&lt;br&gt;이 비누 장사가 2025년 한 해 매출만 약 78조 원인 도브와 바세린을 파는 유니레버가 되었다.  &lt;/p&gt;
-        &lt;p&gt;반면, 비누만으로는 막지 못한 감염도 있었다.&lt;br&gt;1959년 영국에서는 병원 감염만 맡는 감염관리 간호사가 처음 생겼다.&lt;br&gt;비누를 만들고 퍼뜨리는 사람, 비누로도 막지 못하는 감염을 연구하는 사람처럼 위생을 다루는 일은 오히려 여러 갈래로 늘었다.&lt;br&gt;설사를 막는 일의 상당 부분은 비누가 맡고, 의사는 손을 잘 씻고도 걸리는 설사를 들여다보는 셈이다.&lt;/p&gt;
-        &lt;p&gt;AI로 프로그램을 만드는 사람이 많아지면 개발자가 하는 일은 지금과 달라질 수 있다.&lt;br&gt;그 변화도 위생을 다루는 일처럼 갈래가 늘어나는 쪽일 것 같다.&lt;br&gt;회사의 비누를 만드는 사람, 그리고 비누가 있어도 생기는 사고를 해결하는 사람처럼.&lt;/p&gt;
-        &lt;p&gt;누구나 AI로 프로그램을 만들려면 회사의 비누가 있어야 한다.&lt;br&gt;회사 데이터에 안전하게 연결되고, 실수해도 되돌릴 수 있고, 매일 써도 비용이 부담되지 않는 AI 환경 말이다.&lt;br&gt;개발자가 이런 비누를 만들어 두면 개발자가 아닌 사람도 마음 놓고 AI로 일할 수 있다.&lt;/p&gt;
-        &lt;p&gt;이런 비누로도 막지 못하는 사고가 있다.&lt;br&gt;AI로 각자 만든 프로그램은 하나씩 떼어 보면 문제없어 보인다.&lt;br&gt;그런데 여러 프로그램이 같은 데이터를 바꾸기 시작하면 어느 프로그램이 바꾼 값이 맞는지부터 헷갈린다.&lt;br&gt;한 곳에서 난 오류가 다른 업무에 어디까지 번지는지도 알기 어렵다.&lt;br&gt;사고가 나면 어디부터 복구할지도 누군가는 정해야 한다.&lt;br&gt;이런 일에는 회사의 업무와 데이터, 이미 운영 중인 시스템을 아는 개발자가 필요하다.&lt;/p&gt;
-        &lt;p&gt;팔다리를 절단한 환자의 절반 가까이가 감염으로 목숨을 잃던 시대에서, 손 씻기와 소독이 당연해진 시대가 되기까지는 수십 년이 걸렸다.&lt;br&gt;지금은 그만한 변화가 몇 년 사이에 일어나고 있다.&lt;/p&gt;
-        &lt;p&gt;이 시기만 지나면 괜찮아지겠지, 조금만 버티면 되겠지 하는 마음으로는 하루하루를 보내기 어렵다.&lt;br&gt;이렇게 큰 변화를 직접 눈으로 보고 몸으로 겪을 수 있는 때는 흔치 않다.&lt;br&gt;빨리 지나가기만 바라기에는 아까운, 멋진 시기라고 생각한다.&lt;/p&gt;
-      </content:encoded>
+      <title>소프트웨어 개발을 공학으로 만드는 것</title>
+      <link>https://parksb.github.io/article/44.html</link>
+      <guid>https://parksb.github.io/article/44.html</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
+      <content:encoded>KO | EN | Discussions on HN 소프트웨어를 만드는 직업에는 여러 이름이 있다. 개발자라는 이름이 가장 흔하고, 프로그래머라는 이름은 중립적이면서 약간은 전통적인 느낌을 준다. 코더는 말 그대로 코딩하는 사람을 의미하는 이름이지만, 소프트웨어 개발에 수반되는 수많은 과정에서 수동적인 코드 작성만을 담당한다는 뉘앙스로 인해 멸칭으로 쓰이기도 한다. 그리고 그 반대편에는 소프트웨어 엔지니어가 있다. 소프트웨어 엔지니어라는 이름은 사뭇 다른 느낌을 준다. 왠지 모르게 코더보다 전문적일 것 같고, 어째서인지 프로그래머보다...</content:encoded>
     </item>
     <item>
-      <title>[SE-0548] resignRemoteID for remote distributed actor references</title>
-      <link>https://green1229.tistory.com/638</link>
-      <guid>https://green1229.tistory.com/638</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
+      <title>제목 없음</title>
+      <link>https://tensorflow.blog/2026/10/01/book-roadmap/</link>
+      <guid>https://tensorflow.blog/2026/10/01/book-roadmap/</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
+      <content:encoded></content:encoded>
+    </item>
+    <item>
+      <title>혼자 공부하는 머신러닝+딥러닝 개정판이 출간되었습니다!</title>
+      <link>https://tensorflow.blog/2026/10/01/%ed%98%bc%ec%9e%90-%ea%b3%b5%eb%b6%80%ed%95%98%eb%8a%94-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d%eb%94%a5%eb%9f%ac%eb%8b%9d-%ea%b0%9c%ec%a0%95%ed%8c%90%ec%9d%b4-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</link>
+      <guid>https://tensorflow.blog/2026/10/01/%ed%98%bc%ec%9e%90-%ea%b3%b5%eb%b6%80%ed%95%98%eb%8a%94-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d%eb%94%a5%eb%9f%ac%eb%8b%9d-%ea%b0%9c%ec%a0%95%ed%8c%90%ec%9d%b4-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
+      <content:encoded></content:encoded>
+    </item>
+    <item>
+      <title>“핸즈온 머신러닝 with 사이킷런, 파이토치”가 출간되었습니다!</title>
+      <link>https://tensorflow.blog/2026/10/01/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-with-%ec%82%ac%ec%9d%b4%ed%82%b7%eb%9f%b0-%ed%8c%8c%ec%9d%b4%ed%86%a0%ec%b9%98%ea%b0%80-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</link>
+      <guid>https://tensorflow.blog/2026/10/01/%ed%95%b8%ec%a6%88%ec%98%a8-%eb%a8%b8%ec%8b%a0%eb%9f%ac%eb%8b%9d-with-%ec%82%ac%ec%9d%b4%ed%82%b7%eb%9f%b0-%ed%8c%8c%ec%9d%b4%ed%86%a0%ec%b9%98%ea%b0%80-%ec%b6%9c%ea%b0%84%eb%90%98%ec%97%88/</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
+      <content:encoded>오렐리앙 제롱의 베스트 셀러 &amp;#60;핸즈온 머신러닝 with 사이킷런, 파이토치&amp;#62;가 출간되었습니다! 기존에 &amp;#60;핸즈온 머신러닝 3판&amp;#62;과 비교해 보면 주로 딥러닝 파트가 바뀌었습니다. 책 제목에서 알 수 있듯이 텐서플로+케라스 조합을 사용했던 기존 코드와 설명을 파이토치로 바꾸었습니다. 단순히 코드와 설명을 바꾼 것뿐만 아니라 많은 내용이 추가되었습니다. 특히 대규모 언어 모델에 대한 장을 크게 늘렸고, 미세 튜닝은 물론 비전, 멀티 [&amp;#8230;]</content:encoded>
+    </item>
+    <item>
+      <title>SwiftUI - TipKit</title>
+      <link>https://green1229.tistory.com/639</link>
+      <guid>https://green1229.tistory.com/639</guid>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
       <content:encoded>
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0548 &amp;mdash; 원격 분산 액터 참조를 위한 resignRemoteID&lt;/b&gt;&lt;/span&gt;에 대해 정리해보겠습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;213.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/7LFO6/dJMcagtBgCK/kGKepfksvhSAE9IZfYDGF1/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/7LFO6/dJMcagtBgCK/kGKepfksvhSAE9IZfYDGF1/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/7LFO6/dJMcagtBgCK/kGKepfksvhSAE9IZfYDGF1/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F7LFO6%2FdJMcagtBgCK%2FkGKepfksvhSAE9IZfYDGF1%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;213.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SwiftUI의 TipKit 프레임워크&lt;/b&gt;&lt;/span&gt;에 대해 애플 공식 문서를 기준으로 정리해보겠습니다  &lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;12312.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/GC2cO/dJMcafByQNM/GCQssw0rzLh8TIGO5RYjJ0/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/GC2cO/dJMcafByQNM/GCQssw0rzLh8TIGO5RYjJ0/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/GC2cO/dJMcafByQNM/GCQssw0rzLh8TIGO5RYjJ0/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FGC2cO%2FdJMcafByQNM%2FGCQssw0rzLh8TIGO5RYjJ0%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;12312.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
         &lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Intro&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
         &lt;div style=&quot;background: #f2f8ee; border-radius: 10px; padding: 16px 20px; margin: 16px 0;&quot;&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Proposal:&lt;/b&gt; SE-0548&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Author:&lt;/b&gt; Konrad &apos;ktoso&apos; Malawski&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Review Manager:&lt;/b&gt; Doug Gregor&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Status:&lt;/b&gt; Accepted&lt;/span&gt;&lt;/p&gt;
-        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Implementation:&lt;/b&gt; swiftlang/swift#91610&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;주제:&lt;/b&gt; TipKit&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;프레임워크:&lt;/b&gt; TipKit&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;지원 버전:&lt;/b&gt; iOS/iPadOS 17 &amp;middot; macOS 14 &amp;middot; tvOS 16 &amp;middot; watchOS 10 &amp;middot; visionOS 1 이상&lt;/span&gt;&lt;/p&gt;
+        &lt;p style=&quot;margin: 4px 0;&quot; data-ke-size=&quot;size16&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;공식 문서:&lt;/b&gt; &lt;a style=&quot;color: #000000;&quot; href=&quot;https://developer.apple.com/documentation/tipkit&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;developer.apple.com/documentation/tipkit&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
         &lt;/div&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Summary of Changes&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;분산 액터(distributed actor)의 정체성은 연관된 &lt;code&gt;DistributedActorSystem&lt;/code&gt;이 관리해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;지금까지 시스템은 &lt;code&gt;assignID(_:)&lt;/code&gt;/&lt;code&gt;resignID(_:)&lt;/code&gt; 쌍을 통해 &lt;b&gt;로컬&lt;/b&gt; 분산 액터 인스턴스의 생명주기를 관찰하고, &lt;code&gt;resolve(id:as:)&lt;/code&gt;를 통해 원격 참조의 &lt;b&gt;생성&lt;/b&gt;에 관여했어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;TipKit이란&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;공식 문서는 TipKit을 이렇게 소개해요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Use TipKit to show contextual tips that highlight new, interesting, or unused features people haven&apos;t discovered on their own yet.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;하지만 원격 참조가 언제 deinitialize되는지 관찰할 방법은 없었습니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이 제안은 &lt;b&gt;원격 분산 액터 프록시가 deinitialize될 때 호출되는 새 프로토콜 요구사항 &lt;code&gt;resignRemoteID(_:)&lt;/code&gt; 하나를 추가하자고 제안&lt;/b&gt;합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;즉, &lt;b&gt;사람들이 아직 스스로 발견하지 못한 기능을 가볍게 알려주는 용도&lt;/b&gt;예요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Tip&lt;/code&gt; 프로토콜로 팁의 내용과, 그 팁이 언제 나타나야 하는지의 조건을 정의하고, &lt;code&gt;TipView&lt;/code&gt;로 그 기능에 시선을 끌게 만들어요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Motivation&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;a style=&quot;color: #000000;&quot; href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0344-distributed-actor-runtime.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SE-0344: Distributed Actor Runtime&lt;/a&gt;는 &lt;code&gt;DistributedActorSystem&lt;/code&gt;에 다음과 같은 생명주기 콜백들을 정의해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;공식 문서는 사용 가이드도 명확히 제시해요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
         &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;assignID(_:)&lt;/code&gt;: 로컬 분산 액터가 초기화되는 중에 정체성(identity)을 얻기 위해 호출됨&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;actorReady(_:)&lt;/code&gt;: 로컬 분산 액터가 초기화를 완료했을 때 호출됨&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resignID(_:)&lt;/code&gt;: 로컬 분산 액터가 deinitialize될 때(또는 초기화가 실패할 때) 호출됨&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resolve(id:as:)&lt;/code&gt;: 사용자 코드가 &lt;code&gt;SomeActor.resolve(id:using:)&lt;/code&gt;를 호출할 때 실행됨. &lt;code&gt;nil&lt;/code&gt;을 반환하면 런타임에게 이 &lt;code&gt;id&lt;/code&gt;에 대한 &lt;b&gt;원격&lt;/b&gt; 참조를 할당하라고 알려줌&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사람들을 부담주지 않도록 팁은 아껴서 써야 함&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;스스로 발견하기 어려운, 눈에 잘 안 띄는 기능에만 써야 함&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;앱을 쓸 때마다 매번 팁을 띄우지 말 것 &amp;mdash; 불필요하게 나타나면 방해가 됨&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁으로 앱 사용법을 처음부터 끝까지 안내하거나, 광고/프로모션 목적으로 쓰면 안 됨&lt;/span&gt;&lt;/li&gt;
         &lt;/ul&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;원격 경로의 생명주기는 비대칭적이에요.&lt;/span&gt;&lt;/b&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt; &lt;code&gt;resolve(id:as:)&lt;/code&gt;는 원격 참조를 생성할 때 호출되지만, 그 참조들에 대해 &lt;code&gt;resignID&lt;/code&gt;와 대응되는 콜백은 없습니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;디자인 가이드는 &lt;a style=&quot;color: #000000;&quot; href=&quot;https://developer.apple.com/design/human-interface-guidelines/offering-help&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Human Interface Guidelines의 Offering Help&lt;/a&gt; 문서를 참고하라고 안내하고 있어요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;원격 참조가 상태가 없고 리소스를 들고 있지 않은 시스템이라면 이걸로 충분해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;하지만 예를 들어 특정 커넥션을 쓰고 있는 원격 액터 참조가 최소 하나라도 존재하는 동안엔 그 커넥션을 계속 살려두고 싶은 시스템에는 문제가 되는 것으로 나타났습니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이상적으로는, 원격 참조가 할당 해제될 때마다 시스템이 통지받아서, 그 id를 이용해 커넥션을 이미 종료해도 되는지 아직 안 되는지를 관리할 수 있어야 합니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Proposed Solution&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;원격 분산 액터 참조가 &lt;b&gt;deinitialize될 때 호출되는 새 프로토콜 요구사항을 &lt;code&gt;DistributedActorSystem&lt;/code&gt;에 추가해서 이 문제를 해결&lt;/b&gt;하자고 제안합니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;public protocol DistributedActorSystem {
-        // ... existing requirements, including:
-        func resignID(_ id: ActorID)
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Tip 프로토콜 &amp;mdash; 팁의 내용 정의하기&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;공식 문서의 첫 예제 코드예요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;import SwiftUI
+        import TipKit
         
-        /// Invoked when a remote distributed actor reference is deinitializing. 
-        /// 
-        /// The passed in ID, generally, would have been passed to \`resolve(id:as:)\` earlier
-        /// and a remote distributed reference would have been created as a result of that resolve call.
-        ///
-        /// - SeeAlso: \`\`resignID(_:)\`\` which is invoked for local instances.
-        func resignRemoteID(_ id: ActorID)
+        // Define your tip&apos;s content.
+        struct FavoriteLandmarkTip: Tip {
+        var title: Text {
+        Text(&quot;Save as a Favorite&quot;)
         }
         
-        extension DistributedActorSystem {
-        public func resignRemoteID(_ id: ActorID) {}
+        var message: Text? {
+        Text(&quot;Your favorite landmarks always appear at the top of the list.&quot;)
+        }
+        
+        var image: Image? {
+        Image(systemName: &quot;star&quot;)
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;&lt;/code&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Tip&lt;/code&gt;은 &lt;code&gt;Identifiable&lt;/code&gt;, &lt;code&gt;Sendable&lt;/code&gt;을 채택하는 프로토콜이에요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁이 유효하려면 &lt;code&gt;title&lt;/code&gt;은 반드시 설정해야 하고, &lt;code&gt;message&lt;/code&gt;와 &lt;code&gt;image&lt;/code&gt;는 선택이에요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;rules&lt;/code&gt;와 &lt;code&gt;options&lt;/code&gt; 프로퍼티에 &lt;code&gt;Rule&lt;/code&gt;과 &lt;code&gt;Option&lt;/code&gt; 인스턴스를 전달해서 팁이 언제 나타날지 제어할 수 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;앱 시작 시 팁 로드하기 &amp;mdash; Tips.configure(_:)&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁을 화면에 띄우기 전에, &lt;b&gt;먼저 앱에 로드해야 해요. &lt;/b&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;공식 문서는 앱 세션마다 한 번, 예를 들어 &lt;code&gt;App&lt;/code&gt;의 &lt;code&gt;init()&lt;/code&gt;에서 &lt;code&gt;configure(_:)&lt;/code&gt;를 호출하는 걸 베스트 프랙티스로 안내해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;@main
+        struct TipKitExamples: App {
+        var body: some Scene {
+        WindowGroup {
+        ContentView()
+        }
+        }
+        
+        init() {
+        do {
+        // Configure and load all tips in the app.
+        try Tips.configure()
+        }
+        catch {
+        print(&quot;Error initializing tips: \(error)&quot;)
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;&lt;/code&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;configure(_:)&lt;/code&gt;에는 &lt;code&gt;ConfigurationOption&lt;/code&gt; 배열을 전달해서 세부 설정도 가능해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;displayFrequency(_:)&lt;/code&gt;: 팁이 뜬 뒤 다음 팁이 뜨기까지의 최소 간격을 설정. &lt;code&gt;.immediate&lt;/code&gt;(기본값), &lt;code&gt;.hourly&lt;/code&gt;, &lt;code&gt;.daily&lt;/code&gt;, &lt;code&gt;.weekly&lt;/code&gt;, &lt;code&gt;.monthly&lt;/code&gt; 중 선택&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;datastoreLocation(_:)&lt;/code&gt;: 팁 상태를 저장할 위치를 커스터마이즈&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;cloudKitContainer(_:)&lt;/code&gt;: 팁 동기화에 쓸 CloudKit 컨테이너를 설정&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;.monthly&lt;/code&gt;를 예로 들면, 공식 문서는 이렇게 설명해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;When you set this, the system shows no more than one tip per month.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁 띄우기 &amp;mdash; Inline과 Popover&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁을 보여주는 방법은 두 가지예요. &lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;공식 문서는 가능하면 &lt;b&gt;인라인(Inline)&lt;/b&gt; 방식을 먼저 쓰라고 권장해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사람들이 상호작용하고 싶어할 UI 요소를 가리지 않기 때문이에요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;인라인 팁 &amp;mdash; TipView&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct InlineView: View {
+        // Create an instance of your tip content.
+        let inlineTip = InlineTip()
+        
+        var body: some View {
+        VStack(spacing: 20) {
+        Text(&quot;A TipView embeds itself directly in the view.&quot;)
+        
+        // Place your tip near the feature you want to highlight.
+        TipView(inlineTip, arrowEdge: .bottom)
+        Button {
+        // Invalidate the tip when someone uses the feature.
+        inlineTip.invalidate(reason: .actionPerformed)
+        } label: {
+        Label(&quot;Favorite&quot;, systemImage: &quot;star&quot;)
+        }
+        Spacer()
+        }
+        .padding()
+        }
         }&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Swift 런타임은 원격 분산 액터 프록시의 &lt;code&gt;deinit&lt;/code&gt;이 실행될 때 &lt;code&gt;resignRemoteID(_:)&lt;/code&gt;를 호출하도록 업데이트돼요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;인라인 팁은 그 뷰 안에 직접 끼어들어 자리를 차지해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그래서 팁이 나타나거나 사라질 때 주변 레이아웃이 그에 맞춰 바뀝니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;기존 &lt;code&gt;resignID(_:)&lt;/code&gt;는 계속 &lt;b&gt;로컬&lt;/b&gt; 인스턴스에 대해서만 호출됩니다.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Detailed Design&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;구현 수준에서, 프로토콜 요구사항을 도입하는 것 외의 유일한 변경은 원격 분산 액터의 deinit에서 이걸 실제로 호출하는 것뿐이에요.&lt;/span&gt;&lt;/p&gt;
-        &lt;pre class=&quot;awk&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;deinit {
-        // if  {
-        //   &amp;lt;&amp;lt; actorSystem.resignRemoteID(self.id)  // NEW
-        //   &amp;lt;&amp;lt; deallocate memory for \`id\` and \`actorSystem\` only
-        // } else if  {
-        //   &amp;lt;&amp;lt; run user-declared deinit body
-        //   &amp;lt;&amp;lt; actorSystem.resignID(self.id)
-        //   &amp;lt;&amp;lt; deallocate all stored properties
-        // }
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팝오버 팁 &amp;mdash; popoverTip(_:arrowEdge:action:)&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct PopoverView: View {
+        let highlightTip = HighlightTip()
+        
+        var body: some View {
+        Image(systemName: &quot;wand.and.stars&quot;)
+        .imageScale(.large)
+        // Place the tip on the feature to highlight.
+        .popoverTip(highlightTip)
+        .onTapGesture {
+        tip.invalidate(reason: .actionPerformed)
+        }
+        }
         }&lt;/code&gt;&lt;/pre&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사용자가 선언한 &lt;code&gt;deinit&lt;/code&gt; 본문은 원격 참조에서는 여전히 절대 실행되지 않고, 기존 &lt;code&gt;resignID&lt;/code&gt; 경로도 변경되지 않은 채로 유지됩니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팝오버 방식은 화면 위에 팁을 띄워서 아래 UI를 가려요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;레이아웃을 바꾸고 싶지 않거나, 팁이 가리는 컨트롤과 상호작용할 필요가 없을 때 적합해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팝오버는 이미 기능을 가리키고 있으니, 이미지는 생략하는 걸 고려해보라고도 안내합니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이 결과로 생명주기 관리는 다음과 같이 정리돼요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%; margin: 16px 0;&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&amp;nbsp;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&quot;Local instance&quot; 분산 액터&lt;/span&gt;&lt;/th&gt;
-        &lt;th style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&quot;Remote reference&quot; 분산 액터&lt;/span&gt;&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Registration&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;init 중 &lt;code&gt;assignID(_:)&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resolve(id:as:)&lt;/code&gt;가 &lt;code&gt;nil&lt;/code&gt; 반환&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Ready&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;init 후 &lt;code&gt;actorReady(_:)&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;N/A&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;b&gt;Deinit&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;deinit 시 &lt;code&gt;resignID(_:)&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;border: 1px solid #ddd; padding: 8px;&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;deinit 시 &lt;code&gt;resignRemoteID(_:)&lt;/code&gt;&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁 무효화하기 &amp;mdash; invalidate(reason:)&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사람이 그 기능을 실제로 쓰고 나면, 팁을 프로그래밍적으로 무효화할 수 있어요. &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resolve&lt;/code&gt;는 같은 id로 여러 번 호출될 수 있기 때문에, &lt;code&gt;resignRemoteID&lt;/code&gt;도 같은 id로 여러 번 호출될 수 있어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resolve&lt;/code&gt;로 생성된 원격 참조마다 한 번씩요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;새로 추가된 resignRemoteID(_:)는 &quot;대응되는&quot; resolve(id:as:)가 다음과 같은 경우엔 호출되지 않아요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;InvalidationReason&lt;/code&gt;에는 다음 네 가지 케이스가 있습니다.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
         &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;에러를 던진 경우 (참조가 생성되지 않음)&lt;/span&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;로컬 액터를 반환한 경우 (원격 참조가 아니라 로컬 경로가 적용됨)&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;actionPerformed&lt;/code&gt;: 팁이 설명하는 행동을 사용자가 실제로 수행함&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;displayCountExceeded&lt;/code&gt;: 팁이 최대 표시 횟수를 초과함&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;displayDurationExceeded&lt;/code&gt;: 팁이 최대 표시 기간을 초과함&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;tipClosed&lt;/code&gt;: 사용자가 팁이 떠 있는 동안 명시적으로 닫기 버튼을 눌러 닫음&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/li&gt;
         &lt;/ul&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Source Compatibility&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;기존 &lt;code&gt;DistributedActorSystem&lt;/code&gt; 구현체들은 계속 컴파일되고 동일하게 동작합니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;버튼 추가하기 &amp;mdash; actions&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁에 추가 정보나 옵션으로 안내하는 버튼을 넣을 수도 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt; &lt;code&gt;Tip&lt;/code&gt;의 &lt;code&gt;actions&lt;/code&gt; 프로퍼티에 &lt;code&gt;Action&lt;/code&gt; 인스턴스들을 정의하면 됩니다.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;ABI Compatibility&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;DistributedActorSystem&lt;/code&gt;은 기본 구현이 있는 새 요구사항을 하나 추가로 얻는데, 이건 기존 구현체들에 대해 소스/ABI 호환적이에요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;분산 액터의 deinit에 새로 추가되는 SILGen 호출 지점은 back-deployment 호환적이라, 이 요구사항이 없는 옛날 런타임에 새로 컴파일된 코드를 배포하는 것도 가능해요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그런 경우엔 그냥 그 호출이 일어나지 않을 뿐입니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;struct PasswordResetTip: Tip {
+        var title: Text {
+        Text(&quot;Need Help?&quot;)
+        }
+        
+        var message: Text? {
+        Text(&quot;Do you need help logging in to your account?&quot;)
+        }
+        
+        var image: Image? {
+        Image(systemName: &quot;lock.shield&quot;)
+        }
+        
+        var actions: [Action] {
+        Action(id: &quot;reset-password&quot;, title: &quot;Reset Password&quot;)
+        Action(id: &quot;faq&quot;, title: &quot;View our FAQ&quot;)
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;TipView&lt;/code&gt;에 전달한 클로저에서 &lt;code&gt;action.id&lt;/code&gt;를 확인해서 각 버튼을 눌렀을 때의 동작을 분기할 수 있어요.&lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Alternatives Considered&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그냥 resignID를 원격 참조에도 재사용하기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;가장 쉬운 해법은 &lt;code&gt;resignID&lt;/code&gt;가 원격 참조를 포함해서 항상 호출되도록 동작을 바꾸는 것일 거예요.&lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;여기엔 두 가지 문제가 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;reasonml&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;TipView(passwordResetTip, arrowEdge: .bottom) { action in
+        if action.id == &quot;reset-password&quot;, let url = URL(string: &quot;https://iforgot.apple.com&quot;) {
+        openURL(url) { accepted in
+        print(accepted ? &quot;Success Reset&quot; : &quot;Failure&quot;)
+        }
+        }
+        if action.id == &quot;faq&quot;, let url = URL(string: &quot;https://appleid.apple.com/faq&quot;) {
+        openURL(url) { accepted in
+        print(accepted ? &quot;Success FAQ&quot; : &quot;Failure&quot;)
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;언제 보여줄지 제어하기 &amp;mdash; Rule, Parameter, Event&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p style=&quot;border-left: 4px solid #3a8c28; background: #f2f8ee; padding: 8px 16px; margin: 16px 0;&quot; data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁 구조체에 아무 rules도 정의하지 않으면, 그 팁은 닫히거나 display frequency 한계를 넘기 전까지 계속 나타나요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;앱 상태 기반 &amp;mdash; Parameter&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;추적하고 싶은 앱 상태를 변수로 정의하고, &lt;code&gt;Parameter&lt;/code&gt; 프로퍼티 래퍼로 감싼 뒤, &lt;code&gt;rules&lt;/code&gt; 프로퍼티에서 &lt;code&gt;#Rule&lt;/code&gt; 매크로로 조건을 정의해요.&lt;/span&gt;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct ParameterRuleTip: Tip {
+        // Define the app state you want to track.
+        @Parameter
+        static var isLoggedIn: Bool = false
+        
+        var rules: [Rule] {
+        // Define a rule based on the app state.
+        #Rule(Self.$isLoggedIn) {
+        // Set the conditions for when the tip displays.
+        $0 == true
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;이렇게 정의해두면, 앱 상태가 바뀔 때(예: 버튼 탭으로 isLoggedIn을 토글) 팁이 그에 맞춰 나타나거나 사라져요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;pre class=&quot;stylus&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;Button(&quot;Tap&quot;) {
+        ParameterRuleTip.isLoggedIn.toggle()
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사용자 행동 기반 &amp;mdash; Event&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;사용자 행동을 추적하고 싶다면, &lt;code&gt;id&lt;/code&gt;를 가진 &lt;code&gt;Event&lt;/code&gt; 상수를 정의하고 그 이벤트를 참조하는 &lt;code&gt;#Rule&lt;/code&gt;을 정의해요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;아래 예제는 이벤트가 3번 이상 발생하면 팁이 나타납니다.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct EventRuleTip: Tip {
+        // Define the user interaction you want to track.
+        static let didTriggerControlEvent = Event(id: &quot;didTriggerControlEvent&quot;)
+        
+        var rules: [Rule] {
+        #Rule(Self.didTriggerControlEvent) {
+        $0.donations.count &amp;gt;= 3
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;TipKit은 이벤트가 발생한 횟수를 자동으로 디스크에 저장하고, 이 상태는 앱을 재시작해도 유지돼요.&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h3 data-ke-size=&quot;size23&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;여러 조건 조합하기&lt;/span&gt;&lt;/b&gt;&lt;/h3&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Parameter와 Event 기반 규칙을 여러 개 정의하면, &lt;code&gt;rules&lt;/code&gt; 프로퍼티 안에서 이 규칙들은 AND로 결합돼요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;아래 &lt;code&gt;ComboTip&lt;/code&gt;은 로그인 상태(parameter)와 화면 진입 3회(event)를 모두 만족해야 나타납니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct ComboTip: Tip {
+        @Parameter
+        static var isLoggedIn: Bool = false
+        
+        static let enteredView = Event(id: &quot;enteredView&quot;)
+        
+        var rules: [Rule] {
+        // Note: These rules AND together.
+        #Rule(Self.$isLoggedIn) {
+        $0 == true
+        }
+        #Rule(Self.enteredView) {
+        $0.donations.count &amp;gt;= 3
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;표시 빈도 제어하기 &amp;mdash; Option&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;Tip&lt;/code&gt;의 &lt;code&gt;options&lt;/code&gt; 프로퍼티에 &lt;code&gt;Option&lt;/code&gt;을 설정해서 표시 빈도를 제어할 수 있어요.&lt;/span&gt;&lt;/p&gt;
         &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resignID&lt;/code&gt; 메서드의 문서는 개발자들에게 자신이 할당하지 않은 id가 전달되면 &lt;b&gt;크래시&lt;/b&gt;내라고 권장해왔어요. &lt;br /&gt;그게 액터 시스템의 오작동을 나타낸다고 봤기 때문이에요. &lt;br /&gt;실제로는 그런 값을 무시해도 완전히 안전하니 이 가이드는 너무 보수적이었던 셈이지만, 실제로 크래시내는 시스템이 있다면 새 Swift 버전에서 동작이 바뀌었을 때 새롭게 크래시가 나기 시작할 수 있어요.&lt;/span&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;MaxDisplayCount&lt;/code&gt;: 시스템이 자동으로 팁을 무효화하기 전까지 보여줄 최대 횟수를 지정&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;MaxDisplayDuration&lt;/code&gt;: 팁이 무효화되기 전까지 표시되는 최대 시간을 지정&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;IgnoresDisplayFrequency&lt;/code&gt;: 사전에 설정된 display frequency 간격을 이 팁이 따를지 여부를 제어&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct OptionTip: Tip {
+        var options: [Option] {
+        // Show this tip once.
+        MaxDisplayCount(1)
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;여러 팁을 순서대로 &amp;mdash; TipGroup&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;TipGroup&lt;/code&gt;은 여러 팁을 특정 순서로 보여주거나, 표시 가능한 첫 번째 팁만 보여줄 수 있는 클래스예요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;Priority에는 두 가지 케이스가 있어요.&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;/blockquote&gt;
         &lt;ul style=&quot;list-style-type: disc;&quot; data-ke-list-type=&quot;disc&quot;&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;실제로는 이 리스크가 작은 편인데, 우리가 아는 액터 시스템들은 &quot;알 수 없는 ID&quot; 케이스를 허용하도록 쉽게 업데이트해서 계속 동작하게 만들 수 있기 때문이에요.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;firstAvailable&lt;/code&gt;(기본값): 표시 가능한 첫 번째 팁을 보여줌&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;ordered&lt;/code&gt;: 이전 팁들이 모두 &lt;code&gt;invalidated&lt;/code&gt; 상태가 됐을 때, 표시 가능한 팁을 보여줌&lt;/span&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;/span&gt;&lt;/li&gt;
         &lt;/ul&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&quot;resign&quot;이라는 의미에 과부하가 걸리고, assign/resign 짝과도 잘 안 어울려요. &lt;br /&gt;이 메서드들은 더 이상 짝이 아니게 되고, resolve-remote 경로에는 호출될 &quot;짝&quot;이 없어져서 resign을 구현하기가 더 어려워져요 (어떤 경로를 타야 하는지 추적해야 하니까요).&lt;/span&gt;&lt;/li&gt;
-        &lt;/ul&gt;
+        &lt;pre class=&quot;less&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;init(_ priority: TipGroup.Priority = .firstAvailable, @Tips.GroupBuilder _ builder: () -&amp;gt; [any Tip])&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;currentTip&lt;/code&gt; 프로퍼티로 현재 표시 가능한 팁을 가져올 수 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁 모양 커스터마이징 &amp;mdash; TipViewStyle&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;기본적으로 &lt;code&gt;TipView&lt;/code&gt;는 &lt;code&gt;MiniTipViewStyle&lt;/code&gt;(&lt;code&gt;TipViewStyle.miniTip&lt;/code&gt;)로 그려져요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;뷰 계층 전체에 커스텀 스타일을 적용하려면 &lt;code&gt;TipViewStyle&lt;/code&gt; 프로토콜을 채택한 타입을 만들고, &lt;code&gt;.tipViewStyle(_:)&lt;/code&gt; 모디파이어로 적용하면 됩니다.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;TipViewStyle&lt;/code&gt;의 유일한 요구사항은 &lt;code&gt;makeBody(configuration:)&lt;/code&gt;예요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;여기서 받는 &lt;code&gt;TipViewStyleConfiguration&lt;/code&gt;에는 &lt;code&gt;image&lt;/code&gt;, &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;message&lt;/code&gt;, &lt;code&gt;actions&lt;/code&gt; 프로퍼티가 있어서, 이를 조합해 원하는 모습으로 그릴 수 있어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;struct HeadlineTipViewStyle: TipViewStyle {
+        func makeBody(configuration: TipViewStyleConfiguration) -&amp;gt; some View {
+        VStack(alignment: .leading) {
+        configuration.image?
+        configuration.title?.font(.headline)
+        configuration.message?.font(.subheadline)
+        
+        ForEach(configuration.actions) { action in
+        Button(action.title) { action.handler() }
+        }
+        }
+        }
+        }&lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;isbl&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot;&gt;&lt;code&gt;.tipViewStyle(HeadlineTipViewStyle())&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;테스트하기 위한 API&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;팁이 더 이상 표시 자격이 없어지면 앱에서 사라지는데, 이건 개발 중 팁의 배치와 모양을 테스트하기 어렵게 만들어요.&lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;blockquote data-ke-style=&quot;style1&quot;&gt;&lt;span style=&quot;font-family: &apos;Noto Serif KR&apos;;&quot;&gt;TipKit은 이를 위한 테스트 전용 API를 제공합니다.&lt;/span&gt;&lt;/blockquote&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
+        &lt;pre class=&quot;swift&quot; style=&quot;background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow: auto;&quot; data-ke-language=&quot;swift&quot;&gt;&lt;code&gt;// Show all defined tips in the app.
+        Tips.showAllTipsForTesting()
+        
+        // Show some tips, but not all.
+        Tips.showTipsForTesting([tip1, tip2, tip3])
+        
+        // Hide all tips defined in the app.
+        Tips.hideAllTipsForTesting()
+        
+        // Purge all TipKit-related data.
+        try Tips.resetDatastore()&lt;/code&gt;&lt;/pre&gt;
+        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;Conclusion&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;그동안 분산 액터의 원격 참조는 언제 사라지는지 시스템이 알 방법이 없어서, 커넥션처럼 원격 참조 개수에 따라 살았다 죽었다 해야 하는 리소스를 관리하기가 까다로웠어요. &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;&lt;code&gt;resignRemoteID(_:)&lt;/code&gt; 하나만 추가해서 &lt;code&gt;assignID&lt;/code&gt;/&lt;code&gt;resignID&lt;/code&gt; 짝처럼 로컬과 원격 양쪽 모두 대칭적인 생명주기 콜백을 갖추게 됐다는 점이 좋은 포인트인것 같습니다  &lt;/span&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;기본 구현이 빈 함수라 기존 구현체에 아무 영향도 주지 않으면서 필요한 시스템만 채택하면 되는 점도 실용적입니다  &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;TipKit은 &lt;code&gt;Tip&lt;/code&gt; 프로토콜로 내용을 정의하고, &lt;code&gt;TipView&lt;/code&gt;/&lt;code&gt;popoverTip&lt;/code&gt;으로 보여주는 단순한 구조 위에, Parameter&amp;middot;Event 기반 &lt;code&gt;Rule&lt;/code&gt;과 &lt;code&gt;Option&lt;/code&gt;으로 &quot;언제, 얼마나 자주&quot; 보여줄지를 세밀하게 제어할 수 있는 프레임워크예요. &lt;/span&gt;&lt;/p&gt;
+        &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;직접 상태를 들고 조건문으로 온보딩 UI를 관리하던 걸, 선언적인 규칙으로 옮길 수 있게 됐다는 점이 핵심인 것 같습니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size18&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;h2 style=&quot;border-left: 4px solid #3a8c28; padding-left: 12px; margin-top: 32px;&quot; data-ke-size=&quot;size26&quot;&gt;&lt;b&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;References&lt;/span&gt;&lt;/b&gt;&lt;/h2&gt;
-        &lt;figure id=&quot;og_1790413899149&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;object&quot; data-og-title=&quot;swift-evolution/proposals/0548-resign-remote-id.md at main &amp;middot; swiftlang/swift-evolution&quot; data-og-description=&quot;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&quot; data-og-host=&quot;github.com&quot; data-og-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0548-resign-remote-id.md&quot; data-og-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0548-resign-remote-id.md&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/bgfAKm/dJMb9iI2yPZ/Pjxvdq8uASQ1VEtmFeNYs0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/vWHzj/dJMb9hDmTcv/V1eGTjgifykItH8gc7kC8k/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&quot;&gt;&lt;a href=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0548-resign-remote-id.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://github.com/swiftlang/swift-evolution/blob/main/proposals/0548-resign-remote-id.md&quot;&gt;
-        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/bgfAKm/dJMb9iI2yPZ/Pjxvdq8uASQ1VEtmFeNYs0/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600,https://scrap.kakaocdn.net/dn/vWHzj/dJMb9hDmTcv/V1eGTjgifykItH8gc7kC8k/img.png?width=1200&amp;amp;height=600&amp;amp;face=0_0_1200_600&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;figure id=&quot;og_1790988921872&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;website&quot; data-og-title=&quot;TipKit | Apple Developer Documentation&quot; data-og-description=&quot;Display tips that help people discover features in your app.&quot; data-og-host=&quot;developer.apple.com&quot; data-og-source-url=&quot;https://developer.apple.com/documentation/tipkit&quot; data-og-url=&quot;https://developer.apple.com/documentation/tipkit&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/d5v0d0/dJMb84qvvdz/yCk5ig0YHe3ApsRN3IjYok/img.jpg?width=1200&amp;amp;height=630&amp;amp;face=0_0_1200_630,https://scrap.kakaocdn.net/dn/2R7hF/dJMb8Rkpo3e/nzlLjupev03xFKV5STaGs1/img.jpg?width=1024&amp;amp;height=512&amp;amp;face=0_0_1024_512&quot;&gt;&lt;a href=&quot;https://developer.apple.com/documentation/tipkit&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://developer.apple.com/documentation/tipkit&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/d5v0d0/dJMb84qvvdz/yCk5ig0YHe3ApsRN3IjYok/img.jpg?width=1200&amp;amp;height=630&amp;amp;face=0_0_1200_630,https://scrap.kakaocdn.net/dn/2R7hF/dJMb8Rkpo3e/nzlLjupev03xFKV5STaGs1/img.jpg?width=1024&amp;amp;height=512&amp;amp;face=0_0_1024_512&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
         &lt;div class=&quot;og-text&quot;&gt;
-        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;swift-evolution/proposals/0548-resign-remote-id.md at main &amp;middot; swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;This maintains proposals for changes and user-visible enhancements to the Swift Programming Language. - swiftlang/swift-evolution&lt;/p&gt;
-        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;github.com&lt;/p&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;TipKit | Apple Developer Documentation&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;Display tips that help people discover features in your app.&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;developer.apple.com&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/a&gt;&lt;/figure&gt;
+        &lt;figure id=&quot;og_1790988942323&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;website&quot; data-og-title=&quot;Highlighting app features with TipKit | Apple Developer Documentation&quot; data-og-description=&quot;Bring attention to new features in your app by using tips.&quot; data-og-host=&quot;developer.apple.com&quot; data-og-source-url=&quot;https://developer.apple.com/documentation/tipkit/highlightingappfeatureswithtipkit&quot; data-og-url=&quot;https://developer.apple.com/documentation/tipkit/highlightingappfeatureswithtipkit&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/exqkx/dJMb9dHK02X/eGw7mKF8rKjjkFhRFKhV0K/img.jpg?width=1200&amp;amp;height=630&amp;amp;face=0_0_1200_630,https://scrap.kakaocdn.net/dn/bPfcjs/dJMb9iI3q1h/NPCaXiloxm8cpfi0gqLXCk/img.jpg?width=1024&amp;amp;height=512&amp;amp;face=0_0_1024_512&quot;&gt;&lt;a href=&quot;https://developer.apple.com/documentation/tipkit/highlightingappfeatureswithtipkit&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://developer.apple.com/documentation/tipkit/highlightingappfeatureswithtipkit&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/exqkx/dJMb9dHK02X/eGw7mKF8rKjjkFhRFKhV0K/img.jpg?width=1200&amp;amp;height=630&amp;amp;face=0_0_1200_630,https://scrap.kakaocdn.net/dn/bPfcjs/dJMb9iI3q1h/NPCaXiloxm8cpfi0gqLXCk/img.jpg?width=1024&amp;amp;height=512&amp;amp;face=0_0_1024_512&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;div class=&quot;og-text&quot;&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;Highlighting app features with TipKit | Apple Developer Documentation&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;Bring attention to new features in your app by using tips.&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;developer.apple.com&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/a&gt;&lt;/figure&gt;
+        &lt;figure id=&quot;og_1790988935087&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;website&quot; data-og-title=&quot;Make features discoverable with TipKit - WWDC23 - Videos - Apple Developer&quot; data-og-description=&quot;Teach people how to use your app with TipKit! Learn how you can create effective educational moments through tips. We&apos;ll share how you...&quot; data-og-host=&quot;developer.apple.com&quot; data-og-source-url=&quot;https://developer.apple.com/videos/play/wwdc2023/10229/&quot; data-og-url=&quot;https://developer.apple.com/videos/play/wwdc2023/10229/&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/fkslz/dJMb8U9gORF/tKDlkOG1KeKc0b7h88Ozdk/img.jpg?width=500&amp;amp;height=282&amp;amp;face=66_80_146_168,https://scrap.kakaocdn.net/dn/bTGkrc/dJMb83kQeJH/DmGrDrLpzCIlWoYtckATEK/img.jpg?width=1800&amp;amp;height=1012&amp;amp;face=216_298_947_705&quot;&gt;&lt;a href=&quot;https://developer.apple.com/videos/play/wwdc2023/10229/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://developer.apple.com/videos/play/wwdc2023/10229/&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/fkslz/dJMb8U9gORF/tKDlkOG1KeKc0b7h88Ozdk/img.jpg?width=500&amp;amp;height=282&amp;amp;face=66_80_146_168,https://scrap.kakaocdn.net/dn/bTGkrc/dJMb83kQeJH/DmGrDrLpzCIlWoYtckATEK/img.jpg?width=1800&amp;amp;height=1012&amp;amp;face=216_298_947_705&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;div class=&quot;og-text&quot;&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;Make features discoverable with TipKit - WWDC23 - Videos - Apple Developer&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;Teach people how to use your app with TipKit! Learn how you can create effective educational moments through tips. We&apos;ll share how you...&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;developer.apple.com&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/a&gt;&lt;/figure&gt;
+        &lt;figure id=&quot;og_1790988937090&quot; contenteditable=&quot;false&quot; data-ke-type=&quot;opengraph&quot; data-ke-align=&quot;alignCenter&quot; data-og-type=&quot;website&quot; data-og-title=&quot;Customize feature discovery with TipKit - WWDC24 - Videos - Apple Developer&quot; data-og-description=&quot;Focused on feature discovery, the TipKit framework makes it easy to display tips in your app. Now you can group tips so features are...&quot; data-og-host=&quot;developer.apple.com&quot; data-og-source-url=&quot;https://developer.apple.com/videos/play/wwdc2024/10070/&quot; data-og-url=&quot;https://developer.apple.com/videos/play/wwdc2024/10070/&quot; data-og-image=&quot;https://scrap.kakaocdn.net/dn/cmQjch/dJMb8QMzxCT/k66TKdrVlfPPNih3h9w5sK/img.jpg?width=500&amp;amp;height=282&amp;amp;face=0_0_500_282,https://scrap.kakaocdn.net/dn/4mBn4/dJMb9lltM40/IckfkO2TujCavZ63wDP9gk/img.jpg?width=1800&amp;amp;height=1012&amp;amp;face=0_0_1800_1012&quot;&gt;&lt;a href=&quot;https://developer.apple.com/videos/play/wwdc2024/10070/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; data-source-url=&quot;https://developer.apple.com/videos/play/wwdc2024/10070/&quot;&gt;
+        &lt;div class=&quot;og-image&quot; style=&quot;background-image: url(&apos;https://scrap.kakaocdn.net/dn/cmQjch/dJMb8QMzxCT/k66TKdrVlfPPNih3h9w5sK/img.jpg?width=500&amp;amp;height=282&amp;amp;face=0_0_500_282,https://scrap.kakaocdn.net/dn/4mBn4/dJMb9lltM40/IckfkO2TujCavZ63wDP9gk/img.jpg?width=1800&amp;amp;height=1012&amp;amp;face=0_0_1800_1012&apos;);&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;div class=&quot;og-text&quot;&gt;
+        &lt;p class=&quot;og-title&quot; data-ke-size=&quot;size16&quot;&gt;Customize feature discovery with TipKit - WWDC24 - Videos - Apple Developer&lt;/p&gt;
+        &lt;p class=&quot;og-desc&quot; data-ke-size=&quot;size16&quot;&gt;Focused on feature discovery, the TipKit framework makes it easy to display tips in your app. Now you can group tips so features are...&lt;/p&gt;
+        &lt;p class=&quot;og-host&quot; data-ke-size=&quot;size16&quot;&gt;developer.apple.com&lt;/p&gt;
         &lt;/div&gt;
         &lt;/a&gt;&lt;/figure&gt;
       </content:encoded>
@@ -492,7 +511,7 @@
       <title>[Spring] Jackson ObjectMapper 설정으로 JSON 역직렬화 비용 줄이기</title>
       <link>https://mangkyu.tistory.com/477</link>
       <guid>https://mangkyu.tistory.com/477</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
@@ -719,34 +738,10 @@
       </content:encoded>
     </item>
     <item>
-      <title>리더는 유년부터 시작된다</title>
-      <link>https://happysisyphe.tistory.com/107</link>
-      <guid>https://happysisyphe.tistory.com/107</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;leader-2.png&quot; data-origin-width=&quot;1080&quot; data-origin-height=&quot;708&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/cpeVha/dJMcaf2r6tM/riqY4ApkT2yvcMgjEWKQCK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/cpeVha/dJMcaf2r6tM/riqY4ApkT2yvcMgjEWKQCK/img.png&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/cpeVha/dJMcaf2r6tM/riqY4ApkT2yvcMgjEWKQCK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcpeVha%2FdJMcaf2r6tM%2FriqY4ApkT2yvcMgjEWKQCK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;1080&quot; height=&quot;708&quot; data-filename=&quot;leader-2.png&quot; data-origin-width=&quot;1080&quot; data-origin-height=&quot;708&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;lt;테크니컬 리더&amp;gt;(제럴드 와인버그) 책에서 이런 질문을 한다. &quot;리더라고 생각하는 사람을 관찰해 보자. 그 사람의 생활은 당신의 생활과 어떻게 다른가? ... 또 어떤 것이 그 사람을 리더로 만들었을까?&quot; 내가 떠올린 인상 깊은 리더는 5명이었다. 2명은 대학교 동기이고, 1명은 대학교 동아리에서, 1명은 토스에서, 1명은 우아한형제들에서 만났다. 제럴드 와인버그가 질문한 것처럼, 나는 그들의 업무 방식이 아니라, 생활을 들여다보았다. 그들이 어떤 가정을 꾸리는지, 어떤 모임을 만드는지, 어떻게 모임을 이어가는지, 친구를 어떻게 대하는지, 어떤 발언을 주로 하는지, 다른 사람들은 그에 어떻게 반응하는지 등.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;그들의 행동을 관찰하니, 5가지 공통 요소를 뽑을 수 있었다. 1) 책임감, 2) 회피하지 않고 진실한 마음으로 마주한다. 3) 좋은 의사결정을 할 만큼 역량과 신뢰가 있다 4) 그 집단에 애정이 있다 5) 동기부여 하고 사람들을 모으는 것을 잘 한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;나는 지금 회사에서 리더가 되고 싶다. 빠른 시일 내에 테크 조직을 이끌고 싶다. 성장하려고 많이 노력하고 있다. 그런데 리더에 대해 생각하면 할수록, 과거에서부터 리더가 시작된다는 것을 깨닫는다. 초등학교 4학년 시절 마산에서 야구하는 친구를 모았을 때, 초등학교 6학년 때 옆에 초등학교와 다툼이 있었던 순간, 중학교 2학년 때 친구 11명이 축구 유니폼을 선정하고 돈을 걷고 구매해야 했던 순간, 고등학교 3학년 때 선생님과 우리반 학우들과 갈등이 있었고 그걸 해결해야 했던 순간, 가족(우리 가족은 6명이다)이 다같이 여행을 준비하는 순간, 대학교 1학년 개강날 어색했지만 내심 놀고 싶은 마음이 있었던 친구들을 모아야 했던 순간, 대학생 때 MT 를 준비하며 모두가 즐길 수 있는 환경을 만들어야 했던 순간 등등, 수도 없는 리더십 순간이 있었다. 여러명을 통솔해야 했거나, 모두가 만족하는 합의점을 만들어야 했다. 또는 누군가 불만족 하더라도, 집단이 유지되도록 해야했다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;지금 회사에서 새로운 팀이 결성될 때는, 대학교 1학년 때의 어색했던 순간을 떠올리게 한다. 성공과 실패가 불확실한 프로젝트를 수행할 때는, 대학생 때 MT 를 기획하던 순간을 떠올리게 한다. 과거에 나는 어떻게 행동했는가? 자랑스러운 기억도, 부끄러운 기억도 많다. 아, 나는 어렸을 적부터 친구들을 모으는 것을 좋아했구나. 함께 야구하고, 축구하고, 옆반과 대결을 하는 등 즐거웠던 기억이 많다. 한편으로 끝까지 책임지지 못했구나. 한 발짝 더 나아갔으면 좋았을텐데. 난 한 반의 축구 리더처럼 활동했지만, 그게 전교권으로 커지고, 다른 학교와 소통해야 했던 때는 내가 나서지 못 했다. MT 를 열심히 기획하고, 재밌게 놀게 하는데 성공했지만, 각자 집으로 돌아가는 길까지 책임을 지지는 않고 먼저 떠나버린 기억도 있다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;어릴 때부터 나의 리더십 성향이 보였다고 생각한다. 나는 내가 먼저 흥미를 느끼고, 그것을 사람들에게 전달해서 동기부여 하는 것을 잘한다. 야구, 축구, 게임, 공부 등 많은 주제가 있었다. 그리고 같이 할 사람들을 잘 모은다. 모아서 하나의 방향으로 나아가도록 의사결정을 해낸다. 요새는 재테크에 관심이 생겨서 스터디를 모집해서 함께 공부하고 있다. 다만 풍파 속에서도 끝까지 집단을 책임지거나, 갈등 상황을 마주하고 해결한 경험은 많지 않다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;지금도 거의 비슷하다고 생각한다. 다만 내 약점을 깨닫고 그것을 개선하려고 뼈를 깎는 노력을 하고 있다. 이것은 내가 회사에서 리더가 되는 길이기도 하면서, 동시에 내 삶에서, 관계에서 리더가 되는 길이다. 그게 나를 더 나답게 하면서, 내가 원하는 것을 이루도록 도와준다. 나의 리더십을 개선하고 나서 훨씬 행복해졌다고 느낀다. 사람들과 더 재밌게 놀 수 있게 되었고, 더 재밌게 공부할 수 있게 되었다. 내 목적, 주변 지인들의 목적을 더 잘 달성할 수 있게 되었다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;리더가 되고 싶은 사람은 직책자(Leader)가 회사에서 하는 행동이 아니라, 이끄는 사람(leader)이 일상에서 어떻게 행동하는지 돌아보면 도움이 될 것이다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
       <title>[근황] 학사 졸업의 논문 도전기</title>
       <link>https://pangyoalto.com/first-paper-challenge/</link>
       <guid>https://pangyoalto.com/first-paper-challenge/</guid>
-      <pubDate>Fri, 02 Oct 2026 19:45:17 GMT</pubDate>
+      <pubDate>Sat, 03 Oct 2026 18:36:25 GMT</pubDate>
       <content:encoded>&lt;h2 id=&quot;%EB%85%BC%EB%AC%B8-%EC%9E%91%EC%97%85%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8B%A4&quot;&gt;&amp;#xb17c;&amp;#xbb38; &amp;#xc791;&amp;#xc5c5;&amp;#xc744; &amp;#xc2dc;&amp;#xc791;&amp;#xd558;&amp;#xb2e4;&lt;/h2&gt;&lt;p&gt;&amp;#xc62c;&amp;#xd574; &amp;#xd300;&amp;#xc744; &amp;#xc62e;&amp;#xae30;&amp;#xc9c0; &amp;#xc54a;&amp;#xc558;&amp;#xc9c0;&amp;#xb9cc;, &amp;#xadf8;&amp;#xb3d9;&amp;#xc548; &amp;#xba54;&amp;#xc778;&amp;#xc73c;&amp;#xb85c; &amp;#xd558;&amp;#xb358; &amp;#xd504;&amp;#xb85c;&amp;#xc81d;&amp;#xd2b8;&amp;#xb97c; &amp;#xc11c;&amp;#xbe0c;&amp;#xb85c; &amp;#xb0b4;&amp;#xb824;&amp;#xb193;&amp;#xace0; &amp;#xd300;&amp;#xc758; &amp;#xac00;&amp;#xc7a5; &amp;#xd070; &amp;#xd504;&amp;#xb85c;&amp;#xc81d;&amp;#xd2b8;&lt;/p&gt;</content:encoded>
     </item>
   </channel>
