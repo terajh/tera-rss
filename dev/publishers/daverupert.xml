@@ -4,7 +4,196 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Mon, 05 Oct 2026 22:13:59 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 06 Oct 2026 20:21:50 GMT</lastBuildDate>
+    <item>
+      <title>Recursion is DEAD and HTML killed it</title>
+      <link>https://daverupert.com/2026/10/html-recursion/</link>
+      <guid>https://daverupert.com/2026/10/html-recursion/</guid>
+      <pubDate>Tue, 06 Oct 2026 15:36:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;There’s a new web platform feature flighting in Chromium called &amp;lt;a href=&amp;quot;https://developer.chrome.com/docs/web-platform/declarative-partial-updates&amp;quot;&amp;gt;Declarative Partial Updates&amp;lt;/a&amp;gt;. This proposal adds a new &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; element which enables out-of-order streaming of content. Rather than the traditional way of building the HTML you need on the server, or sending JSON down to a JavaScript framework, you can staple HTML onto the initial response and use the &amp;lt;code&amp;gt;&amp;amp;lt;template for=&amp;amp;quot;&amp;amp;quot;&amp;amp;gt;&amp;lt;/code&amp;gt; syntax to inject that content into the &amp;lt;code&amp;gt;&amp;amp;lt;?marker name=&amp;amp;quot;&amp;amp;quot;&amp;amp;gt;&amp;lt;/code&amp;gt; placeholder.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;A simple example of this would be:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;!-- NOTE:
+        FYI, throughout this post I&amp;apos;m using the closing `?&amp;amp;gt;` 
+        syntax for `&amp;amp;lt;?marker&amp;amp;gt;` becuase the HTML highlighter 
+        likes that better. Either syntax works.
+        --&amp;amp;gt;
+        &amp;amp;lt;main id=&amp;amp;quot;main&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;?marker name=&amp;amp;quot;post-abc123&amp;amp;quot; ?&amp;amp;gt;
+        &amp;amp;lt;/main&amp;amp;gt;
+        
+        &amp;amp;lt;!-- ...bunch of html goes here... --&amp;amp;gt;
+        
+        &amp;amp;lt;template for=&amp;amp;quot;post-abc123&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;h2&amp;amp;gt;Hello world&amp;amp;lt;/h2&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;First post&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;/template&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;The late-arriving template will auto-magically get slurped up into the &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; placeholder slot. Unlike the &amp;lt;code&amp;gt;&amp;amp;lt;slot&amp;amp;gt;&amp;lt;/code&amp;gt; element though, once you use &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; it’s done. You burned that card and it doesn’t work a second time. If you want to chain more than one post together and create a feed of posts, you can repeat the placeholder with the same &amp;lt;code&amp;gt;&amp;amp;lt;?marker name=&amp;amp;quot;post-abc123&amp;amp;quot;&amp;amp;gt;&amp;lt;/code&amp;gt; at the bottom of the appended item.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The essence of the feature is that you can open a server connection, never close it, and keep pumping more HTML onto the page. The &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; element does the heavy lifting of taking that new HTML and putting it in the right place. There’s lots of potential here (e.g. my beloved HTML Imports?) but I think the canonical use case would be how an LLM chatbot could stream in content that generates at different speeds:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;div class=&amp;amp;quot;chat-response&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;?marker name=&amp;amp;quot;chat-response-abc123-widget&amp;amp;quot;?&amp;amp;gt;
+        
+        Markdown formatted text goes here...
+        &amp;amp;lt;/div&amp;amp;gt;
+        
+        &amp;amp;lt;template for=&amp;amp;quot;chat-response-abc123-widget&amp;amp;quot;&amp;amp;gt;
+        Hi, sorry I took so long! Here&amp;apos;s a whole-ass application.
+        &amp;amp;lt;/template&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;That will create some other problems like FOUC and LCP &amp;lt;a href=&amp;quot;https://daverupert.com/2015/10/on-hurk-jerk/&amp;quot;&amp;gt;hurk-jerk&amp;lt;/a&amp;gt; you will have to manage –and that’s for another post– but lazy-loaded HTML rendering adds an interesting capability to the web platform. It took me a couple walks around the neighborhood to understand how I could potentially use &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; and out-of-order rendering on a normal workday.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;rendering-a-threaded-response&amp;quot;&amp;gt;Rendering a threaded response&amp;lt;a href=&amp;quot;#rendering-a-threaded-response&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Rendering a threaded response&amp;apos;&amp;quot; data-heading-content=&amp;quot;Rendering a threaded response&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;The rule of thumb I came up with is that &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; might be a pattern to reach for any time where you want important content to show up first and then you kind of don’t care when other content shows up below the fold.&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;A post with nested replies&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;A product with reviews that show reviewer profile cards&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;A gigantic pull request with nested comment threads&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;A book with authors that have related books&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;You get the gist, a classic relational data situation. The example I’m going to go with is a nested reply thread like a Reddit thread or Bluesky post.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Building a nested thread of replies isn’t rocket science, but you have to do a lot of for-looping to first build up the tree of posts you’re going to render…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;→ Fetch all root posts in thread
+        → Loop through posts
+        → Fetch replies for each root post
+        → Loop through root post replies
+        → Fetch replies for each reply
+        → Add nested reply to parent reply
+        → Add parent replies to root posts
+        → Walk tree
+        → Send HTML for all posts
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Assuming the data tree gets stitched together by the database or our server backend, your first attempt at rendering nested content will probably be the most literal approach: create a for-loop for each level of content…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;// pseudo-code
+        const postsTree = postsDb.find(p =&amp;amp;gt; p.thread_id === &amp;apos;abc123&amp;apos;);
+        
+        postsTree.map(post =&amp;amp;gt; 
+        html`&amp;amp;lt;div id=&amp;amp;quot;post-${post.id}&amp;amp;quot; class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.username}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.body}&amp;amp;lt;/div&amp;amp;gt;
+        
+        ${post.replies?.map(reply =&amp;amp;gt; 
+        html`&amp;amp;lt;div id=&amp;amp;quot;post-${reply.id}&amp;amp;quot; class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${reply.username}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${reply.body}&amp;amp;lt;/div&amp;amp;gt;
+        
+        ${reply.replies?.map(nestedReply =&amp;amp;gt; 
+        html`&amp;amp;lt;div id=&amp;amp;quot;post-${nestedReply.id}&amp;amp;quot; class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${nestedReply.username}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${nestedReply.body}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;/div&amp;amp;gt;`
+        ).join(&amp;apos;&amp;apos;)}
+        &amp;amp;lt;/div&amp;amp;gt;`
+        ).join(&amp;apos;&amp;apos;)}
+        &amp;amp;lt;/div&amp;amp;gt;`
+        ).join(&amp;apos;&amp;apos;)
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;An obvious limitation here is that we’ve hard-coded ourselves to three levels of nesting. Adding more nesting would require backend and frontend work and break the classic “&amp;lt;a href=&amp;quot;https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)&amp;quot;&amp;gt;Rule of three&amp;lt;/a&amp;gt;” programming rule. Hard-coding your nesting is the “dumb way” to render nested content… but also the normal way.&amp;lt;/p&amp;gt;
+        &amp;lt;h3 id=&amp;quot;making-this-a-bit-smarter-and-more-infinite&amp;quot;&amp;gt;Making this a bit smarter and more infinite&amp;lt;a href=&amp;quot;#making-this-a-bit-smarter-and-more-infinite&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Making this a bit smarter and more infinite&amp;apos;&amp;quot; data-heading-content=&amp;quot;Making this a bit smarter and more infinite&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
+        &amp;lt;p&amp;gt;Philosophically-speaking, UI should be agnostic to the content it renders. If nested content is a possibility, a content renderer should theoretically support infinite nested content. Practically-speaking, most of us have learned that it doesn’t matter if the Product Manager’s Jira ticket says “The max is two nested items”, there will always be at least three.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The smarter way is to render this is to use recursion because nested for-loops are &amp;lt;em&amp;gt;BAD&amp;lt;/em&amp;gt; and you are &amp;lt;em&amp;gt;DUMB&amp;lt;/em&amp;gt; if you use them. But if you obfuscate the nesting into a function that calls itself, then that’s ✨recursion, baby✨ and you’re a &amp;lt;em&amp;gt;GENIUS&amp;lt;/em&amp;gt; programmer.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Jokes aside, recursion will clean up the template code and simplify getting HTML on the page.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;→ Fetch all posts in thread
+        → Loop through posts
+        → Build a map
+        → Loop through map
+        → Build a tree
+        → Walk tree
+        → Send HTML for all posts
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Before we grabbed all posts, then all replies, then all nested replies. Walking that tree is a bit slow. We can make that faster by fetching a flat list of posts in the thread and then assemble a tree. You can do this with some crafty &amp;lt;code&amp;gt;LEFT JOIN&amp;lt;/code&amp;gt; SQL statements but its generally easier on the server.&amp;lt;/p&amp;gt;
+        &amp;lt;details&amp;gt;
+        &amp;lt;summary&amp;gt;&amp;lt;code&amp;gt;buildPostTree&amp;lt;/code&amp;gt;: building a nested tree from a flat list of posts&amp;lt;/summary&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;function buildPostTree(posts) {
+        const postsById = new Map()
+        // Loop through posts to build map
+        for (const post of posts) {
+        postsById.set(post.id, { ...post, replies: [], })
+        }
+        
+        const roots = []
+        
+        // Loop through map values to build tree
+        for (const post of postsById.values()) {
+        // Parentless posts must be roots
+        if (!post.parent_id) { roots.push(post); continue; }
+        
+        // Find this child&amp;apos;s parents!
+        const parent = postsById.get(post.parent_id)
+        // Add child post to parent&amp;apos;s replies
+        parent.replies.push(post)
+        }
+        return roots
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;/details&amp;gt;
+        &amp;lt;p&amp;gt;Then instead of hard-coding nested for-loops, we can recursively walk the tree to render the HTML for the posts.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;// pseudo-code
+        const posts = postsDb.find(p =&amp;amp;gt; p.thread_id === &amp;apos;abc123&amp;apos;);
+        const postsTree = buildPostsTree(posts);
+        
+        const renderPost = (post) =&amp;amp;gt; html`
+        &amp;amp;lt;div id=&amp;amp;quot;post-${post.id}&amp;amp;quot; class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.username}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.body}&amp;amp;lt;/div&amp;amp;gt;
+        
+        ${
+        // Loop through post replies and render the HTML
+        post.replies?.map(reply =&amp;amp;gt; renderPost(reply)).join(&amp;apos;&amp;apos;)
+        }
+        &amp;amp;lt;/div&amp;amp;gt;
+        `;
+        
+        postsTree.map(post =&amp;amp;gt; renderPost(post)).join(&amp;apos;&amp;apos;)
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;That’s a more robust and understandable way to handle infinitely nested content. Our code is more durable to future changes. Need more or less nesting? Sure, we don’t care. That’s a data concern not a component rendering concern.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;Even though we’ve simplified and reduced lines of code, both strategies have the same bottleneck: &amp;lt;strong&amp;gt;You need to build the entire tree before you can render the HTML&amp;lt;/strong&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The user waits for us to stitch the data together and the user waits for us to walk the tree and render synchronously. That’s two render blocking operations to put a thread onto the page.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The &amp;lt;code&amp;gt;&amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/code&amp;gt; element gives us another path…&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;infinitely-nested-threads-with-out-of-order-html&amp;quot;&amp;gt;Infinitely nested threads with out-of-order HTML&amp;lt;a href=&amp;quot;#infinitely-nested-threads-with-out-of-order-html&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Infinitely nested threads with out-of-order HTML&amp;apos;&amp;quot; data-heading-content=&amp;quot;Infinitely nested threads with out-of-order HTML&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;First we setup our page to receive the HTML, like we did at the top of this post…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-html&amp;quot;&amp;gt;&amp;amp;lt;main id=&amp;amp;quot;main&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;?marker name=&amp;amp;quot;post-abc123&amp;amp;quot; ?&amp;amp;gt;
+        &amp;amp;lt;/main&amp;amp;gt;
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And our rendering strategy gets a lot more simple…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;→ Get all posts in thread
+        → Loop through posts
+        → Send HTML for post
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And code looks a little something like this…&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;/* get all root posts */
+        const posts = postsDb.find(p =&amp;amp;gt; p.thread_id === &amp;apos;abc123&amp;apos;);
+        
+        const renderPost = (post) =&amp;amp;gt; html`
+        &amp;amp;lt;template for=&amp;amp;quot;post-${post.parent_id ?? post.thread_id}&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div id=&amp;amp;quot;post-${post.id}&amp;amp;quot; class=&amp;amp;quot;post&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.username}&amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;div&amp;amp;gt;${post.body}&amp;amp;lt;/div&amp;amp;gt;
+        
+        &amp;amp;lt;?marker name=&amp;amp;quot;post-${id}&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;/div&amp;amp;gt;
+        &amp;amp;lt;?marker name=&amp;amp;quot;post-${parent_id ?? post.thread_id}&amp;amp;quot;&amp;amp;gt;
+        &amp;amp;lt;/template&amp;amp;gt;
+        `
+        
+        /* loop through posts */
+        posts.forEach(post =&amp;amp;gt; 
+        main.appendHTML(renderPost(post))
+        );
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;No tree building is happening whatsoever on the server. The microsecond after we generate the template we’re able to stream/send the HTML directly to the client and the page assembles itself. No recursion, no pre-assembly required. It all snap-fits together without us imperatively injecting content.&amp;lt;/p&amp;gt;
+        &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;500&amp;quot; data-pen-title=&amp;quot;LEFT JOIN with HTML &amp;amp;amp;lt;?marker&amp;amp;amp;gt;&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;html,result&amp;quot; data-slug-hash=&amp;quot;LEWRJaq&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
+        &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/01a09d84-a554-7c87-b9e4-63d46f866b17&amp;quot;&amp;gt;
+        LEFT JOIN with HTML &amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
+        on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;p&amp;gt;It’s worth noting a thread of 10K posts will crush the browser, so you’ll still have to load responsibly and think about “Show more comments” buttons. I’m hand-waving the details here, but this gets easier too because your &amp;lt;code&amp;gt;loadMoreComments()&amp;lt;/code&amp;gt; function doesn’t need to know anything about where to append those new comments, it can just staple them to the bottom of the page.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;I’m excited about the possibilities here of removing ancillary content or UI from the critical rendering path. I’m interested in HTML’s newfound ability to self-assemble content and relationships in a declarative way. And maybe… he says with a glimmer of hope in his eyes… HTML Imports will be resurrected and there will be peace on Earth.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Tupo</title>
       <link>https://daverupert.com/2026/09/play-tupo/</link>
@@ -1302,30 +1491,6 @@
         &amp;lt;p&amp;gt;Watching someone make numbers by typing into the random number generator isn’t that fun. But if there’s some novel, reason, or idea behind it… you could convince me it isn’t slop. I don’t particularly find the medium of decoupage enjoyable but with the right artistic mindset, curiosity, or obsession… sure? And if a bird assembles a house from trash, well I love that.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Some like to draw thin blurry lines and some prefer to draw thick crisp lines, I love to see and read both. And I’m glad the term “slop” exists because we as a creative species created a label for the abstract idea of thoughtless outputs from a thoughtless content extruder.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;So, make something. Or not. I don’t care. Actually, I do care. Please make something. With your hands, or your brain, or your feet… wait, no that has other connotations.&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>People are not friction</title>
-      <link>https://daverupert.com/2026/03/people-are-not-friction/</link>
-      <guid>https://daverupert.com/2026/03/people-are-not-friction/</guid>
-      <pubDate>Fri, 20 Mar 2026 15:54:00 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;The &amp;lt;a href=&amp;quot;https://blog.jim-nielsen.com/2025/a-in-ai-stands-for-amnesia/&amp;quot;&amp;gt;Gell-Mann Amnesia Effect of AI&amp;lt;/a&amp;gt; is a pretty well documented phenomenon:&amp;lt;/p&amp;gt;
-        &amp;lt;blockquote&amp;gt;
-        &amp;lt;p&amp;gt;The Gell-Mann amnesia effect is a cognitive bias describing the tendency of individuals to critically assess media reports in a domain they are knowledgeable about, yet continue to trust reporting in other areas despite recognizing similar potential inaccuracies.&amp;lt;/p&amp;gt;
-        &amp;lt;/blockquote&amp;gt;
-        &amp;lt;p&amp;gt;Summarizing, AI sounds like an incredible genius synthesizing the world’s knowledge right up until you ask it about the thing you know about, then it’s an idiot. Even knowing about this phenomenon and having experienced it countless times, LLMs have an intoxicating quality to them.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;If there’s one thing LLMs do well, it’s delivering an enormous blast of dopamine if they do a good job on the first try. That “if” does a lot of heavy lifting, but when it happens you start to believe the idea that the multi-modal chat box could make you faster and infinitely capable. A hop and a skip and hundreds of dollars in tokens later, you made something that would take lifetimes of learning to create.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;The marketing around Generative AI is that every person can be their own Designer, Developer, Researcher, Content Writer, Video Producer, and Podcast Editor. With the right &amp;lt;code&amp;gt;skills.md&amp;lt;/code&amp;gt; files everything will fall into place. We will automate all automatable tasks. The experience will be “&amp;lt;a href=&amp;quot;https://nazhamid.com/journal/the-hunt/&amp;quot;&amp;gt;frictionless&amp;lt;/a&amp;gt;”.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;You’ll be able to automate away the jobs you don’t enjoy…&amp;lt;br /&amp;gt;
-        And the jobs you don’t know how to do…&amp;lt;br /&amp;gt;
-        And the people who do those jobs…&amp;lt;br /&amp;gt;
-        The people you don’t enjoy…&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;You won’t need to talk to or wait on anyone. You can automate away anything or anyone that stands in your way. You will reduce costs. You will be richer. It will be frictionless.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Sometimes I feel like there’s a palpable tension in the air as if we’re waiting to see whether AI will replace designers or engineers first. Designers empowered by AI might feel those pesky nay-saying, opinionated engineers aren’t needed anymore. Engineers empowered with AI might feel like AI creates designs that are good enough for most situations. Backend engineers feel like frontend engineering is a solved problem. Frontend engineers know scaffolding a CRUD app or an entire backend API is simple fodder for the agent. Meanwhile, management cackles in their leather chairs saying “Let them fight…”&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;I think it’s a dangerous place to be when we start to consider people as friction.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;That’s because we know Gell-Mann is real. We know there’s an &amp;lt;a href=&amp;quot;https://en.wikipedia.org/wiki/Optimism_bias&amp;quot;&amp;gt;optimism bias&amp;lt;/a&amp;gt; the size of the sun blinding us to the actual quality of what the machine is producing. We need knowledgeable people to share what they know to improve the quality of our work, generated or otherwise. We even need ignorant people to make sure we can break ideas down into their simplest form that everyone, agents or human, understand. People can have bad attitudes, be shitty, and have wrong opinions… but people are not friction. An LLM may be able to autocorrect its way into a plausible human response, but it’s not people. It doesn’t care if it’s right or wrong. The money and hype surrounding it acts as a shield to its reputation. LLMs make up answers if it doesn’t have enough context and they fall over if it has too much context. It amplifies good patterns the same as bad patterns. And it glazes you with flattering language the entire time so that chart go up.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;People, the context-bearers, have experience and capabilities that machines might never understand encoded in our muscles and memory. I’m on record saying I despise nuance –&amp;lt;em&amp;gt;and I do&amp;lt;/em&amp;gt;– but it’s more important than ever to be able to connect to our fellow humans over this nuance so our world is not paved over by contextless opinions from ill-informed robots. Empower and believe people over machines.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
   </channel>

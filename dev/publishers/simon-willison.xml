@@ -4,7 +4,76 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 05 Oct 2026 22:13:59 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 06 Oct 2026 20:21:50 GMT</lastBuildDate>
+    <item>
+      <title>Using Parseable with Datasette for OpenTelemetry traces</title>
+      <link>https://simonwillison.net/2026/Oct/6/datasette-parseable-opentelemetry/</link>
+      <guid>https://simonwillison.net/2026/Oct/6/datasette-parseable-opentelemetry/</guid>
+      <pubDate>Tue, 06 Oct 2026 19:07:31 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;TIL:&lt;/strong&gt; &lt;a href=&quot;https://til.simonwillison.net/datasette/datasette-parseable-opentelemetry&quot;&gt;Using Parseable with Datasette for OpenTelemetry traces&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I &lt;a href=&quot;https://news.ycombinator.com/item?id=49978171&quot;&gt;saw Parseable in a Show HN&lt;/a&gt; today - it&apos;s a new observability platform with both an &lt;a href=&quot;https://github.com/parseablehq/parseable&quot;&gt;open source (AGPL)&lt;/a&gt; Rust implementation (a single ~180MB binary), an &quot;Enterprise&quot; version with extra features and a cloud hosted option.&lt;/p&gt;
+        &lt;p&gt;Since &lt;a href=&quot;https://docs.datasette.io/en/latest/changelog.html#a41-2026-09-24&quot;&gt;Datasette 1.0a41 added OpenTelemetry support&lt;/a&gt; (thanks, Alex Garcia), I decided to fire up Codex and have it figure out how to run Parseable and feed it traces from Datasette.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s my (human-written) TIL showing the patterns that worked, and here&apos;s a screenshot of a Datasette trace displayed within the Parseable localhost web application:&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Screenshot of a trace detail view in an observability web app, with a span waterfall overlaid on a dimmed navigation sidebar and filter column. Dimmed sidebar: breadcrumb &amp;quot;Community &amp;gt; Traces &amp;gt; datas&amp;quot; (cut off), search box &amp;quot;Search... ⌘K&amp;quot;, nav items &amp;quot;Home&amp;quot;, &amp;quot;Ingest telemetry&amp;quot;, section &amp;quot;ANALYZE&amp;quot;: &amp;quot;Keystone&amp;quot;, &amp;quot;Dashboards&amp;quot;, &amp;quot;SQL Editor&amp;quot;, section &amp;quot;OBSERVE&amp;quot;: &amp;quot;Logs&amp;quot;, &amp;quot;Metrics&amp;quot;, &amp;quot;Traces&amp;quot; (selected), &amp;quot;APM&amp;quot;, &amp;quot;Agents&amp;quot;, section &amp;quot;MONITOR&amp;quot;: &amp;quot;Alerts&amp;quot;, &amp;quot;Errors&amp;quot;, section &amp;quot;DATA&amp;quot;: &amp;quot;Datasets&amp;quot;, and at the bottom &amp;quot;Settings&amp;quot;, &amp;quot;Book a call&amp;quot;, &amp;quot;Support&amp;quot;. Dimmed filter column, cut off at the right edge: &amp;quot;Search fi&amp;quot;, &amp;quot;Core&amp;quot;, &amp;quot;Log format&amp;quot;, &amp;quot;User agent&amp;quot;, &amp;quot;Source IPs&amp;quot;, &amp;quot;Error&amp;quot;, &amp;quot;Service&amp;quot;, &amp;quot;service.ins&amp;quot;, &amp;quot;service.na&amp;quot;, &amp;quot;datasett&amp;quot; (checked), &amp;quot;Span&amp;quot;, &amp;quot;Database&amp;quot;, &amp;quot;HTTP&amp;quot;, &amp;quot;http.reque&amp;quot;, &amp;quot;NULL&amp;quot; (unchecked), &amp;quot;GET&amp;quot; (checked), &amp;quot;http.respo&amp;quot;, &amp;quot;http.route&amp;quot;, &amp;quot;Server&amp;quot;, &amp;quot;server.add&amp;quot;, &amp;quot;Telemetry&amp;quot;, &amp;quot;URL&amp;quot;, &amp;quot;All fields&amp;quot;. Trace panel header: &amp;quot;Trace detail &amp;gt; 6f819a2170bcd1e91c6ea3ae236ec60b&amp;quot; with a copy icon, a &amp;quot;Related logs&amp;quot; button and a close X. Summary: &amp;quot;Start time 6:56 PM, Oct 6, 2026 UTC&amp;quot;, &amp;quot;Duration 40.9 ms&amp;quot;, &amp;quot;Spans 247&amp;quot;. A minimap with axis &amp;quot;0ns 10.2ms 20.5ms 30.7ms 40.9ms&amp;quot; shows many short span bars cascading diagonally from top left toward the lower middle, with a few longer bars. Below is a span table with a &amp;quot;Span name&amp;quot; header, a &amp;quot;Search spans...&amp;quot; box, collapse and expand buttons, and a timeline axis &amp;quot;0ns 10.2ms 20.5ms 30.7ms 40.9ms&amp;quot;. Rows (name, service, duration): root span with collapse toggle &amp;quot;123&amp;quot;, &amp;quot;GET /...&amp;quot; &amp;quot;datasette...&amp;quot; 40.9ms spanning the full timeline; then alternating rows where each &amp;quot;db.query&amp;quot; has a collapse toggle &amp;quot;1&amp;quot;: db.query datasette-local 679µs, db.query.execute datasette-local 278µs, db.query datasette-local 341µs, db.query.execute datasette-local 55µs, db.query datasette-local 357µs, db.query.execute datasette-local 197µs, db.query datasette-local 330µs, db.query.execute datasette-local 73µs, db.query datasette-local 2.26ms, db.query.execute datasette-local 2.02ms, db.query datasette-local 232µs, db.query.execute datasette-local 64µs, db.query datasette-local 207µs, db.query.execute datasette-local 71µs, db.query datasette-local 6.11ms. The child span bars start progressively later across the early part of the timeline.&quot; src=&quot;https://raw.githubusercontent.com/simonw/til/refs/heads/main/datasette/datasette-parsable.webp&quot; /&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/observability&quot;&gt;observability&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/alex-garcia&quot;&gt;alex-garcia&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/opentelemetry&quot;&gt;opentelemetry&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Mistral Large 4</title>
+      <link>https://simonwillison.net/2026/Oct/6/hn-49982139/</link>
+      <guid>https://simonwillison.net/2026/Oct/6/hn-49982139/</guid>
+      <pubDate>Tue, 06 Oct 2026 18:20:58 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;a href=&quot;https://news.ycombinator.com/item?id=49977979#49982139&quot;&gt;My comment&lt;/a&gt; on &lt;a href=&quot;https://news.ycombinator.com/item?id=49977979&quot;&gt;Mistral Large 4&lt;/a&gt; &amp;mdash; Hacker News.&lt;/p&gt;&lt;blockquote&gt;
+        &lt;p&gt;&lt;a href=&quot;https://news.ycombinator.com/item?id=49977979#49979658&quot;&gt;wren6991&lt;/a&gt;: The benchmark is saturated. Frontier models are tested with an armadillo in fishnet tights jaywalking on Mars.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;OK well I couldn&apos;t resist this one:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;llm -m claude-opus-5.5 &apos;Generate an SVG of an armadillo in fishnet tights jaywalking on Mars&apos;
+        llm -m gpt-6.1-sol &apos;Generate an SVG of an armadillo in fishnet tights jaywalking on Mars&apos;
+        llm -m gemini-3.8-flash &apos;Generate an SVG of an armadillo in fishnet tights jaywalking on Mars&apos;
+        llm -m mistral/mistral-large-4 &apos;Generate an SVG of an armadillo in fishnet tights jaywalking on Mars&apos;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Default reasoning levels for each: &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F18c9f7fc3b3705cf88514cb9170ec246&quot;&gt;https://tools.simonwillison.net/markdown-svg-renderer?url=ht...&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Scrimshaw Jukebox</title>
+      <link>https://simonwillison.net/2026/Oct/6/scrimshaw-jukebox/</link>
+      <guid>https://simonwillison.net/2026/Oct/6/scrimshaw-jukebox/</guid>
+      <pubDate>Tue, 06 Oct 2026 15:17:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/scrimshaw-jukebox&quot;&gt;Scrimshaw Jukebox&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I wanted to see if Claude Opus 5.5 could compose music, so &lt;a href=&quot;https://claude.ai/share/1f721c20-2499-4d23-b368-3ab57146d956&quot;&gt;I tried this&lt;/a&gt;:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;I want you to write some computer game music for me. First design simple text based format for the music and build an artifact that can play it out loud - include some example tracks in that artifact&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;I am looking for music of the quality of the original secret of Monkey Island&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;It leaned a lot harder into the Monkey Island theme than I had intended, but the results are surprisingly good.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://tools.simonwillison.net/scrimshaw-jukebox&quot;&gt;&lt;img alt=&quot;Screenshot of a retro pixel-art web music player. Header in blackletter type reads &amp;quot;Scrimshaw Jukebox&amp;quot;, with the text &amp;quot;Six original adventure-game tracks, written as plain text and played by a synthesizer running in your browser. Pick a tune, press Play, then open the score and change it.&amp;quot; A large pixel-art scene shows a harbor at night under a purple starry sky: a full moon at top right reflecting on the water, an island silhouette on the left with palm trees and a hut with two lit windows, and a sailing ship moored at a wooden pier. Overlaid on the scene: &amp;quot;Moonlit Harbor&amp;quot; and &amp;quot;Press Play&amp;quot;. Below it a bar reads &amp;quot;Play Moonlit Harbor&amp;quot;. A control panel has buttons &amp;quot;Play&amp;quot;, &amp;quot;Stop&amp;quot;, &amp;quot;Restart&amp;quot;, &amp;quot;Loop: on&amp;quot;, &amp;quot;Edit score&amp;quot;, &amp;quot;Read guide&amp;quot; and a &amp;quot;Volume&amp;quot; slider set to about three quarters. A track list of six cards, the first highlighted: &amp;quot;Moonlit Harbor 100 bpm · 4/4 · 16 voices · 1:26&amp;quot;, &amp;quot;The Rusty Anchor 112 bpm · 6/8 · 8 voices · 0:56&amp;quot;, &amp;quot;The Ghost Galleon 66 bpm · 4/4 · 9 voices · 2:11&amp;quot;, &amp;quot;The Jungle Path 92 bpm · 4/4 · 12 voices · 1:29&amp;quot;, &amp;quot;Duel on the Docks 152 bpm · 4/4 · 12 voices · 1:13&amp;quot;, &amp;quot;Lantern Waltz 96 bpm · 3/4 · 8 voices · 1:38&amp;quot;. A section titled &amp;quot;Score view&amp;quot; with the caption &amp;quot;1:26 · 4/4 at 100 bpm · Main theme. A calypso for a harbour town after dark.&amp;quot; shows a piano-roll visualization of colored horizontal note bars and percussion ticks on a dark background, with a section marker &amp;quot;A&amp;quot; and a yellow vertical playhead line. A color-coded legend of voices reads: &amp;quot;pan steeldrum&amp;quot;, &amp;quot;flute flute&amp;quot;, &amp;quot;marimba marimba&amp;quot;, &amp;quot;skank organ&amp;quot;, &amp;quot;strings strings&amp;quot;, &amp;quot;harp harp&amp;quot;, &amp;quot;bass fretless&amp;quot;, &amp;quot;timp timpani&amp;quot;, &amp;quot;kick kick&amp;quot;, &amp;quot;rim rim&amp;quot;, &amp;quot;shaker shaker&amp;quot;, &amp;quot;conga conga&amp;quot;, &amp;quot;tumba tumba&amp;quot;, &amp;quot;bongo bongo&amp;quot;, &amp;quot;crash crash&amp;quot;, &amp;quot;surf surf&amp;quot;. Footer text: &amp;quot;Click a voice to mute it. Space bar plays and stops.&amp;quot;&quot; src=&quot;https://static.simonwillison.net/static/2026/scrimshaw.webp&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I wonder if the ability to compose competent music is similar to the 3D graphics thing - a new capability for text models that emerged in the past few months?&lt;/p&gt;
+        &lt;p&gt;Would need some careful experiments with other recent and not-so-recent models to confirm if this is new or if they&apos;ve been able to do this for a while.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/vibe-coding&quot;&gt;vibe-coding&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting Felix Rieseberg</title>
+      <link>https://simonwillison.net/2026/Oct/5/felix-rieseberg/</link>
+      <guid>https://simonwillison.net/2026/Oct/5/felix-rieseberg/</guid>
+      <pubDate>Mon, 05 Oct 2026 23:56:47 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://twitter.com/felixrieseberg/status/2107206431376334975&quot;&gt;&lt;p&gt;The &quot;old&quot; version of Cowork runs model inference in the cloud, executing tool calls in an Anthropic-provided VM we shipped to your computer. We added the VM for capability, safety, and security reasons - mapping in just the data you explicitly added to your session. People loved what they were able to do with Claude but didn&apos;t love the disk, battery, and performance cost of running the VM locally. Also, people didn&apos;t love that closing your laptop means the work stops.&lt;/p&gt;
+        &lt;p&gt;The &quot;new&quot; version of Cowork runs model inference and the VM in the cloud. Each session gets its own sandbox, not sharing state with other sessions. When the VM needs something on the users&apos; device (like a file), the desktop app is responsible for that file access tool call. [...]&lt;/p&gt;
+        &lt;p&gt;We think this solves a lot of problems we&apos;ve heard about  (like using Cowork from a phone, keeping work running, or getting all the same power without losing battery to the VM)&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/felixrieseberg/status/2107206431376334975&quot;&gt;Felix Rieseberg&lt;/a&gt;, Anthropic, see also &lt;a href=&quot;https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile#h_f951c27c48&quot;&gt;this help page&lt;/a&gt;&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/claude-cowork&quot;&gt;claude-cowork&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/general-agents&quot;&gt;general-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Qwen3.8 27B addition in words</title>
       <link>https://simonwillison.net/2026/Oct/4/qwen38-addition-in-words/</link>
@@ -1327,176 +1396,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/text-to-speech&quot;&gt;text-to-speech&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gemini&quot;&gt;gemini&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Shadow roots, explained with live examples</title>
-      <link>https://simonwillison.net/2026/Sep/23/shadow-roots/</link>
-      <guid>https://simonwillison.net/2026/Sep/23/shadow-roots/</guid>
-      <pubDate>Wed, 23 Sep 2026 16:37:18 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/shadow-roots&quot;&gt;Shadow roots, explained with live examples&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Prompt to Fable 5.1 Medium:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Build an artifact to explain shadow roots in CSS with interactive examples&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/css&quot;&gt;css&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>SF October 14th: A Birds of a Feather Session on Agentic Engineering</title>
-      <link>https://simonwillison.net/2026/Sep/23/bof-agentic-engineering/</link>
-      <guid>https://simonwillison.net/2026/Sep/23/bof-agentic-engineering/</guid>
-      <pubDate>Wed, 23 Sep 2026 02:53:19 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://luma.com/vxuiuyvg&quot;&gt;SF October 14th: A Birds of a Feather Session on Agentic Engineering&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        I&apos;m hosting an evening event with Jesse Vincent in San Francisco on Wednesday 14th October for people who are building weird and interesting things with and on top of coding agents.&lt;/p&gt;
-        &lt;p&gt;Think of it as an agentic show-and-tell:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;​Compare notes with other builders and experimenters on things you’re trying, what you&apos;re learning, and what you haven’t figured out yet. We’re especially interested in work you haven’t discussed publicly, odd experiments, or unfinished projects that don’t have an obvious market.&lt;/p&gt;
-        &lt;p&gt;​Expect one flowing conversation with an informal show-and-tell. Sharing something you’re working on is encouraged but no presentation is required.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This isn&apos;t about product pitches, it&apos;s about much earlier explorations than that. This agentic AI stuff is weird! Let&apos;s celebrate and lean into that weirdness.
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/events&quot;&gt;events&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/jesse-vincent&quot;&gt;jesse-vincent&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war</title>
-      <link>https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/</link>
-      <guid>https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/</guid>
-      <pubDate>Tue, 22 Sep 2026 23:46:41 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Yesterday was &lt;a href=&quot;https://x.ai/news/grok-4-7&quot;&gt;Grok 4.7&lt;/a&gt; (&lt;a href=&quot;https://news.ycombinator.com/item?id=49788838#49790209&quot;&gt;pelicans&lt;/a&gt;) and &lt;a href=&quot;https://mimo.xiaomi.com/mimo-v2-6&quot;&gt;MiMo v2.6 Flash/Pro&lt;/a&gt; (&lt;a href=&quot;https://news.ycombinator.com/item?id=49792730#49793480&quot;&gt;more pelicans&lt;/a&gt;). Today Anthropic &lt;a href=&quot;https://www.anthropic.com/claude-opus-5-5&quot;&gt;released Claude Opus 5.5&lt;/a&gt;, and around an hour later OpenAI &lt;a href=&quot;https://openai.com/index/introducing-gpt-6-sol-and-luna/&quot;&gt;released GPT-6 Sol and GPT-6 Luna&lt;/a&gt;. It&apos;s going to take a while to get a good read on all of these new models, but here are my impressions so far.&lt;/p&gt;
-        &lt;h4 id=&quot;gpt-6-sol-and-luna-are-half-the-price-of-their-gpt-5-6-equivalents&quot;&gt;GPT-6 Sol and Luna are half the price of their GPT-5.6 equivalents&lt;/h4&gt;
-        &lt;p&gt;GPT-5.6 Luna was already my favorite model for building applications against, because it combined excellent performance with being &lt;em&gt;really cheap&lt;/em&gt;. Somehow GPT-6 Luna is half the price of that again - and GPT-6 Sol had a similar reduction compared to GPT-5.6 Sol.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s what the pricing landscape looks like today:&lt;/p&gt;
-        &lt;center&gt;&lt;table&gt;
-        &lt;thead&gt;
-        &lt;tr&gt;
-        &lt;th&gt;Model&lt;/th&gt;
-        &lt;th&gt;Input&lt;/th&gt;
-        &lt;th&gt;Cached input&lt;/th&gt;
-        &lt;th&gt;Output&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-6 Luna&lt;/td&gt;
-        &lt;td&gt;$0.10/M&lt;/td&gt;
-        &lt;td&gt;$0.01/M&lt;/td&gt;
-        &lt;td&gt;$0.50/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-5.6 Luna&lt;/td&gt;
-        &lt;td&gt;$0.20/M&lt;/td&gt;
-        &lt;td&gt;$0.02/M&lt;/td&gt;
-        &lt;td&gt;$1.20/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;Grok 4.7&lt;/td&gt;
-        &lt;td&gt;$2/M&lt;/td&gt;
-        &lt;td&gt;$0.50/M&lt;/td&gt;
-        &lt;td&gt;$6/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-6 Sol&lt;/td&gt;
-        &lt;td&gt;$2/M&lt;/td&gt;
-        &lt;td&gt;$0.20/M&lt;/td&gt;
-        &lt;td&gt;$10/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-5.6 Terra&lt;/td&gt;
-        &lt;td&gt;$2/M&lt;/td&gt;
-        &lt;td&gt;$0.20/M&lt;/td&gt;
-        &lt;td&gt;$12/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;Claude Opus 5.5&lt;/td&gt;
-        &lt;td&gt;$4/M&lt;/td&gt;
-        &lt;td&gt;$0.20/M&lt;/td&gt;
-        &lt;td&gt;$20/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-5.6 Sol&lt;/td&gt;
-        &lt;td&gt;$4/M&lt;/td&gt;
-        &lt;td&gt;$0.40/M&lt;/td&gt;
-        &lt;td&gt;$20/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;Claude Fable 5.1&lt;/td&gt;
-        &lt;td&gt;$10/M&lt;/td&gt;
-        &lt;td&gt;$0.25/M&lt;/td&gt;
-        &lt;td&gt;$50/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td&gt;GPT-6 Astra&lt;/td&gt;
-        &lt;td&gt;$10/M&lt;/td&gt;
-        &lt;td&gt;$1/M&lt;/td&gt;
-        &lt;td&gt;$50/M&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;&lt;/center&gt;
-        &lt;p&gt;Note that GPT-5.6 has a scheduled 25% price increase for November, so GPT-6 is half the price of the &lt;em&gt;promotional&lt;/em&gt; pricing for those models.&lt;/p&gt;
-        &lt;p&gt;(With GPT-5.6 Terra priced the same as GPT-6 Sol, any remaining reasons to use Terra just evaporated.)&lt;/p&gt;
-        &lt;p&gt;It&apos;s hard to overstate how competitive this pricing is. Grok 4.7 priced itself at $2/$6, less than half the price of GPT-5.6 Sol, but is now equally priced to GPT-6 Sol on input and closer on output.&lt;/p&gt;&lt;p&gt;At $0.10/$0.50 GPT-6 Luna is one of the cheapest models OpenAI have ever released, beaten only by the far weaker GPT-4.1 Nano ($0.10/$0.40, April 2025) and GPT-5 Nano ($0.05/$0.40, August 2025).&lt;/p&gt;
-        &lt;p&gt;I rendered &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F40d129fc140faca378b9c9f4f16c6ec2&quot;&gt;pelicans for GPT-6 Luna&lt;/a&gt; and &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Fbe7ae25af2634b68bc34b7b7aaf02cb2&quot;&gt;for GPT-6 Sol&lt;/a&gt;, then I combined them all together in &lt;a href=&quot;https://static.simonwillison.net/static/2026/gpt-pelicans-grid.html&quot;&gt;this comparison grid&lt;/a&gt; along with the GPT-5.6 pelicans. I like how you can instantly see that the 5.6 family chose bolder, brighter colors, while the 6 family is a lot more muted. I still think GPT-6 Astra on max produced the best pelican.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/gpt-pelicans-grid.webp&quot; alt=&quot;A grid of pelicans for six GPT models at different thinking efforts.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;claude-opus-5-5-got-a-price-cut-too&quot;&gt;Claude Opus 5.5 got a price cut too&lt;/h4&gt;
-        &lt;p&gt;Opus 5.5 looks like it addresses the biggest complaints people had about Opus in terms of its communication style. &lt;a href=&quot;https://twitter.com/trq212/status/2102437686967738431&quot;&gt;Thariq Shihipar&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Opus 5.5 is the result of your feedback.&lt;/p&gt;
-        &lt;p&gt;It communicates clearly, it&apos;s cheaper per token than Opus 5.0 with the intelligence of Fable 5.1 it&apos;s very token efficient and works across every effort level.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;It&apos;s also meant to be &lt;a href=&quot;https://twitter.com/alexalbert__/status/2102466523164274839&quot;&gt;better at Blender&lt;/a&gt;. I&apos;m looking forward to putting it through its paces there.&lt;/p&gt;
-        &lt;p&gt;Opus 4.5, 4.6, 4.7, 4.8, and 5 all shared the same price: $5/million tokens for input and $25/million for output. 5.5 is a 20% reduction - $4/million and $20/million.&lt;/p&gt;
-        &lt;p&gt;The price for cache reads fell 60%. That&apos;s significant for longer agentic conversations, where 90%+ of input tokens are processed at cached token prices.&lt;/p&gt;
-        &lt;p&gt;The new price for Opus 5.5 is the same as the price for GPT-5.6 Sol, but that was &lt;em&gt;before&lt;/em&gt; OpenAI dropped their Sol prices by half.&lt;/p&gt;
-        &lt;p&gt;GPT-6 Astra and Claude Fable 5.1 are both priced at $10/million input and $50/million output. The price war currently affects the next tier of models below that.&lt;/p&gt;
-        &lt;p&gt;Anthropic say that Sonnet 5.5 and Haiku 5.5 are coming soon. It&apos;s going to be interesting to see if Haiku can regain its price competitiveness at the lower end, given current Haiku 4.5 is $1/$5 while the latest GPT-6 Luna is &lt;em&gt;one tenth&lt;/em&gt; of that price at $0.10/$0.50.&lt;/p&gt;
-        &lt;h4 id=&quot;claude-opus-5-5-max-over-thinks-to-the-point-of-breaking&quot;&gt;Claude Opus 5.5 max over-thinks to the point of breaking&lt;/h4&gt;
-        &lt;p&gt;In a first for my &quot;&lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle/&quot;&gt;Generate an SVG of a pelican riding a bicycle&lt;/a&gt;&quot; test, Claude Opus 5.5 at &quot;max&quot; thinking level failed to return a response!&lt;/p&gt;
-        &lt;p&gt;It started by calling this &quot;a classic test request&quot;, and then thought really, &lt;em&gt;really&lt;/em&gt; hard about what it was doing:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;This is a classic test request, so I want to plan out a well-composed pelican with its distinctive beak and pouch riding a bicycle with proper wheels, frame, and pedals, set against a simple sky and ground backdrop. [...]&lt;/p&gt;
-        &lt;p&gt;Verifying the shin length checks out at roughly 95.2, close enough. Now I&apos;m working out the near leg path from hip to knee to ankle, then sketching the foot shape resting on the pedal — outlining the heel, toe tips, and sole contour with a path using lines and curves to sit naturally on the pedal surface around y=478-494. [...]&lt;/p&gt;
-        &lt;p&gt;I like the fish sticking prominently out of the basket with the pelican eyeing it as a fun detail worth keeping. I&apos;m also confirming the eye placement near the bill base matches typical pelican anatomy, and considering giving it a slightly happier expression. [...]&lt;/p&gt;
-        &lt;p&gt;The far leg reads correctly as passing behind the frame, so I&apos;m moving on to check the chainring teeth and confirm layer ordering—the far crank arm should be mostly hidden by the seat tube and chainring. I&apos;m settling on the final SVG&apos;s width and height attributes alongside the viewBox to ensure proper scaling, noting there&apos;s no text so no font-family is needed. [...]&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I was so excited to see this pelican... but then it &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F61fd7c3683fffce9a3ab7c43d1180024#response-4&quot;&gt;stopped&lt;/a&gt;. Opus 5.5 has a 128,000 maximum output token limit (as do the other Claude models), and it hit that while it was still reasoning about the SVG!&lt;/p&gt;
-        &lt;p&gt;I tried a second time and got the same result. This makes me suspect that &quot;max&quot; is effectively useless - if it over-thinks to breaking point on a stupid SVG prompt I don&apos;t trust it not to do the same for more interesting work.&lt;/p&gt;
-        &lt;p&gt;(Those two failures each cost me &lt;a href=&quot;https://www.llm-prices.com/#it=27&amp;amp;ot=128000&amp;amp;sel=claude-opus-5-5&quot;&gt;$2.56&lt;/a&gt; and took nearly 20 minutes.)&lt;/p&gt;
-        &lt;p&gt;Fable 5.1 on &quot;max&quot; didn&apos;t over-think and did give me &lt;a href=&quot;https://simonwillison.net/2026/Sep/1/claude-fable-5-1/#max&quot;&gt;the best pelican I&apos;ve seen&lt;/a&gt; from any Anthropic model.&lt;/p&gt;
-        &lt;p&gt;Here are &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F61fd7c3683fffce9a3ab7c43d1180024&quot;&gt;the Opus 5.5 pelicans&lt;/a&gt;, excluding 5.5 max.&lt;/p&gt;
-        &lt;p&gt;I also built &lt;a href=&quot;https://static.simonwillison.net/static/2026/claude-pelicans-grid.html&quot;&gt;this comparison grid&lt;/a&gt; comparing them with pelicans by Opus 5, Fable 5.1, and Sonnet 5:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/claude-pelicans-grid.webp&quot; alt=&quot;A grid of pelicans for four Claude models at different thinking efforts.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Comparing different model vendors by how well they draw a pelican riding a bicycle may not make much sense now (if it ever did), but I&apos;m still finding value in using them for comparisons of the same model families at different reasoning levels.&lt;/p&gt;
-        &lt;p&gt;I&apos;m now using GPT-6 Sol and Claude Opus 5.5 as my default models in Codex and Claude Code. I&apos;ve upgraded the Datasette Agent demo at &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;agent.datasette.io&lt;/a&gt; to use GPT-6 Luna, and it seems to be fast and competent at both SQL queries and building HTML and JavaScript for &lt;a href=&quot;https://simonwillison.net/2026/Jun/18/datasette-apps/&quot;&gt;Datasette Apps&lt;/a&gt;.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt&quot;&gt;gpt&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt-6-astra&quot;&gt;gpt-6-astra&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm 0.36</title>
-      <link>https://simonwillison.net/2026/Sep/22/llm/</link>
-      <guid>https://simonwillison.net/2026/Sep/22/llm/</guid>
-      <pubDate>Tue, 22 Sep 2026 18:48:37 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.36&quot;&gt;llm 0.36&lt;/a&gt;&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;ul&gt;
-        &lt;li&gt;New OpenAI models: &lt;code&gt;gpt-6-sol&lt;/code&gt; for &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-6-sol&quot;&gt;GPT-6 Sol&lt;/a&gt; and &lt;code&gt;gpt-6-luna&lt;/code&gt; for &lt;a href=&quot;https://developers.openai.com/api/docs/models/gpt-6-luna&quot;&gt;GPT-6 Luna&lt;/a&gt;. &lt;a href=&quot;https://github.com/simonw/llm/issues/1702&quot;&gt;#1702&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Model plugins can now declare &lt;code&gt;supports_conversation = False&lt;/code&gt; for models that only accept single-turn prompts. LLM raises &lt;code&gt;llm.ConversationNotSupported&lt;/code&gt; when these models receive assistant or tool history, and &lt;code&gt;llm chat&lt;/code&gt; rejects them before starting a session. See &lt;a href=&quot;https://llm.datasette.io/en/stable/plugins/advanced-model-plugins.html#advanced-model-plugins-conversations&quot;&gt;Models that do not support conversations&lt;/a&gt;. The first plugin to use this is &lt;a href=&quot;https://github.com/simonw/llm-typesafe&quot;&gt;llm-typesafe&lt;/a&gt;. &lt;a href=&quot;https://github.com/simonw/llm/issues/1692&quot;&gt;#1692&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Reasoning traces in the Markdown output of &lt;code&gt;llm logs&lt;/code&gt; are now wrapped in &lt;code&gt;&amp;lt;details&amp;gt;&amp;lt;summary&amp;gt;&lt;/code&gt; tags. &lt;a href=&quot;https://github.com/simonw/llm/issues/1701&quot;&gt;#1701&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Plus &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-36&quot;&gt;bug fixes from five new contributors&lt;/a&gt;.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
