@@ -4,12 +4,261 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 08 Oct 2026 20:56:18 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 09 Oct 2026 20:27:19 GMT</lastBuildDate>
+    <item>
+      <title>Tiny Apps with TinyJS</title>
+      <link>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</link>
+      <guid>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</guid>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;About a year ago, I was still running my live stream (&lt;a href=&quot;https://www.youtube.com/watch?v=BzRUsvAR4oQ&amp;amp;list=PL_z-rqJYNijqhtPcEbwacp34TiFfb8eyO&quot;&gt;Code Break&lt;/a&gt;) and my final three streams all covered one topic - building desktop applications with non-native code. I covered &lt;a href=&quot;https://v2.tauri.app/&quot;&gt;Tauri&lt;/a&gt; (HTML on the front, Rust on the back) and &lt;a href=&quot;https://flet.dev/&quot;&gt;Flet&lt;/a&gt; (all Python). Recently I came across another option, &lt;a href=&quot;https://tinyjs.app/&quot;&gt;tinyjs&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;TinyJS (technically the name is &amp;quot;tinyjs&amp;quot; but I can&apos;t make myself use the lowercase in my writing like that ;) is a lot like PhoneGap/Apache Cordova. Your application is the system web view shipped along with the ability to make system calls via a bridge to &lt;a href=&quot;https://txikijs.org/&quot;&gt;txiki.js&lt;/a&gt;. This bridge gives you full access to the file system and more, like any other native app.&lt;/p&gt;
+        &lt;p&gt;Unlike PhoneGap, this is &lt;em&gt;just&lt;/em&gt; for desktop apps, which is fine, but I think the biggest selling point is the size of the bundled app - typically around 6 megs. That&apos;s tiny versus something like Electron.&lt;/p&gt;
+        &lt;p&gt;It&apos;s got hooks into everything a desktop app could need, like native dialogs and OS menus and such. It can write securely to the OS&apos;s credential store, use SQLite, and even handle application updating.&lt;/p&gt;
+        &lt;p&gt;I&apos;ve just begun playing with it recently and I&apos;ve got a few ideas for apps I want to build, but I thought I&apos;d share a quick demo. This one&apos;s a bit ugly, and to be clear, that&apos;s on me. As it&apos;s a web view, you&apos;ve got full control over how the end result looks. I was just going for something quick and dirty in my test.&lt;/p&gt;
+        &lt;h2 id=&quot;first-steps&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-steps&quot;&gt;First Steps&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;After doing a quick &lt;a href=&quot;https://tinyjs.app/docs.html#install&quot;&gt;install&lt;/a&gt;, you can scaffold at the command line with:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;tinyjs new appname
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;By default this scaffolds out a vanilla application (no React default, woot!) with a few files and folders - the important ones (at least initially while testing and learning) are:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;frontend - the UI/UX layer (HTML, CSS, JS)&lt;/li&gt;
+        &lt;li&gt;main.js - a &amp;quot;backend&amp;quot; file that lets you build services you expose to your front end code. This is where you do &amp;quot;system&amp;quot; stuff your frontend JavaScript can&apos;t do.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;As an example, your backend code could use this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;export const api: Record&amp;lt;string, TinyApiHandler&amp;gt; = {
+        hello: async ({ name }: { name: string }) =&amp;gt; &apos;hi &apos; + name + &apos; — from the backend&apos;,
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which would then be available in the frontend as &lt;code&gt;await tiny.api.call(&apos;hello&apos;, {...})&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;Running the app is done via &lt;code&gt;tinyjs dev&lt;/code&gt; which will load the app and enable HMR. In my testing, reloading was &lt;em&gt;incredibly&lt;/em&gt; quick, but I didn&apos;t build anything large (yet).&lt;/p&gt;
+        &lt;h2 id=&quot;working-with-alpine&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#working-with-alpine&quot;&gt;Working with Alpine&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The CLI has got a number of different scaffolds you can use, including Alpine. (And I should say - huge thanks to &lt;a href=&quot;https://tarwin.art/&quot;&gt;tarwin&lt;/a&gt;, the creator - who answered a lot of my questions via email and added stuff I asked for left and right!) I scaffolded one like that and one thing I&apos;ll note - the scaffold for different frameworks will differ a bit from the simple app you get by default. Each project has a &lt;code&gt;tinyjs.json&lt;/code&gt; file which has metadata for the project, including where your backend file is and how the frontend works.&lt;/p&gt;
+        &lt;p&gt;For my simple test, I wanted to check a few things. First, is CORS still enforced when using &lt;code&gt;fetch&lt;/code&gt;? The short answer is yes, it is. The longer answer is that doesn&apos;t matter as you can use &lt;code&gt;tiny.fetch&lt;/code&gt; instead. I thought it would be fun then to build a simple &amp;quot;RSS to HTML&amp;quot; application where I could enter an RSS feed and render the items.&lt;/p&gt;
+        &lt;p&gt;I copied the browser distributable for the &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;&lt;code&gt;rss-parser&lt;/code&gt;&lt;/a&gt; project and simply included it in my HTML via a script tag. Here&apos;s the entirety of that file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!doctype html&amp;gt;
+        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+        &amp;lt;link rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/svg+xml&amp;quot; href=&amp;quot;/favicon.svg&amp;quot; /&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot; /&amp;gt;
+        &amp;lt;title&amp;gt;RSS Parser&amp;lt;/title&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        &amp;lt;section id=&amp;quot;center&amp;quot; x-data=&amp;quot;hello&amp;quot;&amp;gt;
+        &amp;lt;h1&amp;gt;RSS Parser&amp;lt;/h1&amp;gt;
+        &amp;lt;input x-model=&amp;quot;url&amp;quot; placeholder=&amp;quot;RSS feed URL&amp;quot; /&amp;gt; &amp;lt;button @click=&amp;quot;parse&amp;quot;&amp;gt;Parse&amp;lt;/button&amp;gt;
+        &amp;lt;template x-if=&amp;quot;items.length &amp;gt; 0&amp;quot;&amp;gt;
+        &amp;lt;div&amp;gt;
+        &amp;lt;h2&amp;gt;Items&amp;lt;/h2&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;template x-for=&amp;quot;item in items&amp;quot; :key=&amp;quot;item.link&amp;quot;&amp;gt;
+        &amp;lt;li&amp;gt;
+        &amp;lt;a :href=&amp;quot;item.link&amp;quot; target=&amp;quot;_blank&amp;quot; x-text=&amp;quot;item.title&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;
+        &amp;lt;/li&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;script src=&amp;quot;/src/rss-parser.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script type=&amp;quot;module&amp;quot; src=&amp;quot;/src/main.ts&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That&apos;s all regular Alpine.js stuff, nothing fancy there. Now for the JavaScript:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import &apos;./style.css&apos;;
+        import &apos;simpledotcss/simple.min.css&apos;;
+        
+        import Alpine from &apos;alpinejs&apos;;
+        
+        Alpine.data(&apos;hello&apos;, () =&amp;gt; ({
+        name: &apos;world&apos;,
+        url: &apos;https://www.raymondcamden.com/feed.xml&apos;,
+        items: [],
+        async init() {
+        },
+        async parse() {
+        const parser = new RSSParser();
+        let req = await tiny.fetch(this.url);
+        let res = await req.text();
+        let feed = await parser.parseString(res);
+        this.items = feed.items;
+        },
+        async ask() {
+        // Every function in the backend&apos;s api object is callable from the page.
+        this.reply = await tiny.api.call(&apos;hello&apos;, { name: this.name })
+        },
+        }))
+        
+        Alpine.start()
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;A few things to note here - I&apos;ve got some junk in the file still, like the &lt;code&gt;ask&lt;/code&gt; function which was a leftover from the scaffold. The important bit is the &lt;code&gt;parse&lt;/code&gt; function. The RSSParser object has the ability to parse a URL, but it uses fetch and is blocked by CORS. So instead I get the XML via &lt;code&gt;tiny.fetch&lt;/code&gt; and pass it to &lt;code&gt;parseString&lt;/code&gt;. And that&apos;s literally it. Here&apos;s a screenshot of the application running:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/tj1.png&quot; loading=&quot;lazy&quot; alt=&quot;App running&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;h2 id=&quot;more-info&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#more-info&quot;&gt;More Info&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://tinyjs.app/docs.html&quot;&gt;docs&lt;/a&gt; obviously are a great place to start, and if you&apos;re curious about more of how it actually works, there&apos;s a good &lt;a href=&quot;https://tinyjs.app/docs.html#howitworks&quot;&gt;explanation&lt;/a&gt; of that as well.&lt;/p&gt;
+        &lt;p&gt;My next demo is going to be testing an OAuth login flow with the application. The project supports registering custom URL schemes which is typically how that&apos;s handled so it &lt;em&gt;should&lt;/em&gt; be possible, but I want to test it out myself of course. :)&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@goumbik?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Lukas Blazek&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/coffee-latte-near-white-wireless-keyboard-and-apple-earpods-on-the-table-photography-GnvurwJsKaY?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Adding My Latest CodePens to My Blog</title>
+      <link>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</link>
+      <guid>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</guid>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve been a fan of CodePen for many, many years, and it&apos;s one of the few services I spend money on to help support. A few months back, they released an entirely new version that dramatically improved the service (CodePen 2.0) and it just made me more happy I was a supporter. Just a few days ago they &lt;a href=&quot;https://codepen.io/changelog/2026-10-02&quot;&gt;announced more changes&lt;/a&gt; including a full &lt;a href=&quot;https://blog.codepen.io/docs/api/api-v2/&quot;&gt;API&lt;/a&gt;. I thought it would be fun to add a display of my recent pens. Yes, I thought that would be fun, because that&apos;s the kind of nerd I am.&lt;/p&gt;
+        &lt;h2 id=&quot;adding-dynamic-content-to-a-ssg&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-dynamic-content-to-a-ssg&quot;&gt;Adding Dynamic Content to a SSG&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;It has been a &lt;em&gt;very&lt;/em&gt; long time since I blogged about anything related to static site generators. There&apos;s no particular reason for that, but I figure this is a good time to bring up the topic again, specifically about how static sites can include dynamic content. There&apos;s two main paths to this.&lt;/p&gt;
+        &lt;p&gt;The first is getting content at build time. For Eleventy, this is done with data files that are executed at build time and can return ad hoc data for use in your templates. As an example of that, the list of books I&apos;m reading on my &lt;a href=&quot;https://www.raymondcamden.com/now&quot;&gt;Now&lt;/a&gt; page are gathered via a GraphQL query:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const HARDCOVER_BOOKS = process.env.HARDCOVER_BOOKS;
+        
+        export default async function() {
+        
+        if(process.env.SKIP_REMOTE_DATA) return [];
+        if(!HARDCOVER_BOOKS) return [];
+        let req;
+        
+        let body = `
+        {
+        user_books(
+        where: {user_id: {_eq: 65213}, status_id: {_eq: 2}}
+        ) {
+        book {
+        title
+        image {
+        url
+        }
+        contributions {
+        author {
+        name
+        }
+        }
+        }
+        }
+        }
+        `.trim();
+        
+        try {
+        req = await fetch(&apos;https://api.hardcover.app/v1/graphql&apos;, {
+        method:&apos;POST&apos;, 
+        headers: {
+        &apos;authorization&apos;:HARDCOVER_BOOKS,
+        &apos;Content-Type&apos;:&apos;application/json&apos;
+        },
+        body:JSON.stringify({query:body})
+        });
+        } catch (e) {
+        console.log(&apos;Hardcover API error&apos;, e);
+        return [];
+        }
+        
+        let data = (await req.json()).data.user_books.map(ob =&amp;gt; ob.book);
+        /* normalize authors */
+        data = data.map(b =&amp;gt; {
+        b.authors = b.contributions.reduce((list,c) =&amp;gt; {
+        if(c.author) list.push(c.author.name);
+        return list;
+        },[]);
+        return b;
+        });
+        
+        return data;
+        
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The list of books returned there can then be rendered in my page template:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div class=&amp;quot;films&amp;quot;&amp;gt;
+        {% for book in hardcover_books  %}
+        &amp;lt;div class=&amp;quot;film&amp;quot;&amp;gt;
+        {% if book.image != null %}
+        &amp;lt;img src=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_216/{{book.image.url}}&amp;quot; alt=&amp;quot;Cover of {{ book.title }}&amp;quot;&amp;gt;
+        {% else  %}
+        &amp;lt;img src=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_216/https://static.raymondcamden.com/images/no_cover_available.jpg&amp;quot; alt=&amp;quot;No Cover Available&amp;quot;&amp;gt;
+        {% endif %}
+        &amp;quot;{{ book.title  }}&amp;quot; by {{ book.authors | join: &apos;, &apos; }}
+        &amp;lt;/div&amp;gt;
+        {% endfor %}
+        &amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As you can tell by the class names, I use the same logic for the films I&apos;ve watched. In both cases, the data doesn&apos;t change terribly often so I&apos;m ok with it being a bit out of date. I also publish &lt;em&gt;something&lt;/em&gt; to the blog every week so it&apos;s never too far behind.&lt;/p&gt;
+        &lt;p&gt;That&apos;s option 1. Option 2 is to use JavaScript and an API. That ensures the content is always 100% up to date but it has other trade offs. Some APIs don&apos;t have CORS support and APIs requiring keys that can&apos;t be in client-side code. In that case, I simply use a serverless function which Netlify makes pretty simple.&lt;/p&gt;
+        &lt;h2 id=&quot;getting-my-pens&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-my-pens&quot;&gt;Getting my Pens&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, so given that I&apos;ve decided to fetch my CodePens via JavaScript on the front-end via a serverless function, I first created a key in CodePen&apos;s settings, added to my Netlify configuration, and then wrote a quick and dirty function:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import { Context } from &apos;@netlify/functions&apos;
+        
+        export default async (request: Request, context: Context) =&amp;gt; {
+        try {
+        
+        const CP_KEY = process.env.CODEPEN_KEY;
+        
+        const req = await fetch(&apos;https://api.codepen.io/v2/pens?sort=updated&amp;amp;direction=desc&amp;amp;access=Public&amp;amp;template=false&amp;amp;per_page=10&apos;, {
+        method: &apos;GET&apos;,
+        headers: {
+        &apos;Authorization&apos;: `Bearer ${CP_KEY}`,
+        &apos;Content-Type&apos;: &apos;application/json&apos;
+        }});
+        
+        let data = await req.json();
+        
+        // now lets do some mapping 
+        data = data.map((pen: any) =&amp;gt; {
+        return {
+        title: pen.title,
+        url: pen.urls.editor,
+        created_at: pen.created_at,
+        updated_at: pen.updated_at,
+        screenshot: pen.screenshot_urls.small
+        }
+        });
+        
+        return new Response(JSON.stringify(data), {
+        headers: {
+        &apos;Content-Type&apos;: &apos;application/json&apos;
+        }
+        })
+        } catch (error) {
+        return new Response(error.toString(), {
+        status: 500,
+        })
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;m filtering by public pens and pens that aren&apos;t templates, sorted by last updated, and capping the list to 10. Then I map the data to a &lt;em&gt;much&lt;/em&gt; smaller set of information as I only need part of what&apos;s returned in my front end.&lt;/p&gt;
+        &lt;p&gt;Then all I needed to do was add it to my &lt;a href=&quot;/stuff&quot;&gt;stuff&lt;/a&gt; page:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let $pens = document.querySelector(&apos;#pens&apos;);
+        
+        let pens = await fetch(&apos;/.netlify/functions/get-codepens&apos;).then(r =&amp;gt; r.json());
+        
+        pens.forEach(p =&amp;gt; {
+        let pen = document.createElement(&apos;a&apos;);
+        pen.className = &apos;penBox&apos;;
+        pen.href = p.url;
+        pen.target = &apos;_blank&apos;;
+        pen.rel = &apos;noopener noreferrer&apos;;
+        
+        let screenshot = document.createElement(&apos;img&apos;);
+        screenshot.src = p.screenshot;
+        screenshot.alt = &apos;&apos;;
+        screenshot.loading = &apos;lazy&apos;;
+        
+        let title = document.createElement(&apos;h3&apos;);
+        title.textContent = p.title;
+        
+        pen.append(screenshot, title);
+        $pens.append(pen);
+        });
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Sweet. Of course, I think I&apos;m the only person who visits either my &lt;a href=&quot;/stuff&quot;&gt;stuff&lt;/a&gt; or &lt;a href=&quot;/now&quot;&gt;now&lt;/a&gt; pages, but they make me happy!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>A Not-So-Simple RSS App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, I lie, this demo is also pretty simple, but I wanted to break the pattern of the last few posts and at least pretend this example is a bit more complex. As I try to find excuses to write more TypeScript, I thought a great example of that would be a simple RSS aggregator. You hit the site, tell it the feeds you care about, and it renders a date sorted list of entries.&lt;/p&gt;
         &lt;p&gt;Because RSS typically can&apos;t be parsed in client-side JavaScript (don&apos;t know why? ask me below!) so I&apos;d have to make use of a serverless function to proxy the calls (and at the same time, handle turning the XML into JSON).&lt;/p&gt;
@@ -144,7 +393,7 @@
       <title>A Simple Weather App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
         &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
@@ -392,7 +641,7 @@
       <title>A Simple Alpine.js Template with Vite and TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
@@ -490,7 +739,7 @@
       <title>Links For You (9/20/26)</title>
       <link>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</link>
       <guid>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Football is Back&amp;quot; season to those of you who celebrate. I&apos;m currently watching my Saints take on the Ravens (who are also a favorite of mine) and hoping for our first win. The last few weeks have been incredibly busy (I feel like I always say that, sorry) with a trip for work that then morphed into a short vacation with my wife and I which included my first Blizzcon (which is freaking cool as hell) and our first visit to Disneyland. (We&apos;ve been to Disney World a few times.) I think we both agreed that Disney World is cooler, but the crowds and - most importantly - the weather - was much better in California.&lt;/p&gt;
         &lt;p&gt;
@@ -527,7 +776,7 @@
       <title>It&apos;s only a decade late, I&apos;ll learn TypeScript!</title>
       <link>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a bit worried lately. Of course, my friends will tell you that&apos;s my norm. But more specifically, I&apos;ve been worried about my coding skills. As I use AI to generate more and more code, and it does that job well, I kinda miss actually &lt;em&gt;writing&lt;/em&gt; code. I&apos;ve also had a bit of writer&apos;s block in terms of &lt;em&gt;topics&lt;/em&gt; to cover, and especially in the area of the web platform. A few days ago it occurred to me - I&apos;ve never &lt;em&gt;really&lt;/em&gt; dug into &lt;a href=&quot;https://www.typescriptlang.org/&quot;&gt;TypeScript&lt;/a&gt;. Sure, I&apos;ve used it, many times, in the fourteen or so years it&apos;s been out, but many times I kinda guess at what I&apos;m doing and it was never my default for projects. Partly that&apos;s due to my philosophy of avoiding a build step in my projects and just KISS in general.&lt;/p&gt;
         &lt;p&gt;But as I said - the inspiration hit me this past week and I thought I&apos;d do some digging. Here&apos;s a few initial thoughts and experiments. Oh, and I still used AI a bit and I&apos;ll explain exactly how in the post below.&lt;/p&gt;
@@ -872,7 +1121,7 @@
       <title>Building a Document Q&amp;A System with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
         &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
@@ -909,7 +1158,7 @@
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -935,7 +1184,7 @@
       <title>Weather Nerd? Check out My OSX Radar Widget</title>
       <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
       <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
+      <pubDate>Fri, 09 Oct 2026 20:07:21 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
         &lt;p&gt;
@@ -944,182 +1193,6 @@
         &lt;p&gt;Ok, to be fair, I used Cursor to build it - but it really scratched an itch I&apos;ve had for a while to constantly have one more thing to distract me.&lt;/p&gt;
         &lt;p&gt;If you want a copy of this yourself (or want to make it better!), I&apos;ve set up a GitHub repo here: &lt;a href=&quot;https://github.com/cfjedimaster/precipradar&quot;&gt;https://github.com/cfjedimaster/precipradar&lt;/a&gt;. I&apos;ve got both the source as well as a build for easy installation.&lt;/p&gt;
         &lt;p&gt;Note that as with my &lt;a href=&quot;https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver&quot;&gt;LEGO screensaver&lt;/a&gt;, you&apos;ll need to run a CLI command to authorize the app, but that&apos;s a onetime operation. Enjoy!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Like LEGO? Got a Mac? Get My Screensaver</title>
-      <link>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</link>
-      <guid>https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Good morning my fabulous readers. This will be a quick post as I just wanted to share something cool I built with Cursor over the past couple of days - a LEGO screensaver. I&apos;m a huge fan of &amp;quot;show me something random from something I like&amp;quot; and have built multiple bots in that vein. I recently discovered &lt;a href=&quot;https://rebrickable.com/downloads/&quot;&gt;Rebrickable&apos;s LEGO datasets&lt;/a&gt; which contains a CSV file of LEGO sets. The data looks like so:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;set_num,name,year,theme_id,num_parts,img_url
-        0003977811-1,Ninjago: Book of Adventures,2022,761,1,https://cdn.rebrickable.com/media/sets/0003977811-1.jpg
-        001-1,Gears,1965,756,43,https://cdn.rebrickable.com/media/sets/001-1.jpg
-        0011-2,Town Mini-Figures,1979,67,12,https://cdn.rebrickable.com/media/sets/0011-2.jpg
-        0011-3,Castle 2 for 1 Bonus Offer,1987,199,0,https://cdn.rebrickable.com/media/sets/0011-3.jpg
-        0012-1,Space Mini-Figures,1979,143,12,https://cdn.rebrickable.com/media/sets/0012-1.jpg
-        0013-1,Space Mini-Figures,1979,143,12,https://cdn.rebrickable.com/media/sets/0013-1.jpg
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I thought it would be cool to select a random set, show the year, name, number of pieces, and render the image as well. I gave this CSV to Cursor and started iterating on building a simple OSX screensaver. I had it filter out sets where the number of pieces was greater than or equal to 50 (typically &amp;quot;swag&amp;quot;, non-buildable items) or with names that also appeared to be non-buildable things.&lt;/p&gt;
-        &lt;p&gt;After that, I just let Cursor handle creating the project. I know &lt;em&gt;nothing&lt;/em&gt; about OSX development, thankfully Cursor does. The only real issue I ran into was OSX aggressively caching the screensaver data which made updates a bit difficult. I think we (and by that I mean mostly Cursor, and some me) figured that out eventually.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s an example of how it looks:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/08/lego.png&quot; loading=&quot;lazy&quot; alt=&quot;LEGO screensaver example&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Alright, so before I link you to the GitHub repo, a quick warning. I&apos;m not paying Apple for a developer&apos;s license which means if you get the build, you&apos;ll need to run a one-time command in your terminal to whitelist the app.&lt;/p&gt;
-        &lt;p&gt;Ok, with that out of the way, head over to the repo and check it out: &lt;a href=&quot;https://github.com/cfjedimaster/lego-screensaver&quot;&gt;https://github.com/cfjedimaster/lego-screensaver&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Adding My Latest CodePens to My Blog</title>
-      <link>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</link>
-      <guid>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</guid>
-      <pubDate>Thu, 08 Oct 2026 20:36:35 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve been a fan of CodePen for many, many years, and it&apos;s one of the few services I spend money on to help support. A few months back, they released an entirely new version that dramatically improved the service (CodePen 2.0) and it just made me more happy I was a supporter. Just a few days ago they &lt;a href=&quot;https://codepen.io/changelog/2026-10-02&quot;&gt;announced more changes&lt;/a&gt; including a full &lt;a href=&quot;https://blog.codepen.io/docs/api/api-v2/&quot;&gt;API&lt;/a&gt;. I thought it would be fun to add a display of my recent pens. Yes, I thought that would be fun, because that&apos;s the kind of nerd I am.&lt;/p&gt;
-        &lt;h2 id=&quot;adding-dynamic-content-to-a-ssg&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-dynamic-content-to-a-ssg&quot;&gt;Adding Dynamic Content to a SSG&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;It has been a &lt;em&gt;very&lt;/em&gt; long time since I blogged about anything related to static site generators. There&apos;s no particular reason for that, but I figure this is a good time to bring up the topic again, specifically about how static sites can include dynamic content. There&apos;s two main paths to this.&lt;/p&gt;
-        &lt;p&gt;The first is getting content at build time. For Eleventy, this is done with data files that are executed at build time and can return ad hoc data for use in your templates. As an example of that, the list of books I&apos;m reading on my &lt;a href=&quot;https://www.raymondcamden.com/now&quot;&gt;Now&lt;/a&gt; page are gathered via a GraphQL query:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const HARDCOVER_BOOKS = process.env.HARDCOVER_BOOKS;
-        
-        export default async function() {
-        
-        if(process.env.SKIP_REMOTE_DATA) return [];
-        if(!HARDCOVER_BOOKS) return [];
-        let req;
-        
-        let body = `
-        {
-        user_books(
-        where: {user_id: {_eq: 65213}, status_id: {_eq: 2}}
-        ) {
-        book {
-        title
-        image {
-        url
-        }
-        contributions {
-        author {
-        name
-        }
-        }
-        }
-        }
-        }
-        `.trim();
-        
-        try {
-        req = await fetch(&apos;https://api.hardcover.app/v1/graphql&apos;, {
-        method:&apos;POST&apos;, 
-        headers: {
-        &apos;authorization&apos;:HARDCOVER_BOOKS,
-        &apos;Content-Type&apos;:&apos;application/json&apos;
-        },
-        body:JSON.stringify({query:body})
-        });
-        } catch (e) {
-        console.log(&apos;Hardcover API error&apos;, e);
-        return [];
-        }
-        
-        let data = (await req.json()).data.user_books.map(ob =&amp;gt; ob.book);
-        /* normalize authors */
-        data = data.map(b =&amp;gt; {
-        b.authors = b.contributions.reduce((list,c) =&amp;gt; {
-        if(c.author) list.push(c.author.name);
-        return list;
-        },[]);
-        return b;
-        });
-        
-        return data;
-        
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;The list of books returned there can then be rendered in my page template:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div class=&amp;quot;films&amp;quot;&amp;gt;
-        {% for book in hardcover_books  %}
-        &amp;lt;div class=&amp;quot;film&amp;quot;&amp;gt;
-        {% if book.image != null %}
-        &amp;lt;img src=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_216/{{book.image.url}}&amp;quot; alt=&amp;quot;Cover of {{ book.title }}&amp;quot;&amp;gt;
-        {% else  %}
-        &amp;lt;img src=&amp;quot;https://res.cloudinary.com/raymondcamden/image/fetch/c_fit,w_216/https://static.raymondcamden.com/images/no_cover_available.jpg&amp;quot; alt=&amp;quot;No Cover Available&amp;quot;&amp;gt;
-        {% endif %}
-        &amp;quot;{{ book.title  }}&amp;quot; by {{ book.authors | join: &apos;, &apos; }}
-        &amp;lt;/div&amp;gt;
-        {% endfor %}
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;As you can tell by the class names, I use the same logic for the films I&apos;ve watched. In both cases, the data doesn&apos;t change terribly often so I&apos;m ok with it being a bit out of date. I also publish &lt;em&gt;something&lt;/em&gt; to the blog every week so it&apos;s never too far behind.&lt;/p&gt;
-        &lt;p&gt;That&apos;s option 1. Option 2 is to use JavaScript and an API. That ensures the content is always 100% up to date but it has other trade offs. Some APIs don&apos;t have CORS support and APIs requiring keys that can&apos;t be in client-side code. In that case, I simply use a serverless function which Netlify makes pretty simple.&lt;/p&gt;
-        &lt;h2 id=&quot;getting-my-pens&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#getting-my-pens&quot;&gt;Getting my Pens&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, so given that I&apos;ve decided to fetch my CodePens via JavaScript on the front-end via a serverless function, I first created a key in CodePen&apos;s settings, added to my Netlify configuration, and then wrote a quick and dirty function:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import { Context } from &apos;@netlify/functions&apos;
-        
-        export default async (request: Request, context: Context) =&amp;gt; {
-        try {
-        
-        const CP_KEY = process.env.CODEPEN_KEY;
-        
-        const req = await fetch(&apos;https://api.codepen.io/v2/pens?sort=updated&amp;amp;direction=desc&amp;amp;access=Public&amp;amp;template=false&amp;amp;per_page=10&apos;, {
-        method: &apos;GET&apos;,
-        headers: {
-        &apos;Authorization&apos;: `Bearer ${CP_KEY}`,
-        &apos;Content-Type&apos;: &apos;application/json&apos;
-        }});
-        
-        let data = await req.json();
-        
-        // now lets do some mapping 
-        data = data.map((pen: any) =&amp;gt; {
-        return {
-        title: pen.title,
-        url: pen.urls.editor,
-        created_at: pen.created_at,
-        updated_at: pen.updated_at,
-        screenshot: pen.screenshot_urls.small
-        }
-        });
-        
-        return new Response(JSON.stringify(data), {
-        headers: {
-        &apos;Content-Type&apos;: &apos;application/json&apos;
-        }
-        })
-        } catch (error) {
-        return new Response(error.toString(), {
-        status: 500,
-        })
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I&apos;m filtering by public pens and pens that aren&apos;t templates, sorted by last updated, and capping the list to 10. Then I map the data to a &lt;em&gt;much&lt;/em&gt; smaller set of information as I only need part of what&apos;s returned in my front end.&lt;/p&gt;
-        &lt;p&gt;Then all I needed to do was add it to my &lt;a href=&quot;/stuff&quot;&gt;stuff&lt;/a&gt; page:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let $pens = document.querySelector(&apos;#pens&apos;);
-        
-        let pens = await fetch(&apos;/.netlify/functions/get-codepens&apos;).then(r =&amp;gt; r.json());
-        
-        pens.forEach(p =&amp;gt; {
-        let pen = document.createElement(&apos;a&apos;);
-        pen.className = &apos;penBox&apos;;
-        pen.href = p.url;
-        pen.target = &apos;_blank&apos;;
-        pen.rel = &apos;noopener noreferrer&apos;;
-        
-        let screenshot = document.createElement(&apos;img&apos;);
-        screenshot.src = p.screenshot;
-        screenshot.alt = &apos;&apos;;
-        screenshot.loading = &apos;lazy&apos;;
-        
-        let title = document.createElement(&apos;h3&apos;);
-        title.textContent = p.title;
-        
-        pen.append(screenshot, title);
-        $pens.append(pen);
-        });
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Sweet. Of course, I think I&apos;m the only person who visits either my &lt;a href=&quot;/stuff&quot;&gt;stuff&lt;/a&gt; or &lt;a href=&quot;/now&quot;&gt;now&lt;/a&gt; pages, but they make me happy!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

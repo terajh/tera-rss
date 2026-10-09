@@ -4,7 +4,7 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Thu, 08 Oct 2026 20:56:18 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 09 Oct 2026 20:27:18 GMT</lastBuildDate>
     <item>
       <title>Recursion is DEAD and HTML killed it</title>
       <link>https://daverupert.com/2026/10/html-recursion/</link>
@@ -92,7 +92,7 @@
         &amp;lt;p&amp;gt;An obvious limitation here is that we’ve hard-coded ourselves to three levels of nesting. Adding more nesting would require backend and frontend work and break the classic “&amp;lt;a href=&amp;quot;https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)&amp;quot;&amp;gt;Rule of three&amp;lt;/a&amp;gt;” programming rule. Hard-coding your nesting is the “dumb way” to render nested content… but also the normal way.&amp;lt;/p&amp;gt;
         &amp;lt;h3 id=&amp;quot;making-this-a-bit-smarter-and-more-infinite&amp;quot;&amp;gt;Making this a bit smarter and more infinite&amp;lt;a href=&amp;quot;#making-this-a-bit-smarter-and-more-infinite&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Making this a bit smarter and more infinite&amp;apos;&amp;quot; data-heading-content=&amp;quot;Making this a bit smarter and more infinite&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h3&amp;gt;
         &amp;lt;p&amp;gt;Philosophically-speaking, UI should be agnostic to the content it renders. If nested content is a possibility, a content renderer should theoretically support infinite nested content. Practically-speaking, most of us have learned that it doesn’t matter if the Product Manager’s Jira ticket says “The max is two nested items”, there will always be at least three.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;The smarter way is to render this is to use recursion because nested for-loops are &amp;lt;em&amp;gt;BAD&amp;lt;/em&amp;gt; and you are &amp;lt;em&amp;gt;DUMB&amp;lt;/em&amp;gt; if you use them. But if you obfuscate the nesting into a function that calls itself, then that’s ✨recursion, baby✨ and you’re a &amp;lt;em&amp;gt;GENIUS&amp;lt;/em&amp;gt; programmer.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;The smarter way to render this is to use recursion because nested for-loops are &amp;lt;em&amp;gt;BAD&amp;lt;/em&amp;gt; and you are &amp;lt;em&amp;gt;DUMB&amp;lt;/em&amp;gt; if you use them. But if you obfuscate the nesting into a function that calls itself, then that’s ✨recursion, baby✨ and you’re a &amp;lt;em&amp;gt;GENIUS&amp;lt;/em&amp;gt; programmer.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Jokes aside, recursion will clean up the template code and simplify getting HTML on the page.&amp;lt;/p&amp;gt;
         &amp;lt;pre&amp;gt;&amp;lt;code&amp;gt;→ Fetch all posts in thread
         → Loop through posts
@@ -183,14 +183,15 @@
         main.appendHTML(renderPost(post))
         );
         &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
-        &amp;lt;p&amp;gt;No tree building is happening whatsoever on the server. The microsecond after we generate the template we’re able to stream/send the HTML directly to the client and the page assembles itself. No recursion, no pre-assembly required. It all snap-fits together without us imperatively injecting content.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;No tree building is happening whatsoever on the server. The microsecond after we generate the template in the middle of the for-loop we can stream/send the HTML directly to the client and let the page assemble itself. No recursion, no pre-assembly required. It all snap-fits together without us imperatively injecting content.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;A brief demo in CodePen. I recommend reading the HTML first, imagine that’s the order it streamed in, then viewing the assembled tree of nested comments.&amp;lt;/p&amp;gt;
         &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;500&amp;quot; data-pen-title=&amp;quot;LEFT JOIN with HTML &amp;amp;amp;lt;?marker&amp;amp;amp;gt;&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;html,result&amp;quot; data-slug-hash=&amp;quot;LEWRJaq&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
         &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/01a09d84-a554-7c87-b9e4-63d46f866b17&amp;quot;&amp;gt;
         LEFT JOIN with HTML &amp;amp;lt;?marker&amp;amp;gt;&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
         on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
         &amp;lt;/p&amp;gt;
         &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;p&amp;gt;It’s worth noting a thread of 10K posts will crush the browser, so you’ll still have to load responsibly and think about “Show more comments” buttons. I’m hand-waving the details here, but this gets easier too because your &amp;lt;code&amp;gt;loadMoreComments()&amp;lt;/code&amp;gt; function doesn’t need to know anything about where to append those new comments, it can just staple them to the bottom of the page.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;It’s worth noting a thread of 10K posts will crush the browser, so you’ll still have to load responsibly and think about a “Show more comments” buttons. I’m hand-waving the details here, but this gets easier too because your &amp;lt;code&amp;gt;loadMoreComments()&amp;lt;/code&amp;gt; function doesn’t need to know anything about where to append those new comments, it can just staple them to the bottom of the page.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;I’m excited about the possibilities here of removing ancillary content or UI from the critical rendering path. I’m interested in HTML’s newfound ability to self-assemble content and relationships in a declarative way. And maybe… he says with a glimmer of hope in his eyes… HTML Imports will be resurrected and there will be peace on Earth.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
