@@ -4,12 +4,383 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Sun, 11 Oct 2026 20:04:55 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 12 Oct 2026 22:46:13 GMT</lastBuildDate>
+    <item>
+      <title>Adding Google Auth to TinyJS</title>
+      <link>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</link>
+      <guid>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</guid>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;A few days ago I &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;posted&lt;/a&gt; about my experience playing around with &lt;a href=&quot;https://tinyjs.app/&quot;&gt;TinyJS&lt;/a&gt;. This is a &lt;em&gt;very&lt;/em&gt; light &amp;quot;web to desktop app&amp;quot; platform for - well - building desktop apps. Its simplicity and similarity to PhoneGap (at least for the desktop) has got me interested in seeing what I can build with the project. One of my ideas would be improved with a login system so I naturally looked into adding a &amp;quot;Login with Google&amp;quot; feature. While this was &lt;em&gt;mostly&lt;/em&gt; straightforward, I ran into some oddities and figured I&apos;d share it here.&lt;/p&gt;
+        &lt;p&gt;I went into this exploration with a basic idea of how I&apos;d approach it:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Create an app in the Google Cloud console to represent my app, getting the client id and secret.&lt;/li&gt;
+        &lt;li&gt;Generate a link using the standard OAuth flow&lt;/li&gt;
+        &lt;li&gt;For my redirect URL, use a custom URI scheme (like &lt;code&gt;mycustomapp://&lt;/code&gt;) so that on redirect from Google, it would open the app automatically&lt;/li&gt;
+        &lt;li&gt;The response would include the code I&apos;d exchange for an access token (and refresh token), at which point I could get the user&apos;s profile and have their name and email address. I&apos;m only thinking of that as my mental model for this little POC is &lt;em&gt;just&lt;/em&gt; login, not using other Google services.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Right away I hit a couple of snags.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Google&apos;s OAuth flow specifically blocks the use of a custom URI scheme. Instead, you need to hit a locally running web server which would handle getting and verifying the code. I&apos;ve actually seen this before, you end up with a new tab in your browser that says you can close the tab, but I had never implemented it before.&lt;/li&gt;
+        &lt;li&gt;The next bit isn&apos;t a snag per se, but in my research, I found that in most places, your desktop app can include just the client id, but for Google, you must include the secret as well. Obviously that makes me nervous as heck, but again, this is apparently a well known thing for desktop apps that authenticate with Google. While I don&apos;t feel 100% certain about this, I asked multiple agents, Googled, and so forth, and they all seemed to be in agreement. Absolutely correct me in a comment below if I&apos;m wrong.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Alright, so with all of that in mind - I want to once again thank the author of the program for pointing me to the &lt;a href=&quot;https://github.com/tarwin/tinyjsapp-examples/tree/main/platter&quot;&gt;platter demo&lt;/a&gt; which implements the local web server mentioned above. I was able to point my coding agent to that when working through the demo.&lt;/p&gt;
+        &lt;p&gt;I have &lt;em&gt;not&lt;/em&gt; put my code into a GitHub repo, but will include everything below. As this was just a POC I didn&apos;t feel like it was necessary, but if you want a zip, just ask. Nicely. Or not. I&apos;ll still send it.&lt;/p&gt;
+        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Ok, let me start with the simplest part, the HTML. I&apos;m not using Alpine for this, or any real CSS. It&apos;s just this:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+        &amp;lt;html&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;utf-8&amp;quot;&amp;gt;
+        &amp;lt;title&amp;gt;__NAME__&amp;lt;/title&amp;gt;
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style.css&amp;quot;&amp;gt;
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        
+        &amp;lt;main&amp;gt;
+        &amp;lt;h1&amp;gt;Google sign-in Test&amp;lt;/h1&amp;gt;
+        &amp;lt;a id=&amp;quot;login-link&amp;quot; href=&amp;quot;#&amp;quot;&amp;gt;Login with Google&amp;lt;/a&amp;gt;
+        &amp;lt;section id=&amp;quot;profile&amp;quot; aria-live=&amp;quot;polite&amp;quot; hidden&amp;gt;
+        &amp;lt;h2&amp;gt;Signed in&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Name:&amp;lt;/strong&amp;gt; &amp;lt;span id=&amp;quot;profile-name&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Email:&amp;lt;/strong&amp;gt; &amp;lt;span id=&amp;quot;profile-email&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/section&amp;gt;
+        &amp;lt;p id=&amp;quot;login-error&amp;quot; role=&amp;quot;alert&amp;quot; hidden&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/main&amp;gt;
+        
+        &amp;lt;script src=&amp;quot;app.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;/body&amp;gt;
+        &amp;lt;/html&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;ve got a login link (blank, that gets filled in later), a section that&apos;s displayed when you are logged in, and a block for errors. The login link should be hidden as well (I&apos;ll explain why later), but again I was trying to keep this simple.&lt;/p&gt;
+        &lt;p&gt;Now let&apos;s look at the JavaScript, and this is a bit of a mess. With a proper framework like Alpine it would be better organized, but it gets the job done.&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const CLIENT_ID = &amp;quot;safe but why not be sure&amp;quot;;
+        
+        const REDIRECT_URI = &amp;quot;http://127.0.0.1:8765/callback&amp;quot;;
+        const TOKENS_KEY = &amp;quot;google-oauth-tokens&amp;quot;;
+        
+        async function makeLoginUrl() {
+        const b64url = (buf) =&amp;gt;
+        btoa(String.fromCharCode(...new Uint8Array(buf)))
+        .replace(/\+/g, &amp;quot;-&amp;quot;).replace(/\//g, &amp;quot;_&amp;quot;).replace(/=+$/, &amp;quot;&amp;quot;);
+        
+        const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
+        const challenge = b64url(
+        await crypto.subtle.digest(&amp;quot;SHA-256&amp;quot;, new TextEncoder().encode(verifier))
+        );
+        const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
+        
+        // keep these for the token exchange step
+        sessionStorage.setItem(&amp;quot;pkce_verifier&amp;quot;, verifier);
+        sessionStorage.setItem(&amp;quot;oauth_state&amp;quot;, state);
+        
+        const params = new URLSearchParams({
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        response_type: &amp;quot;code&amp;quot;,
+        scope: &amp;quot;openid email profile&amp;quot;,
+        access_type: &amp;quot;offline&amp;quot;,
+        prompt: &amp;quot;consent&amp;quot;,
+        code_challenge: challenge,
+        code_challenge_method: &amp;quot;S256&amp;quot;,
+        state,
+        });
+        
+        return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+        }
+        
+        document.addEventListener(&amp;quot;DOMContentLoaded&amp;quot;, async () =&amp;gt; {
+        const loginLink = document.querySelector(&amp;quot;#login-link&amp;quot;);
+        
+        try {
+        const savedTokens = await tiny.app.secrets.get(TOKENS_KEY);
+        if (savedTokens) {
+        try {
+        const session = await tiny.api.call(&amp;quot;restoreSession&amp;quot;, {
+        tokens: JSON.parse(savedTokens),
+        clientId: CLIENT_ID,
+        });
+        await tiny.app.secrets.set(TOKENS_KEY, JSON.stringify(session.tokens));
+        showProfile(session.profile);
+        return;
+        } catch {
+        await tiny.app.secrets.delete(TOKENS_KEY);
+        }
+        }
+        await prepareLogin(loginLink);
+        } catch (error) {
+        showError(`Google sign-in failed: ${error.message}`);
+        }
+        });
+        
+        async function prepareLogin(loginLink) {
+        const url = await makeLoginUrl();
+        const state = sessionStorage.getItem(&amp;quot;oauth_state&amp;quot;);
+        const codeVerifier = sessionStorage.getItem(&amp;quot;pkce_verifier&amp;quot;);
+        loginLink.href = url;
+        loginLink.target = &amp;quot;_blank&amp;quot;;
+        loginLink.rel = &amp;quot;noopener&amp;quot;;
+        
+        loginLink.onclick = async () =&amp;gt; {
+        try {
+        const session = await tiny.api.call(&amp;quot;waitForCode&amp;quot;, {
+        port: 8765,
+        state,
+        codeVerifier,
+        clientId: CLIENT_ID,
+        });
+        await tiny.app.secrets.set(TOKENS_KEY, JSON.stringify(session.tokens));
+        showProfile(session.profile);
+        } catch (error) {
+        showError(`Google sign-in failed: ${error.message}`);
+        await prepareLogin(loginLink);
+        }
+        };
+        }
+        
+        function showProfile(profile) {
+        document.querySelector(&amp;quot;#profile-name&amp;quot;).textContent = profile.name || &amp;quot;Not provided&amp;quot;;
+        document.querySelector(&amp;quot;#profile-email&amp;quot;).textContent = profile.email || &amp;quot;Not provided&amp;quot;;
+        document.querySelector(&amp;quot;#profile&amp;quot;).hidden = false;
+        document.querySelector(&amp;quot;#login-link&amp;quot;).hidden = true;
+        document.querySelector(&amp;quot;#login-error&amp;quot;).hidden = true;
+        }
+        
+        function showError(message) {
+        const errorOutput = document.querySelector(&amp;quot;#login-error&amp;quot;);
+        errorOutput.textContent = message;
+        errorOutput.hidden = false;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I start off with a utility function to generate my login link. Note that redirect URI - it&apos;s going to be hosted by my app via the backend script and makes an assumption on a port that&apos;s free. A better version would try a set of ports to see which can be used.&lt;/p&gt;
+        &lt;p&gt;In my &lt;code&gt;DOMContentLoaded&lt;/code&gt; block I&apos;ve got multiple things going on.&lt;/p&gt;
+        &lt;p&gt;First off - I look at a secure storage system for an existing access token. This is documented in the &lt;a href=&quot;https://tinyjs.app/docs.html#secrets&quot;&gt;secrets and auth&lt;/a&gt; section of TinyJS&apos;s docs. If the values exist, a call to the backend is made to try to verify the values and treat the user as already logged in.&lt;/p&gt;
+        &lt;p&gt;If this fails, or the values weren&apos;t there, we:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Get the login URL and update the DOM&lt;/li&gt;
+        &lt;li&gt;Tell the backend to fire up the HTTP server&lt;/li&gt;
+        &lt;li&gt;And then wait for a success.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The final two functions just display the profile or an error. Now let&apos;s look at the backend:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Yes, I said it was safe, still, why share it here?
+        const GOOGLE_CLIENT_SECRET = &amp;quot;my secret brings the boys to the yard&amp;quot;;
+        
+        async function exchangeCodeForToken({ code, codeVerifier, clientId, port }) {
+        const response = await fetch(&amp;quot;https://oauth2.googleapis.com/token&amp;quot;, {
+        method: &amp;quot;POST&amp;quot;,
+        headers: {
+        &amp;quot;content-type&amp;quot;: &amp;quot;application/x-www-form-urlencoded&amp;quot;,
+        },
+        body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: `http://127.0.0.1:${port}/callback`,
+        grant_type: &amp;quot;authorization_code&amp;quot;,
+        code_verifier: codeVerifier,
+        }),
+        });
+        const tokens = await response.json();
+        if (!response.ok || tokens.error) {
+        throw new Error(tokens.error_description || tokens.error || `Token request failed (${response.status}).`);
+        }
+        return tokens;
+        }
+        
+        async function refreshAccessToken(refreshToken, clientId) {
+        const response = await fetch(&amp;quot;https://oauth2.googleapis.com/token&amp;quot;, {
+        method: &amp;quot;POST&amp;quot;,
+        headers: {
+        &amp;quot;content-type&amp;quot;: &amp;quot;application/x-www-form-urlencoded&amp;quot;,
+        },
+        body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        refresh_token: refreshToken,
+        grant_type: &amp;quot;refresh_token&amp;quot;,
+        }),
+        });
+        const tokens = await response.json();
+        if (!response.ok || tokens.error) {
+        throw new Error(tokens.error_description || tokens.error || `Token refresh failed (${response.status}).`);
+        }
+        return tokens;
+        }
+        
+        function expiresAt(tokens) {
+        const expiresIn = Number(tokens.expires_in);
+        if (!tokens.access_token || !Number.isFinite(expiresIn) || expiresIn &amp;lt;= 0) {
+        throw new Error(&amp;quot;Google returned an invalid access token response.&amp;quot;);
+        }
+        return Date.now() + expiresIn * 1000;
+        }
+        
+        async function getUserProfile(accessToken) {
+        const response = await fetch(&amp;quot;https://openidconnect.googleapis.com/v1/userinfo&amp;quot;, {
+        headers: {
+        authorization: `Bearer ${accessToken}`,
+        },
+        });
+        const profile = await response.json();
+        if (!response.ok) {
+        throw new Error(profile.error_description || profile.error || `Profile request failed (${response.status}).`);
+        }
+        return {
+        name: profile.name || &amp;quot;&amp;quot;,
+        email: profile.email || &amp;quot;&amp;quot;,
+        };
+        }
+        
+        async function restoreSession(tokens, clientId) {
+        if (!tokens?.access_token || !tokens?.refresh_token || !tokens?.expires_at) {
+        throw new Error(&amp;quot;Saved sign-in is incomplete.&amp;quot;);
+        }
+        
+        let refreshedTokens = {};
+        if (tokens.expires_at &amp;lt;= Date.now() + 60000) {
+        refreshedTokens = await refreshAccessToken(tokens.refresh_token, clientId);
+        }
+        
+        const updatedTokens = {
+        access_token: refreshedTokens.access_token || tokens.access_token,
+        refresh_token: refreshedTokens.refresh_token || tokens.refresh_token,
+        expires_at: refreshedTokens.access_token
+        ? expiresAt(refreshedTokens)
+        : tokens.expires_at,
+        };
+        const profile = await getUserProfile(updatedTokens.access_token);
+        return { profile, tokens: updatedTokens };
+        }
+        
+        async function waitForCode(port, expectedState, codeVerifier, clientId) {
+        return new Promise((resolve, reject) =&amp;gt; {
+        let server;
+        let timer;
+        let settled = false;
+        let processing = false;
+        
+        const stopServer = () =&amp;gt; {
+        if (timer) clearTimeout(timer);
+        if (!server) return;
+        const activeServer = server;
+        server = null;
+        try {
+        activeServer.close();
+        } catch (error) {
+        console.error(&amp;quot;Failed to close OAuth callback server:&amp;quot;, error);
+        }
+        };
+        
+        const finish = (error, code, closeImmediately = false) =&amp;gt; {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        if (closeImmediately) stopServer();
+        else setTimeout(stopServer, 1000);
+        if (error) reject(error);
+        else resolve(code);
+        };
+        
+        const escapeHtml = (value) =&amp;gt; String(value)
+        .replace(/&amp;amp;/g, &amp;quot;&amp;amp;amp;&amp;quot;)
+        .replace(/&amp;lt;/g, &amp;quot;&amp;amp;lt;&amp;quot;)
+        .replace(/&amp;gt;/g, &amp;quot;&amp;amp;gt;&amp;quot;)
+        .replace(/&amp;quot;/g, &amp;quot;&amp;amp;quot;&amp;quot;)
+        .replace(/&apos;/g, &amp;quot;&amp;amp;#39;&amp;quot;);
+        const htmlResponse = (message, status = 200) =&amp;gt; new Response(
+        `&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h3&amp;gt;${escapeHtml(message)}&amp;lt;/h3&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;`,
+        {
+        status,
+        headers: {
+        &amp;quot;content-type&amp;quot;: &amp;quot;text/html; charset=utf-8&amp;quot;,
+        &amp;quot;content-security-policy&amp;quot;: &amp;quot;default-src &apos;none&apos;; style-src &apos;unsafe-inline&apos;&amp;quot;,
+        },
+        }
+        );
+        
+        server = tjs.serve({
+        port,
+        fetch: async (request) =&amp;gt; {
+        let url;
+        try {
+        url = new URL(request.url);
+        } catch {
+        return htmlResponse(&amp;quot;Invalid callback request.&amp;quot;, 400);
+        }
+        
+        if (url.pathname !== &amp;quot;/callback&amp;quot;) return htmlResponse(&amp;quot;Not found.&amp;quot;, 404);
+        if (settled) return htmlResponse(&amp;quot;This login request has already been processed.&amp;quot;, 410);
+        if (processing) return htmlResponse(&amp;quot;This login request is being processed.&amp;quot;, 409);
+        if (url.searchParams.get(&amp;quot;state&amp;quot;) !== expectedState) {
+        return htmlResponse(&amp;quot;State mismatch. Return to the app and try again.&amp;quot;, 400);
+        }
+        
+        const oauthError = url.searchParams.get(&amp;quot;error&amp;quot;);
+        if (oauthError) {
+        finish(new Error(oauthError));
+        return htmlResponse(&amp;quot;Login failed: &amp;quot; + oauthError);
+        }
+        
+        const code = url.searchParams.get(&amp;quot;code&amp;quot;);
+        if (!code) {
+        finish(new Error(&amp;quot;OAuth callback did not include an authorization code.&amp;quot;));
+        return htmlResponse(&amp;quot;Login failed: authorization code was missing.&amp;quot;, 400);
+        }
+        
+        processing = true;
+        try {
+        const tokens = await exchangeCodeForToken({
+        code,
+        codeVerifier,
+        clientId,
+        port,
+        });
+        const profile = await getUserProfile(tokens.access_token);
+        finish(null, {
+        profile,
+        tokens: {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_at: expiresAt(tokens),
+        },
+        });
+        return htmlResponse(&amp;quot;Login complete. You can close this tab.&amp;quot;);
+        } catch (error) {
+        finish(error);
+        return htmlResponse(&amp;quot;Token exchange failed: &amp;quot; + error.message, 502);
+        }
+        },
+        });
+        
+        timer = setTimeout(() =&amp;gt; {
+        finish(new Error(&amp;quot;Timed out waiting for the OAuth callback.&amp;quot;), null, true);
+        }, 120000);
+        });
+        }
+        
+        export const api = {
+        restoreSession: ({ tokens, clientId }) =&amp;gt; {
+        if (!clientId) throw new Error(&amp;quot;Google client ID is required.&amp;quot;);
+        return restoreSession(tokens, clientId);
+        },
+        waitForCode: ({ port, state, codeVerifier, clientId }) =&amp;gt; {
+        if (!codeVerifier || !clientId) {
+        throw new Error(&amp;quot;OAuth code verifier and client ID are required.&amp;quot;);
+        }
+        return waitForCode(port, state, codeVerifier, clientId);
+        },
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This one&apos;s a bit of a beast, but some are fairly standard. Both &lt;code&gt;exchangeCodeForToken&lt;/code&gt; and &lt;code&gt;refreshAccessToken&lt;/code&gt; are standard OAuth stuff. Ditto for &lt;code&gt;getUserProfile&lt;/code&gt;. The important bit is &lt;code&gt;waitForCode&lt;/code&gt;. This is where the small web server is kicked off that attempts to handle the redirect back from Google. I said up front I used AI to build most of this and I have to be honest, I&apos;m glad I did as this part would have taken me quite some time.&lt;/p&gt;
+        &lt;p&gt;All in all - it works great. The only real issue is a nit-picky one - when the app loads you see the login link for a second before the stored auth is verified. A bit of UX magic there would handle that.&lt;/p&gt;
+        &lt;p&gt;There&apos;s an important part left out of this that I&apos;ll need to tackle next - which is how I would take the verified identity here and pass it to a remote service in a secure way such that the remote service can also verify it (&amp;quot;Yes, this was Raymond Camden&amp;quot;) before performing an action.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Tiny Apps with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;About a year ago, I was still running my live stream (&lt;a href=&quot;https://www.youtube.com/watch?v=BzRUsvAR4oQ&amp;amp;list=PL_z-rqJYNijqhtPcEbwacp34TiFfb8eyO&quot;&gt;Code Break&lt;/a&gt;) and my final three streams all covered one topic - building desktop applications with non-native code. I covered &lt;a href=&quot;https://v2.tauri.app/&quot;&gt;Tauri&lt;/a&gt; (HTML on the front, Rust on the back) and &lt;a href=&quot;https://flet.dev/&quot;&gt;Flet&lt;/a&gt; (all Python). Recently I came across another option, &lt;a href=&quot;https://tinyjs.app/&quot;&gt;tinyjs&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;TinyJS (technically the name is &amp;quot;tinyjs&amp;quot; but I can&apos;t make myself use the lowercase in my writing like that ;) is a lot like PhoneGap/Apache Cordova. Your application is the system web view shipped along with the ability to make system calls via a bridge to &lt;a href=&quot;https://txikijs.org/&quot;&gt;txiki.js&lt;/a&gt;. This bridge gives you full access to the file system and more, like any other native app.&lt;/p&gt;
@@ -107,7 +478,7 @@
       <title>Adding My Latest CodePens to My Blog</title>
       <link>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a fan of CodePen for many, many years, and it&apos;s one of the few services I spend money on to help support. A few months back, they released an entirely new version that dramatically improved the service (CodePen 2.0) and it just made me more happy I was a supporter. Just a few days ago they &lt;a href=&quot;https://codepen.io/changelog/2026-10-02&quot;&gt;announced more changes&lt;/a&gt; including a full &lt;a href=&quot;https://blog.codepen.io/docs/api/api-v2/&quot;&gt;API&lt;/a&gt;. I thought it would be fun to add a display of my recent pens. Yes, I thought that would be fun, because that&apos;s the kind of nerd I am.&lt;/p&gt;
         &lt;h2 id=&quot;adding-dynamic-content-to-a-ssg&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-dynamic-content-to-a-ssg&quot;&gt;Adding Dynamic Content to a SSG&lt;/a&gt;&lt;/h2&gt;
@@ -258,7 +629,7 @@
       <title>A Not-So-Simple RSS App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, I lie, this demo is also pretty simple, but I wanted to break the pattern of the last few posts and at least pretend this example is a bit more complex. As I try to find excuses to write more TypeScript, I thought a great example of that would be a simple RSS aggregator. You hit the site, tell it the feeds you care about, and it renders a date sorted list of entries.&lt;/p&gt;
         &lt;p&gt;Because RSS typically can&apos;t be parsed in client-side JavaScript (don&apos;t know why? ask me below!) so I&apos;d have to make use of a serverless function to proxy the calls (and at the same time, handle turning the XML into JSON).&lt;/p&gt;
@@ -393,7 +764,7 @@
       <title>A Simple Weather App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
         &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
@@ -641,7 +1012,7 @@
       <title>A Simple Alpine.js Template with Vite and TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
@@ -739,7 +1110,7 @@
       <title>Links For You (9/20/26)</title>
       <link>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</link>
       <guid>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy &amp;quot;Football is Back&amp;quot; season to those of you who celebrate. I&apos;m currently watching my Saints take on the Ravens (who are also a favorite of mine) and hoping for our first win. The last few weeks have been incredibly busy (I feel like I always say that, sorry) with a trip for work that then morphed into a short vacation with my wife and I which included my first Blizzcon (which is freaking cool as hell) and our first visit to Disneyland. (We&apos;ve been to Disney World a few times.) I think we both agreed that Disney World is cooler, but the crowds and - most importantly - the weather - was much better in California.&lt;/p&gt;
         &lt;p&gt;
@@ -776,7 +1147,7 @@
       <title>It&apos;s only a decade late, I&apos;ll learn TypeScript!</title>
       <link>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a bit worried lately. Of course, my friends will tell you that&apos;s my norm. But more specifically, I&apos;ve been worried about my coding skills. As I use AI to generate more and more code, and it does that job well, I kinda miss actually &lt;em&gt;writing&lt;/em&gt; code. I&apos;ve also had a bit of writer&apos;s block in terms of &lt;em&gt;topics&lt;/em&gt; to cover, and especially in the area of the web platform. A few days ago it occurred to me - I&apos;ve never &lt;em&gt;really&lt;/em&gt; dug into &lt;a href=&quot;https://www.typescriptlang.org/&quot;&gt;TypeScript&lt;/a&gt;. Sure, I&apos;ve used it, many times, in the fourteen or so years it&apos;s been out, but many times I kinda guess at what I&apos;m doing and it was never my default for projects. Partly that&apos;s due to my philosophy of avoiding a build step in my projects and just KISS in general.&lt;/p&gt;
         &lt;p&gt;But as I said - the inspiration hit me this past week and I thought I&apos;d do some digging. Here&apos;s a few initial thoughts and experiments. Oh, and I still used AI a bit and I&apos;ll explain exactly how in the post below.&lt;/p&gt;
@@ -1121,7 +1492,7 @@
       <title>Building a Document Q&amp;A System with On-Device AI</title>
       <link>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</link>
       <guid>https://www.raymondcamden.com/2026/09/06/building-a-document-qa-system-with-on-device-ai</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I build a demo for a presentation and think to myself - this deserves its own blog post. I then promptly forget to actually do that. Even better, I completely forget to even show the demo in the presentation. A few weeks ago I made my first presentation at RenderATL and gave my talk on Chrome&apos;s &lt;a href=&quot;https://developer.chrome.com/docs/ai/built-in&quot;&gt;on-device AI&lt;/a&gt; technology. I&apos;ve been blogging about this particular set of APIs for a few years now and I&apos;ve given talks on it at numerous conferences. While these APIs are still evolving, many of them (and the ones I&apos;m using today in particular) are now fully GA for Chrome. For this demo, I put together a few things I&apos;ve done before into one cohesive tool - a completely client-side application that lets you pick a file, get a summary, and then chat with it.&lt;/p&gt;
         &lt;h2 id=&quot;the-stack&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-stack&quot;&gt;The Stack&lt;/a&gt;&lt;/h2&gt;
@@ -1158,7 +1529,7 @@
       <title>My Family Allowance - a Simple Allowance Tracking Site</title>
       <link>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</link>
       <guid>https://www.raymondcamden.com/2026/09/02/my-family-allowance-a-simple-allowance-tracking-site</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 22:30:34 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As you can probably tell, I&apos;ve been on a bit of a builder kick the last few weeks. Today&apos;s &amp;quot;release&amp;quot; (it&apos;s been live for a few days already) is a tool to help fix a manual process we had in our family - tracking allowance for the kids.&lt;/p&gt;
         &lt;p&gt;Previously we made use of a Google Sheet. Each kid had a column. When a kid would ask for something, we&apos;d look to see when we last added allowance, multiply the number of weeks by their rate, add it, and then add another row to reduce by the amount they were spending. A simple formula on the right hand side would give a running total so they could see what their current balance was.&lt;/p&gt;
@@ -1178,21 +1549,6 @@
         &lt;p&gt;The stack is Astro, hosted on Netlify, with their Netlify DB as the storage system.&lt;/p&gt;
         &lt;p&gt;That&apos;s it! You can check it out here: &lt;a href=&quot;https://www.myallowance.family/&quot;&gt;https://www.myallowance.family/&lt;/a&gt;. If you want to check out the source, you can check out the repo: &lt;a href=&quot;https://github.com/cfjedimaster/myfamilyallowance&quot;&gt;https://github.com/cfjedimaster/myfamilyallowance&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@igalness?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Igal Ness&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/person-holding-fan-of-100-us-dollar-bill-9wY2ofzQ9Us?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Weather Nerd? Check out My OSX Radar Widget</title>
-      <link>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</link>
-      <guid>https://www.raymondcamden.com/2026/09/01/weather-nerd-check-out-my-osx-radar-widget</guid>
-      <pubDate>Sun, 11 Oct 2026 19:27:08 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I know I&apos;m not alone in being a bit of a weather nerd. Along with four or five weather apps on my phone, I&apos;ve got two physical devices in my office that show the weather and a weather widget on my Mac that shows the day&apos;s forecast. That&apos;s not enough. What I really wanted was a radar widget as well, so I built one:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/radar1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Screenshot of radar widget&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;Ok, to be fair, I used Cursor to build it - but it really scratched an itch I&apos;ve had for a while to constantly have one more thing to distract me.&lt;/p&gt;
-        &lt;p&gt;If you want a copy of this yourself (or want to make it better!), I&apos;ve set up a GitHub repo here: &lt;a href=&quot;https://github.com/cfjedimaster/precipradar&quot;&gt;https://github.com/cfjedimaster/precipradar&lt;/a&gt;. I&apos;ve got both the source as well as a build for easy installation.&lt;/p&gt;
-        &lt;p&gt;Note that as with my &lt;a href=&quot;https://www.raymondcamden.com/2026/08/26/like-lego-got-a-mac-get-my-screensaver&quot;&gt;LEGO screensaver&lt;/a&gt;, you&apos;ll need to run a CLI command to authorize the app, but that&apos;s a onetime operation. Enjoy!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
