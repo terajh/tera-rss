@@ -4,7 +4,147 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Wed, 21 Oct 2026 19:33:26 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 22 Oct 2026 19:28:01 GMT</lastBuildDate>
+    <item>
+      <title>Native masonry layouts with CSS grid lanes</title>
+      <link>https://piccalil.li/blog/native-masonry-layouts-with-css-grid-lanes/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/native-masonry-layouts-with-css-grid-lanes/?ref=main-rss-feed</guid>
+      <pubDate>Thu, 22 Oct 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Native masonry layouts have been a long time coming to CSS and after years of debate over how they should work and fit into the language, we finally have &lt;code&gt;display: grid-lanes&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;If you want the full backstory on how we got here, Sunkanmi Fafowora has a great &lt;a href=&quot;https://css-tricks.com/masonry-layout-is-now-grid-lanes/&quot;&gt;overview of the grid-lanes announcement&lt;/a&gt; over on CSS-Tricks. Here, I want to focus on the technical side of masonry, why it took so long to get right, and how &lt;code&gt;display: grid-lanes&lt;/code&gt; works.&lt;/p&gt;
+        &lt;h1&gt;How we got here&lt;/h1&gt;
+        &lt;p&gt;Masonry has been a long-running CSS challenge. Back in 2017, Rachel Andrew opened a &lt;a href=&quot;https://github.com/w3c/csswg-drafts/issues/945&quot;&gt;CSSWG issue&lt;/a&gt; about creating a native Pinterest-style layout. As Rachel noted back then, the closest native CSS got to this was multi-column layout (column-count), but that flows items top-to-bottom. Masonry needs to flow items &lt;em&gt;across&lt;/em&gt; rows, tightly packing them into whatever column currently has the most available vertical space.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/pintrest-masonry.jpg&quot; alt=&quot;A browser screenshot of a pintrest page, showing a masonry layout, split over 3 columns&quot; title=&quot;Pinterest’s masonry layout&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;That same year, Tab Atkins-Bittner shared a clever Grid hack to approximate the layout. It relied on knowing each item’s height in advance, making it less practical for dynamic content.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.hacky-masonry {
+        display: grid;
+        grid: auto-flow dense 1px / repeat(3, 1fr);
+        }
+        
+        /* Manually set each item&apos;s row span */
+        .item {
+        grid-row: span 50; /* Matches the item&apos;s 50px height */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As cool as this hack was, having to know the exact height of every item ahead of time wasn’t very practical, especially when you’re dealing with dynamic content, where heights can change. When I spoke with Tab Atkins-Bittner for my piece on the &lt;a href=&quot;https://css-tricks.com/masonry-watching-a-css-feature-evolve/&quot;&gt;evolution of CSS Masonry&lt;/a&gt;, they put the broader challenge of designing CSS layouts this way:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;em&gt;“Flexbox was the first of the modern layout algorithms; we made a lot of mistakes and missteps while writing it, because we were trying to figure out how a modern layout model should work.”&lt;/em&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That same process of figuring things out played a role in masonry&apos;s development and until CSS had a better answer, many of us ended up reaching for David DeSandro’s legendary &lt;a href=&quot;https://masonry.desandro.com/&quot;&gt;Masonry.js&lt;/a&gt; library instead.&lt;/p&gt;
+        &lt;p&gt;But the challenge wasn&apos;t just figuring out how to make masonry work in CSS. There was also the question of how it should fit into the language. Should it be part of Flexbox, an extension of Grid, or its own display value? For years, the CSS Working Group went back and forth without settling on a final syntax.&lt;/p&gt;
+        &lt;p&gt;Mozilla first explored adding masonry to Grid, and WebKit later picked up that approach. It lets you keep display: grid and use a special value for the tracks to enable masonry.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        grid-template-rows: masonry;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This kept Grid&apos;s familiar column definitions while letting the browser pack items vertically instead of aligning them into rows. You can read more about WebKit&apos;s reasoning in &lt;a href=&quot;https://webkit.org/blog/16026/css-masonry-syntax/&quot;&gt;&lt;em&gt;Help us choose the final syntax for Masonry in CSS&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Google&apos;s Chromium team had a different take. They argued that masonry&apos;s layout algorithm was different enough from Grid to deserve its own layout mode, proposed as &lt;code&gt;display: masonry&lt;/code&gt; .&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry {
+        display: masonry;
+        masonry-template-tracks: repeat(auto-fill, minmax(14rem, 1fr));
+        gap: 1rem;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Their reasoning, along with an alternative syntax, is explained in &lt;em&gt;&lt;a href=&quot;https://developer.chrome.com/blog/masonry&quot;&gt;An alternative proposal for CSS masonry&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+        &lt;p&gt;The debate continued through several rounds of proposals, including WebKit&apos;s broader item-flow idea for unifying aspects of Grid and Flexbox, but that approach was eventually dropped in favor of a simpler direction.&lt;/p&gt;
+        &lt;p&gt;In January 2025, the CSS Working Group agreed to reuse CSS Grid&apos;s track-definition and placement properties for masonry. By December 2025, the group had settled on a name for the new layout mode, &lt;strong&gt;&lt;code&gt;grid-lanes&lt;/code&gt;&lt;/strong&gt;. WebKit announced the direction in &lt;a href=&quot;https://webkit.org/blog/17660/introducing-css-grid-lanes/&quot;&gt;&lt;em&gt;Introducing CSS Grid Lanes&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h1&gt;How grid lanes works&lt;/h1&gt;
+        &lt;p&gt;The nice thing about &lt;code&gt;display: grid-lanes&lt;/code&gt; is that you don&apos;t have to figure out where every item goes yourself. You define the tracks along one axis, just as you would with regular CSS Grid and the browser handles placement along the other.&lt;/p&gt;
+        &lt;p&gt;For a typical masonry layout, that means defining your columns with &lt;code&gt;grid-template-columns&lt;/code&gt; and letting the browser stack items into whichever lane makes the most sense.&lt;/p&gt;
+        &lt;p&gt;You still get familiar Grid properties like &lt;code&gt;grid-template-columns&lt;/code&gt;, &lt;code&gt;repeat()&lt;/code&gt;, &lt;code&gt;minmax()&lt;/code&gt;, &lt;code&gt;gap&lt;/code&gt;, and explicit placement. Under the hood, though, Grid Lanes uses a different layout algorithm: it &lt;strong&gt;maintains tracks along the grid axis&lt;/strong&gt; and packs items along the stacking axis. That makes it possible to build responsive masonry layouts without calculating item heights yourself.&lt;/p&gt;
+        &lt;h2&gt;A Basic Masonry Layout&lt;/h2&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry {
+        display: grid-lanes;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        gap: 1rem;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This defines as many columns as fit, with each column at least &lt;code&gt;14rem&lt;/code&gt; wide. The browser handles the rest, placing items into lanes as it lays them out. Unlike regular Grid, items don&apos;t need to share row heights, so each lane can grow independently.&lt;/p&gt;
+        &lt;p&gt;Here’s how this layout would look:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/masonry-wireframes.png&quot; alt=&quot;A wireframe diagram comparing masonry website layouts for tablet and desktop. The left side shows a tablet view with a 2-column grid for screen widths 768px to 1024px. The right side shows a desktop view with a 3-column grid for screen widths 1024px and above.&quot; title=&quot;A simple masonry layout example&quot; /&gt;&lt;/p&gt;
+        &lt;h2&gt;The fill algorithm&lt;/h2&gt;
+        &lt;p&gt;Unlike regular CSS Grid, Grid Lanes doesn&apos;t try to line everything up in rows. Instead, the browser keeps track of how much space each lane takes up and uses that to decide where the next item should go.&lt;/p&gt;
+        &lt;p&gt;The process is pretty simple:&lt;/p&gt;
+        &lt;ol&gt;
+        &lt;li&gt;Check how much each lane is filled.&lt;/li&gt;
+        &lt;li&gt;Place the next item in a suitable lane, usually the shortest one.&lt;/li&gt;
+        &lt;li&gt;Update that lane&apos;s position and repeat.&lt;/li&gt;
+        &lt;/ol&gt;
+        &lt;p&gt;For example, with three columns, the first three cards go into separate lanes. If column 2 is now the shortest, the next card goes there.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry {
+        display: grid-lanes;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h2&gt;Controlling item placement&lt;/h2&gt;
+        &lt;p&gt;Most of the time, you&apos;ll let the browser handle placement. But you can still use familiar Grid properties when you want more control. For example, &lt;code&gt;grid-column: span 2&lt;/code&gt; lets an item span two columns instead of occupying just one.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.featured-item {
+        grid-column: span 2;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The browser actually places these explicitly positioned and spanning items &lt;em&gt;first&lt;/em&gt;, before it runs the masonry algorithm for the rest of the auto-placed items. Spanning items affects how the remaining space is distributed, so placement can get more complicated than simply choosing the shortest lane, especially in larger layouts with lots of moving pieces.&lt;/p&gt;
+        &lt;p&gt;Since items can appear in a different visual order from their source order, it&apos;s also worth checking that the layout still makes sense when read from the HTML. This matters for accessibility, too, as screen readers generally follow the document order rather than the visual layout. We’ll cover this in more detail later.&lt;/p&gt;
+        &lt;h2&gt;A note on fit-tolerance&lt;/h2&gt;
+        &lt;p&gt;The Grid Lanes spec is still evolving, but its direction is becoming clearer. The CSS Working Group dropped the broader &lt;code&gt;item-*&lt;/code&gt; proposal for unifying flow controls across layout modes and settled on &lt;code&gt;display: grid-lanes&lt;/code&gt; for masonry. Another change is the rename of flow-tolerance to &lt;strong&gt;&lt;code&gt;fit-tolerance&lt;/code&gt;&lt;/strong&gt;, a property that helps control how the browser chooses between lanes of similar heights.&lt;/p&gt;
+        &lt;p&gt;Say you have two lanes; one is &lt;code&gt;400px&lt;/code&gt; tall and the other is &lt;code&gt;398px&lt;/code&gt;. The second lane is technically shorter, but only by &lt;code&gt;2px&lt;/code&gt;. With a tolerance of &lt;code&gt;1em&lt;/code&gt; , the browser can treat both lanes as close enough in height and choose the lane that better preserves the source order, rather than always picking the shortest one. This can help prevent items from jumping ahead of earlier items just to fill tiny gaps.&lt;/p&gt;
+        &lt;p&gt;Here’s how different values affect the layout:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry {
+        fit-tolerance: 0; /* favor the shortest lane */
+        }
+        
+        .masonry {
+        fit-tolerance: 1em; /* Treat lanes within 1em as close enough */
+        }
+        
+        .masonry {
+        fit-tolerance: infinite; /* Prioritize source order over compact packing */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;A value of &lt;code&gt;0&lt;/code&gt; favors tighter packing, while a larger tolerance gives the browser more flexibility to keep items closer to their source order. &lt;code&gt;infinite&lt;/code&gt; prioritizes source order, even if that leaves more empty space in the layout. The default is &lt;code&gt;normal&lt;/code&gt;, which resolves to 1em.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;&lt;code&gt;infinite&lt;/code&gt; prioritizes source order, but it won’t guarantee it in every case. Similarly, 0 removes the tolerance for treating lanes of similar heights as equivalent.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Switching directions&lt;/h2&gt;
+        &lt;p&gt;Masonry doesn&apos;t have to flow vertically. With Grid Lanes, the tracks you define also determine the direction items are packed in. When you define &lt;code&gt;grid-template-columns&lt;/code&gt;, items are packed vertically into columns. When you define &lt;code&gt;grid-template-rows&lt;/code&gt;, items are packed horizontally into rows. The first is the familiar Pinterest-style layout, while the second creates a brick-like arrangement.&lt;/p&gt;
+        &lt;p&gt;Check out this &lt;em&gt;&lt;a href=&quot;https://ics-creative.github.io/260611_grid-lanes/brick.html&quot;&gt;Waterfall and Brick demo&lt;/a&gt;,&lt;/em&gt; by &lt;em&gt;ICS Creative,&lt;/em&gt; to switch between the two layouts and see the difference. Both use &lt;code&gt;display: grid-lanes&lt;/code&gt;, just with different track definitions.&lt;/p&gt;
+        &lt;p&gt;The WebKit team has also published the &lt;a href=&quot;https://gridlanes.webkit.org/&quot;&gt;&lt;em&gt;Field Guide to Grid Lanes&lt;/em&gt;&lt;/a&gt;. It includes an interactive playground, a reference for the different properties and values, and six demos covering layouts like photo galleries, recipe cards, timelines, and pinboards.&lt;/p&gt;
+        &lt;h2&gt;Subgrids in masonry layouts&lt;/h2&gt;
+        &lt;p&gt;One of the arguments for keeping masonry part of CSS Grid was that it would preserve features like &lt;code&gt;subgrid&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;If masonry had its own &lt;code&gt;display: masonry&lt;/code&gt; layout mode, getting nested elements to align with their parent&apos;s grid tracks could have required changes across multiple CSS specifications. Keeping masonry within the Grid model means subgrid can work alongside it.&lt;/p&gt;
+        &lt;p&gt;Say you&apos;re building a masonry layout of recipe cards, each with a title, an image, and a list of ingredients. &lt;code&gt;subgrid&lt;/code&gt; lets the cards use their parent&apos;s grid tracks rather than defining their own, making it easier to align their internal elements.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.masonry-container {
+        display: grid-lanes;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+        
+        .recipe-card {
+        display: grid;
+        /* The card&apos;s internal columns align with the parent masonry grid */
+        grid-template-columns: subgrid;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;h1&gt;Where we’re at today&lt;/h1&gt;
+        &lt;p&gt;Grid Lanes has come a long way from the early proposals and workarounds, but there&apos;s still work to do. The specification is an Editor’s Draft, which means details can change as the &lt;em&gt;CSS Working Group&lt;/em&gt; continues to refine the layout model.&lt;/p&gt;
+        &lt;p&gt;Browser support is another thing to keep an eye on. As of writing this article, Grid Lanes works in Safari 26.4 and later, but support in other browsers is still evolving. Check &lt;a href=&quot;https://caniuse.com/css-grid-lanes&quot;&gt;&lt;em&gt;Can I Use&lt;/em&gt;&lt;/a&gt; for the latest updates, and consider using a simpler fallback for browsers that don&apos;t support it.&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://paper-attachments.dropboxusercontent.com/s_C0DFFD9E054868E848ED727F19306D49CB155C963160AD9B419BF7E4D1EBF6AC_1792047319842_image.png&quot; alt=&quot;A Can I Use screenshot showing only support for later versions of Safari&quot; /&gt;&lt;/p&gt;
+        &lt;h1&gt;Wrapping up&lt;/h1&gt;
+        &lt;p&gt;Grid Lanes has come a long way from the early proposals and workarounds. Here&apos;s a quick recap of where things stand now:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Masonry uses &lt;code&gt;display: grid-lanes&lt;/code&gt; as a separate layout mode.&lt;/li&gt;
+        &lt;li&gt;Lanes are defined by &lt;code&gt;grid-template-columns&lt;/code&gt; or &lt;code&gt;grid-template-rows&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;Items are automatically placed into lanes based on available space.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;fit-tolerance&lt;/code&gt; controls how much difference between lanes is treated as a tie.&lt;/li&gt;
+        &lt;li&gt;The DOM source order stays intact, even when the visual order differs.&lt;/li&gt;
+        &lt;li&gt;Unsupported browsers can use a simpler fallback layout.&lt;/li&gt;
+        &lt;/ul&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #202</title>
       <link>https://piccalil.li/the-index/202/?ref=main-rss-feed</link>
@@ -117,38 +257,6 @@
         &lt;h2&gt;Sponsor message&lt;/h2&gt;&lt;a href=&quot;https://www.mozillafoundation.org/en/festival/?utm_medium=paid&amp;utm_source=newsletter&amp;utm_campaign=26-mozfest&amp;utm_content=ad_the-index&amp;utm_term=piccalilli&quot;&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/ads/mozilla-festival.png&quot; alt=&quot;Mozilla Festival&quot; /&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Mozilla Festival&lt;/strong&gt; is co-built by developers and designers from around the world. Come gather, share, and connect with us in Barcelona, October 28-30.&lt;/p&gt;
         &lt;p&gt;Last year, more than 2,000 people came together to unlearn old ways of building tech. This year, with eight tracks and a spot in Barcelona&apos;s Open Tech Week, MozFest gives your ideas room to run wild. Join us for three days of conversation and hands-on building.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://www.mozillafoundation.org/en/festival/?utm_medium=paid&amp;utm_source=newsletter&amp;utm_campaign=26-mozfest&amp;utm_content=ad_the-index&amp;utm_term=piccalilli&quot;&gt;Get your badge&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Stop buttons triggering zoom when they’re double tapped</title>
-      <link>https://piccalil.li/blog/stop-buttons-triggering-zoom-when-theyre-double-tapped/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/blog/stop-buttons-triggering-zoom-when-theyre-double-tapped/?ref=main-rss-feed</guid>
-      <pubDate>Wed, 23 Sep 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I stumbled across &lt;a href=&quot;https://bsky.app/profile/renderg.host/post/3mvipol2rzk2m&quot;&gt;this great project&lt;/a&gt; by &lt;a href=&quot;https://renderg.host/&quot;&gt;Barry Prendergast&lt;/a&gt;. It&apos;s a web-based radio player with a &lt;em&gt;lush&lt;/em&gt; UI. On mobile I spotted that as I was rapidly flicking through the stations to find one that was on air, the browser was zooming in and out.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a screen clip:&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;&lt;p&gt;Watch the &lt;a href=&quot;https://iframe.mediadelivery.net/embed/468647/040189f2-c87a-4fda-a3bf-c65bf2254edb?autoplay=false&amp;amp;loop=false&amp;amp;muted=false&amp;amp;preload=true&amp;amp;responsive=true&quot;&gt;video&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
-        &lt;p&gt;I thought this behaviour was related to their viewport meta tag setup, but they have that set up perfectly:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Now, you could prevent the zooming by adding &lt;code&gt;, maximum-scale=1.0, user-scalable=no&lt;/code&gt; to the &lt;code&gt;content&lt;/code&gt; attribute, but &lt;strong&gt;don&apos;t do that&lt;/strong&gt; because it prevents zooming at all, which is a &lt;a href=&quot;https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html&quot;&gt;WCAG violation&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;What&apos;s actually happening here is the browser is responding to the double tap gesture, which in the case of Safari on iOS, zooms into the button element I&apos;m tapping. Luckily there&apos;s a CSS one-liner for us that gets the job done.&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;.button {
-        touch-action: manipulation;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;As per &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/touch-action&quot;&gt;MDN&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Enable panning and pinch zoom gestures, but disable additional non-standard gestures such as double-tap to zoom. Disabling double-tap to zoom removes the need for browsers to delay the generation of &lt;strong&gt;click&lt;/strong&gt; events when the user taps the screen. This is an alias for &quot;&lt;strong&gt;pan-x pan-y pinch-zoom&lt;/strong&gt;&quot; (which, for compatibility, is itself still valid).&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;p&gt;Let&apos;s see it in action. First, here&apos;s a couple of buttons without &lt;code&gt;touch-action&lt;/code&gt;. Try rapidly tapping on your phone/touch device:&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/emvBdae/c0ed51c7ebc182fe12fec6967a92c584&quot;&gt;Buttons without touch-action applied&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;a href=&quot;https://cdpn.io/pen/debug/emvBdae/c0ed51c7ebc182fe12fec6967a92c584&quot;&gt;This link&lt;/a&gt; has no CodePen framing to make that easier for you&lt;/p&gt;
-        &lt;p&gt;Here are the same buttons &lt;em&gt;with&lt;/em&gt; &lt;code&gt;touch-action&lt;/code&gt; applied:&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;&lt;p&gt;See the Pen &lt;a href=&quot;https://codepen.io/piccalilli/pen/myWOrzY/1c43253e5ffc8a38d68dd7fc42cccf7a&quot;&gt;Buttons with touch-action applied&lt;/a&gt; by Andy Bell (&lt;a href=&quot;https://codepen.io/piccalilli/&quot;&gt;@piccalilli&lt;/a&gt;) on &lt;a href=&quot;https://codepen.io&quot;&gt;CodePen&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;
-        &lt;p&gt;Again, &lt;a href=&quot;https://cdpn.io/pen/debug/myWOrzY/1c43253e5ffc8a38d68dd7fc42cccf7a&quot;&gt;here&apos;s a frameless version&lt;/a&gt; for you&lt;/p&gt;
-        &lt;p&gt;Handy!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
