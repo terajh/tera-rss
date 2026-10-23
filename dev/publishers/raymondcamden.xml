@@ -4,12 +4,112 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 22 Oct 2026 19:28:01 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 23 Oct 2026 19:19:03 GMT</lastBuildDate>
+    <item>
+      <title>Building the Unicorn-themed app of my dreams with TinyJS</title>
+      <link>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</link>
+      <guid>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</guid>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Everyone likes to talk about light versus dark theme while no one is addressing the real need for our users - a proper unicorn theme. I mean, take a look at this beauty:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/uni1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Uninote desktop app running&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This is &lt;a href=&quot;https://github.com/cfjedimaster/tinyjsdemos/tree/main/uninote&quot;&gt;Uninote&lt;/a&gt;, a desktop note taking application that - well - takes notes. You create notebooks, write notes, and that&apos;s it. No AI features. Nothing complex, just a note taking app. I&apos;ve had a love/hate relationship with these apps for years. I was a &lt;em&gt;huge&lt;/em&gt; Evernote fan until it went to poo. I currently use OneNote and... it&apos;s ok but I wish it was better. And yes, before folks chime in with suggestions, I&apos;m aware I&apos;ve got choices, but I &amp;quot;share&amp;quot; note access with my wife so one of the caveats is that I need an app she&apos;s comfortable with and I can deal with as well.&lt;/p&gt;
+        &lt;p&gt;That being said - &lt;a href=&quot;https://tinyjs.app/index.html&quot;&gt;TinyJS&lt;/a&gt; is a cool as hell platform to build desktop apps and I thought I&apos;d try building a basic note application with it. You can &lt;a href=&quot;https://github.com/cfjedimaster/tinyjsdemos/tree/main/uninote&quot;&gt;peruse&lt;/a&gt; all the code you want, and if you clone the repo and use the CLI, run a build yourself (I don&apos;t have any plans to release a &amp;quot;real&amp;quot; app - maybe) if you want to see it in action. Most of it is &amp;quot;just&amp;quot; HTML, CSS, and JavaScript, so let me share some of the more interesting tidbits.&lt;/p&gt;
+        &lt;h2 id=&quot;design&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#design&quot;&gt;Design&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Before getting into the code, let me talk about the design. I began in Claude and used this prompt:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;im building a simple desktop app with TinyJS that is a note taking application, 
+        like Evernote and OneNote. the app will be called Uninote, and is unicorn 
+        themed. functionality is pretty simple - you have notebooks that have a name, 
+        you can add, edit, and remove notebooks. notebooks have notes with a title, 
+        last edited value, and just a block of text (no support for binary data). it 
+        should support light/dark mode
+        
+        can you give me 3 mocks for this - images only if you can, no HTML. as i said, 
+        its unicorn themed so it should slick, but cute
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Let me just say - I greatly appreciate AI tools that can deal with my typos. Claude did a pretty good job with the three mocks it created, but the design you see above was a clear favorite for me. While I love the light version, the dark version is pretty great as well:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/uni2.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Uninote desktop app running - dark theme&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;This blew away most of my daily Claude usage however, so I took it to Copilot in Visual Studio Code to convert the mock to HTML. I forgot to tell it to ignore the desktop UI (ie OSX app frame stuff) so I had to ask it to do that as a followup, but it worked well.&lt;/p&gt;
+        &lt;p&gt;This was done in a new app scaffolded by the TinyJS CLI. As I mentioned in my &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;first post&lt;/a&gt;, you can scaffold an app with Alpine and TypeScript, and Copilot had no issues going from mock to layout with that setup. From there, I basically &amp;quot;rolled back&amp;quot; the mock data into Alpine directives. So for example, my mock had a list of notebooks that I was able to convert to a proper list in Alpine based on data.&lt;/p&gt;
+        &lt;h2 id=&quot;code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#code&quot;&gt;Code&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;So most of this is vanilla Alpine type stuff, where the interesting bit comes in is the persistence, which uses SQLite. SQLite access is provided in the &amp;quot;backend&amp;quot; code. You begin with one import:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { Database } from &apos;tjs:sqlite&apos;;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And then handle your database initialization. For me it looks like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;let db = null;
+        
+        export const api = {
+        initDB: async () =&amp;gt; {
+        db.exec(`
+        CREATE TABLE IF NOT EXISTS notebooks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+        );      
+        `);
+        
+        db.exec(`
+        CREATE TABLE IF NOT EXISTS notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        notebook_id INTEGER NOT NULL,
+        created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (notebook_id) REFERENCES notebooks(id) ON DELETE CASCADE
+        );      
+        `);
+        db.exec(&apos;PRAGMA foreign_keys = ON&apos;);
+        
+        return true;
+        },
+        // more stuff
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;My database is two simple tables - one for notebooks and one for notes. TinyJS takes any method defined in the &lt;code&gt;api&lt;/code&gt; export and lets you call it from the client. So in my Alpine startup I&apos;ve got:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async init() {
+        await tiny.api.call(&apos;initDB&apos;)
+        // more stuff
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The rest of the &apos;CRUD&apos; (Creating, Reading, Updating, Deleting), are just more DB calls. On the front end, I gather the data, pass it to the backend via &lt;code&gt;tiny.api.call&lt;/code&gt;, and write the SQL back there.&lt;/p&gt;
+        &lt;p&gt;So for example, to just get a list of notebooks:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// in the front end
+        this.notebooks = await tiny.api.call(&apos;getNotebooks&apos;)
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;getNotebooks: async () =&amp;gt; {
+        if (!db) throw new Error(&apos;Database not initialized. Call initDB first.&apos;);
+        return db.prepare(`
+        SELECT notebooks.id, notebooks.name, COUNT(notes.id) AS noteCount
+        FROM notebooks LEFT JOIN notes ON notes.notebook_id = notebooks.id
+        GROUP BY notebooks.id ORDER BY notebooks.id
+        `).all();
+        },
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That&apos;s basically it. Let me share two more little TinyJS bits. To copy to the clipboard, I did not use the usual web platform way, but rather:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;await tiny.clipboard.write({ text: `${note.title}\n\n${note.content}` })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I&apos;m not sure what that offers in contrast to the &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Clipboard&quot;&gt;Clipboard API&lt;/a&gt; and will find some time to figure that out.&lt;/p&gt;
+        &lt;p&gt;The second is a small thing, but super useful. Your TinyJS app has a &apos;controller&apos; JSON file that lets you set a heck of a lot of properties. One of those is the window size:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;&amp;quot;size&amp;quot;: &amp;quot;960x640&amp;quot;,
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But out of the box, you can set a default size &lt;em&gt;and&lt;/em&gt; have the app automatically remember the window size and position:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;&amp;quot;size&amp;quot;: &amp;quot;960x640&amp;quot;,
+        &amp;quot;rememberWindows&amp;quot;: true,
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I was convinced I was going to need a &amp;quot;listen for window resize and persist&amp;quot; type logic but nope - one line in JSON. Perfect.&lt;/p&gt;
+        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@anniespratt?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Annie Spratt&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/white-and-gold-ceramic-unicorn-figurine-near-coins-Jr8byYZmTTU?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Adding a PDF Display to Eleventy</title>
       <link>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</link>
       <guid>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short one. I&apos;ve talked about embedding PDFs on web pages for probably close to ten years now. Blame Adobe. Blame me being a nerd and finding this stuff interesting. Blame whoever. While I&apos;ve blogged about the topic, I&apos;ve also actually done that on my site here, in a variety of different ways.&lt;/p&gt;
         &lt;p&gt;A while back I realized I wasn&apos;t being consistent with how I did... &amp;quot;stuff&amp;quot; here, like call outs, Youtube links, etc. I started a &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/guide.md&quot;&gt;guide doc&lt;/a&gt; so I&apos;d have a quick way to remember what I did last time, and be more consistent.&lt;/p&gt;
@@ -80,7 +180,7 @@
       <title>Links For You (10/19/26)</title>
       <link>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</link>
       <guid>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Wowza - I&apos;m like nearly a month late on this. This is where I&apos;d try to come up with a good excuse, but I think if I just randomly point around at things and said... &amp;quot;life&amp;quot; most of you would completely understand where I&apos;m coming from. It&apos;s been a difficult few months for myself, and for nearly every person I know. This week I&apos;m going to try focus on the positive and the things that make me smile, and I hope all my lovely readers can do the same!&lt;/p&gt;
         &lt;h2 id=&quot;make-music%2C-not-war&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#make-music%2C-not-war&quot;&gt;Make Music, Not War&lt;/a&gt;&lt;/h2&gt;
@@ -130,7 +230,7 @@
       <title>Generating PDFs from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been singing the praises of the &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library for a while. It&apos;s an open source JavaScript library that can parse, extract, and convert between PDFs and Office documents, as well as OpenOffice, ePub and more. My demos have all focused on client-side examples but obviously the library would work great in a server side workflow as well. I haven&apos;t worked at Adobe for years now, but I still get strangely excited working with documents. I&apos;ll just add that to the long list of reasons I&apos;m a big nerd.&lt;/p&gt;
         &lt;p&gt;A few weeks ago, I reached out to &lt;a href=&quot;https://harshankur.com/&quot;&gt;Harsh Ankur&lt;/a&gt; about an idea inspired by Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. This was probably my favorite API in their suite of PDF services. You take a Word document, put in tokens, and call the API with your data. The API would swap out the tokens with real data and give you a PDF in return. (Or Word again if you wanted that.) I suggested this to Harsh and then - voila - he added it!&lt;/p&gt;
@@ -215,7 +315,7 @@
       <title>Adding Google Auth to TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;posted&lt;/a&gt; about my experience playing around with &lt;a href=&quot;https://tinyjs.app/&quot;&gt;TinyJS&lt;/a&gt;. This is a &lt;em&gt;very&lt;/em&gt; light &amp;quot;web to desktop app&amp;quot; platform for - well - building desktop apps. Its simplicity and similarity to PhoneGap (at least for the desktop) has got me interested in seeing what I can build with the project. One of my ideas would be improved with a login system so I naturally looked into adding a &amp;quot;Login with Google&amp;quot; feature. While this was &lt;em&gt;mostly&lt;/em&gt; straightforward, I ran into some oddities and figured I&apos;d share it here.&lt;/p&gt;
         &lt;p&gt;I went into this exploration with a basic idea of how I&apos;d approach it:&lt;/p&gt;
@@ -586,7 +686,7 @@
       <title>Tiny Apps with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;About a year ago, I was still running my live stream (&lt;a href=&quot;https://www.youtube.com/watch?v=BzRUsvAR4oQ&amp;amp;list=PL_z-rqJYNijqhtPcEbwacp34TiFfb8eyO&quot;&gt;Code Break&lt;/a&gt;) and my final three streams all covered one topic - building desktop applications with non-native code. I covered &lt;a href=&quot;https://v2.tauri.app/&quot;&gt;Tauri&lt;/a&gt; (HTML on the front, Rust on the back) and &lt;a href=&quot;https://flet.dev/&quot;&gt;Flet&lt;/a&gt; (all Python). Recently I came across another option, &lt;a href=&quot;https://tinyjs.app/&quot;&gt;tinyjs&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;TinyJS (technically the name is &amp;quot;tinyjs&amp;quot; but I can&apos;t make myself use the lowercase in my writing like that ;) is a lot like PhoneGap/Apache Cordova. Your application is the system web view shipped along with the ability to make system calls via a bridge to &lt;a href=&quot;https://txikijs.org/&quot;&gt;txiki.js&lt;/a&gt;. This bridge gives you full access to the file system and more, like any other native app.&lt;/p&gt;
@@ -684,7 +784,7 @@
       <title>Adding My Latest CodePens to My Blog</title>
       <link>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a fan of CodePen for many, many years, and it&apos;s one of the few services I spend money on to help support. A few months back, they released an entirely new version that dramatically improved the service (CodePen 2.0) and it just made me more happy I was a supporter. Just a few days ago they &lt;a href=&quot;https://codepen.io/changelog/2026-10-02&quot;&gt;announced more changes&lt;/a&gt; including a full &lt;a href=&quot;https://blog.codepen.io/docs/api/api-v2/&quot;&gt;API&lt;/a&gt;. I thought it would be fun to add a display of my recent pens. Yes, I thought that would be fun, because that&apos;s the kind of nerd I am.&lt;/p&gt;
         &lt;h2 id=&quot;adding-dynamic-content-to-a-ssg&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-dynamic-content-to-a-ssg&quot;&gt;Adding Dynamic Content to a SSG&lt;/a&gt;&lt;/h2&gt;
@@ -835,7 +935,7 @@
       <title>A Not-So-Simple RSS App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, I lie, this demo is also pretty simple, but I wanted to break the pattern of the last few posts and at least pretend this example is a bit more complex. As I try to find excuses to write more TypeScript, I thought a great example of that would be a simple RSS aggregator. You hit the site, tell it the feeds you care about, and it renders a date sorted list of entries.&lt;/p&gt;
         &lt;p&gt;Because RSS typically can&apos;t be parsed in client-side JavaScript (don&apos;t know why? ask me below!) so I&apos;d have to make use of a serverless function to proxy the calls (and at the same time, handle turning the XML into JSON).&lt;/p&gt;
@@ -970,7 +1070,7 @@
       <title>A Simple Weather App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
         &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
@@ -1218,7 +1318,7 @@
       <title>A Simple Alpine.js Template with Vite and TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 18:59:55 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
         &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
@@ -1310,43 +1410,6 @@
         &lt;p&gt;Again - this is pretty minimal TypeScript usage, but I dig it, and I can really see how in some of my larger Alpine demos in the past, the additional safety/checking/etc would have been real helpful I think.&lt;/p&gt;
         &lt;h2 id=&quot;there-is-no-step-five&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#there-is-no-step-five&quot;&gt;There Is No Step Five&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;If you want the code to try it yourself, you can copy it from here: &lt;a href=&quot;https://github.com/cfjedimaster/typescript-stuff/tree/main/alpine-test-1&quot;&gt;https://github.com/cfjedimaster/typescript-stuff/tree/main/alpine-test-1&lt;/a&gt;. I know this was pretty short, but I&apos;d still love any feedback or advice, so hit up the comments below!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Links For You (9/20/26)</title>
-      <link>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</link>
-      <guid>https://www.raymondcamden.com/2026/09/20/links-for-you-92026</guid>
-      <pubDate>Thu, 22 Oct 2026 19:10:09 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Happy &amp;quot;Football is Back&amp;quot; season to those of you who celebrate. I&apos;m currently watching my Saints take on the Ravens (who are also a favorite of mine) and hoping for our first win. The last few weeks have been incredibly busy (I feel like I always say that, sorry) with a trip for work that then morphed into a short vacation with my wife and I which included my first Blizzcon (which is freaking cool as hell) and our first visit to Disneyland. (We&apos;ve been to Disney World a few times.) I think we both agreed that Disney World is cooler, but the crowds and - most importantly - the weather - was much better in California.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/st.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Stormtroopers&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;h2 id=&quot;rss-lookup&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#rss-lookup&quot;&gt;RSS Lookup&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;First up for the links today is &lt;a href=&quot;https://www.rsslookup.com/&quot;&gt;RSS Lookup&lt;/a&gt;, a simple web site that lets you paste in a URL and see if it has a RSS feed. Not every site does a good job of letting you know about their RSS options so this can make it easier. Most likely I think the bookmarklet will be more useful to folks.&lt;/p&gt;
-        &lt;p&gt;If your curious, here&apos;s the meta tag used to signify a site&apos;s feed:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;link rel=&amp;quot;alternate&amp;quot; type=&amp;quot;application/rss+xml&amp;quot; 
-        title=&amp;quot;Your Site Title - RSS Feed&amp;quot; href=&amp;quot;https://example.com&amp;quot; /&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2 id=&quot;interfaces%2C-a-collection-by-ron-domingue&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#interfaces%2C-a-collection-by-ron-domingue&quot;&gt;Interfaces, a collection by Ron Domingue&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ron is someone I&apos;ve known for a while, a local down here in Louisiana, who has done some &lt;em&gt;incredibly&lt;/em&gt; stunning visual works. His &lt;a href=&quot;https://interfaces.rondomingue.com/&quot;&gt;Interfaces&lt;/a&gt; is a collection of various UI interfaces for different types of data. I&apos;d be hard pressed to pick a favorite, but &lt;a href=&quot;https://interfaces.rondomingue.com/landfall.html&quot;&gt;Landfall&lt;/a&gt; is a stunning visualization of hurricane tracks and their landfall.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/09/landfall.png&quot; loading=&quot;lazy&quot; alt=&quot;Landfall&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;h2 id=&quot;remember-imagemaps%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#remember-imagemaps%3F&quot;&gt;Remember Imagemaps?&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Imagemaps are one of those old web techs that used to be everywhere, and then disappeared. In case you don&apos;t remember, the idea was that one image on a web page, when clicked, could have multiple different destinations based on where you clicked. Typically this was defined in HTML with coordinates mapping to URLs. But you could also handle the location on the server side as well. In that form, the coordinates are included in the URL and your server side tech has to handle figuring out what goes where.&lt;/p&gt;
-        &lt;p&gt;This post, &lt;a href=&quot;https://danq.me/2026/07/10/rescuing-7234-gifs/?utm_source=tldrdev&quot;&gt;&amp;quot;Today I Rescued 7,234 Old GIFs&amp;quot;&lt;/a&gt;, by Dan Q explores how he attempted (and succeeded) in scraping a bunch of Gif icons for an old directory.&lt;/p&gt;
-        &lt;p&gt;Not gonna lie - kinda miss the old web. :)&lt;/p&gt;
-        &lt;h2 id=&quot;just-for-fun&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#just-for-fun&quot;&gt;Just For Fun&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, usually I share cool music videos here, but today I want to share something different. My father-in-law shared this short with us and while it&apos;s marked as comedy, it&apos;s a pretty deep 30-ish minute short staring Jane Kaczmarek. It&apos;s definitely worth your time!&lt;/p&gt;
-        &lt;lite-youtube videoid=&quot;Ec6yq3isEjg&quot; style=&quot;background-image: url(&apos;https://i.ytimg.com/vi/Ec6yq3isEjg/hqdefault.jpg&apos;);&quot;&gt;
-        &lt;a href=&quot;https://youtube.com/watch?v=Ec6yq3isEjg&quot; class=&quot;lty-playbtn&quot; title=&quot;Play Video&quot;&gt;
-        &lt;span class=&quot;lyt-visually-hidden&quot;&gt;Play Video&lt;/span&gt;
-        &lt;/a&gt;
-        &lt;/lite-youtube&gt;
-        &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
-        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
-        &lt;p&gt;
       </content:encoded>
     </item>
   </channel>
