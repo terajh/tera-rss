@@ -7,6 +7,32 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "How to avoid rendering delays when switching from text to dynamic selects?",
+    "partialText": "<p>I'm using Vue 3 with TypeScript and Element Plus to render a dynamic form.</p>\n<p>In view mode, fields are displayed as text. In edit mode, they are replaced with <code>el-select</code> components using <code>v-if / v-else</code>.</p>\n<p>When switching to edit mode, there's a noticeable delay before the selects appear. All data is already loaded, so this is a rendering issue, not an HTTP request issue.</p>\n<p>Simplified example:</p>\n<pre><code>&lt;template&gt;\n  &lt;div v-for=&quot;field in fields&quot; :key=&quot;field.id&quot;&gt;\n    &lt;span v-if=&quot;!isEditing&quot;&gt;\n      {{ field.value }}\n    &lt;/span&gt;\n\n    &lt;el-select v-else v-model=&quot;field.value&quot;&gt;\n      &lt;el-option\n        v-for=&quot;option in field.options&quot;\n        :key=&quot;option.value&quot;\n        :label=&quot;option.label&quot;\n        :value=&quot;option.value&quot;\n      /&gt;\n    &lt;/el-select&gt;\n  &lt;/div&gt;\n&lt;/template&gt;\n</code></pre>\n<p>Using <code>v-show</code> would avoid remounting the selects, but it would also mount every select during the initial page load.</p>\n<p>How can I defer mounting these selects until after the initial render, while keeping them ready for a fast transition to edit mode?</p>",
+    "date": "2026-10-27T08:02:43.000Z",
+    "url": "https://stackoverflow.com/questions/80012793/how-to-avoid-rendering-delays-when-switching-from-text-to-dynamic-selects"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "Vue 3 – Best approach to avoid rendering delays with dynamic form inputs (v-if vs v-show)? [closed]",
+    "partialText": "<p><strong>Title: Vue 3 – How to avoid rendering delays when switching dynamic forms from view mode to edit mode?</strong></p>\n<p>Hi everyone!</p>\n<p>I'm working on a Vue 3 application using TypeScript and Element Plus, and I'm experiencing some performance issues when switching between view mode and edit mode in dynamic forms.</p>\n<p><strong>The current implementation:</strong></p>\n<ul>\n<li><p>In <strong>view mode</strong>, fields are displayed as plain text.</p>\n</li>\n<li><p>In <strong>edit mode</strong>, those fields are replaced with interactive inputs, mainly <code>el-select</code> components.</p>\n</li>\n<li><p>The fields are generated dynamically using <code>v-for</code>.</p>\n</li>\n<li><p>I'm currently using <code>v-if / v-else</code> to switch between the two modes.</p>\n</li>\n</ul>\n<p><strong>The problem:</strong></p>\n<p>When switching to edit mode, there's a noticeable delay where the input section remains blank before the selects appear.</p>\n<p>This is NOT related to HTTP requests or data fetching. All the data and select options are already loaded.</p>\n<p>The delay seems to come from Vue mounting and rendering the components.</p>\n<p><strong>Simplified example:</strong></p>\n<pre><code>&lt;script setup lang=&quot;ts&quot;&gt;\nimport { ref } from 'vue'\n\ninterface Field {\n  id: number\n  value: string\n  options: { label: string; value: string }[]\n}\n\nconst isEditing = ref(false)\n\nconst fields = ref&lt;Field[]&gt;(\n  Array.from({ length: 100 }, (_, index) =&gt; ({\n    id: index,\n    value: `option-${index}-0`,\n    options: Array.from({ length: 100 }, (_, i) =&gt; ({\n      label: `Option ${i + 1}`,\n      value: `option-${index}-${i}`\n    }))\n  }))\n)\n&lt;/script&gt;\n\n&lt;template&gt;\n  &lt;button @click=&quot;isEditing = !isEditing&quot;&gt;\n    {{ isEditing ? 'View mode' : 'Edit mode' }}\n  &lt;/button&gt;\n\n  &lt;div v-for=&quot;field in fields&quot; :key=&quot;field.id&quot;&gt;\n    &lt;span v-if=&quot;!isEditing&quot;&gt;\n      {{ field.value }}\n    &lt;/span&gt;\n\n    &lt;el-select\n      v-else\n      v-model=&quot;field.value&quot;\n      filterable\n    &gt;\n      &lt;el-option\n        v-for=&quot;option in field.options&quot;\n        :key=&quot;option.value&quot;\n        :label=&quot;option.label&quot;\n        :value=&quot;option.value&quot;\n      /&gt;\n    &lt;/el-select&gt;\n  &lt;/div&gt;\n&lt;/template&gt;\n</code></pre>\n<p>This example uses 100 fields with 100 options each to illustrate the rendering cost. The exact number of fields varies in the real application.</p>\n<p><strong>What I've considered:</strong></p>\n<p><strong>1. Using <code>v-show</code> instead of <code>v-if</code></strong></p>\n<p>This would keep the select components mounted and simply toggle their visibility.</p>\n<p>However, it would also mean mounting all the selects during the initial page load, even if the user never enters edit mode.</p>\n<p><strong>2. Lazy mounting + <code>v-show</code></strong></p>\n<p>Mount the selects only after the initial page render, keep them hidden, and reuse them when switching to edit mode.</p>\n<p><strong>3. Progressive rendering</strong></p>\n<p>Render the selects in smaller batches to avoid blocking the main thread.</p>\n<p><strong>My questions:</strong></p>\n<ol>\n<li><p>What's the recommended approach for this scenario in Vue 3?</p>\n</li>\n<li><p>How do you handle large dynamic forms with view/edit modes in production applications?</p>\n</li>\n<li><p>Is there a way to preload or progressively mount hidden components without negatively affecting initial rendering performance?</p>\n</li>\n<li><p>Would lazy mounting combined with <code>v-show</code> be a reasonable solution, or is there a better pattern?</p>\n</li>\n<li><p>Would you recommend optimizing the component mounting process rather than introducing a loading state?</p>\n</li>\n</ol>\n<p>Ideally, I'd like to keep the initial page load lightweight while making the transition to edit mode as smooth as possible.</p>\n<p>I'm particularly interested in solutions that scale well with large forms and dynamic components.</p>\n<p>Any suggestions, performance tips, or examples from real-world Vue 3 applications would be greatly appreciated!</p>\n<p>Thanks in advance!</p>",
+    "date": "2026-10-26T22:21:53.000Z",
+    "url": "https://stackoverflow.com/questions/80012717/vue-3-best-approach-to-avoid-rendering-delays-with-dynamic-form-inputs-v-if-v"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "How to prevent HTML minification when generating a static site in Nuxt?",
     "partialText": "<p>I am working on a Nuxt project and generating a static site using the <code>nuxt generate</code> command.</p>",
     "date": "2026-09-15T17:30:37.000Z",
@@ -362,31 +388,5 @@
     "partialText": "<p>Fullcalendar docs mention only one slot template, &quot;event-content&quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren't mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: <a href=\"https://fullcalendar.io/docs/resourceAreaColumns\" rel=\"nofollow noreferrer\">https://fullcalendar.io/docs/resourceAreaColumns</a>) from resource timeline feature, but it doesn't work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: <a href=\"https://fullcalendar.io/docs/vue#slot-templates\" rel=\"nofollow noreferrer\">https://fullcalendar.io/docs/vue#slot-templates</a>)</p>\n<p>So while this works:</p>\n<pre><code>&lt;FullCalendar&gt;\n    &lt;template #eventContent&gt;\n        &lt;p&gt;Example&lt;/p&gt;\n    &lt;/template&gt;\n&lt;/FullCalendar&gt;\n</code></pre>\n<p>This doesn't:</p>\n<pre><code>&lt;FullCalendar&gt;\n    &lt;template #cellContent&gt;\n        &lt;p&gt;Example&lt;/p&gt;\n    &lt;/template&gt;\n&lt;/FullCalendar&gt;\n</code></pre>",
     "date": "2026-03-03T10:14:17.000Z",
     "url": "https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Architectural differences between Laravel + Inertia (Vue) and Laravel API + React SPA",
-    "partialText": "<p>I am building a Laravel 11 backend for a job portal application with real-time features and REST APIs. I am deciding between Vue 3 and React 18 for the frontend. Considering ecosystem support, integration with Laravel (Sanctum, Inertia, etc.), and long-term scalability, what are the architectural trade-offs?</p>",
-    "date": "2026-02-26T14:34:51.000Z",
-    "url": "https://stackoverflow.com/questions/79897129/architectural-differences-between-laravel-inertia-vue-and-laravel-api-reac"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "File download not working in iPhone Safari but works in Chrome [duplicate]",
-    "partialText": "<p>I'm having trouble finding a solution for downloading files on <strong>iPhone Safari</strong>.</p>\n<p>The code I shared is the current function in my application. It downloads the file correctly in <strong>Google Chrome</strong>, but it does not work in <strong>Safari</strong>.</p>\n<p>How can I fix this so the file download works on Safari as well?</p>\n<pre><code>const downloadDocument = async (url) =&gt; {\n  try {\n    const response = await fetch(url)\n    const blob = await response.blob()\n    const blobUrl = window.URL.createObjectURL(blob)\n    const link = document.createElement('a')\n    link.href = blobUrl\n    link.target = '_blank'\n    link.download = url.split('/').pop() || 'document'\n    document.body.appendChild(link)\n    link.click()\n    document.body.removeChild(link)\n    setTimeout(() =&gt; window.URL.revokeObjectURL(blobUrl), 100)\n  } catch (error) {\n    console.error('Error downloading document.:', error)\n    window.open(url, '_blank', 'noopener,noreferrer')\n  }\n}\n</code></pre>",
-    "date": "2026-02-24T21:16:14.000Z",
-    "url": "https://stackoverflow.com/questions/79895739/file-download-not-working-in-iphone-safari-but-works-in-chrome"
   }
 ]
