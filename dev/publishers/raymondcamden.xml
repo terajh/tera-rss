@@ -4,12 +4,336 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 27 Oct 2026 20:16:34 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 28 Oct 2026 20:47:22 GMT</lastBuildDate>
+    <item>
+      <title>Generating PDF Invoices from Word Templates with officeParser</title>
+      <link>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</link>
+      <guid>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</guid>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Last week I shared a demo (&lt;a href=&quot;https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser%5D&quot;&gt;&amp;quot;Generating PDFs from Word Templates with officeParser&amp;quot;&lt;/a&gt;) that made use of the awesome &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; open source library. That demo was a simple &amp;quot;customer report&amp;quot; web app that took custom data and a Word template. Once the form was submitted, the library converted tokens in the Word template to real data and output a PDF. I decided to build another demo using the library, this time on the server with a simple Node.js script.&lt;/p&gt;
+        &lt;p&gt;As I mentioned previously, this new feature mimics Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. At the time I wrote my blog post, the library just supported simple transformations. So given `` in your Word template, if you passed a name value of &apos;Ray&apos;, you would see that in the resulting PDF.&lt;/p&gt;
+        &lt;p&gt;Now the library&apos;s been updated to support:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Conditional logic&lt;/li&gt;
+        &lt;li&gt;Looping&lt;/li&gt;
+        &lt;li&gt;Formatting of values&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Basically, and no shade to Adobe (not that I think they care), this open source library replicates the most of the same functionality, on your server, for free.&lt;/p&gt;
+        &lt;p&gt;Given these new features, I thought a simple &amp;quot;data invoicing system&amp;quot; would be a good demo. The idea being:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;You have data for invoices, usually in a database, but for me, just a JSON file.&lt;/li&gt;
+        &lt;li&gt;You have a Word template for the invoice.&lt;/li&gt;
+        &lt;li&gt;A script combines this together and spits out PDFs.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The first thing I built was the Word template. I used one of the built-in Word templates and modified it a bit. The screenshot below is from Word&apos;s online viewer which frankly looks pretty jank. In my desktop Word it looked a lot better:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/word1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Word template&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;In this template you can see the simple tokens but also an example of looping in the table using &lt;code&gt;for line in lineItems&lt;/code&gt;. Also note the formatting on the dollar amounts. I could have found a way to get conditionals in, but figured this was interesting enough.&lt;/p&gt;
+        &lt;p&gt;My raw data is just JSON. Here&apos;s part of the file:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;invoices&amp;quot;: [
+        {
+        &amp;quot;invoiceNumber&amp;quot;: 100,
+        &amp;quot;name&amp;quot;: &amp;quot;Ada Lovelace&amp;quot;,
+        &amp;quot;email&amp;quot;: &amp;quot;ada@example.com&amp;quot;,
+        &amp;quot;lineItems&amp;quot;: [
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Consulting&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 3,
+        &amp;quot;unitCost&amp;quot;: 150
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Travel expenses&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 1,
+        &amp;quot;unitCost&amp;quot;: 48.75
+        }
+        ]
+        },
+        {
+        &amp;quot;invoiceNumber&amp;quot;: 101,
+        &amp;quot;name&amp;quot;: &amp;quot;Grace Hopper&amp;quot;,
+        &amp;quot;email&amp;quot;: &amp;quot;grace@example.com&amp;quot;,
+        &amp;quot;lineItems&amp;quot;: [
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Database review&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 2,
+        &amp;quot;unitCost&amp;quot;: 225
+        }
+        ]
+        },
+        {
+        &amp;quot;invoiceNumber&amp;quot;: 102,
+        &amp;quot;name&amp;quot;: &amp;quot;Katherine Johnson&amp;quot;,
+        &amp;quot;email&amp;quot;: &amp;quot;katherine@example.com&amp;quot;,
+        &amp;quot;lineItems&amp;quot;: [
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Orbital trajectory analysis&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 2,
+        &amp;quot;unitCost&amp;quot;: 310
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Technical review&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 3,
+        &amp;quot;unitCost&amp;quot;: 85.5
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Project meeting&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 1,
+        &amp;quot;unitCost&amp;quot;: 120
+        }
+        ]
+        },
+        {
+        &amp;quot;invoiceNumber&amp;quot;: 103,
+        &amp;quot;name&amp;quot;: &amp;quot;Alan Turing&amp;quot;,
+        &amp;quot;email&amp;quot;: &amp;quot;alan@example.com&amp;quot;,
+        &amp;quot;lineItems&amp;quot;: [
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Systems consulting&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 4,
+        &amp;quot;unitCost&amp;quot;: 175
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Prototype review&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 2,
+        &amp;quot;unitCost&amp;quot;: 240
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Documentation&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 6,
+        &amp;quot;unitCost&amp;quot;: 42.5
+        },
+        {
+        &amp;quot;description&amp;quot;: &amp;quot;Materials&amp;quot;,
+        &amp;quot;quantity&amp;quot;: 1,
+        &amp;quot;unitCost&amp;quot;: 63.25
+        }
+        ]
+        }
+        ]
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;And finally, here&apos;s the script that does the processing:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const { readFile, mkdir, writeFile } = require(&apos;node:fs/promises&apos;)
+        const path = require(&apos;node:path&apos;)
+        const { OfficeConverter, OfficeTemplate } = require(&apos;officeparser&apos;)
+        
+        function isRecord(value) {
+        return value !== null &amp;amp;&amp;amp; typeof value === &apos;object&apos; &amp;amp;&amp;amp; !Array.isArray(value)
+        }
+        
+        function requireText(value, label) {
+        if (typeof value !== &apos;string&apos; || value.trim() === &apos;&apos;) {
+        throw new Error(`${label} must be a non-empty string.`)
+        }
+        
+        return value.trim()
+        }
+        
+        function toCents(value, label) {
+        if (typeof value !== &apos;number&apos; || !Number.isFinite(value) || value &amp;lt; 0) {
+        throw new Error(`${label} must be a non-negative number.`)
+        }
+        
+        const cents = Math.round((value + Number.EPSILON) * 100)
+        if (!Number.isSafeInteger(cents)) {
+        throw new Error(`${label} is too large to represent as currency.`)
+        }
+        
+        return cents
+        }
+        
+        function buildInvoiceData(json, issuedOn = new Date()) {
+        if (!isRecord(json) || !Array.isArray(json.invoices) || json.invoices.length === 0) {
+        throw new Error(&apos;The JSON file must contain a non-empty &amp;quot;invoices&amp;quot; array.&apos;)
+        }
+        
+        const invoiceDate = [
+        issuedOn.getFullYear(),
+        String(issuedOn.getMonth() + 1).padStart(2, &apos;0&apos;),
+        String(issuedOn.getDate()).padStart(2, &apos;0&apos;),
+        ].join(&apos;-&apos;)
+        
+        return json.invoices.map((invoice, invoiceIndex) =&amp;gt; {
+        const invoiceLabel = `Invoice ${invoiceIndex + 1}`
+        if (!isRecord(invoice)) {
+        throw new Error(`${invoiceLabel} must be an object.`)
+        }
+        
+        if (!Number.isSafeInteger(invoice.invoiceNumber) || invoice.invoiceNumber &amp;lt;= 0) {
+        throw new Error(`${invoiceLabel} invoiceNumber must be a positive whole number.`)
+        }
+        
+        const recipientName = requireText(invoice.name, `${invoiceLabel} name`)
+        const recipientEmail = requireText(invoice.email, `${invoiceLabel} email`)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
+        throw new Error(`${invoiceLabel} email must be a valid email address.`)
+        }
+        if (!Array.isArray(invoice.lineItems) || invoice.lineItems.length === 0) {
+        throw new Error(`${invoiceLabel} must contain at least one line item.`)
+        }
+        
+        let subtotalCents = 0
+        const lineItems = invoice.lineItems.map((item, itemIndex) =&amp;gt; {
+        const itemLabel = `${invoiceLabel} line item ${itemIndex + 1}`
+        if (!isRecord(item)) {
+        throw new Error(`${itemLabel} must be an object.`)
+        }
+        
+        const description = requireText(item.description, `${itemLabel} description`)
+        if (!Number.isSafeInteger(item.quantity) || item.quantity &amp;lt;= 0) {
+        throw new Error(`${itemLabel} quantity must be a positive whole number.`)
+        }
+        
+        const unitCostCents = toCents(item.unitCost, `${itemLabel} unitCost`)
+        const lineTotalCents = unitCostCents * item.quantity
+        if (!Number.isSafeInteger(lineTotalCents) || !Number.isSafeInteger(subtotalCents + lineTotalCents)) {
+        throw new Error(`${itemLabel} total is too large to represent as currency.`)
+        }
+        subtotalCents += lineTotalCents
+        
+        return {
+        description,
+        quantity: item.quantity,
+        unitCost: unitCostCents / 100,
+        total: lineTotalCents / 100,
+        lineTotal: lineTotalCents / 100,
+        }
+        })
+        
+        const invoiceNumber = String(invoice.invoiceNumber)
+        const salesTaxCents = Math.round(subtotalCents / 20)
+        const totalCents = subtotalCents + salesTaxCents
+        if (!Number.isSafeInteger(totalCents)) {
+        throw new Error(`${invoiceLabel} total due is too large to represent as currency.`)
+        }
+        
+        return {
+        invoiceNumber,
+        invoiceDate,
+        recipientName,
+        recipientEmail,
+        lineItems,
+        subtotal: subtotalCents / 100,
+        salesTax: salesTaxCents / 100,
+        total: totalCents / 100,
+        }
+        })
+        }
+        
+        function makeFilename(invoice) {
+        const customerSlug = invoice.recipientName
+        .normalize(&apos;NFKD&apos;)
+        .replace(/[\u0300-\u036f]/g, &apos;&apos;)
+        .replace(/[^a-z0-9]+/gi, &apos;-&apos;)
+        .replace(/^-|-$/g, &apos;&apos;)
+        .toLowerCase() || &apos;customer&apos;
+        
+        return `${invoice.invoiceNumber.toLowerCase()}-${customerSlug}.pdf`
+        }
+        
+        async function generateInvoices(inputPath, outputPath, templatePath) {
+        const input = JSON.parse(await readFile(inputPath, &apos;utf8&apos;))
+        const invoices = buildInvoiceData(input)
+        const template = await readFile(templatePath)
+        
+        await mkdir(outputPath, { recursive: true })
+        
+        const renderedDocuments = await OfficeTemplate.render(template, {
+        data: invoices,
+        onMissing: &apos;error&apos;,
+        })
+        if (!Array.isArray(renderedDocuments) || renderedDocuments.length !== invoices.length) {
+        throw new Error(&apos;officeparser did not return one rendered document per invoice.&apos;)
+        }
+        
+        for (const [index, invoice] of invoices.entries()) {
+        const renderedDocx = renderedDocuments[index]
+        if (!(renderedDocx instanceof Uint8Array)) {
+        throw new Error(`officeparser did not return a rendered document for ${invoice.invoiceNumber}.`)
+        }
+        
+        const { value: pdfBytes } = await OfficeConverter.convert(renderedDocx, &apos;pdf&apos;, {
+        generatorConfig: {
+        pdfConfig: { engine: &apos;native&apos; },
+        },
+        })
+        
+        if (!(pdfBytes instanceof Uint8Array)) {
+        throw new Error(`officeparser did not return PDF data for ${invoice.invoiceNumber}.`)
+        }
+        
+        const outputFile = path.join(outputPath, makeFilename(invoice))
+        await writeFile(outputFile, pdfBytes)
+        console.log(`Created ${outputFile}`)
+        }
+        }
+        
+        async function main(args) {
+        if (args[0] === &apos;--help&apos; || args[0] === &apos;-h&apos;) {
+        console.log(&apos;Usage: node script.js [invoices.json] [output-directory]&apos;)
+        return
+        }
+        if (args.length &amp;gt; 2) {
+        throw new Error(&apos;Usage: node script.js [invoices.json] [output-directory]&apos;)
+        }
+        
+        const inputPath = args[0]
+        ? path.resolve(args[0])
+        : path.join(__dirname, &apos;invoices.json&apos;)
+        const outputPath = args[1]
+        ? path.resolve(args[1])
+        : path.join(__dirname, &apos;output&apos;)
+        const templatePath = path.join(__dirname, &apos;invoiceTemplate.docx&apos;)
+        
+        await generateInvoices(inputPath, outputPath, templatePath)
+        }
+        
+        if (require.main === module) {
+        main(process.argv.slice(2)).catch((error) =&amp;gt; {
+        console.error(&apos;Invoice generation failed:&apos;, error)
+        process.exitCode = 1
+        })
+        }
+        
+        module.exports = { buildInvoiceData, generateInvoices, makeFilename }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It can be run at the CLI and takes arguments for where the data is and where to write it out - along with basic defaults for each. &lt;code&gt;buildInvoiceData&lt;/code&gt; does the job of mapping the &apos;raw&apos; data to what I need for the operation. This is something I did with Adobe&apos;s APIs as well. Rarely was the source data in a shape that mapped directly to the Word template, so a bit of shaping handles that transformation.&lt;/p&gt;
+        &lt;p&gt;The officeParser library part is here:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const renderedDocuments = await OfficeTemplate.render(template, {
+        data: invoices,
+        onMissing: &apos;error&apos;,
+        })
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That second arg is interesting. If the Word template references a value you don&apos;t pass, you can have the library simply ignore it, or throw an error. I like throwing an error as it makes it obvious when you&apos;ve screwed something up.&lt;/p&gt;
+        &lt;p&gt;After the conversion is done, the bits are all saved out to PDFs using the invoice number and name of the person getting the invoice.&lt;/p&gt;
+        &lt;p&gt;There&apos;s a bit more to the script above, but the gist is - read the data, shape it, pass it along with the template, save the result.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s an example of how one looks:&lt;/p&gt;
+        &lt;div id=&quot;pdf-viewer-1&quot; style=&quot;width: 100%; height: 500px; margin-bottom: 30px&quot;&gt;&lt;/div&gt;
+        &lt;script type=&quot;module&quot;&gt;
+        import EmbedPDF, { ZoomMode } from &apos;https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js&apos;;
+        
+        EmbedPDF.init({
+        type: &apos;container&apos;,
+        target: document.getElementById(&apos;pdf-viewer-1&apos;),
+        src: &apos;https://static.raymondcamden.com/images/2026/10/106-radia-perlman.pdf&apos;,
+        theme: { preference: &apos;system&apos; },
+        disabledCategories: [&apos;annotation&apos;],
+        zoom: {
+        defaultZoomLevel: ZoomMode.FitWidth
+        }
+        });
+        &lt;/script&gt;
+        &lt;p&gt;Pretty cool, right? I mean, we all agree, PDFs are REALLY COOL! Anyway, you can grab all the bits, along with the Word template and sample output here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/invoice&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/invoice&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Building the Unicorn-themed app of my dreams with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Everyone likes to talk about light versus dark theme while no one is addressing the real need for our users - a proper unicorn theme. I mean, take a look at this beauty:&lt;/p&gt;
         &lt;p&gt;
@@ -109,7 +433,7 @@
       <title>Adding a PDF Display to Eleventy</title>
       <link>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</link>
       <guid>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short one. I&apos;ve talked about embedding PDFs on web pages for probably close to ten years now. Blame Adobe. Blame me being a nerd and finding this stuff interesting. Blame whoever. While I&apos;ve blogged about the topic, I&apos;ve also actually done that on my site here, in a variety of different ways.&lt;/p&gt;
         &lt;p&gt;A while back I realized I wasn&apos;t being consistent with how I did... &amp;quot;stuff&amp;quot; here, like call outs, Youtube links, etc. I started a &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/guide.md&quot;&gt;guide doc&lt;/a&gt; so I&apos;d have a quick way to remember what I did last time, and be more consistent.&lt;/p&gt;
@@ -180,7 +504,7 @@
       <title>Links For You (10/19/26)</title>
       <link>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</link>
       <guid>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Wowza - I&apos;m like nearly a month late on this. This is where I&apos;d try to come up with a good excuse, but I think if I just randomly point around at things and said... &amp;quot;life&amp;quot; most of you would completely understand where I&apos;m coming from. It&apos;s been a difficult few months for myself, and for nearly every person I know. This week I&apos;m going to try focus on the positive and the things that make me smile, and I hope all my lovely readers can do the same!&lt;/p&gt;
         &lt;h2 id=&quot;make-music%2C-not-war&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#make-music%2C-not-war&quot;&gt;Make Music, Not War&lt;/a&gt;&lt;/h2&gt;
@@ -230,7 +554,7 @@
       <title>Generating PDFs from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been singing the praises of the &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library for a while. It&apos;s an open source JavaScript library that can parse, extract, and convert between PDFs and Office documents, as well as OpenOffice, ePub and more. My demos have all focused on client-side examples but obviously the library would work great in a server side workflow as well. I haven&apos;t worked at Adobe for years now, but I still get strangely excited working with documents. I&apos;ll just add that to the long list of reasons I&apos;m a big nerd.&lt;/p&gt;
         &lt;p&gt;A few weeks ago, I reached out to &lt;a href=&quot;https://harshankur.com/&quot;&gt;Harsh Ankur&lt;/a&gt; about an idea inspired by Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. This was probably my favorite API in their suite of PDF services. You take a Word document, put in tokens, and call the API with your data. The API would swap out the tokens with real data and give you a PDF in return. (Or Word again if you wanted that.) I suggested this to Harsh and then - voila - he added it!&lt;/p&gt;
@@ -315,7 +639,7 @@
       <title>Adding Google Auth to TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;posted&lt;/a&gt; about my experience playing around with &lt;a href=&quot;https://tinyjs.app/&quot;&gt;TinyJS&lt;/a&gt;. This is a &lt;em&gt;very&lt;/em&gt; light &amp;quot;web to desktop app&amp;quot; platform for - well - building desktop apps. Its simplicity and similarity to PhoneGap (at least for the desktop) has got me interested in seeing what I can build with the project. One of my ideas would be improved with a login system so I naturally looked into adding a &amp;quot;Login with Google&amp;quot; feature. While this was &lt;em&gt;mostly&lt;/em&gt; straightforward, I ran into some oddities and figured I&apos;d share it here.&lt;/p&gt;
         &lt;p&gt;I went into this exploration with a basic idea of how I&apos;d approach it:&lt;/p&gt;
@@ -686,7 +1010,7 @@
       <title>Tiny Apps with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;About a year ago, I was still running my live stream (&lt;a href=&quot;https://www.youtube.com/watch?v=BzRUsvAR4oQ&amp;amp;list=PL_z-rqJYNijqhtPcEbwacp34TiFfb8eyO&quot;&gt;Code Break&lt;/a&gt;) and my final three streams all covered one topic - building desktop applications with non-native code. I covered &lt;a href=&quot;https://v2.tauri.app/&quot;&gt;Tauri&lt;/a&gt; (HTML on the front, Rust on the back) and &lt;a href=&quot;https://flet.dev/&quot;&gt;Flet&lt;/a&gt; (all Python). Recently I came across another option, &lt;a href=&quot;https://tinyjs.app/&quot;&gt;tinyjs&lt;/a&gt;.&lt;/p&gt;
         &lt;p&gt;TinyJS (technically the name is &amp;quot;tinyjs&amp;quot; but I can&apos;t make myself use the lowercase in my writing like that ;) is a lot like PhoneGap/Apache Cordova. Your application is the system web view shipped along with the ability to make system calls via a bridge to &lt;a href=&quot;https://txikijs.org/&quot;&gt;txiki.js&lt;/a&gt;. This bridge gives you full access to the file system and more, like any other native app.&lt;/p&gt;
@@ -784,7 +1108,7 @@
       <title>Adding My Latest CodePens to My Blog</title>
       <link>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</link>
       <guid>https://www.raymondcamden.com/2026/10/06/adding-my-latest-codepens-to-my-blog</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been a fan of CodePen for many, many years, and it&apos;s one of the few services I spend money on to help support. A few months back, they released an entirely new version that dramatically improved the service (CodePen 2.0) and it just made me more happy I was a supporter. Just a few days ago they &lt;a href=&quot;https://codepen.io/changelog/2026-10-02&quot;&gt;announced more changes&lt;/a&gt; including a full &lt;a href=&quot;https://blog.codepen.io/docs/api/api-v2/&quot;&gt;API&lt;/a&gt;. I thought it would be fun to add a display of my recent pens. Yes, I thought that would be fun, because that&apos;s the kind of nerd I am.&lt;/p&gt;
         &lt;h2 id=&quot;adding-dynamic-content-to-a-ssg&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#adding-dynamic-content-to-a-ssg&quot;&gt;Adding Dynamic Content to a SSG&lt;/a&gt;&lt;/h2&gt;
@@ -935,7 +1259,7 @@
       <title>A Not-So-Simple RSS App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/10/02/a-not-so-simple-rss-app-in-typescript</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Ok, I lie, this demo is also pretty simple, but I wanted to break the pattern of the last few posts and at least pretend this example is a bit more complex. As I try to find excuses to write more TypeScript, I thought a great example of that would be a simple RSS aggregator. You hit the site, tell it the feeds you care about, and it renders a date sorted list of entries.&lt;/p&gt;
         &lt;p&gt;Because RSS typically can&apos;t be parsed in client-side JavaScript (don&apos;t know why? ask me below!) so I&apos;d have to make use of a serverless function to proxy the calls (and at the same time, handle turning the XML into JSON).&lt;/p&gt;
@@ -1070,7 +1394,7 @@
       <title>A Simple Weather App in TypeScript</title>
       <link>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</link>
       <guid>https://www.raymondcamden.com/2026/09/26/a-simple-weather-app-in-typescript</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
+      <pubDate>Wed, 28 Oct 2026 20:12:39 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, my fellow nerds. If you&apos;ve been keeping up with my posts (all 4 of you - thank you!) then you know I&apos;ve been experimenting with TypeScript (and Vite) recently. This past week I decided to try building a real &amp;quot;app&amp;quot;, and of course by app I mean something incredibly small, but a bit &amp;quot;real world&amp;quot;-ish to kind of get a feel for what the development process felt like.&lt;/p&gt;
         &lt;p&gt;I decided on a fairly simple weather application. The application would prompt you for a location. That location gets geocoded to longitude and latitude values. With those values, I&apos;d grab a simple weather forecast. After you add one, you can add another, and delete as well. Finally, all the values are stored in local storage so that on reload you get the same values loaded immediately.&lt;/p&gt;
@@ -1312,104 +1636,6 @@
         &lt;h2 id=&quot;your-turn!&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#your-turn!&quot;&gt;Your Turn!&lt;/a&gt;&lt;/h2&gt;
         &lt;p&gt;Ok, I know blogging is dead (again) and no humans read these posts again, but if you are reading this, and know TypeScript well, I&apos;d &lt;strong&gt;love&lt;/strong&gt; any and all feedback! Give me a comment below and help me keep learning this.&lt;/p&gt;
         &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@patrickian4?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Patrick Fore&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/black-corona-typewriter-on-brown-wood-planks-0gkw_9fy0eQ?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>A Simple Alpine.js Template with Vite and TypeScript</title>
-      <link>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</link>
-      <guid>https://www.raymondcamden.com/2026/09/22/a-simple-alpinejs-template-with-vite-and-typescript</guid>
-      <pubDate>Tue, 27 Oct 2026 19:55:54 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;This will be a quick one - but as I think more about TypeScript and how I&apos;d like to learn (and play, and build silly demos), I naturally thought it may make sense to look at how I&apos;d use &lt;a href=&quot;https://alpinejs.dev/&quot;&gt;Alpine.js&lt;/a&gt; with that stack. Alpine&apos;s been my go to library for web apps that reach the level of complexity where I&apos;d like some help with DOM manipulation and such. I don&apos;t &lt;em&gt;always&lt;/em&gt; use it, because (imho) the default stack should be as vanilla as possible (obviously I&apos;m going a bit off ranch with these explorations into TypeScript and Vite) but Alpine is lightweight and simple and just a great little library in general. What follows isn&apos;t necessarily a &amp;quot;template&amp;quot; as it&apos;s got a bit of template code with it, but I thought it would be helpful to share. As always, let me know what you think!&lt;/p&gt;
-        &lt;h2 id=&quot;step-one---the-scaffold&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-one---the-scaffold&quot;&gt;Step One - the Scaffold&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;In my &lt;a href=&quot;https://www.raymondcamden.com/2026/09/18/its-only-a-decade-late-ill-learn-typescript&quot;&gt;first post&lt;/a&gt; a few days ago, I mentioned that the Vite scaffold support lets you create a vanilla application with TypeScript. I used that for my code and removed as much of the demo code as I could. I do wish Vite&apos;s template was a bit more minimal.&lt;/p&gt;
-        &lt;h2 id=&quot;step-two---adding-alpine&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-two---adding-alpine&quot;&gt;Step Two - Adding Alpine&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Usually I make use of the Alpine CDN in my demos, for this one, I instead installed it as a dependency. I also installed the Alpine types dependency. Here&apos;s my package.json:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
-        &amp;quot;name&amp;quot;: &amp;quot;alpine-test-1&amp;quot;,
-        &amp;quot;private&amp;quot;: true,
-        &amp;quot;version&amp;quot;: &amp;quot;0.0.0&amp;quot;,
-        &amp;quot;type&amp;quot;: &amp;quot;module&amp;quot;,
-        &amp;quot;scripts&amp;quot;: {
-        &amp;quot;dev&amp;quot;: &amp;quot;vite&amp;quot;,
-        &amp;quot;build&amp;quot;: &amp;quot;tsc &amp;amp;&amp;amp; vite build&amp;quot;,
-        &amp;quot;preview&amp;quot;: &amp;quot;vite preview&amp;quot;
-        },
-        &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;@types/alpinejs&amp;quot;: &amp;quot;^3.13.11&amp;quot;,
-        &amp;quot;typescript&amp;quot;: &amp;quot;~6.0.2&amp;quot;,
-        &amp;quot;vite&amp;quot;: &amp;quot;^8.3.0&amp;quot;
-        },
-        &amp;quot;dependencies&amp;quot;: {
-        &amp;quot;alpinejs&amp;quot;: &amp;quot;^3.17.4&amp;quot;
-        }
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2 id=&quot;step-three---the-html&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-three---the-html&quot;&gt;Step Three - the HTML&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, so this part is really simple. Alpine &amp;quot;ties&amp;quot; to your DOM usually via an &lt;code&gt;x-data&lt;/code&gt; attribute. That means this is the bare minimum:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;div x-data=&amp;quot;app&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;But of course you&apos;ll have more Alpine directives and more HTML. Also, &amp;quot;app&amp;quot; is not required, but is the name I pretty much use all the time. For my template/demo, I output a couple of variables and included a few click directives just to test stuff out. Oh, I also added &lt;a href=&quot;https://simplecss.org/&quot;&gt;Simple.css&lt;/a&gt; to just to make it look prettier. That&apos;s absolutely not necessary. The Vite demo actually imports CSS in their main TypeScript file (you can see that on Stackblitz &lt;a href=&quot;https://stackblitz.com/edit/vitejs-vite-hpgbiipd?file=src%2Fmain.ts&amp;amp;terminal=dev&quot;&gt;here&lt;/a&gt;) and I&apos;m not sure how I feel about that. I know it minimizes the code, but it feels really weird to me. Anyway, here&apos;s my HTML:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!doctype html&amp;gt;
-        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
-        &amp;lt;link rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/svg+xml&amp;quot; href=&amp;quot;/favicon.svg&amp;quot; /&amp;gt;
-        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot; /&amp;gt;
-        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.simplecss.org/simple.min.css&amp;quot;&amp;gt;
-        &amp;lt;title&amp;gt;alpine-test-1&amp;lt;/title&amp;gt;
-        &amp;lt;/head&amp;gt;
-        &amp;lt;body&amp;gt;
-        &amp;lt;div x-data=&amp;quot;app&amp;quot;&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;span x-text=&amp;quot;message&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;
-        &amp;lt;button @click=&amp;quot;meow()&amp;quot;&amp;gt;Meow (default)&amp;lt;/button&amp;gt;
-        &amp;lt;button @click=&amp;quot;meow(&apos;Purr...&apos;)&amp;quot;&amp;gt;Meow (custom)&amp;lt;/button&amp;gt;
-        &amp;lt;/p&amp;gt;
-        &amp;lt;ul&amp;gt;
-        &amp;lt;template x-for=&amp;quot;(cat, index) in cats&amp;quot; :key=&amp;quot;index&amp;quot;&amp;gt;
-        &amp;lt;li x-text=&amp;quot;cat.name&amp;quot;&amp;gt;&amp;lt;/li&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;script type=&amp;quot;module&amp;quot; src=&amp;quot;/src/main.ts&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;h2 id=&quot;step-four---enter-the-typescript&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#step-four---enter-the-typescript&quot;&gt;Step Four - Enter the TypeScript&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, for the final bit - my TypeScript code:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import Alpine from &apos;alpinejs&apos;;
-        
-        type Cat = {
-        name: string;
-        breed: string;
-        gender: &apos;male&apos; | &apos;female&apos;;
-        };
-        
-        Alpine.data(&apos;app&apos;, () =&amp;gt; ({
-        message:&apos;Hello from Alpine!&apos;,
-        cats: [] as Cat[],
-        init() {
-        this.cats.push({ name: &apos;Whiskers&apos;, breed: &apos;Siamese&apos;, gender: &apos;male&apos; });
-        this.cats.push({ name: &apos;Fluffy&apos;, breed: &apos;Persian&apos;, gender: &apos;female&apos; });
-        },
-        meow(message:string = &apos;Meow!&apos;) {
-        alert(message);
-        }
-        }));
-        
-        Alpine.start();
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Let me point out the important bits. Unlike my usual Alpine demos, I import Alpine here from the local install. I also need to fire &lt;code&gt;Alpine.start()&lt;/code&gt; manually. But outside of that, it&apos;s pretty vanilla Alpine - define the app and include relevant variables and methods, which in this case is pretty small.&lt;/p&gt;
-        &lt;p&gt;Now obviously I&apos;m trying to learn TypeScript as well, but I kept it pretty short here. I&apos;ve defined a type for &lt;code&gt;Cat&lt;/code&gt; and when I worked with the data, my editor (Visual Studio Code) provided support as I&apos;d expect - it knew the right parts of a cat and correctly flagged an error if I tried to include something that wasn&apos;t defined in the type.&lt;/p&gt;
-        &lt;p&gt;As a reminder, this is all done in the editor - it wouldn&apos;t be a &amp;quot;real&amp;quot; error in production - but the idea here - and the benefit of TypeScript - is that I&apos;d (hopefully!) catch it much earlier.&lt;/p&gt;
-        &lt;p&gt;Outside of that, you can also see where I define &lt;code&gt;cats&lt;/code&gt; as an array of &lt;code&gt;Cat&lt;/code&gt; and specify that the &lt;code&gt;message&lt;/code&gt; argument to &lt;code&gt;meow&lt;/code&gt; is string.&lt;/p&gt;
-        &lt;p&gt;Again - this is pretty minimal TypeScript usage, but I dig it, and I can really see how in some of my larger Alpine demos in the past, the additional safety/checking/etc would have been real helpful I think.&lt;/p&gt;
-        &lt;h2 id=&quot;there-is-no-step-five&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#there-is-no-step-five&quot;&gt;There Is No Step Five&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;If you want the code to try it yourself, you can copy it from here: &lt;a href=&quot;https://github.com/cfjedimaster/typescript-stuff/tree/main/alpine-test-1&quot;&gt;https://github.com/cfjedimaster/typescript-stuff/tree/main/alpine-test-1&lt;/a&gt;. I know this was pretty short, but I&apos;d still love any feedback or advice, so hit up the comments below!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

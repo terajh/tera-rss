@@ -7,6 +7,19 @@
       "frontend"
     ],
     "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
+    "title": "How can search engines crawl dynamic page content when JavaScript is disabled? [closed]",
+    "partialText": "<p>My website uses Vue 3, and I have two types of dynamic pages: blog articles and company profiles.</p>\n<p>Currently, the page content is fetched through API calls in the Vue components after the page loads. As a result, when JavaScript is disabled, the actual content isn't present in the HTML.</p>\n<p>I already use prerendering for fixed public pages, but my company profile URLs number around 70–80k and may grow to millions, so generating static HTML for every URL doesn't seem practical.</p>\n<p>My Express server already fetches blog data for SEO metadata.</p>\n<p>What's the recommended approach to make the actual content of these dynamic pages available in the initial HTML for search engine crawlers, without generating static HTML for every URL? Would server-side rendering or another approach be more suitable?</p>",
+    "date": "2026-10-28T04:45:34.000Z",
+    "url": "https://stackoverflow.com/questions/80013003/how-can-search-engines-crawl-dynamic-page-content-when-javascript-is-disabled"
+  },
+  {
+    "publisherId": "so-tags",
+    "publisherName": "Stack Overflow Tags",
+    "specTitle": "Vue",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
     "title": "How to avoid rendering delays when switching from text to dynamic selects?",
     "partialText": "<p>I'm using Vue 3 with TypeScript and Element Plus to render a dynamic form.</p>\n<p>In view mode, fields are displayed as text. In edit mode, they are replaced with <code>el-select</code> components using <code>v-if / v-else</code>.</p>\n<p>When switching to edit mode, there's a noticeable delay before the selects appear. All data is already loaded, so this is a rendering issue, not an HTTP request issue.</p>\n<p>Simplified example:</p>\n<pre><code>&lt;template&gt;\n  &lt;div v-for=&quot;field in fields&quot; :key=&quot;field.id&quot;&gt;\n    &lt;span v-if=&quot;!isEditing&quot;&gt;\n      {{ field.value }}\n    &lt;/span&gt;\n\n    &lt;el-select v-else v-model=&quot;field.value&quot;&gt;\n      &lt;el-option\n        v-for=&quot;option in field.options&quot;\n        :key=&quot;option.value&quot;\n        :label=&quot;option.label&quot;\n        :value=&quot;option.value&quot;\n      /&gt;\n    &lt;/el-select&gt;\n  &lt;/div&gt;\n&lt;/template&gt;\n</code></pre>\n<p>Using <code>v-show</code> would avoid remounting the selects, but it would also mount every select during the initial page load.</p>\n<p>How can I defer mounting these selects until after the initial render, while keeping them ready for a fast transition to edit mode?</p>",
     "date": "2026-10-27T08:02:43.000Z",
@@ -375,18 +388,5 @@
     "partialText": "<p>Given this Nuxt example code of the app root component using the Nuxt UI calendar component to handle the current selected day</p>\n<pre class=\"lang-js prettyprint-override\"><code>&lt;script setup lang=&quot;ts&quot;&gt;\nimport { today, getLocalTimeZone } from '@internationalized/date';\n\nconst foo = 'some-id'; // this is a page parameter but for the sake of simplicity...\n\nconst currentSelectedDate = shallowRef(today(getLocalTimeZone()));\n\nconst currentSelectedISODate = computed(() =&gt; {\n  return currentSelectedDate.value.toString();\n});\n&lt;/script&gt;\n\n&lt;template&gt;\n  &lt;UApp&gt;\n    &lt;UCalendar v-model:model-value=&quot;currentSelectedDate&quot; /&gt;\n    &lt;Child :foo=&quot;foo&quot; :bar=&quot;currentSelectedISODate&quot; /&gt;\n  &lt;/UApp&gt;\n&lt;/template&gt;\n</code></pre>\n<p>Now I got a child component expecting the values as props</p>\n<pre class=\"lang-js prettyprint-override\"><code>&lt;script setup lang=&quot;ts&quot;&gt;\nconst { foo, bar } = defineProps&lt;{\n  foo: string;\n  bar: string;\n}&gt;();\n\n// does not refetch on bar ( isoDate ) change\nconst { data, pending, error } = await useFetch(`/api/${foo}/${bar}`);\n&lt;/script&gt;\n\n&lt;template&gt;\n  &lt;UCard&gt;\n    &lt;template #header&gt; Foo: {{ foo }} &lt;/template&gt;\n    &lt;template #footer&gt; Bar: {{ bar }} &lt;/template&gt;\n  &lt;/UCard&gt;\n  &lt;UCard&gt;\n    &lt;template #header&gt; data: {{ data }} &lt;/template&gt;\n    &lt;div&gt;pending: {{ pending }}&lt;/div&gt;\n    &lt;template #footer&gt; error: {{ error }} &lt;/template&gt;\n  &lt;/UCard&gt;\n&lt;/template&gt;\n</code></pre>\n<p>For the sake of simplicity I created an API endpoint at</p>\n<blockquote>\n<p>/api/[foo]/[bar].get.ts</p>\n</blockquote>\n<pre class=\"lang-ts prettyprint-override\"><code>export default defineEventHandler(async (event) =&gt; {\n  return new Date().toISOString();\n});\n</code></pre>\n<p>I can see that the props change but <code>useFetch</code> won't refetch if <code>bar</code> changes. Whenever I select another day I can see that <code>bar</code> changes but <code>data</code> never changes. Further there is no API call so <code>useFetch</code> is not reactive anymore.</p>\n<hr />\n<p><em>I'm currently working on a sandbox</em></p>\n<p><a href=\"https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue\" rel=\"nofollow noreferrer\">https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue</a></p>\n<hr />\n<p>How can I take care of the reactivity?</p>",
     "date": "2026-03-03T15:04:43.000Z",
     "url": "https://stackoverflow.com/questions/79900219/nuxt-usefetch-does-not-refetch-on-url-parameter-change"
-  },
-  {
-    "publisherId": "so-tags",
-    "publisherName": "Stack Overflow Tags",
-    "specTitle": "Vue",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://stackoverflow.com/feeds/tag?tagnames=vue.js&sort=newest",
-    "title": "Fullcalendar Vue slot templates",
-    "partialText": "<p>Fullcalendar docs mention only one slot template, &quot;event-content&quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren't mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: <a href=\"https://fullcalendar.io/docs/resourceAreaColumns\" rel=\"nofollow noreferrer\">https://fullcalendar.io/docs/resourceAreaColumns</a>) from resource timeline feature, but it doesn't work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: <a href=\"https://fullcalendar.io/docs/vue#slot-templates\" rel=\"nofollow noreferrer\">https://fullcalendar.io/docs/vue#slot-templates</a>)</p>\n<p>So while this works:</p>\n<pre><code>&lt;FullCalendar&gt;\n    &lt;template #eventContent&gt;\n        &lt;p&gt;Example&lt;/p&gt;\n    &lt;/template&gt;\n&lt;/FullCalendar&gt;\n</code></pre>\n<p>This doesn't:</p>\n<pre><code>&lt;FullCalendar&gt;\n    &lt;template #cellContent&gt;\n        &lt;p&gt;Example&lt;/p&gt;\n    &lt;/template&gt;\n&lt;/FullCalendar&gt;\n</code></pre>",
-    "date": "2026-03-03T10:14:17.000Z",
-    "url": "https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates"
   }
 ]
