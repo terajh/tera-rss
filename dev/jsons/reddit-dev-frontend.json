@@ -20,6 +20,45 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "Some notes on the vaguely interesting CSS aspects I encountered during the development of pure CSS price history graphs.",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xiu87p/some_notes_on_the_vaguely_interesting_css_aspects/\"> <img src=\"https://preview.redd.it/358a5zj4mgyh1.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=6164a456e2056c1155fad39478dd2c7f3443c66f\" alt=\"Some notes on the vaguely interesting CSS aspects I encountered during the development of pure CSS price history graphs.\" title=\"Some notes on the vaguely interesting CSS aspects I encountered during the development of pure CSS price history graphs.\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p><strong>Context</strong> </p> <p><a href=\"https://gog.com/\">https://gog.com/</a> is an online store selling fully DRM-free PC games. <a href=\"https://gamesieve.com/\">https://gamesieve.com/</a> is my price tracker and alternative front-end for GOG&#39;s catalog. The population of GOG users is quite atypical and privacy-aware. Close to 60% of my visitors use Firefox. A noticeable percentage have JavaScript disabled. A smaller but still noticeable percentage are maintaining dedicated Windows 7 gaming machines (meaning Firefox 115 as their browser - or very rarely Chrome 109). I built a price history graph which works for both groups, and I&#39;m (mostly) quite pleased with how this turned out. </p> <p>Also context: One of my personal goals with GameSieve is just getting back to as much hands-on webdev as possible, fully understanding everything I build, not using libraries and other tooling unless things are otherwise infeasible.</p> <p>Example page: <a href=\"https://gamesieve.com/game/x4_foundations\">https://gamesieve.com/game/x4_foundations</a></p> <p><strong>From SVG to CSS</strong></p> <p>I originally set out to build an SVG graph, but discovered this was clearly the wrong technology for the job. It <em>scales</em>, but it&#39;s not <em>responsive</em>! You can&#39;t easily scale some elements in one direction while leaving others untouched (or scaling them differently), and it all felt incredibly clunky.</p> <p>Prototyping various directions for making parts of it work, I was trying to put into words exactly what felt clunky about it, and I kept coming back to CSS terminology and concepts for what I wanted.</p> <p>That really told me (once I stopped to listen to myself) that I should take a CSS-first approach. Building the logic for the SVG graph had made me think a lot about how to scale a time-range of variable length and a price-range with a variable maximum and put it into my own scale which would be easy to work and reason with, and that proved very beneficial here. I could very swiftly port it all to HTML+CSS.</p> <p>One of the slightly clever things I did in my SVG attempt was to flip the coordinate system of the grid around with a <code>transform: scale(1, -1)</code> (and then back again for the text labels), plus to use a negative offset on the viewBox for the space for the axes and their labels. The y coordinate was then just the price in cents. This approach translated well to CSS, where a price segment of 1999 cents had a <code>--price: 1999; bottom: calc(var(--price) * var(--scaling-factor))</code>, and that scaling factor was dependent on max price. </p> <p>Sadly when the time came to to figure out responsive behavior anew, I determined that on small resolutions I really wanted to make the entire chart scroll rather than scale (allowing individual time ranges as short as a day to remain &#39;easily&#39; clickable). Yet for products which released &#39;recently&#39; (up to 3 years ago depending on screen resolution), there would be no scrollbar. But the existence of the scrollbar influenced bottom positioning, causing an offset from the y-axis grid, which I&#39;d specifically placed outside the overflowing container! So I had to flip all my numbers back around and do top positioning...</p> <p><strong>Accessibility quandary</strong></p> <p>Getting out of SVG-land allowed me to think semantically about the content of my price history graph. At heart, it&#39;s really just a list of time ranges with associated pricing information. (You could also model this as a table, but experience has taught me not to go there.) So, my HTML for the entire graph is a list. (Erm, I realized I made it an &lt;ul&gt;, while it&#39;s certainly ordered... Consider that a TODO for next week!) :)</p> <p>Since individual games can have a hefty amount of time ranges (NecroVisioN: Lost Company currently leads with 222 distinct price ranges over the last 5.5 years), I save some bytes by using effectively meaningless i and u elements (rather than spans) for defining the shape of the time range and the sibling tooltip. Re-examining what I&#39;m doing here in the course of writing this, I realized I need to revisit this: The current chart behaviour suggests adding aria-describedby on the time range pointing to the tooltip with role=&quot;tooltip&quot; (and I guess aria-hidden to prevent it being read twice). And that up to 222 times... so much for saving bytes! :/</p> <p>The thing is, when originally thinking about the semantics of my price history chart, I approached this graph content as really just a non-interactive list (which is explicitly available as a rendering option through a simple <code>:checked ~</code> radiobutton toggle). There, things are currently correct: that tooltip role (and aria-hidden!) would be inappropriate for the list. Not certain how to resolve that, since CSS can&#39;t change these things. I mean, it can remove things from the accessibility tree with display: none, but I want the tooltip content to be present as just the content of the list item, as now. Adding duplicate content in my HTML - once with role=&quot;tooltip&quot; and once without - and then display: none-ing them based on the toggle really does not feel like something I&#39;d want to do... Might have to just toggle the role with JavaScript, and accept that the non-JS functionality is bad from an accessibility point of view? That feels weak, though, when everything else works perfectly without JS... Any a11y experts with guidance?</p> <p>Taking a step back, I feel that the list view is the accessible alternative content for my visual/interactive graph view. But I don&#39;t think there&#39;s any way to properly indicate that for the users who need to know this? I guess I could just add an aria-describedby (or maybe even label) spelling this out on the radiobutton toggle, and for the moment, that feels like what I&#39;ll probably do first.</p> <p><strong>A rare case where pointer-events weren&#39;t the solution!</strong></p> <p>...anyway! Keyboard accessibility for the graph means there&#39;s a skip link and each price range is focusable, showing the associated tooltip. And of course for convenience the tooltip should also show on :hover. But that meant two tooltips could be showing, which&#39;d overlap. So I started moving the :focus one out of the way when the :hover one is showing. </p> <p>Originally I moved it down, but that could cause rapid back-and-forth if the mouse pointer triggering the :hover tooltip started hitting the :focus tooltip when it moved down, causing the :hover tooltip to disappear and the :focus tooltip to move up, causing a new :hover tooltip, etc. </p> <p>So I moved the :focus tooltip up, out of the :hover range. Alas, my container scrolls (overflow-x: auto), meaning no overflow-y: visible, so I needed to add a negative margin and padding to the container to create space for the tooltip moving up to keep showing, and then had to juggle z-index on hover to make certain tooltips would show above previous content, while the reserved space for them wouldn&#39;t catch clicks. (Key annoyance: Couldn&#39;t do this with pointer-events, as then the scrollbar wouldn&#39;t be clickable! I also suspect this would&#39;ve been <em>way</em> easier if I could&#39;ve just used <a href=\"https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overflow-clip-margin\">overflow-clip-margin</a> (usefully supported in Fx 102+, but in nothing else) to create space for the tooltips. Why isn&#39;t that one listed as a top contender in any of the interop lists?)</p> <p><strong>Other notes</strong></p> <p>In the end, I did end up using a tiny bit of JavaScript for the graph: initially for showing the &quot;now&quot; side of the graph on load when it was scrollable, and then for adding zooming (just setting a single multiplier custom property on the root element for CSS to use). Finally, since I had JS-zoom anyway, I also added detection if the graph was overflowing just a tiny bit, and if so, would zoom out one step (max 20%) to stop that.</p> <p>Some other mildly interesting things worth looking at in the inspector:</p> <ul> <li><p>There&#39;s a .scroll-bumper element to push subsequent content down <em>only</em> when a scrollbar is showing (which has a few edgecase quirks where it doesn&#39;t perform perfectly, but for the most common cases does what it should) - just using float magic.</p></li> <li><p>When switching countries to anything non-US, I only have ~23 months worth of price history, and show a scaled graph of the US price history before that, using dotted borders. However, when a price goes up and down on the same day (or one or two days later for long enough time ranges), Firefox&#39;s rendering of overlapping dotted borders would cause a solid line to form, which looks very distracting! (Chrome always puts the dots in the same place, regardless of where the line starts or ends, which works much better.) So I&#39;m detecting that case server-side, and either hiding the shorter of the two borders, or drawing one of the two with a 1px instead of 2px border.</p></li> <li><p>X-axis labels hide based on a whole bunch of container queries, so that they never overlap. <em>Really</em> wish I could&#39;ve used CSS vars in those query definitions, but Fx 115 made that a no-go (and I&#39;m not even certain I actually could&#39;ve simplified that much with custom properties).</p></li> </ul> <p>Speaking of Fx 115, I was pleasantly surprised by how few cases I encountered where I was actively hampered by limited support. Lack of :has() always feels like the big one (but here only would&#39;ve made my z-index juggling a bit cleaner), and lack of the rch unit was mildly annoying. Creating the tooltips through the popovertarget/popover attributes would&#39;ve been neat (though I don&#39;t know if that would&#39;ve actually improved things from an accessibility perspective).</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Undeclared_Aubergine\"> /u/Undeclared_Aubergine </a> <br/> <span><a href=\"https://i.redd.it/358a5zj4mgyh1.png\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xiu87p/some_notes_on_the_vaguely_interesting_css_aspects/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-10-29T19:51:12.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1xiu87p/some_notes_on_the_vaguely_interesting_css_aspects/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "CSS Tint Filter",
+    "partialText": "<!-- SC_OFF --><div class=\"md\"><p>There is no standard CSS filter to tint with some specific color, so I created a library to generate a chain of filters that takes that target color and replicates the multiplication operator with it.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/objectorientedman\"> /u/objectorientedman </a> <br/> <span><a href=\"https://k-adam.github.io/css-tint-filter/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xhzr1w/css_tint_filter/\">[comments]</a></span>",
+    "date": "2026-10-28T20:35:10.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1xhzr1w/css_tint_filter/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "HTML/CSS AHK V1 WRAPPING POSSIBLE?",
+    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Crafty_Wind_7635\"> /u/Crafty_Wind_7635 </a> <br/> <span><a href=\"/r/AutoHotkey/comments/1xi9p71/htmlcss_ahk_v1_wrapping_possible/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xi9pef/htmlcss_ahk_v1_wrapping_possible/\">[comments]</a></span>",
+    "date": "2026-10-29T03:52:21.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1xi9pef/htmlcss_ahk_v1_wrapping_possible/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
     "title": "Fixed Position to Absolute position?",
     "partialText": "<!-- SC_OFF --><div class=\"md\"><p>I am making a site but i got a problem<br/> I made the classes all fixed<br/> But when i wanted to make the site scrollable to the bottom it didn&#39;t work because i make it fixed<br/> So i swapped all the fixed to absolute<br/> But then the positions where not good</p> <p>Can someone help me?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Holiday-Being9972\"> /u/Holiday-Being9972 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1xhrjww/fixed_position_to_absolute_position/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xhrjww/fixed_position_to_absolute_position/\">[comments]</a></span>",
     "date": "2026-10-28T15:41:00.000Z",
@@ -72,6 +111,19 @@
       "frontend"
     ],
     "specUrl": "https://www.reddit.com/r/css.rss",
+    "title": "CVentered poetry verses for an ebook?",
+    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\"> <img src=\"https://preview.redd.it/x7y0jm83y2yh1.png?width=140&amp;height=140&amp;crop=1:1,smart&amp;auto=webp&amp;s=37de8956c4722d68d4961bf29d45b013b3ed2ab6\" alt=\"CVentered poetry verses for an ebook?\" title=\"CVentered poetry verses for an ebook?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Any idea how I can create this spacing and centering using CSS (and no, I will not be using this kiddie font)?</p> <p>Between &quot;Katmandu&quot; and &quot;A magic name&quot; is a regular paragraph space, and &lt;br&gt; creates tighter line spacing, but centering becomes the problem.</p> <p><a href=\"https://preview.redd.it/x7y0jm83y2yh1.png?width=289&amp;format=png&amp;auto=webp&amp;s=1bec0a7d53cf493e5059d4c7165cc9455c8548f4\">https://preview.redd.it/x7y0jm83y2yh1.png?width=289&amp;format=png&amp;auto=webp&amp;s=1bec0a7d53cf493e5059d4c7165cc9455c8548f4</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/IntelligentBill8622\"> /u/IntelligentBill8622 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\">[comments]</a></span> </td></tr></table>",
+    "date": "2026-10-27T21:51:46.000Z",
+    "url": "https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/"
+  },
+  {
+    "publisherId": "reddit-dev",
+    "publisherName": "Reddit Dev",
+    "specTitle": "/r/css",
+    "categories": [
+      "frontend"
+    ],
+    "specUrl": "https://www.reddit.com/r/css.rss",
     "title": "Warping html with two svg filter primitives, no webgl. anyone using this in production?",
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xgxjsj/warping_html_with_two_svg_filter_primitives_no/\"> <img src=\"https://external-preview.redd.it/plNxRBG-JuusHh-Ks_h1ITkIf-bkafViC-ItGKUDiEQ.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=81d9a58876c1f6cebcc718779573d66408a5949a\" alt=\"Warping html with two svg filter primitives, no webgl. anyone using this in production?\" title=\"Warping html with two svg filter primitives, no webgl. anyone using this in production?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>feTurbulence makes the noise and feDisplacementMap uses it to push pixels around. chain them and you get heat haze, ripples, brush strokes, and goo on regular html elements with no javascript. </p> <p>I&#39;ve only used it on a couple of sites. Anyone ship this to real users?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/daring-designs\"> /u/daring-designs </a> <br/> <span><a href=\"https://daring-designs.com/blog/warping-elements-with-feturbulence-and-fedisplacementmap\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xgxjsj/warping_html_with_two_svg_filter_primitives_no/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-10-27T16:39:40.000Z",
@@ -102,19 +154,6 @@
     "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xgsweq/modapproved_free_manning_ebook_sampler_modular/\"> <img src=\"https://preview.redd.it/tqzeanx9k0yh1.png?width=140&amp;height=104&amp;auto=webp&amp;s=8bd1c01a9f5177dfeee53fa895d69e27e220930e\" alt=\"[Mod-approved] Free Manning ebook sampler: modular CSS, native scope, and more\" title=\"[Mod-approved] Free Manning ebook sampler: modular CSS, native scope, and more\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Hey <a href=\"/r/CSS\">r/CSS</a>!</p> <p>Stjepan from Manning here. The mods permitted us to share this here, so thanks to them for letting me post.</p> <p>We’ve put together a free <em>Modern Web Development</em> sampler, and I think the most useful part here is the chapter from CSS in Depth, Second Edition. It covers keeping growing stylesheets manageable with reusable modules, naming conventions, and native CSS scope.</p> <p>If you’ve ever made a small style change and then had to check what else it accidentally affected, that’s the kind of problem this material gets into.</p> <p>It’s a four-chapter sampler, not four full books. Alongside the CSS material, there are chapters on built-in browser capabilities, how asynchronous JavaScript works, and building web components with Lit.</p> <p>You can find it here:<br/> <a href=\"https://hubs.la/Q04CshfG0\">https://blog.manning.com/free-ebook-modern-web-development-sampler</a></p> <p>Hope the CSS chapter is useful. I’d also be interested to hear how you’re organizing styles these days, especially what’s held up as your projects have grown.</p> <p>Thank you.</p> <p>Cheers,</p> <p>Stjepan</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/ManningBooks\"> /u/ManningBooks </a> <br/> <span><a href=\"https://www.reddit.com/gallery/1xgsweq\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xgsweq/modapproved_free_manning_ebook_sampler_modular/\">[comments]</a></span> </td></tr></table>",
     "date": "2026-10-27T13:43:10.000Z",
     "url": "https://www.reddit.com/r/css/comments/1xgsweq/modapproved_free_manning_ebook_sampler_modular/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "CVentered poetry verses for an ebook?",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\"> <img src=\"https://preview.redd.it/x7y0jm83y2yh1.png?width=140&amp;height=140&amp;crop=1:1,smart&amp;auto=webp&amp;s=37de8956c4722d68d4961bf29d45b013b3ed2ab6\" alt=\"CVentered poetry verses for an ebook?\" title=\"CVentered poetry verses for an ebook?\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Any idea how I can create this spacing and centering using CSS (and no, I will not be using this kiddie font)?</p> <p>Between &quot;Katmandu&quot; and &quot;A magic name&quot; is a regular paragraph space, and &lt;br&gt; creates tighter line spacing, but centering becomes the problem.</p> <p><a href=\"https://preview.redd.it/x7y0jm83y2yh1.png?width=289&amp;format=png&amp;auto=webp&amp;s=1bec0a7d53cf493e5059d4c7165cc9455c8548f4\">https://preview.redd.it/x7y0jm83y2yh1.png?width=289&amp;format=png&amp;auto=webp&amp;s=1bec0a7d53cf493e5059d4c7165cc9455c8548f4</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/IntelligentBill8622\"> /u/IntelligentBill8622 </a> <br/> <span><a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-10-27T21:51:46.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1xh5z9k/cventered_poetry_verses_for_an_ebook/"
   },
   {
     "publisherId": "reddit-dev",
@@ -284,44 +323,5 @@
     "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/mrholek\"> /u/mrholek </a> <br/> <span><a href=\"/r/webdev/comments/1xdb819/bootstrap_5_users_do_you_actually_want_the_new/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xdb8e7/bootstrap_5_users_do_you_actually_want_the_new/\">[comments]</a></span>",
     "date": "2026-10-23T11:17:55.000Z",
     "url": "https://www.reddit.com/r/css/comments/1xdb8e7/bootstrap_5_users_do_you_actually_want_the_new/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "shadcn-looking components with zero React, plus an MCP so your AI writes them right",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xdcwpd/shadcnlooking_components_with_zero_react_plus_an/\"> <img src=\"https://external-preview.redd.it/doF3n90x7wST6Yb4_ipC4bhOlbQAvwQAmbXNMqlxEGQ.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=b0a38f40883b1f16bffa4ebbdb57d3b84924d457\" alt=\"shadcn-looking components with zero React, plus an MCP so your AI writes them right\" title=\"shadcn-looking components with zero React, plus an MCP so your AI writes them right\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Fragrant-Phase-1072\"> /u/Fragrant-Phase-1072 </a> <br/> <span><a href=\"/r/htmx/comments/1xdctd7/shadcnlooking_components_with_zero_react_plus_an/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xdcwpd/shadcnlooking_components_with_zero_react_plus_an/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-10-23T12:39:54.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1xdcwpd/shadcnlooking_components_with_zero_react_plus_an/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "CSS Single Element Clock with shape()",
-    "partialText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/css/comments/1xbti2l/css_single_element_clock_with_shape/\"> <img src=\"https://external-preview.redd.it/NHY1YmFlOW11dXdoMW2kGJptllriOP9sZ5EtyZu_EHacoV2W7yCwb_PMJl-G.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=0b72c92752e1205c1bc03098a4ae189ae8948939\" alt=\"CSS Single Element Clock with shape()\" title=\"CSS Single Element Clock with shape()\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Made a single element CSS clock powered by shape() and a custom property animation.</p> <p>JS just set the initial time in seconds, which as far as I can&#39;t be done any other way.</p> <p><a href=\"https://codepen.io/editor/matthewmorete/pen/01a15944-6751-7d6a-8004-a3fabb0de22d?tab=%2Fstyle.css&amp;orientation=left&amp;panel=files&amp;show=split\">https://codepen.io/editor/matthewmorete/pen/01a15944-6751-7d6a-8004-a3fabb0de22d?tab=%2Fstyle.css&amp;orientation=left&amp;panel=files&amp;show=split</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/morete\"> /u/morete </a> <br/> <span><a href=\"https://v.redd.it/l4mzb59muuwh1\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xbti2l/css_single_element_clock_with_shape/\">[comments]</a></span> </td></tr></table>",
-    "date": "2026-10-21T17:26:34.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1xbti2l/css_single_element_clock_with_shape/"
-  },
-  {
-    "publisherId": "reddit-dev",
-    "publisherName": "Reddit Dev",
-    "specTitle": "/r/css",
-    "categories": [
-      "frontend"
-    ],
-    "specUrl": "https://www.reddit.com/r/css.rss",
-    "title": "Should we still be using Tailwind in the era of AI?",
-    "partialText": "&#32; submitted by &#32; <a href=\"https://www.reddit.com/user/mindful-journeys\"> /u/mindful-journeys </a> <br/> <span><a href=\"/r/webdevelopment/comments/1xcofdd/should_we_still_be_using_tailwind_in_the_era_of_ai/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/css/comments/1xcofo6/should_we_still_be_using_tailwind_in_the_era_of_ai/\">[comments]</a></span>",
-    "date": "2026-10-22T17:08:38.000Z",
-    "url": "https://www.reddit.com/r/css/comments/1xcofo6/should_we_still_be_using_tailwind_in_the_era_of_ai/"
   }
 ]

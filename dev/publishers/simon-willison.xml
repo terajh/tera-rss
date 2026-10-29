@@ -4,7 +4,68 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Wed, 28 Oct 2026 20:47:24 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 29 Oct 2026 20:43:56 GMT</lastBuildDate>
+    <item>
+      <title>Building a multiplayer game world with autonomous Fable-class models</title>
+      <link>https://simonwillison.net/2026/Oct/29/how-i-built-the-most-ai-pilled-company-in-the-world/</link>
+      <guid>https://simonwillison.net/2026/Oct/29/how-i-built-the-most-ai-pilled-company-in-the-world/</guid>
+      <pubDate>Thu, 29 Oct 2026 17:00:26 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://twitter.com/jsnnsa/status/2115623382721126826&quot;&gt;How I Built the Most AI-Pilled Company in the World&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Don&apos;t be put off by the clickbait headline, this piece by Jacob Sansbury describing how they are building &lt;a href=&quot;https://spawn.co&quot;&gt;Spawn&lt;/a&gt; is a fascinating exploration of the bleeding edge of what&apos;s possible with agentic engineering against frontier models.&lt;/p&gt;
+        &lt;p&gt;Spawn is a massively multiplayer gaming environment where players can use prompts (to the in-game agent, Savi) to modify the game world.&lt;/p&gt;
+        &lt;p&gt;I fired it up on my phone for a few minutes and was able to prompt a castle into existence, then a dragon, then ride the dragon to fly around that castle.&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Two mobile screenshots side by side from a 3D voxel-style game. Left: a first-person view from the saddle of a small teal dragon, its neck with pale diamond markings and two curved white horns in the foreground, flying toward a dark stone castle with tall teal-gray conical spires, glowing windows and teal pennants, on a rocky island in a lake with green and snowy hills behind. Top bar: profile icon, &amp;quot;keep it&amp;quot;, &amp;quot;your den&amp;quot; dropdown, &amp;quot;+ new game&amp;quot; button and a &amp;quot;...&amp;quot; menu. Right side: icon buttons and a portrait of a white-haired, freckled character labeled &amp;quot;tap to talk&amp;quot;. Bottom right buttons: &amp;quot;JUMP&amp;quot; and &amp;quot;USE&amp;quot;. Right: the same game with the chat panel open over the castle scene. Top bar: &amp;quot;your den&amp;quot; dropdown, &amp;quot;+ new game&amp;quot;. Button: &amp;quot;earlier ↑&amp;quot;. User message: &amp;quot;Make the dragon smaller and land it next to me again&amp;quot;. Replies from the white-haired character: &amp;quot;on it. shrinking it to a pony-sized dragon and landing it right beside you.&amp;quot; Then: &amp;quot;it&apos;s a little dragon now and you&apos;re already up on it over the lake. your view sits right in its saddle, horns ahead. fly back to the house and look down. saw your screen just now: flying over the water, the neck and horns ahead, the house on the far shore&amp;quot; Then: &amp;quot;oh, idea: USE while flying could breathe fire instead, with JUMP held to land. want it?&amp;quot; Input box: &amp;quot;what do you want to bring in?&amp;quot; Buttons below: upload, a small pixel-art icon, &amp;quot;lock in&amp;quot; and a microphone.&quot; src=&quot;https://static.simonwillison.net/static/2026-10-29/IMG_9406.webp&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;By Jacob&apos;s telling, Spawn is now being developed autonomously by a swarm of Fable-powered agents costing over $3 million in tokens &lt;em&gt;per month&lt;/em&gt; (&quot;we spend 30x payroll on AI tokens&quot;).&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Our agents change the live code directly and ship to production hourly, so they read every error, bug report and metric themselves. About 60% of our work starts from a production error, a Savi bug report (Savi is the AI you build games with in Spawn), something odd in our logs, or a feature request.&lt;/p&gt;
+        &lt;p&gt;Savi files bugs herself. When a user hits one, or Savi hits one in the product, she files it. It goes straight to an agent that decides whether it&apos;s a real bug to fix, something we won&apos;t fix, or intentional design that needs a decision. Usually it becomes a change, delivered to that user within an hour, with a message in the same chat.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This is &lt;a href=&quot;https://en.wikipedia.org/wiki/Continuous_deployment&quot;&gt;continuous deployment&lt;/a&gt; turned up to 11:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;A loop this tight only works if it never stops, so we treat an hour without a ship as a SEV-0, our most severe kind of incident. Unshipped changes pile up, and every problem already in production lasts longer. The feedback slows down too. An agent can only keep a few hours of work in its head, so shipping faster than that actually helps it stay coherent. [...]&lt;/p&gt;
+        &lt;p&gt;We can roll back a broken change in 30 seconds, exactly where it&apos;s broken and nowhere else. When a monitor or a log alert fires, it starts or wakes an agent that owns the incident, and we break things on purpose to test that those recovery paths work.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;My eyebrows raised at least a dozen times reading this. I have trouble imagining this style of development working on software with higher stakes for when something goes wrong, but for a game this appears to be working surprisingly well.&lt;/p&gt;
+        &lt;p&gt;Jacob says that Fable 5 (and then 5.1) was the model that made this level of autonomy possible. Opus 5.5 doesn&apos;t quite hack it for them, and when they tried GPT-6 Astra to apply fixes from a security review everything stopped working:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Every feature had been disabled and marked to be turned on again once the security fixes were done. Astra had gone through our whole product and made the insecure things secure by turning them off.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;These kinds of extreme experiments are why I&apos;m &lt;a href=&quot;https://simonwillison.net/2026/Oct/28/vibe-game-development/&quot;&gt;excited about game development&lt;/a&gt; as a substrate for exploring the edges of what today&apos;s coding agents can do.
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-mythos-fable&quot;&gt;claude-mythos-fable&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting Ben Hylak</title>
+      <link>https://simonwillison.net/2026/Oct/29/ben-hylak/</link>
+      <guid>https://simonwillison.net/2026/Oct/29/ben-hylak/</guid>
+      <pubDate>Thu, 29 Oct 2026 14:06:27 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://twitter.com/benhylak/status/2115172657910120740&quot;&gt;&lt;p&gt;every product i use should just be a headless mcp, that feeds into an agent, where i never have to think about anything underneath.&lt;/p&gt;
+        &lt;p&gt;except for our product, of course. &lt;/p&gt;
+        &lt;p&gt;in our product, customers love the ui and love us very much.&lt;/p&gt;
+        &lt;p&gt;we&apos;re special that way.&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/benhylak/status/2115172657910120740&quot;&gt;Ben Hylak&lt;/a&gt;&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/model-context-protocol&quot;&gt;model-context-protocol&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Quoting Ted Sanders</title>
+      <link>https://simonwillison.net/2026/Oct/28/ted-sanders/</link>
+      <guid>https://simonwillison.net/2026/Oct/28/ted-sanders/</guid>
+      <pubDate>Wed, 28 Oct 2026 23:23:21 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://news.ycombinator.com/item?id=50248124#50249160&quot;&gt;&lt;p&gt;In general, LLM performance is incredibly multidimensional. There&apos;s no guarantee of a fixed ordering where the model that is best at math is also the model that&apos;s best at jokes. Despite that complexity, much of the variation in performance is explained by just a single variable: model size. In general, models that are bigger will (a) be more performant / reliable, (b) cost more per token, and (c) have better recall of esoteric facts. As you note, our models are ordered:&lt;/p&gt;
+        &lt;p&gt;Luna &amp;lt; Terra &amp;lt; Sol &amp;lt; Astra&lt;/p&gt;
+        &lt;p&gt;[&lt;a href=&quot;https://news.ycombinator.com/item?id=50248124#50250804&quot;&gt;...&lt;/a&gt;] These days, version number signifies a few things at once: the order of release, the relationship to other releases, and the magnitude of improvement. So something like 6.1 would indicate it was launched after 5.6, may share some similarities to other 6.1 models in terms of training data / personality (which is why it&apos;s not 5.7), and isn&apos;t a giant enough leap to merit the headlines and expectations that would come with a 7.&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://news.ycombinator.com/item?id=50248124#50249160&quot;&gt;Ted Sanders&lt;/a&gt;, explaining OpenAI&apos;s model naming conventions&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt&quot;&gt;gpt&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ted-sanders&quot;&gt;ted-sanders&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>GitHub Octoverse 2026</title>
       <link>https://simonwillison.net/2026/Oct/28/github-octoverse-2026/</link>
@@ -120,6 +181,7 @@
         &lt;p&gt;This isn&apos;t my best game yet - it&apos;s not as fun to play as Battle Drones - but it represents the kind of game I want more of: weird, fun, uniquely personal - something that wouldn&apos;t have been built in the before-times.&lt;/p&gt;
         &lt;h4 id=&quot;four-times-as-insulting&quot;&gt;Four times as insulting&lt;/h4&gt;
         &lt;p&gt;If you are offended by AI-generated art, AI-generated music, AI-generated writing, and AI-generated code, I have bad news for you: vibe coded games combine &lt;strong&gt;all of those at once&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt; I respect those opinions, even though I don’t strongly hold them myself.&lt;/p&gt;
         &lt;p&gt;The wider games community already has an aversion to AI-generated assets in games. This has been a growing issue over the past few years as tools like Midjourney have enabled developers to generate assets for their projects. &lt;a href=&quot;https://www.ign.com/articles/steam-fans-are-begging-for-a-no-ai-filter-as-steam-next-fest-is-filled-with-slop&quot;&gt;This IGN story&lt;/a&gt; covering complaints about slop in Valve&apos;s Steam Next Fest is a good recent example.&lt;/p&gt;
         &lt;p&gt;We now have games where &lt;em&gt;everything&lt;/em&gt; - code, assets, dialog, and even the game design itself - can be outsourced to the models. And the results don&apos;t suck!&lt;/p&gt;
         &lt;p&gt;Building a computer game used to be one of the most challenging projects in all of software development, combining a diverse range of skills and requiring intense focus and effort over many months or even years. And now here I am spitting out a playable multiplayer RTS by prompting on my phone!&lt;/p&gt;
@@ -205,7 +267,7 @@
         &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=50248124&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
         
         
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt&quot;&gt;gpt&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-pricing&quot;&gt;llm-pricing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm-release&quot;&gt;llm-release&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/gpt&quot;&gt;gpt&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ted-sanders&quot;&gt;ted-sanders&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
     <item>
@@ -917,75 +979,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>LaTeX renderer</title>
-      <link>https://simonwillison.net/2026/Oct/15/latex/</link>
-      <guid>https://simonwillison.net/2026/Oct/15/latex/</guid>
-      <pubDate>Thu, 15 Oct 2026 02:07:28 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/latex&quot;&gt;LaTeX renderer&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Inspired by Paul Ford and Aboard Foundary&apos;s new web app &lt;a href=&quot;https://tinylittleoffice.com/&quot;&gt;Tiny Little Office&lt;/a&gt;, which provides a suite of web app content editors (a Word Processor, Outliner, Presentation Builder, Spreadsheet, Calculator, Drawing Tool, Diagram Maker, Animator, Calendar, and Trip Planner).&lt;/p&gt;
-        &lt;p&gt;Tiny Little Office&apos;s signature trick is to store all of the document data in the &lt;code&gt;#fragment&lt;/code&gt; section of the URL, so every document created using it becomes a bookmarkable and shareable link.&lt;/p&gt;
-        &lt;p&gt;It also has &lt;a href=&quot;https://tinylittleoffice.com/llms.txt&quot;&gt;an llms.txt file&lt;/a&gt; telling agents how to construct URLs that will render as documents. Claude &lt;a href=&quot;https://claude.ai/share/239301ff-edde-420e-b433-b9c16fe40a6c&quot;&gt;used that file&lt;/a&gt; to generate &lt;a href=&quot;https://tinylittleoffice.com/#/v1/deck/zXVVdb9tGEHznr1hED2kBSbZcO4UFtIHTuCgQtylstwH6Uq7Io3gRdcfeHS1T_fjtnV1Ssp038r52d2Z2djabZcmmxizpJ78jpnvrerqxCUv0sapsYaixbkM7HzYxS7XZ4ujWls6u65SlwC7aZL1bUmxsabIZHpxMaCmXlnRfG9rVHm~Vvui2xiWykfDK8Ojfc439b5bN6BdP0YQHE6bkPJWceMXR6A8Xhe9cwqFr7Peptm5NXCUT9Kl8klNM3EeyjnrfBVoFv8Nj2TGbaDgU9ZKuHCe_7clXKFVSkMh5Qs2Nluy14nnhtyeTk4fFSWmKzUn_7e~f5_N5LkcfFvlSg1Y~bDkR8omoXrbkLDZ3tS1q4rYl3xqHnCTvvB~vbX2J2k1C7rI8vjzsHSCaEuK3wcRoSmJXknEFrpVZ9r0CWgVeK5QDBBOB1BlkAgCxmry~dgAz~hePj0i1wT5wMnIY_Ohl0FQ~cTN_Aq~yIo~7ZFpaoL5gcc8iOg6bx5QdaHlB8f3Nxykg_pnDpvQ7Rw8cLCuFdyKTSLEF4uQd5QiTS0gTsftDzSHFKZWBd2A5av3sLLAGzPgNqB94AJlV44uN3LmvEVDQl8C88l2iBX14JyS3DUMTY5pjOS0XG14fKjqDcP_qjNlLTVLLLe_o_fWPN1f319MBSN4a4mbtUXi9lbL3ttW81vgQFvcgcIg0XjwwPv7SDjeBhnBqEpW2kGI49HIu4Bw0fqAcGwRdcdMc6O6fXdAKAcBurA9dWSrYR_AjddGIuH1ayqNbvHft1o2N9RTqc5IIUi~5J4fCAHVEXC5jbZBa1TkNheUjdbF3iR_ndGtaw3i_9RYcr1jwdtAPaLQuJrwhGa2MNGdsTdOAI3DxTEii4hH2b2AivFEd_XZ7M4tcGQH_XZ~gjZVB4oak_9~cd6FZ0htaWQkNmRZQCBdj_1zN_iCe7el0dpkLWZDTf7kWmP~p_Yq_YMBNYQZpd7HjBprLp8OpmViHbRpSDKiCDNWLBo9xxpQatQCyM21DLD8rSNQ6uBwKtgU71eGUVj1Fu0dJeZ4rsnplPL7ioL93CTKkf4aiMyFRhIqFi_PLs~y9qRp0aDmIp8fy4vzsIrsR32y5bzzwxtrl6UKCiFgu5hejLNSKozTg2EdjGz11EioV2kYXpM6VgPZsenp6~gSwaKP2IcF_fLeuxfKgoJjkRBKHi8~43Zh~SZ_qXgyYAMTrpJAKwQDD9ErvJ5Qi7amGdBT1lGpuKl1cKf~DwhDDDTxoj3N6HeFVvfSR9pp1ChBVbJs4oPSqtLA3uAN8zWMjqExfaZshma~~zqVmbWqYGN7j1s4_q3l4MSXG7BunwnFwpCQ~tKTrRwy7KI4l940rdXS8BUK7fLR6HlxI29ylIfH8bZkfJ4HYrSRyGBfztk2PJzIBSFpNOI2jtaLLYbs4~KsWK~MGpgAz10G8pHyYTRP0_Xc5EOm~0CmE89L2ihrnoVUxkfRi8sJzHYTonVE_Ua0cR3Shm1H9CXPLNP2XjovGNI3M0_1smG4C4P8&quot;&gt;this link to a deck&lt;/a&gt; that explains how the URL format works:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;Screenshot of a slide deck editor in a web app with a dark-themed presentation open. The document title field reads &amp;quot;How a Tiny Little Office link works&amp;quot;, with a progress ring, share icon and menu icon at top right. Below is a formatting toolbar with an &amp;quot;Insert&amp;quot; dropdown followed by icon buttons for play, bold, italic, underline, strikethrough, highlight, code, link, superscript, emoji, outdent, indent, layout and color palette. The main canvas shows slide 1 with a blue chain-link icon and the text: &amp;quot;The whole document is the link&amp;quot; &amp;quot;No server, no database, no account&amp;quot; &amp;quot;Everything after the # stays in your browser&amp;quot; and a slide counter &amp;quot;1 / 9&amp;quot;. Below the canvas is a &amp;quot;SPEAKER NOTES&amp;quot; heading. A sidebar on the right shows slide thumbnails. Slide 1 (selected): &amp;quot;The whole document is the link&amp;quot; &amp;quot;No server, no database, no account&amp;quot; &amp;quot;Everything after the # stays in your browser&amp;quot;. Slide 2: &amp;quot;Anatomy of a link&amp;quot; with bullets &amp;quot;tinylittleoffice.com/#/v1/deck/y7Vj...&amp;quot; &amp;quot;v1: the format version&amp;quot; &amp;quot;deck: which app opens it&amp;quot; &amp;quot;y: the mode letter&amp;quot; &amp;quot;7Vj...: the document, compressed and encoded&amp;quot;. Slide 3: &amp;quot;Step 1: write it as text&amp;quot; with bullets &amp;quot;Every document is TLO, a Markdown variant&amp;quot; &amp;quot;Slides split on --- lines&amp;quot; &amp;quot;Charts, drawings and animations are fenced blocks&amp;quot; &amp;quot;This deck is about 1 KB of plain text&amp;quot;. Slide 4: &amp;quot;Step 2: squeeze it&amp;quot; with bullets &amp;quot;Raw DEFLATE, the same algorithm as zip and gzip&amp;quot; &amp;quot;z: plain DEFLATE&amp;quot; &amp;quot;y: DEFLATE with a preset dictionary&amp;quot; &amp;quot;r: no compression at all&amp;quot;.&quot; src=&quot;https://static.simonwillison.net/static/2026/tiny-little-office.webp&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Tiny Little Office inspired me &lt;a href=&quot;https://claude.ai/code/session_017KJrPqqWVHLqr4E7TLPnpt&quot;&gt;to have Claude Code&lt;/a&gt; (Opus 5.5 Extra) build a similar tool that works with LaTeX. Here&apos;s the sequence of prompts I used:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;I want a tool where you can link to it with a fragment hash #code-here and it treats that code as LaTeX and renders it really effectively. It should also support a prefix which means the latex is compressed with a custom compression dictionary optimized for latex. Use the best available latex render library from a CDN (consider WebAssembly too). If loaded without a fragment hash show an editor you can paste latex into and then toggle to a &quot;rendered&quot; view. That rendered view should be bookmarkable. The #fragment view should let you switch to edit source too.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Since it was working in &lt;a href=&quot;https://github.com/simonw/tools&quot;&gt;my tools repo&lt;/a&gt; I told it to take inspiration from the &lt;code&gt;&amp;lt;iframe sandbox=&quot;...&quot;&amp;gt;&lt;/code&gt; mechanism used by my existing &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer&quot;&gt;SVG in Markdown tool&lt;/a&gt; as protection against XSS risks:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Safe from XSS? We could run in an iframe sandbox like we do on the SVG markdown render project&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I had it copy the Gist/URL loading feature from that tool as well:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;We should have an option to load latex from a URL (or gist) similar to the markdown SVG tool&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/latex#~1jZq9DoIwEIB3nuKGbigJJS5svoAOMJuQ4EBEJWJjGHh3765A_8DIQtJfIMdR-n0uCV9l4DOs_p8ua3ZZKK2anOsaTqya9AZnHhMo3qqewKWPMh2SOQOFkhSJtmruY1QungBJFk-cQLsspAF8qgFPWKQ6FmdYdCB7oseX5HVNfgE-HGmM2OPATDfAlCssyLcLGI4BONwZ7E8pby5KWoilFBK0n5T4lMeHgQaMMsYjS6hrG61G4Micmcj2EN48tyVgHpzNKMBEHuxEbV0dZhsJwZB7_Lux0mR4YDc9HTd1bnGaki0V1nr6kGHSI8NAwCWaVjeAPyYUNAYxUZt8k2aKlODPRQq7JIYMS-VKaQwHrMmoxqWeLlT6Ag&quot;&gt;an example link&lt;/a&gt;. The tool uses &lt;a href=&quot;https://github.com/nodeca/pako&quot;&gt;Pako 2.1.0&lt;/a&gt;, &lt;a href=&quot;https://github.com/mathjax/MathJax&quot;&gt;MathJax 4.1.3&lt;/a&gt;, &lt;a href=&quot;https://github.com/arena-ai/faster-latex&quot;&gt;faster-latex 0.3.1&lt;/a&gt;, and &lt;a href=&quot;https://github.com/cure53/DOMPurify&quot;&gt;DOMPurify 3.4.16&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;Screenshot of a web app titled &amp;quot;LaTeX renderer&amp;quot; with a split-pane layout. The top bar has an Edit/Rendered toggle, a blue Copy link button, and a Share button. The left pane, labeled LaTeX source with a &amp;quot;Document · faster-latex (WASM)&amp;quot; badge, has a URL/GitHub Gist input with a Load button, a code editor containing a LaTeX document, and rows of example buttons (Quadratic formula, Gaussian integral, Maxwell, Attention, Matrix, Chemistry, Prose, TikZ, Document). The right pane shows the typeset output: a paper titled &amp;quot;Sums of Odd Numbers&amp;quot; by A. Student, with a section stating a theorem that the first n odd numbers sum to n squared, a Proof section with numbered equations, and a bulleted list of small cases.&quot; src=&quot;https://static.simonwillison.net/static/2026/latex-tool.webp&quot; /&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/latex&quot;&gt;latex&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/paul-ford&quot;&gt;paul-ford&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/urls&quot;&gt;urls&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Tree Appreciator</title>
-      <link>https://simonwillison.net/2026/Oct/14/tree-appreciator/</link>
-      <guid>https://simonwillison.net/2026/Oct/14/tree-appreciator/</guid>
-      <pubDate>Wed, 14 Oct 2026 21:23:01 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/tree-appreciator&quot;&gt;Tree Appreciator&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Another game experiment with Claude. This one used the default Claude iPhone app (chat mode, not Claude Code mode), where I prompted Claude Opus 5.5 Max with:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Build a three js game called &quot;Tree appreciator&quot; - it shows you two algorithmically generated trees and the game mechanics is about appreciating the differences between them. Think hard about how to make sure it is both fun and beautiful.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Somewhat embarrassingly given &lt;a href=&quot;https://simonwillison.net/2026/Sep/27/2026-in-llms-so-far/#simon-willison-2026-in-llms.059.webp&quot;&gt;my recent talk&lt;/a&gt;, I&apos;ve found that telling Opus 5.5 &quot;make sure it is fun&quot; works uncomfortably well. In this case Claude &lt;a href=&quot;https://claude.ai/share/ee7de555-f85c-4ff0-96cb-d51ed5e479e9&quot;&gt;crunched for 3 hours and 7 minutes&lt;/a&gt; before retuning a cosy little spot-the-difference game with music and animation and achievements that&apos;s quite compelling to play.&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;Screenshot of a mobile spot-the-difference puzzle game with a dark interface. Header reads &amp;quot;No. 003 Acer autumnalis ‘Hid…&amp;quot; with subtitle &amp;quot;Autumn maple · A country lane in late a…&amp;quot; and icons for sound, a book, and help. Two nearly identical 3D-rendered scenes are stacked vertically, labeled &amp;quot;Fig. i&amp;quot; and &amp;quot;Fig. ii&amp;quot;, each showing a dark-trunked maple tree with red, orange and pale peach leaves, leaves falling through the air, a golden grassy field with a few small rocks, and hazy hills with pine silhouettes under a pale sky. Two differences are circled in blue in both images: circle &amp;quot;a&amp;quot; at the base of the trunk, where Fig. i has a small red mushroom that is missing in Fig. ii, and circle &amp;quot;b&amp;quot; in the right side of the canopy, where Fig. i has a patch of green leaves that are red in Fig. ii. The bottom bar shows &amp;quot;2 of 4&amp;quot;, a reset button, a &amp;quot;Hint&amp;quot; button with three filled and two empty dots, and a score of &amp;quot;1,803&amp;quot;.&quot; src=&quot;https://static.simonwillison.net/static/2026-10-14/image_crop_1320x2195_w1320_q0.7.webp&quot; /&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/javascript&quot;&gt;javascript&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/vibe-coding&quot;&gt;vibe-coding&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/three-js&quot;&gt;three-js&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>AI is mass decompiling games. That&apos;s both awesome and scary.</title>
-      <link>https://simonwillison.net/2026/Oct/14/ai-is-mass-decompiling-games/</link>
-      <guid>https://simonwillison.net/2026/Oct/14/ai-is-mass-decompiling-games/</guid>
-      <pubDate>Wed, 14 Oct 2026 16:26:53 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://popcar.bearblog.dev/ai-is-mass-decompiling-games-thats-both-awesome-and-scary/&quot;&gt;AI is mass decompiling games. That&amp;#x27;s both awesome and scary.&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Indie game developer Popcar talks about the recent wave of AI-powered decompilation of existing games, enabling weird mashups between existing games, and producing a boom in game preservation projects to get old games working on new hardware (often in a browser using WebAssembly).&lt;/p&gt;
-        &lt;p&gt;I like how this piece captures both the positives and the negatives of this new development:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Most people already realized the scary part by now. If AI can decompile games and software, then the entire tech industry is about to explode. Anybody can decompile other software and use it any way they&apos;d like, and nobody can stop them. Companies can steal from competitors. Your paid game or app can be open-sourced against your will. This isn&apos;t exclusive to old video games, we can apply this to &lt;em&gt;any&lt;/em&gt; software. [...]&lt;/p&gt;
-        &lt;p&gt;This is also a big win for preservation. Old games can be ported, modified, enhanced, and made much more easily accessible than before.  [...[&lt;/p&gt;
-        &lt;p&gt;With console makers going all in on digital and games becoming entirely unplayable due to servers shutting down, this is &lt;em&gt;fantastic&lt;/em&gt; news. We could own software we bought regardless of what the company thinks.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=50088534&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/computer-history&quot;&gt;computer-history&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/webassembly&quot;&gt;webassembly&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-ethics&quot;&gt;ai-ethics&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
