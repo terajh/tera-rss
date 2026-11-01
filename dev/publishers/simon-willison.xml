@@ -4,7 +4,60 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sat, 31 Oct 2026 19:39:23 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2026 20:06:31 GMT</lastBuildDate>
+    <item>
+      <title>Quoting Kyle Kingsbury</title>
+      <link>https://simonwillison.net/2026/Nov/1/kyle-kingsbury/</link>
+      <guid>https://simonwillison.net/2026/Nov/1/kyle-kingsbury/</guid>
+      <pubDate>Sun, 01 Nov 2026 16:49:04 GMT</pubDate>
+      <content:encoded>
+        &lt;blockquote cite=&quot;https://jepsen.io/analyses/particledb-1.1.4#llm-tradeoffs&quot;&gt;&lt;p&gt;More broadly, the use of LLMs erodes trust in documentation, in software, and in the organizations which produce them. Perhaps engineers will begin to treat any new software project with suspicion—the signals we used to rely on as markers of a mature system are now easier to counterfeit. [...]&lt;/p&gt;
+        &lt;p&gt;In the age of LLMs, what can maintainers do to ensure correct software and accurate documentation? Having done that work, how can they demonstrate its quality to users?&lt;/p&gt;&lt;/blockquote&gt;
+        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://jepsen.io/analyses/particledb-1.1.4#llm-tradeoffs&quot;&gt;Kyle Kingsbury&lt;/a&gt;, Jepsen results for ParticleDB 1.1.4&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/kyle-kingsbury&quot;&gt;kyle-kingsbury&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-misuse&quot;&gt;ai-misuse&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>How We Took Over ChatGPT Accounts</title>
+      <link>https://simonwillison.net/2026/Oct/31/how-we-took-over-chatgpt-accounts/</link>
+      <guid>https://simonwillison.net/2026/Oct/31/how-we-took-over-chatgpt-accounts/</guid>
+      <pubDate>Sat, 31 Oct 2026 23:15:22 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.parameter.ai/labs/we-found-a-gap-at-openai&quot;&gt;How We Took Over ChatGPT Accounts&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Parameter Labs describe an exploit they found against ChatGPT&apos;s implementation of the artifacts pattern (OpenAI used to call this &quot;Canvas&quot; but it looks like the latest revision is called &lt;a href=&quot;https://help.openai.com/en/articles/20001246-working-with-writing-blocks-and-code-blocks-in-chatgpt&quot;&gt;HTML previews&lt;/a&gt;), where interactive custom HTML apps are displayed in a sandboxed iframe.&lt;/p&gt;
+        &lt;p&gt;It&apos;s important that HTML in these stays tightly sandboxed to avoid untrusted code interacting with OpenAI APIs and accessing private data.&lt;/p&gt;
+        &lt;p&gt;Parameter found quite a complex attack chain. OpenAI use the MathLive JavaScript library as part of their graph support, and that library includes &lt;a href=&quot;https://mathlive.io/mathfield/virtual-keyboard/&quot;&gt;its own virtual keyboard&lt;/a&gt;, which can be triggered in the parent page via &lt;code&gt;postMessage()&lt;/code&gt; from the sandboxed iframe.&lt;/p&gt;
+        &lt;p&gt;That message receiving code uses &lt;code&gt;innerHTML&lt;/code&gt;, so anything that sends a message can add custom HTML to the parent - and there was no mechanism to prevent other sandboxed frames, including HTML preview frames, from calling that method.&lt;/p&gt;
+        &lt;p&gt;This meant untrusted code in an iframe could insert HTML, and while &lt;code&gt;innerHTML&lt;/code&gt; doesn&apos;t directly execute script elements it could be used to inject a new iframe &lt;em&gt;without&lt;/em&gt; sandbox restrictions.&lt;/p&gt;
+        &lt;p&gt;OpenAI’s CSP rules blocked inline scripts entirely, and only allowed script loading from a handful of domains, but one of those was YouTube - and the YouTube oEmbed endpoint could be used to reflect JavaScript back in a way that executed it.&lt;/p&gt;
+        &lt;p&gt;Once the attack had JavaScript execution on ChatGPT, it was trivial to fetch private user data from APIs and exfiltrate it via an image reference.&lt;/p&gt;
+        &lt;p&gt;The end result: you could create a ChatGPT share URL which, when visited by another signed-in user, could exfiltrate their private data or take actions on their behalf.&lt;/p&gt;
+        &lt;p&gt;OpenAI closed the hole and paid out a $5,000 bug bounty, which I think was a bit cheap for a vulnerability this serious.
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=50314699&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/iframes&quot;&gt;iframes&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/javascript&quot;&gt;javascript&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sandboxing&quot;&gt;sandboxing&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/xss&quot;&gt;xss&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/openai&quot;&gt;openai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/chatgpt&quot;&gt;chatgpt&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/content-security-policy&quot;&gt;content-security-policy&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-llm 0.1a9</title>
+      <link>https://simonwillison.net/2026/Oct/31/datasette-llm/</link>
+      <guid>https://simonwillison.net/2026/Oct/31/datasette-llm/</guid>
+      <pubDate>Sat, 31 Oct 2026 22:10:01 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-llm/releases/tag/0.1a9&quot;&gt;datasette-llm 0.1a9&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;I have some big upgrades to &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt; in the pipeline, but in the meantime here&apos;s a tiny user experience improvement to the underlying &lt;code&gt;datasette-llm&lt;/code&gt; plugin. &lt;/p&gt;
+        &lt;p&gt;It now picks up the default model used by &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt;, which means you can start using Datasette Agent without needing to explicitly configure a default model:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;uvx --with datasette-agent datasette content.db --internal internal.db
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Previously you would also need to specify a model with &lt;code&gt;-s plugins.datasette-agent.default_model gpt-6-astra&lt;/code&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-agent&quot;&gt;datasette-agent&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>dbreunig/nesformer</title>
       <link>https://simonwillison.net/2026/Oct/30/nesformer/</link>
@@ -919,59 +972,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/javascript&quot;&gt;javascript&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>web-edit 0.1a2</title>
-      <link>https://simonwillison.net/2026/Oct/17/web-edit/</link>
-      <guid>https://simonwillison.net/2026/Oct/17/web-edit/</guid>
-      <pubDate>Sat, 17 Oct 2026 13:16:49 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/web-edit/releases/tag/0.1a2&quot;&gt;web-edit 0.1a2&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;web-edit (&lt;a href=&quot;https://simonwillison.net/2026/Oct/12/web-edit/&quot;&gt;previously&lt;/a&gt;) is my tiny web app for browsing and editing files in a folder. I mainly built it for editing files on different machines via Tailscale.&lt;/p&gt;
-        &lt;p&gt;I added a &quot;copy to clipboard&quot; option for both text and image data. I needed this because I was running pelican prompts on a laptop from my phone (here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2Fb1cec9726b6aa62d4de47100f90f0c1a&quot;&gt;DeepSeek 4.1 Flash 1017&lt;/a&gt;) and I wanted an easy way to copy the resulting logs into a Gist.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/deepseek&quot;&gt;deepseek&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Addy Osmani, Morgan Westlee Lunt, and Qing Wang</title>
-      <link>https://simonwillison.net/2026/Oct/16/code-review/</link>
-      <guid>https://simonwillison.net/2026/Oct/16/code-review/</guid>
-      <pubDate>Fri, 16 Oct 2026 22:06:37 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://claude.dev/blog/solving-code-review-at-anthropic/&quot;&gt;&lt;p&gt;We think &quot;did a human read the code?&quot; is an imprecise proxy for &quot;what could go wrong with this change, and which check—automated or human—is the right one to catch it?&quot;&lt;/p&gt;
-        &lt;p&gt;Asking that question also changed &lt;em&gt;when&lt;/em&gt; review happens. Before, review was a gate at the end of the road: write the code, open a PR, wait for your colleague.&lt;/p&gt;
-        &lt;p&gt;Now, review runs continuously, more like spellcheck while you write. Most changes have been reviewed and fixed by Claude at least once before a human is asked to look. This catches most routine mistakes, and saves team attention for higher-level questions and scrutiny.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://claude.dev/blog/solving-code-review-at-anthropic/&quot;&gt;Addy Osmani, Morgan Westlee Lunt, and Qing Wang&lt;/a&gt;, How the Claude Code team does code review&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/addy-osmani&quot;&gt;addy-osmani&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/agentic-engineering&quot;&gt;agentic-engineering&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/code-review&quot;&gt;code-review&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>sparqlite: SPARQL 1.1 inside SQLite, written in Rust</title>
-      <link>https://simonwillison.net/2026/Oct/16/sqlite-sparql-rust/</link>
-      <guid>https://simonwillison.net/2026/Oct/16/sqlite-sparql-rust/</guid>
-      <pubDate>Fri, 16 Oct 2026 01:58:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Research:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/research/tree/main/sqlite-sparql-rust#readme&quot;&gt;sparqlite: SPARQL 1.1 inside SQLite, written in Rust&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;This research task is really an experiment in running Claude Code for web in &quot;Ultracode&quot; mode, as described in &lt;a href=&quot;https://code.claude.com/docs/en/workflows&quot;&gt;Orchestrate subagents at scale with dynamic workflows&lt;/a&gt; in the Claude Code documentation.&lt;/p&gt;
-        &lt;p&gt;With Ultracode turned on, Claude Code makes aggressive use of dynamic workflows - it generates JavaScript that defines and coordinates a network of subagents to take on complex problems.&lt;/p&gt;
-        &lt;p&gt;My initial prompt was this - I meant &quot;hit the rows directly&quot;, the word &quot;delete&quot; was an accidental typo on my phone:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Write a SQLite extension in Rust that implants SPARQL and runs really fast because it can hit the delete rows directly&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This caused Claude Code for web to churn for over 12 hours. I checked in on its progress the next day and sent a single follow-up prompt when I noticed how many Rust crates it had built:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Every folder in the crates/ directory needs a README&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Include a tutorial.md teaching users how to install the extension and how to run it in the SQLite CLI and then teaching them SPARQL in addition to how to use the SQLite extension&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Include a script with the tutorial for populating a SQLite database with useful and realistic example data for that tutorial&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This project feels like next-level vibe coding - it&apos;s not remotely feasible to review the code that was produced here, and even following the documentation is a significant investment in work. I&apos;m not entirely sure what to do with this - I appear to have a full SPARQL implementation in Rust inside SQLite now, but how valuable is that if I created it on a whim and can&apos;t (or won&apos;t) invest the necessary time to understand what it can do?&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/rdf&quot;&gt;rdf&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/semantic-web&quot;&gt;semantic-web&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/sqlite&quot;&gt;sqlite&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/rust&quot;&gt;rust&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
