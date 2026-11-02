@@ -4,19 +4,12 @@
     <title>dev RSS - Awesome Blogs</title>
     <link>https://awesome-blogs.petabytes.org</link>
     <description>Awesome Blogs RSS 피드</description>
-    <lastBuildDate>Sun, 01 Nov 2026 20:06:31 GMT</lastBuildDate>
-    <item>
-      <title>늙은 것은 나뿐이었다</title>
-      <link>https://jeho.page/essay/2026/10/31/out-of-comfort-zone.html</link>
-      <guid>https://jeho.page/essay/2026/10/31/out-of-comfort-zone.html</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
-      <content:encoded>며칠 전 코엑스에서 열린 2026 정주영 창업경진대회 데모데이에 다녀왔습니다. 무료 행사인데다 장병규 의장님이 키노트를 한다길래, 바람이나 쐴 겸 절친과 다녀왔답니다. 오랜만에 젊은 창업가들의 에너지도 느끼고 좋은 이야기도 듣고 왔습니다.</content:encoded>
-    </item>
+    <lastBuildDate>Mon, 02 Nov 2026 23:39:11 GMT</lastBuildDate>
     <item>
       <title>LLM 캐시는 어떻게 작동할까: 앤트로픽 S-1 보고서로 읽는 AI 인프라 효율화</title>
       <link>https://roboco.io/posts/how-llm-caching-works/</link>
       <guid>https://roboco.io/posts/how-llm-caching-works/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
         &lt;p&gt;Anthropic은 S-1에서 같은 수준의 모델 성능을 제공하는 데 필요한 추론 연산을 줄이고, 운영 환경에서 연산 자원의 활용 효율도 높여 왔다고 설명한다. – 「Compute Efficiency」 요약&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote-ref&quot; role=&quot;doc-noteref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
@@ -40,166 +33,17 @@
       </content:encoded>
     </item>
     <item>
-      <title>Fedora 44에 CachyOS kernel 설치</title>
-      <link>https://sunyzero.tistory.com/331</link>
-      <guid>https://sunyzero.tistory.com/331</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
-      <content:encoded>
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Fedora 44에 CachyOS의 최적화된 커널을 설치하는 방법을 다룬다. 방법은 Fedora Copr(Community Project)에 개인이 빌드해둔 CachyOS kernel rpm을 설치하는 방법이다. 그리고 Fedora 44 기본 커널과 CachyOS 최적화된 커널의 성능 차이가 얼마나 있는지도 살펴보도록 한다. 모든 작업은 root 권한을 필요로 하므로 root로 변경하거나 sudo 명령을 사용해야만 한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;주의할 점은 copr 저장소는 인증받지 않은 저장소이므로 안정성이 떨어지거나 혹은 해커가 위장하여 뭔가를 숨겨둔 프로그램일 가능성도 있다. 따라서 서비스를 하거나 개발을 위한 작업이라면 되도록이면 copr을 쓰지 않는 것을 권장한다. (굉장히 잘 알려진 copr이나 많이 사용된 경우는 안전할 수도 있지만 그래도 위험성은 있는 편이다)&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;1. CachyOS kernel 관련 Copr repository 활성화&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;먼저 아래 명령으로 bieszczaders kernel-cachyos copr 저장소를 활성화 한다[1].&lt;/p&gt;
-        &lt;pre id=&quot;code_1793030652504&quot; class=&quot;shell&quot; data-ke-language=&quot;shell&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo dnf copr enable bieszczaders/kernel-cachyos&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;2. kernel-cachyos 패키지 설치&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;저장소가 활성화 되었다면 아래의 명령으로 최적화된 캐시오에스 커널을 설치한다.&lt;/p&gt;
-        &lt;pre id=&quot;code_1793030756979&quot; class=&quot;shell&quot; data-ke-language=&quot;shell&quot; data-ke-type=&quot;codeblock&quot;&gt;&lt;code&gt;sudo dnf -y install kernel-cachyos&lt;/code&gt;&lt;/pre&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;설치가 완료되면 커널 모듈 빌드나 램디스크 등의 후처리 작업이 있으므로 top으로 백그라운드 작업을 확인하던지 아니면 4~5분 정도 지난 뒤에 재부팅하면 된다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;재부팅하면 새로 설치된 CachyOS 커널로 부팅하면 끝인데, 만일 GRUB에서 shim 관련 에러가 발생한다면 십중팔구 secure boot를 enabled 해놓아서 서명 문제가 생긴 경우이므로, BIOS에 들어가서 secure boot를 disabled로 변경해주면 된다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;3. 벤치마크(geekbench7)&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;성능이 얼마나 차이나는지 긱벤치7으로 확인해보았다. 3가지를 측정했으면 여러번 측정해서 중간 값을 가진 값을 채택했다. 첫번째는 Fedora 44 순정 커널, 두번째는 같은 하드웨어에 CachyOS 데스크탑 2026년 8월 9일 버전, 세번째는 Fedora 44에 kernel-cachyOS copr 패키지를 설치한 것이다. 먼저 3가지 커널의 점수부터 정리하고 이야기 하자.&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%;&quot; border=&quot;1&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;리눅스 배포판, 커널 버전&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;Geekbench Single-core&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;Geekbench Multi-core&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Fedora 44 original, kernel 7.2.11&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;1868&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;13143&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;CachyOS 260809, kernel 7.1.6&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;&lt;span style=&quot;background-color: #ffc1c8;&quot;&gt;1954&lt;/span&gt;&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;&lt;span style=&quot;background-color: #ffc1c8;&quot;&gt;13452&lt;/span&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 33.3333%;&quot;&gt;Fedora 44 copr, kernel-cachyos 7.3.0&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;1948&lt;/td&gt;
-        &lt;td style=&quot;width: 33.3333%; text-align: center;&quot;&gt;13364&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;하드웨어는 GMKtec K12로서 AMD H 255를 장착하고 있으며, RAM은 32GB (삼성 5600MHz 16GB 모듈 * 2)이다. BIOS에서 balanced mode로 설정했고, power limit은 ECO 모드(35W)로 설정했다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;3.1. Fedora 44 vs CachyOS&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;먼저 Fedora 44 순정 커널 상태로 kernel 7.2.11의 geekbench7의 결과를 보도록 하자[2]. 여러번 실행해봤자 어차리 1~2%는 오차범위 안에서 수치가 차이나므로 1~2% 정도 차이는 무시해도 된다. 각각의 긱벤치 결과는 URL이 있으니 직접 링크를 따라가서 확인해봐도 된다.&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;Linux-geekbench7-Fedora44-20261026.png&quot; data-origin-width=&quot;776&quot; data-origin-height=&quot;1922&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/znck4/dJMcaa1zf6c/TFrI8E7YcDqRbl4XQZsDpK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/znck4/dJMcaa1zf6c/TFrI8E7YcDqRbl4XQZsDpK/img.png&quot; data-alt=&quot;Geekbench7 - Fedora 44 - https://browser.geekbench.com/v7/cpu/724125&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/znck4/dJMcaa1zf6c/TFrI8E7YcDqRbl4XQZsDpK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fznck4%2FdJMcaa1zf6c%2FTFrI8E7YcDqRbl4XQZsDpK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;776&quot; height=&quot;1922&quot; data-filename=&quot;Linux-geekbench7-Fedora44-20261026.png&quot; data-origin-width=&quot;776&quot; data-origin-height=&quot;1922&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Geekbench7 - Fedora 44 - https://browser.geekbench.com/v7/cpu/724125&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;아래는 CachyOS 26년 8월 9일자 데스크탑의 geekbench7 값의 이미지이다. 역시 약간의 성능 향상이 있기는 하다. 특히 싱글 코어 부분이 두드러지는데 2가지 항목에서 큰 차이가 나기 때문에 점수차이가 벌어졌다[3].&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;Linux-geekbench7-CachyOS-20261026.png&quot; data-origin-width=&quot;773&quot; data-origin-height=&quot;1928&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/bc2a24/dJMcaagiyNH/ViZ7YCTGEKruL0C22kldbK/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/bc2a24/dJMcaagiyNH/ViZ7YCTGEKruL0C22kldbK/img.png&quot; data-alt=&quot;Geekbench7 - CachyOS 260809 - https://browser.geekbench.com/v7/cpu/723908&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/bc2a24/dJMcaagiyNH/ViZ7YCTGEKruL0C22kldbK/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fbc2a24%2FdJMcaagiyNH%2FViZ7YCTGEKruL0C22kldbK%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;773&quot; height=&quot;1928&quot; data-filename=&quot;Linux-geekbench7-CachyOS-20261026.png&quot; data-origin-width=&quot;773&quot; data-origin-height=&quot;1928&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Geekbench7 - CachyOS 260809 - https://browser.geekbench.com/v7/cpu/723908&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Fedora 순정 커널과&amp;nbsp; CachyOS의 커널의 대부분은 값이 비슷했으나 약간씩은 CachyOS가 높았다. 그러나 1% 정도는 거의 오차범위이므로 넘어간다고 쳐도 Navigation, Structure from motion은 매우 크게 차이가 났다.&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%;&quot; border=&quot;1&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;Fedora 44&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;CachyOS&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;CachyOS의 성능 우위&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Navigation&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1960&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2308&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;17.7%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Structure from Motion&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1907&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2615&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;37.1%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;HDR&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1860&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1927&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;3.6%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Photo Editor&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2167&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2339&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;7.9%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Navigation이나 Structure from motion이 Shortest path를 찾는 기능과 3D modeling을 위한 성능 측정이라고 하는데, 이부분이 크게 차이가 났고, 그 외에는 HDR, 사진 에디터 정도가 약간 차이가 있었다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;clang 컴파일러나 HTML5 브라우저, 게임, 비디오, 오디오는 거의 오차범위 안에서 1~2%의 근소한 차이였다. 1~2%도 차이가 아예 없는 정도는 아니지만 체감이 가능한 영역은 아닐 것이다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h3 data-ke-size=&quot;size23&quot;&gt;3.2. Fedora 44에 kernel-cachyos로 부팅한 경우&lt;/h3&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;Fedora 44에 kernel-cachyos로 부팅해서 긱벤치7으로 다시 측정해보았다. 결과는 다음과 같다[4].&lt;/p&gt;
-        &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;Linux-geekbench7-Fedora44-cachyos_kernel-20261026.png&quot; data-origin-width=&quot;774&quot; data-origin-height=&quot;1927&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/QX5A8/dJMcaamPsIC/YKgLcdI23f0h77jdoLbmFk/img.png&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/QX5A8/dJMcaamPsIC/YKgLcdI23f0h77jdoLbmFk/img.png&quot; data-alt=&quot;Geekbench7 - Fedora 44 - https://browser.geekbench.com/v7/cpu/725030&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/QX5A8/dJMcaamPsIC/YKgLcdI23f0h77jdoLbmFk/img.png&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FQX5A8%2FdJMcaamPsIC%2FYKgLcdI23f0h77jdoLbmFk%2Fimg.png&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;774&quot; height=&quot;1927&quot; data-filename=&quot;Linux-geekbench7-Fedora44-cachyos_kernel-20261026.png&quot; data-origin-width=&quot;774&quot; data-origin-height=&quot;1927&quot;/&gt;&lt;/span&gt;&lt;figcaption&gt;Geekbench7 - Fedora 44 - https://browser.geekbench.com/v7/cpu/725030&lt;/figcaption&gt;
-        &lt;/figure&gt;
-        &lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p style=&quot;color: #333333; text-align: start;&quot; data-ke-size=&quot;size16&quot;&gt;오리지널 CachyOS와 비교하면 다음과 같다. 이제 거의 차이가 없다고 봐도 무방할 정도이다. 앞서 37.1%나 차이가 났던 Structure from motion은 0.1%로 거의 같다고 보면 되고, 나머지도 1%대이므로 거의 비슷하다고 볼 수 있다.&lt;/p&gt;
-        &lt;table style=&quot;border-collapse: collapse; width: 100%;&quot; border=&quot;1&quot; data-ke-align=&quot;alignLeft&quot;&gt;
-        &lt;tbody&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;&amp;nbsp;&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;Fedora 44, kernel-cachyOS&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;CachyOS&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;CachyOS의 성능 우위&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Navigation&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2278&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2308&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1.3%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Structure from Motion&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2611&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2615&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;0.1%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;HDR&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1908&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1927&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1.0%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td style=&quot;width: 25%;&quot;&gt;Photo Editor&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2307&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;2339&lt;/td&gt;
-        &lt;td style=&quot;width: 25%; text-align: center;&quot;&gt;1.4%&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/tbody&gt;
-        &lt;/table&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;4. 결론&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;CachyOS는 커널 이외에도 애플리케이션이나 중요 유틸리티를 최적화했다고 한다. LTO나 profile guided optimization을 했다고 한다. 그런데 LTO는 아마도 대부분의 배포판이 다 하고 있을거다. PGO는 특정 배치 데이터 처리 애플리케이션 같은 경우가 아니면 큰 효과를 보기 어려우니까 큰 차이는 아닐 것이다. 다만 실제로 CachyOS를 사용해보면 조금은 빠릿한 느낌이 드는데, 기분탓일 수도 있다. 물론 Fedora 44에 CachyOS의 최적화된 커널을 올리면 거의 느낌도 비슷해진다. 뭔가 스케줄링쪽의 차이가 아닌가 생각되기도 한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;하지만 Fedora 44 순정 커널을 쓴다고 해도 느린 것은 아니며, 일반적인 작업에 영향을 주는 clang 컴파일러, HTML5, Video, Audio는 거의 비슷하다. &lt;span style=&quot;color: #ee2323;&quot;&gt;그래서 긱벤치 점수로는 확실히 cachyOS가 우위지만 실사용에서도 우위라고 말하기는 어렵다고 생각된다.&lt;/span&gt; 실제로 대규모 빌드 같은 것을 해보면 거의 비슷하게 끝나고 컨테이너 서비스 성능도 비슷하다. 긱벤치 점수는 재미일뿐 절대적인 기준도 아니고 세부적인 항목을 봐야 한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;물론 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;3D 모델링 같은 것을 한다면 CachyOS의 커널을 올려서 사용하거나 아니면 CachyOS를 사용하는 것도 괜찮다고 생각&lt;/span&gt;한다.&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;K. 레퍼런스&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[1] Fedora Copr kernel-cachyos, &lt;a href=&quot;https://copr.fedorainfracloud.org/coprs/bieszczaders/kernel-cachyos/&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://copr.fedorainfracloud.org/coprs/bieszczaders/kernel-cachyos/&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[2] Geekbench browser, Fedora 44, &lt;a href=&quot;https://browser.geekbench.com/v7/cpu/724125&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://browser.geekbench.com/v7/cpu/724125&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[3] Geekbench browser, CachyOS Desktop 260809, &lt;a href=&quot;https://browser.geekbench.com/v7/cpu/723908&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://browser.geekbench.com/v7/cpu/723908&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;[4] Geekbench browser, Fedora 44 - kernel-cachyos, &lt;a href=&quot;https://browser.geekbench.com/v7/cpu/725030&quot; target=&quot;_blank&quot; rel=&quot;noopener&amp;nbsp;noreferrer&quot;&gt;https://browser.geekbench.com/v7/cpu/725030&lt;/a&gt;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;h2 data-ke-size=&quot;size26&quot;&gt;히스토리&lt;/h2&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;2026.10.26. 릴리즈&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-        &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;&lt;/p&gt;
-      </content:encoded>
+      <title>늙은 것은 나뿐이었다</title>
+      <link>https://jeho.page/essay/2026/10/31/out-of-comfort-zone.html</link>
+      <guid>https://jeho.page/essay/2026/10/31/out-of-comfort-zone.html</guid>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
+      <content:encoded>며칠 전 코엑스에서 열린 2026 정주영 창업경진대회 데모데이에 다녀왔습니다. 무료 행사인데다 장병규 의장님이 키노트를 한다길래, 바람이나 쐴 겸 절친과 다녀왔답니다. 오랜만에 젊은 창업가들의 에너지도 느끼고 좋은 이야기도 듣고 왔습니다.</content:encoded>
     </item>
     <item>
       <title>LLM은 Silver Bullet 일까?</title>
       <link>https://effectivesquid.tistory.com/entry/LLM%EC%9D%80-Silver-Bullet-%EC%9D%BC%EA%B9%8C</link>
       <guid>https://effectivesquid.tistory.com/entry/LLM%EC%9D%80-Silver-Bullet-%EC%9D%BC%EA%B9%8C</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size16&quot;&gt;&amp;nbsp;대략 2년 만에 글을 쓰기 위해 키보드를 타이핑해 본다. 그동안 주로 연말에 작성하는 회고록이나 지식을 전달하기 위한 정보성 및 트러블 슈팅 경험을 위해 글을 작성해 왔다. 하지만,&amp;nbsp;LLM(이하 AI로 명칭 하겠다.)의 발전으로 인해 지식 전달을 위한 글은 stack overflow의 감소된 트래픽처럼 사람들이 많이 찾지 않고 있기에 &lt;a href=&quot;https://github.com/gksxodnd007/TIL&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;TIL Repository&lt;/a&gt;에 정제되지 않은 상태로 업데이트하거나, 개인 Notion에만 정리를 하게 된 것 같다. 글을 쓰는 것도 운동처럼 관성인 것 같다. 한 번 놓게 되면, 글을 쓰기 위해 다시 시간을 내어 자세를 잡기까지 꽤나 큰 준비가 필요하다. 필자도 이 글을 쓰기 위해 손가락 스트레칭을 2년 정도 했다 ㅋ. &lt;b&gt;요즘 너무 많은 사람들이 AI가 주는 환상으로 인해 잘못된 위기를 느끼거나, 느끼게 하는 것 같아 조금은 바로 잡고 싶은 마음에 이 글을 작성하게 되었다.&lt;/b&gt;&lt;/p&gt;
         &lt;p data-ke-size=&quot;size16&quot;&gt;&lt;b&gt;&amp;nbsp;&lt;/b&gt;이야기에 앞서 LLM의 동작에 대해 간단하게 정리해보고자 한다. Provider에 따라 핵심 알고리즘과 Architecture는 다르겠지만 큰 맥락은 다음과 같다고 생각한다.&lt;/p&gt;
@@ -232,7 +76,7 @@
       <title>Blog: [메모] adb install vs android install 차이점 분석 및 비교</title>
       <link>http://pluu.github.io/blog/android/2026/11/01/adb-install-vs-android-install/</link>
       <guid>http://pluu.github.io/blog/android/2026/11/01/adb-install-vs-android-install/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Android CLI의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;android install&lt;/code&gt;은 단순한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;adb install&lt;/code&gt;의 래퍼(Wrapper)가 아닙니다. 소스 빌드 연동 기능과 함께, 변경된 바이트만 전송하는 &lt;strong&gt;증분 설치(Delta Install)&lt;/strong&gt;를 기본값으로 사용합니다.&lt;/p&gt;
         
@@ -591,7 +435,7 @@
       <title>Blog: [요약] The latest in Android dev tools (Android Dev Summit &apos;26)</title>
       <link>http://pluu.github.io/blog/android/androiddevsummit/2026/10/31/ads26-whats-new-in-android-dev-tools/</link>
       <guid>http://pluu.github.io/blog/android/androiddevsummit/2026/10/31/ads26-whats-new-in-android-dev-tools/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;div class=&quot;youtube&quot;&gt;
         &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/w-auFZP5gJo&quot; title=&quot;YouTube video player&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
@@ -975,20 +819,10 @@
       </content:encoded>
     </item>
     <item>
-      <title>AI 시대 : 소프트웨어 세계에 원래 있던 사람들</title>
-      <link>https://velog.io/@joosing/AI-%EC%8B%9C%EB%8C%80-%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%84%B8%EA%B3%84%EC%97%90-%EC%9B%90%EB%9E%98-%EC%9E%88%EB%8D%98-%EC%82%AC%EB%9E%8C%EB%93%A4</link>
-      <guid>https://velog.io/@joosing/AI-%EC%8B%9C%EB%8C%80-%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%84%B8%EA%B3%84%EC%97%90-%EC%9B%90%EB%9E%98-%EC%9E%88%EB%8D%98-%EC%82%AC%EB%9E%8C%EB%93%A4</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;AI 시대 소프트웨어를 전공하지 않은 사람들이 물밀듯이 이 쪽 세계로 낮은 허들을 넘어 들어온다. 반면에 원래 이곳에 있던 사람들은 다른 영역으로로 넘어가는 도전은 생각보다 거의 하지 않는 것 같다.&lt;/p&gt;
-        &lt;p&gt;우리는 계속 해서 소프트웨어의 세계에서 소프트웨어 개발을 가속화하는데 AI를 활용한다. 우리도 이제 FPGA도 하고, 하드웨어 회로도도 보고, 기계 CAD 도면도 봐보는거 어떨까 생각하게 된다.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
       <title>기술 뉴스 #305 : 2026-11-01</title>
       <link>https://blog.outsider.ne.kr/1817</link>
       <guid>https://blog.outsider.ne.kr/1817</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;h2&gt;웹개발 관련&lt;/h2&gt;
         &lt;ul&gt;
@@ -1100,10 +934,30 @@
       </content:encoded>
     </item>
     <item>
+      <title>Riftlancer: Privacy Policy</title>
+      <link>https://blog.ashon.dev/projects/riftlancer/privacy/</link>
+      <guid>https://blog.ashon.dev/projects/riftlancer/privacy/</guid>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Riftlancer does not collect anything.&lt;/strong&gt; The game has no network permission, so it
+        cannot send data anywhere: no account, no sign-in, no analytics, no crash reporting,
+        no ads. Your high scores, stage grades, chosen ship and settings are stored on your
+        device only, and removing the app removes them. We receive nothing about you or your
+        play, and there is nothing for us to delete, sell or share.&lt;/p&gt;
+        &lt;p&gt;Contact: &lt;a href=&quot;mailto:lab.ashon.dev@gmail.com&quot;&gt;lab.ashon.dev@gmail.com&lt;/a&gt;&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;p&gt;&lt;strong&gt;Riftlancer는 아무것도 수집하지 않습니다.&lt;/strong&gt; 이 게임에는 네트워크 권한이 없어서 데이터를
+        어딘가로 보낼 수 없습니다. 계정 없음, 로그인 없음, 분석 없음, 크래시 리포트 없음, 광고
+        없음. 최고 점수, 스테이지 등급, 고른 함선과 설정은 기기에만 저장되며 앱을 지우면 함께
+        사라집니다. 저희는 당신이나 당신의 플레이에 대해 아무것도 받지 않으며, 삭제할 것도,
+        판매할 것도, 공유할 것도 없습니다.&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
       <title>[SE-0553] Task Identity</title>
       <link>https://green1229.tistory.com/642</link>
       <guid>https://green1229.tistory.com/642</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;p data-ke-size=&quot;size18&quot;&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;안녕하세요. &lt;span style=&quot;color: #409d00;&quot;&gt;&lt;b&gt;그린&lt;/b&gt;&lt;/span&gt;입니다  &lt;/span&gt;&lt;br /&gt;&lt;span style=&quot;font-family: &apos;Nanum Gothic&apos;; color: #000000;&quot;&gt;이번 포스팅에서는 &lt;span style=&quot;background-color: #9feec3;&quot;&gt;&lt;b&gt;SE-0553 &amp;mdash; Task Identity에 대해 정리&lt;/b&gt;&lt;/span&gt;해보겠습니다  &lt;/span&gt;&lt;/p&gt;
         &lt;p&gt;&lt;figure class=&quot;imageblock alignCenter&quot; data-ke-mobileStyle=&quot;widthOrigin&quot; data-filename=&quot;티스토리_썸네일_샘플.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;&gt;&lt;span data-url=&quot;https://blog.kakaocdn.net/dn/SqXCL/dJMcagOuMzV/LPPjzzsGrp1UbTzEST9tI1/img.jpg&quot; data-phocus=&quot;https://blog.kakaocdn.net/dn/SqXCL/dJMcagOuMzV/LPPjzzsGrp1UbTzEST9tI1/img.jpg&quot;&gt;&lt;img src=&quot;https://blog.kakaocdn.net/dn/SqXCL/dJMcagOuMzV/LPPjzzsGrp1UbTzEST9tI1/img.jpg&quot; srcset=&quot;https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FSqXCL%2FdJMcagOuMzV%2FLPPjzzsGrp1UbTzEST9tI1%2Fimg.jpg&quot; onerror=&quot;this.onerror=null; this.src=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;; this.srcset=&apos;//t1.daumcdn.net/tistory_admin/static/images/no-image-v1.png&apos;;&quot; loading=&quot;lazy&quot; width=&quot;400&quot; height=&quot;400&quot; data-filename=&quot;티스토리_썸네일_샘플.001.jpeg&quot; data-origin-width=&quot;400&quot; data-origin-height=&quot;400&quot;/&gt;&lt;/span&gt;&lt;/figure&gt;
@@ -1336,30 +1190,17 @@
       </content:encoded>
     </item>
     <item>
-      <title>Riftlancer: Privacy Policy</title>
-      <link>https://blog.ashon.dev/projects/riftlancer/privacy/</link>
-      <guid>https://blog.ashon.dev/projects/riftlancer/privacy/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Riftlancer does not collect anything.&lt;/strong&gt; The game has no network permission, so it
-        cannot send data anywhere: no account, no sign-in, no analytics, no crash reporting,
-        no ads. Your high scores, stage grades, chosen ship and settings are stored on your
-        device only, and removing the app removes them. We receive nothing about you or your
-        play, and there is nothing for us to delete, sell or share.&lt;/p&gt;
-        &lt;p&gt;Contact: &lt;a href=&quot;mailto:lab.ashon.dev@gmail.com&quot;&gt;lab.ashon.dev@gmail.com&lt;/a&gt;&lt;/p&gt;
-        &lt;hr&gt;
-        &lt;p&gt;&lt;strong&gt;Riftlancer는 아무것도 수집하지 않습니다.&lt;/strong&gt; 이 게임에는 네트워크 권한이 없어서 데이터를
-        어딘가로 보낼 수 없습니다. 계정 없음, 로그인 없음, 분석 없음, 크래시 리포트 없음, 광고
-        없음. 최고 점수, 스테이지 등급, 고른 함선과 설정은 기기에만 저장되며 앱을 지우면 함께
-        사라집니다. 저희는 당신이나 당신의 플레이에 대해 아무것도 받지 않으며, 삭제할 것도,
-        판매할 것도, 공유할 것도 없습니다.&lt;/p&gt;
-      </content:encoded>
+      <title>엔딩 이후의 DLC: 토론토에서 당근(Karrot)을 다시 소개하며</title>
+      <link>https://kyoungwon.me/life/2026/11/01/after-the-ending-dlc/</link>
+      <guid>https://kyoungwon.me/life/2026/11/01/after-the-ending-dlc/</guid>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
+      <content:encoded>토론토 할로윈 파티에서 당근(Karrot)을 설명하다 느낀 것. 13년 전 카카오 신입 시절처럼 다시 시작하지만, 이번엔 선배의 자리에서 캐나다에 Karrot을 알리고 싶어요.</content:encoded>
     </item>
     <item>
       <title>Blog: [메모] adb install vs android install 차이점 분석 및 비교</title>
       <link>http://pluu.github.io/blog/android/2026/11/01/adb-install-vs-android-install/</link>
       <guid>http://pluu.github.io/blog/android/2026/11/01/adb-install-vs-android-install/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Android CLI의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;android install&lt;/code&gt;은 단순한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;adb install&lt;/code&gt;의 래퍼(Wrapper)가 아닙니다. 소스 빌드 연동 기능과 함께, 변경된 바이트만 전송하는 &lt;strong&gt;증분 설치(Delta Install)&lt;/strong&gt;를 기본값으로 사용합니다.&lt;/p&gt;
         
@@ -1718,7 +1559,7 @@
       <title>Blog: [요약] The latest in Android dev tools (Android Dev Summit &apos;26)</title>
       <link>http://pluu.github.io/blog/android/androiddevsummit/2026/10/31/ads26-whats-new-in-android-dev-tools/</link>
       <guid>http://pluu.github.io/blog/android/androiddevsummit/2026/10/31/ads26-whats-new-in-android-dev-tools/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>
         &lt;div class=&quot;youtube&quot;&gt;
         &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/w-auFZP5gJo&quot; title=&quot;YouTube video player&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
@@ -2105,7 +1946,7 @@
       <title>AI가 만든 컨텐츠들이 범람하고 있다</title>
       <link>https://pangyoalto.com/ai-slope-future/</link>
       <guid>https://pangyoalto.com/ai-slope-future/</guid>
-      <pubDate>Sun, 01 Nov 2026 19:21:32 GMT</pubDate>
+      <pubDate>Mon, 02 Nov 2026 22:59:43 GMT</pubDate>
       <content:encoded>&lt;p&gt;&amp;#xb124;&amp;#xc774;&amp;#xbc84; &amp;#xac80;&amp;#xc0c9;&amp;#xc758; &amp;#xd004;&amp;#xb9ac;&amp;#xd2f0;&amp;#xc5d0; &amp;#xb300;&amp;#xd574; &amp;#xd56d;&amp;#xc0c1; &amp;#xc9c0;&amp;#xc801;&amp;#xbc1b;&amp;#xb294; &amp;#xbd80;&amp;#xbd84;&amp;#xc774; &amp;#xc788;&amp;#xb2e4;. &amp;#xac80;&amp;#xc0c9; &amp;#xacb0;&amp;#xacfc; &amp;#xc0c1;&amp;#xc704;&amp;#xc5d0; &amp;#xac78;&amp;#xb9ac;&amp;#xb294; &amp;#xbe14;&amp;#xb85c;&amp;#xadf8; &amp;#xacb0;&amp;#xacfc; &amp;#xb4f1;&amp;#xc774; &amp;#xc0ac;&amp;#xb78c;&amp;#xc774; &amp;#xc4f4; &amp;#xae00;&amp;#xc774; &amp;#xc544;&amp;#xb2c8;&amp;#xb77c; AI&lt;/p&gt;</content:encoded>
     </item>
   </channel>
