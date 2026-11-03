@@ -4,7 +4,136 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Mon, 02 Nov 2026 23:38:35 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 03 Nov 2026 21:24:10 GMT</lastBuildDate>
+    <item>
+      <title>Qwen 3.8 27B on my laptop can interpret model weights, too</title>
+      <link>https://simonwillison.net/2026/Nov/3/qwen-can-interpret-model-weights/</link>
+      <guid>https://simonwillison.net/2026/Nov/3/qwen-can-interpret-model-weights/</guid>
+      <pubDate>Tue, 03 Nov 2026 16:29:48 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday&apos;s hot paper was &lt;a href=&quot;https://rikiyat.github.io/blog/weight-space-programming/&quot;&gt;Sparks of Weight-Space Programming: LLMs can natively read &amp;amp; write neural network weights&lt;/a&gt; by Rikiya Takehi, Jayden Teoh, Alex Zhang, and Omar Khattab. The paper (OK, the authors classify is as a &quot;blog post&quot;, but it&apos;s paper-shaped) found that frontier models, in particular GPT-6 Astra, can both interpret and modify the raw weights of a machine learning model - literally a text description of the model containing a bunch of floating point numbers. I&apos;ve been playing with one of the examples from the paper and I&apos;m delighted to share that Qwen 3.8 27B running on my laptop can do this as well!&lt;/p&gt;
+        &lt;h4 id=&quot;weight-space-programming&quot;&gt;Weight-Space Programming&lt;/h4&gt;
+        &lt;p&gt;Here&apos;s the highlight from their abstract, describing impressive capabilities for GPT-6 Astra and coining the term &lt;strong&gt;Weight-Space Programming&lt;/strong&gt; for when LLMs analyze and modify model weights:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Just by looking at the raw weights, GPT-6 Astra &lt;strong&gt;can tell what a network was trained to do&lt;/strong&gt;. And without any environment feedback, it &lt;strong&gt;has no trouble writing, from scratch, small game-playing networks&lt;/strong&gt; that outplay networks trained with PPO for 100 million steps.&lt;/p&gt;
+        &lt;p&gt;Likewise, asked to make Qwen3.5-0.8B better at math without gradients, Astra &lt;strong&gt;identifies an issue in its weights&lt;/strong&gt; causing reasoning loops that Qwen’s own &lt;a href=&quot;https://huggingface.co/Qwen/Qwen3.5-0.8B/blob/main/README.md#L856&quot;&gt;model card&lt;/a&gt; warns about, and &lt;strong&gt;fixes this by natively editing 0.016% of the weights&lt;/strong&gt;. With the same sampling settings, this weight correction raises MATH-500 from 7.9% to 48.1% and generalizes out of the box to instruction following, raising IFEval by 3x.&lt;/p&gt;
+        &lt;p&gt;All of this is possible without allowing Astra to write training loops. It uses its reasoning to figure out what each part of a neural network computes, or should compute, and changes the weights accordingly. We call this &lt;strong&gt;Weight-Space Programming&lt;/strong&gt;.&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The paper combines two topics that I think deserve to be treated separately. The first is what models can do with raw weights &lt;em&gt;without&lt;/em&gt; running tools or executing code. The second explores how well models, once armed with code, can run operations to update and improve other models.&lt;/p&gt;
+        &lt;p&gt;spaCy author Matthew Honnibal &lt;a href=&quot;https://honnibal.dev/blog/astra-read-write-misleading&quot;&gt;called the paper misleading&lt;/a&gt; for conflating the two, and Sean Goedecke &lt;a href=&quot;https://www.seangoedecke.com/llms-are-not-superhuman-at-reading-and-writing-neural-network-weights/&quot;&gt;deconstructed the Qwen3.5-0.8B update example&lt;/a&gt; as taking the same steps that a human ML researcher would use.&lt;/p&gt;
+        &lt;p&gt;I&apos;m going to focus on the no-tools question, which I think is the more interesting of the two.&lt;/p&gt;
+        &lt;p&gt;The paper presents the first question as &lt;strong&gt;Can LLMs understand model behaviors from weights?&lt;/strong&gt; They trained four neural networks to play simplified 10x10 grid versions of four classic computer games - Breakout, Pong, Pac-Man, and Freeway (I had &lt;a href=&quot;https://en.wikipedia.org/wiki/Freeway_(video_game)&quot;&gt;to look that one up&lt;/a&gt;, it&apos;s an Atari 2600 game from 1981). Then they fed those weights (as floating point numbers) to an LLM along with the following question:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;code&gt;The weights below belong to one policy network that was trained with reinforcement learning to play a game on this grid. Which game was it trained on? Work from the weights. You have no tools: no code execution, no calculator, nothing to run. This is a single response.&lt;/code&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;The GitHub repository that accompanies the paper is &lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs&quot;&gt;RikiyaT/lm_understand-logs&lt;/a&gt;. The &lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs/tree/main/exp1_which_game&quot;&gt;exp1_which_game&lt;/a&gt; folder contains the prompts they used, with weights for the four games:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs/blob/main/exp1_which_game/runs/breakout/prompt.txt&quot;&gt;breakout/prompt.txt&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs/blob/main/exp1_which_game/runs/freeway/prompt.txt&quot;&gt;freeway/prompt.txt&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs/blob/main/exp1_which_game/runs/pacman/prompt.txt&quot;&gt;pacman/prompt.txt&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&quot;https://github.com/RikiyaT/lm_understand-logs/blob/main/exp1_which_game/runs/pong/prompt.txt&quot;&gt;pong/prompt.txt&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I checked and, aside from the weights, each prompt is identical to the others.&lt;/p&gt;
+        &lt;h4 id=&quot;trying-it-out-with-qwen-3-8-27b-and-other-models&quot;&gt;Trying it out with Qwen 3.8 27B and other models&lt;/h4&gt;
+        &lt;p&gt;The prompts on GitHub are self-contained. My &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt; tool has a &lt;code&gt;-f/--fragment&lt;/code&gt; option which can be passed the URL to a text file to use as a prompt, which means I can run any of the above like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;llm -f https://raw.githubusercontent.com/RikiyaT/lm_understand-logs/refs/heads/main/exp1_which_game/runs/breakout/prompt.txt \
+        -m openrouter/moonshotai/kimi-k3.1-pro&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;This example requires the &lt;a href=&quot;https://github.com/simonw/llm-openrouter&quot;&gt;llm-openrouter plugin&lt;/a&gt; installed, and runs the Breakout prompt against Kimi K3.1 Pro via OpenRouter. Here&apos;s &lt;a href=&quot;https://gist.github.com/simonw/9f18d2945a105c04734ef7e5cd95717c&quot;&gt;what I got back from Kimi K3.1 Pro&lt;/a&gt;, which successfully guessed Breakout after 9m 41s and 19,493 reasoning tokens.&lt;/p&gt;
+        &lt;p&gt;But how about &lt;a href=&quot;https://simonwillison.net/2026/Aug/16/qwen-38-27b/&quot;&gt;Qwen 3.8 27B&lt;/a&gt;? That&apos;s still my favorite model to run on my own laptop - it&apos;s just 17GB (I use &lt;a href=&quot;https://huggingface.co/lmstudio-community/Qwen3.8-27B-GGUF/blob/main/Qwen3.8-27B-Q4_K_M.gguf&quot;&gt;this version&lt;/a&gt;) and somehow feels close to the leading proprietary models of 2025.&lt;/p&gt;
+        &lt;p&gt;I fired up &lt;a href=&quot;https://lmstudio.ai&quot;&gt;LM Studio&lt;/a&gt;, ensured Qwen 3.8 27B was loaded with a long context window (the default 8192 context failed with errors), installed the &lt;a href=&quot;https://github.com/llm-lmstudio/llm-lmstudio&quot;&gt;llm-lmstudio&lt;/a&gt; plugin and ran this command:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;LMSTUDIO_TIMEOUT=900 \
+        llm -f https://raw.githubusercontent.com/RikiyaT/lm_understand-logs/refs/heads/main/exp1_which_game/runs/pacman/prompt.txt \
+        -m lmstudio/qwen/qwen3.8-27b&lt;/pre&gt;&lt;/div&gt;
+        &lt;p&gt;(I had to bump the timeout up using an environment variable, see &lt;a href=&quot;https://github.com/llm-lmstudio/llm-lmstudio/issues/16&quot;&gt;this issue&lt;/a&gt;.)&lt;/p&gt;
+        &lt;p&gt;After 46m 12s and 43,506 reasoning tokens, Qwen on my laptop &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#response-1&quot;&gt;returned a response&lt;/a&gt; that ended like this (here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#reasoning-1&quot;&gt;the reasoning trace&lt;/a&gt;):&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Game: A simplified Pac-Man-style gridworld: an agent moves through a fixed 8x8 maze with central and corner wall blocks, moving objects/ghosts, and reward targets/pellets.&lt;/p&gt;
+        &lt;p&gt;Description: The agent navigates a fixed maze-like 8x8 board, using current agent/moving-object/previous-frame cues to move through corridors, collect reward-target cells, and avoid moving objects or hazards.&lt;/p&gt;
+        &lt;p&gt;Confidence: 72%&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;This is impressive. I tried it on two of the other games as well. It &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#response-2&quot;&gt;identified Pong&lt;/a&gt; (&lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#reasoning-2&quot;&gt;reasoning&lt;/a&gt;) in 1h 4m 54s:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;&lt;strong&gt;Pong&lt;/strong&gt; — specifically a Pong-like paddle/ball game where the agent controls a vertical paddle on the right side and must move up/down to intercept or return a moving ball/reward object.&lt;/p&gt;
+        &lt;p&gt;Description:&lt;/p&gt;
+        &lt;p&gt;The agent moves a right-side paddle vertically to hit or catch a moving ball-like reward target moving across the 8×8 field, while a left-side moving object/opponent and wall borders define the play; reward is obtained by successfully intercepting/returning/scoring the ball, and missing or failing to hit it is penalized.&lt;/p&gt;
+        &lt;p&gt;Confidence:&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;75%&lt;/strong&gt;&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;And &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#response&quot;&gt;Breakout&lt;/a&gt; (&lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F387d3a7927f165b1986bb6c2099d0f53#reasoning&quot;&gt;reasoning&lt;/a&gt;) in 52m 25s:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;Game: Breakout, or an Arkanoid-like paddle/ball/brick game.&lt;/p&gt;
+        &lt;p&gt;Description: The agent is a paddle on the bottom row and moves left/right to keep a ball in play; the ball moves around the upper grid, and bricks/reward targets in the top rows give reward when hit, while missing the ball/hitting the bottom wall ends the episode or gives penalty.&lt;/p&gt;
+        &lt;p&gt;Confidence: 88%&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;Qwen failed at the Freeway prompt, which didn&apos;t surprise me considering that game is more obscure than the other three. Here&apos;s &lt;a href=&quot;https://tools.simonwillison.net/markdown-svg-renderer?url=https%3A%2F%2Fgist.github.com%2Fsimonw%2F6ed68f659e26a32e7d9096391d92f326&quot;&gt;that transcript&lt;/a&gt; - Qwen thought it was &quot;A simplified Pac-Man-like grid game: agent moves 4-directionally&quot;.&lt;/p&gt;
+        &lt;p&gt;The reasoning traces are fun to skim, and almost incomprehensible. Here&apos;s a sample:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;p&gt;What about agent channel0? We see some large channel0 rows near row8 col7/8 and maybe bottom? Let&apos;s list channel0 large: line436 input435 (row8 col7 ch0) -2.107,1.169,0.513...; line441 input440 (row8 col8 ch0) -0.376,0.010,1.564,3.855...; line445 input444 (row8 col8 ch4) 0.142,0.491...; line382? input381 ch0? Wait line382 input381: 381//5=76 (row7 col6), ch1? 381%5=1? 76 * 5=380, ch1. So not. Channel0 large maybe at row8 col7/8 only. Also top row? line44 input43 ch3, line49 ch3. Channel0 large maybe not many. Agent position could be near bottom-right? If the agent is typically at bottom-right?&lt;/p&gt;
+        &lt;/blockquote&gt;
+        &lt;p&gt;That said though, I expect a sufficiently experienced human being armed with a notepad and a pencil could get there with enough effort.&lt;/p&gt;
+        &lt;p&gt;It&apos;s a cool paper, but some of the wider commentary I&apos;ve seen around it does not feel justified. I&apos;m not ready to declare that the age of source code is over and our future involves incomprehensible machines editing their own model weights in incomprehensible ways.&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/machine-learning&quot;&gt;machine-learning&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/local-llms&quot;&gt;local-llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/qwen&quot;&gt;qwen&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/paper-review&quot;&gt;paper-review&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>I discovered a sound that leaks your exact location (and it&apos;s everywhere) - YouTube</title>
+      <link>https://simonwillison.net/2026/Nov/3/a-sound-that-leaks-your-exact-location/</link>
+      <guid>https://simonwillison.net/2026/Nov/3/a-sound-that-leaks-your-exact-location/</guid>
+      <pubDate>Tue, 03 Nov 2026 05:32:25 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=UytYrhYLOKI&quot;&gt;I discovered a sound that leaks your exact location (and it&amp;#x27;s everywhere) - YouTube&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        Genius piece of OSINT by Colsto, who demonstrates how you can take almost imperceptible background noise of planes from a video soundtrack, figure out their Doppler curves, then cross reference them against ADS-B data to find the exact location of the video based on their speed, distance, and gaps between different flights.&lt;/p&gt;
+        &lt;p&gt;&lt;lite-youtube videoid=&quot;UytYrhYLOKI&quot; js-api=&quot;js-api&quot;
+        title=&quot;I discovered a sound that leaks your exact location (and it&apos;s everywhere)&quot;
+        playlabel=&quot;Play: I discovered a sound that leaks your exact location (and it&apos;s everywhere)&quot;
+        &gt; &lt;/lite-youtube&gt;
+        
+        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://lobste.rs/s/s1btqo/this_background_sound_leaks_your_exact&quot;&gt;Lobste.rs&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/privacy&quot;&gt;privacy&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/youtube&quot;&gt;youtube&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>October sponsors-only newsletter</title>
+      <link>https://simonwillison.net/2026/Nov/3/october-newsletter/</link>
+      <guid>https://simonwillison.net/2026/Nov/3/october-newsletter/</guid>
+      <pubDate>Tue, 03 Nov 2026 05:28:59 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I sent out the October edition of my &lt;a href=&quot;https://github.com/sponsors/simonw/&quot;&gt;sponsors-only monthly newsletter&lt;/a&gt;. If you are a sponsor (or start a sponsorship now) you can &lt;a href=&quot;https://github.com/simonw-private/monthly/blob/main/2026-10-october.md&quot;&gt;access it here&lt;/a&gt;. This month:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;The October inflection point for vibe game development&lt;/li&gt;
+        &lt;li&gt;The vulnerability apocalypse gets hot&lt;/li&gt;
+        &lt;li&gt;LLM releases&lt;/li&gt;
+        &lt;li&gt;API credits for $100+/month subscriptions&lt;/li&gt;
+        &lt;li&gt;What I&apos;m using right now&lt;/li&gt;
+        &lt;li&gt;My software releases&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;My September newsletter &lt;a href=&quot;https://simonwillison.net/newsletters/monthly-2026-09-september/&quot;&gt;can now be seen here&lt;/a&gt;, as a preview of what you&apos;ll get. Pay $10/month to stay a month ahead of the free copy!&lt;/p&gt;
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/newsletter&quot;&gt;newsletter&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm 0.37</title>
+      <link>https://simonwillison.net/2026/Nov/2/llm/</link>
+      <guid>https://simonwillison.net/2026/Nov/2/llm/</guid>
+      <pubDate>Mon, 02 Nov 2026 23:49:30 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.37&quot;&gt;llm 0.37&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;There&apos;s a &lt;em&gt;lot&lt;/em&gt; of stuff in this new release of my LLM CLI tool and Python library, representing around two months of accumulated features and fixes.&lt;/p&gt;
+        &lt;p&gt;I added &lt;code&gt;gpt-6.1-sol&lt;/code&gt; and &lt;code&gt;gpt-6.1-terra&lt;/code&gt;, plus a new &lt;a href=&quot;https://llm.datasette.io/en/stable/other-models.html#configure-an-openai-compatible-model&quot;&gt;llm openai endpoint add&lt;/a&gt; command to make it easier to configure additional models that use OpenAI-compatible endpoints.&lt;/p&gt;
+        &lt;p&gt;I switched the default model (if you have not set your own default) to &lt;code&gt;gpt-6-luna&lt;/code&gt; - half the price of the previous default, &lt;code&gt;gpt-5.6-luna&lt;/code&gt;.&lt;/p&gt;
+        &lt;p&gt;LLM&apos;s support for embeddings now accepts that different binary content may have different content-type - necessary for models like &lt;a href=&quot;https://deepmind.google/models/gemini/embedding/&quot;&gt;Gemini Embedding 2&lt;/a&gt;, which can embed text, audio, images, and video.&lt;/p&gt;
+        &lt;p&gt;A lot of open source maintainers complain about a flood of AI-assisted PRs. LLM is my project that has been most affected by this and, to be honest, I&apos;m not finding it to be a problem. That&apos;s mainly because I have Opus 5.5 or GPT-6 Astra help me with triage to spot the most useful fixes!&lt;/p&gt;
+        &lt;p&gt;This release includes fixes from 12 authors - almost all AI-assisted - and the burden of reviewing them wasn&apos;t nearly as great as I expected. I really see them as bug reports with attached examples - sometimes I land them, sometimes I implement my own fix.&lt;/p&gt;
+        &lt;p&gt;So thanks to &lt;a href=&quot;https://github.com/0d00ciallo0721&quot;&gt;0d00ciallo0721&lt;/a&gt;, &lt;a href=&quot;https://github.com/ac1982&quot;&gt;ac1982&lt;/a&gt;, &lt;a href=&quot;https://github.com/allenflux&quot;&gt;Allen Flux&lt;/a&gt;, &lt;a href=&quot;https://github.com/bianyh&quot;&gt;Bian Yuhan&lt;/a&gt;, &lt;a href=&quot;https://github.com/porkedchop&quot;&gt;Bishop Kammeraad&lt;/a&gt;, &lt;a href=&quot;https://github.com/feiiiiii5&quot;&gt;Chen Yufeiyang&lt;/a&gt;, &lt;a href=&quot;https://github.com/chrikrah&quot;&gt;Christopher Krah&lt;/a&gt;, &lt;a href=&quot;https://github.com/ethanstoner&quot;&gt;Ethan Stoner&lt;/a&gt;, &lt;a href=&quot;https://github.com/er-s-an&quot;&gt;Jiachen Xie&lt;/a&gt;, &lt;a href=&quot;https://github.com/Pajimo&quot;&gt;Olamide Faniyan&lt;/a&gt;, &lt;a href=&quot;https://github.com/sharatchandrasai999-sketch&quot;&gt;Sharat Chandra Sai Boddu&lt;/a&gt;, &lt;a href=&quot;https://github.com/nosmile99&quot;&gt;nosmile99&lt;/a&gt; for helping out with (or spending tokens on) this release!&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-release-notes&quot;&gt;annotated-release-notes&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/embeddings&quot;&gt;embeddings&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The U.S. Census Bureau and “Super Intelligence”</title>
       <link>https://simonwillison.net/2026/Nov/2/census-bureau-super-intelligence/</link>
@@ -17,6 +146,8 @@
         &lt;p&gt;The latest data is published on alternating Thursdays at 10am.&lt;/p&gt;
         &lt;p&gt;I used the most recent numbers (published October 22, 2026) to create a new version (&lt;a href=&quot;https://chatgpt.com/share/6ae89e86-8658-83e8-85fd-c4ef2d4f3b89?ogimg=plain&quot;&gt;GPT-6 Astra Extra High transcript&lt;/a&gt;) of the AI adoption chart, updated to reflect both the last twelve months and a change that was made to the survey question sent out by the Bureau:&lt;/p&gt;
         &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026-11-01/5821A414-FAF6-4E61-B037-952C1FD80D39.png&quot; alt=&quot;Line chart titled &amp;quot;AI use by U.S. firm size&amp;quot;, subtitled &amp;quot;Six-survey trailing average • Share of employer businesses reporting use in the last two weeks&amp;quot; and &amp;quot;Updated with the October 22, 2026 Census release&amp;quot;. Seven lines for firm sizes 250+, 100–249, 50–99, 20–49, 10–19, 5–9 and 1–4, on a y-axis from 0% to 45% and an x-axis from Jan 2024 to Oct 2026. Left section, &amp;quot;AI in producing goods or services&amp;quot;: all sizes start at 3–5% in late 2023 and climb slowly to 7–13% by September 2025, with 250+ highest. A shaded gap is labeled &amp;quot;Question broadened Nov 2025&amp;quot; and &amp;quot;Series not comparable&amp;quot;. Right section, &amp;quot;AI in any business function&amp;quot;: all lines restart higher in February 2026 and rise steadily to &amp;quot;250+: 40.7%&amp;quot;, &amp;quot;100–249: 33.5%&amp;quot;, &amp;quot;50–99: 27.9%&amp;quot;, &amp;quot;20–49: 23.8%&amp;quot;, &amp;quot;1–4: 23.3%&amp;quot;, &amp;quot;10–19: 22.1%&amp;quot;, &amp;quot;5–9: 21.1%&amp;quot;. Footnotes: &amp;quot;Source: U.S. Census Bureau, Business Trends and Outlook Survey (BTOS). Size groups are numbers of employees.&amp;quot; &amp;quot;Method: arithmetic mean of six successive survey estimates, calculated separately for each question wording; no bridging of the break.&amp;quot; &amp;quot;Dates use reference-period end, matching the original chart. Latest: Oct 4, 2026 (collected Oct 5–18). First new six-wave average: Jan 25, 2026.&amp;quot; &amp;quot;The gap includes the 2025 shutdown and the wait for six observations under the broader question. Survey uncertainty is not displayed.&amp;quot;&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://static.simonwillison.net/static/2026-11-01/5821A414-FAF6-4E61-B037-952C1FD80D39.png&quot;&gt;a link to the larger image&lt;/a&gt;.&lt;/p&gt;
         
         
         &lt;p&gt;For comparison, here&apos;s that AI adoption chart from last year (my GPT-5 version):
@@ -669,330 +800,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>eMudhra Intermediate CA Compromise</title>
-      <link>https://simonwillison.net/2026/Oct/20/emudhra-certificates/</link>
-      <guid>https://simonwillison.net/2026/Oct/20/emudhra-certificates/</guid>
-      <pubDate>Tue, 20 Oct 2026 23:50:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://emudhra.we-have-a-problem.com&quot;&gt;eMudhra Intermediate CA Compromise&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        This is very, very bad news:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;The private keys of eight eMudhra intermediate CA certificates have been compromised. They chain to roots trusted by the Mozilla, Microsoft, Apple and Chrome root programs and by many downstream trust stores.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Any software that bundles a list of trusted certificates needs to be updated. This site is tracking software updates &lt;a href=&quot;https://github.com/galadran/we-have-a-problem.com&quot;&gt;via this GitHub repository&lt;/a&gt; - Linux distros need to update their &lt;code&gt;ca-certificates&lt;/code&gt; packages.&lt;/p&gt;
-        &lt;p&gt;In Python world &lt;a href=&quot;https://github.com/astral-sh/uv/releases/tag/0.13.4&quot;&gt;uv 0.13.4&lt;/a&gt; and &lt;a href=&quot;https://github.com/pypa/pip/releases/tag/26.2.2&quot;&gt;pip 26.2.2&lt;/a&gt; and &lt;a href=&quot;https://github.com/certifi/python-certifi/releases/tag/2026.10.19&quot;&gt;certifi 2026.10.19&lt;/a&gt; have been released with upgraded certificate lists.&lt;/p&gt;
-        &lt;p&gt;There&apos;s a &lt;a href=&quot;https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576&quot;&gt;very informative thread&lt;/a&gt; about this on the official Python forum.
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/encryption&quot;&gt;encryption&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/https&quot;&gt;https&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pip&quot;&gt;pip&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/python&quot;&gt;python&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/uv&quot;&gt;uv&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Battle Drones - a vibe coded RTS with audio-based multiplayer</title>
-      <link>https://simonwillison.net/2026/Oct/20/battledrones/</link>
-      <guid>https://simonwillison.net/2026/Oct/20/battledrones/</guid>
-      <pubDate>Tue, 20 Oct 2026 19:34:19 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;My latest vibe coded game experiment is a Command &amp;amp; Conquer style RTS (Real Time Strategy) game called &lt;a href=&quot;https://github.com/simonw/battledrones#readme&quot;&gt;Battle Drones&lt;/a&gt; (&lt;a href=&quot;https://simonw.github.io/battledrones/&quot;&gt;play it here&lt;/a&gt;). Unlike &lt;a href=&quot;https://simonwillison.net/2026/Aug/5/raccoon-heist/&quot;&gt;my previous experiments&lt;/a&gt;, this one is &lt;em&gt;actually fun to play&lt;/em&gt;. I&apos;m somewhat embarrassed to admit that I got there by telling Claude to &quot;Make it a LOT more fun&quot;. It also supports multiplayer between nearby devices using audio to synchronize game state! Here&apos;s what I&apos;ve built so far, and some of the things I learned along the way.&lt;/p&gt;
-        
-        &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#battle-drones&quot;&gt;Battle Drones&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#how-i-built-this&quot;&gt;How I built this&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v1-the-initial-prototype&quot;&gt;v1: the initial prototype&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v2-full-sprites&quot;&gt;v2: full sprites&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v3-varied-terrain&quot;&gt;v3: varied terrain&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v4-the-fun-update&quot;&gt;v4: the fun update&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v5-battle-drones-goes-3d&quot;&gt;v5: Battle Drones goes 3D&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v8-archipelago&quot;&gt;v8: Archipelago&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v10-goliath-and-agent-battles&quot;&gt;v10: Goliath, and agent battles&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#agent-battles&quot;&gt;Agent battles&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v11-random-maps&quot;&gt;v11: Random Maps&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#v12-multiplayer-via-sound&quot;&gt;v12: Multiplayer via sound&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#some-thoughts&quot;&gt;Some thoughts&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#update-online-multiplayer-support&quot;&gt;Update: Online multiplayer support&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h4 id=&quot;battle-drones&quot;&gt;Battle Drones&lt;/h4&gt;
-        &lt;p&gt;My initial goal was to build an RTS game I could play on my phone, in the style of &lt;a href=&quot;https://en.wikipedia.org/wiki/Command_&amp;amp;_Conquer_(1995_video_game)&quot;&gt;Command &amp;amp; Conquer&lt;/a&gt;. I have fond memories of the 1995 original (I liked Red Alert too) and wanted to recapture a little bit of the magic.&lt;/p&gt;
-        &lt;p&gt;After 12 major iterations (and &lt;a href=&quot;https://github.com/simonw/battledrones/commits/main/&quot;&gt;321 commits&lt;/a&gt; by coding agents, mainly Claude Code) I now have a browser-based game that works on mobile and desktop, has multiple play modes, several maps (including a random map generator) and even supports multiplayer for two devices within microphone range of each other. (&lt;strong&gt;Update&lt;/strong&gt;: also &lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/#update-online-multiplayer-support&quot;&gt;online multiplayer&lt;/a&gt;; the audio multiplayer induced headaches!)&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a video demo of Battle Drones running in a desktop browser:&lt;/p&gt;
-        
-        &lt;video
-        src=&quot;https://static.simonwillison.net/static/2026/archipelago_720p_h264.mp4&quot;
-        poster=&quot;https://static.simonwillison.net/static/2026/archipelago_poster.jpg&quot;
-        preload=&quot;none&quot;
-        loop=&quot;1&quot; controls=&quot;1&quot;
-        playsinline=&quot;1&quot; muted=&quot;1&quot;
-        width=&quot;1280&quot;
-        height=&quot;706&quot;
-        style=&quot;display: block; width: 100%; height: auto;&quot;
-        &gt; &lt;/video&gt;
-        
-        &lt;p style=&quot;margin-top: 1em&quot;&gt;Features so far include:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;9 buildings, 7 ground vehicles, 6 aerial vehicles, 3 infantry units - all 3D models, which you can &lt;a href=&quot;https://simonw.github.io/battledrones/models.html&quot;&gt;browse here&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;Fog of war&lt;/li&gt;
-        &lt;li&gt;Different weapons are needed to target aerial or ground vehicles&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Six maps&lt;/strong&gt;, across five biomes - temperate, desert, arctic, volcanic, tropical&lt;/li&gt;
-        &lt;li&gt;A random map generator&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Skirmish mode&lt;/strong&gt; - red vs. blue on a rotationally symmetrical map&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Last Stand mode&lt;/strong&gt; - one player holds out against as many waves of enemies as possible&lt;/li&gt;
-        &lt;li&gt;Area effect weapons: Barrage, EMP, Drop Pod, Sky Hammer&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Crate drops&lt;/strong&gt; with bonus resources&lt;/li&gt;
-        &lt;li&gt;In-game music that responds to events - it gets more intense as fighting breaks out&lt;/li&gt;
-        &lt;li&gt;Different in-game &lt;strong&gt;AI personalities&lt;/strong&gt; (Balanced, Rush, Air Swarm, Boom, Skyforce, Ironclad)&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;AI vs. AI&lt;/strong&gt; mode, to watch those personalities play each other&lt;/li&gt;
-        &lt;li&gt;The &lt;strong&gt;Goliath&lt;/strong&gt; - a giant stomping mech with laser eyes and arm cannons and the ability to establish a new base&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Mutators&lt;/strong&gt; that add extra rules or twists&lt;/li&gt;
-        &lt;li&gt;A &quot;Daily Op&quot; challenge&lt;/li&gt;
-        &lt;li&gt;Ranks and achievements (&lt;strong&gt;Medals&lt;/strong&gt;)&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Agent vs. Agent&lt;/strong&gt; mode where two LLMs can play Battle Drones against each other&lt;/li&gt;
-        &lt;li&gt;A &lt;strong&gt;multiplayer mode&lt;/strong&gt; based on two nearby phones communicating via audio messages, an extension of my earlier experiment with &lt;a href=&quot;https://simonwillison.net/2026/Oct/15/chirp-pong/&quot;&gt;Chirp Pong&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h4 id=&quot;how-i-built-this&quot;&gt;How I built this&lt;/h4&gt;
-        &lt;p&gt;Battle Drones is heavily vibe coded - I&apos;ve reviewed almost none of the code, and it&apos;s built in a language (TypeScript) that I&apos;ve hardly used myself. I&apos;ve playtested it quite a bit though, and it&apos;s been through a large number of iterations since I started the project.&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a rough history of the project so far, including key prompts and links to transcripts.&lt;/p&gt;
-        &lt;h4 id=&quot;v1-the-initial-prototype&quot;&gt;v1: the initial prototype&lt;/h4&gt;
-        &lt;p&gt;I started out with Claude Fable 5 back in July:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;We are going to build a mobile friendly RTS game - command and conquer style - called Battle Drones, in which two armies of drones (both flying and ground-based) battle for territory and resources&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Let&apos;s start with a MVP design, ask me some questions&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Here&apos;s a &lt;a href=&quot;https://claude.ai/code/session_015RYeKm4ji4N16oqthyX1b1&quot;&gt;shared transcript&lt;/a&gt;. I&apos;d given Claude Code for Web an environment variable with an OpenAI API key and told it to use the OpenAI &lt;a href=&quot;https://developers.openai.com/api/docs/guides/image-generation&quot;&gt;Image Generation API&lt;/a&gt; for assets, which got me some basic sprites.&lt;/p&gt;
-        &lt;p&gt;You can &lt;a href=&quot;https://simonw.github.io/battledrones/v1/&quot;&gt;try v1 here&lt;/a&gt; - it looked like this:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v1.webp&quot; alt=&quot;Game screen. Down the right are text icons to build Fab, Airpad, Turret, Harv, Sting, Flak, Scout, Wasp, Raptor. There is a blocky fog of war on a 2D battlefield. There are some gems, an HQ building being attacked by badly rendered tanks, and some blue vehicles dotted around. It&apos;s not very visually impressive but it does look like a basic RTS.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;It&apos;s recognizable as an RTS, has building mechanics and the ability to select and direct units, and a basic AI to play against.&lt;/p&gt;
-        
-        &lt;p&gt;This first version was barely a proof of concept, and it wasn&apos;t any fun to play.&lt;/p&gt;
-        &lt;p&gt;Claude used the &lt;a href=&quot;https://github.com/phaserjs/phaser&quot;&gt;Phaser&lt;/a&gt; 2D game framework for these early versions. I didn&apos;t even realize this until several iterations later!&lt;/p&gt;
-        &lt;h4 id=&quot;v2-full-sprites&quot;&gt;v2: full sprites&lt;/h4&gt;
-        &lt;p&gt;The second version (&lt;a href=&quot;https://simonw.github.io/battledrones/v2/&quot;&gt;try v2 here&lt;/a&gt;) added sprites for all of the vehicles and the &quot;AI vs. AI&quot; mode, so I could watch the game playing without having to directly control it myself.&lt;/p&gt;
-        &lt;p&gt;Claude proved reasonably competent at prompting OpenAI&apos;s image models to generate sprites. You can browse the v2 sprites in the &lt;a href=&quot;https://github.com/simonw/battledrones/tree/v2/public/assets/sprites&quot;&gt;public/assets/sprites&lt;/a&gt; folder.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v2.webp&quot; alt=&quot;Four flying units, three turrets, a harvester and an airpad all have proper sprites now. The scrap field has a new design which doesn&apos;t look great but is at least using a graphic.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;v3-varied-terrain&quot;&gt;v3: varied terrain&lt;/h4&gt;
-        &lt;p&gt;It still wasn&apos;t much fun, and the graphics were boring. It was now October, and I had upgraded to Claude Opus 5.5. I told it:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Massively improve this game. Make the graphics and gameplay better (keep it mobile friendly). Render new graphics using the latest OpenAI GPT image API (lookup details) with the API key in the environment variable. Add new unit types and balance the gameplay better. Also add new buildings and better, more varied terrain.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This resulted in five new maps with generated background tiles in a variety of styles, &lt;a href=&quot;https://github.com/simonw/battledrones/commit/aa22f08a34347d7d9f94b33f44a73b4deb046aa1&quot;&gt;visible here&lt;/a&gt;. Opus also regenerated the sprites, making them much more visually appealing. You can &lt;a href=&quot;https://simonw.github.io/battledrones/v3/&quot;&gt;try v3 here&lt;/a&gt; - it looks like this:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v3.jpg&quot; alt=&quot;The map is now an ice map with snow and ice and broken ice - it looks really good. The vehicles and buildings have all had a cosmetic upgrade too. This is starting to look like a real game.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;This is starting to feel like a real game! It still wasn&apos;t very fun to play though - I found myself getting bored pretty quickly.&lt;/p&gt;
-        &lt;h4 id=&quot;v4-the-fun-update&quot;&gt;v4: the fun update&lt;/h4&gt;
-        &lt;p&gt;So far my Battle Drones experiment was confirming my &lt;a href=&quot;https://simonwillison.net/2026/Sep/27/2026-in-llms-so-far/#simon-willison-2026-in-llms.059.webp&quot;&gt;previous belief&lt;/a&gt; that coding agents can build a thing that looks like a game but can&apos;t actually make something that&apos;s genuinely compelling to play.&lt;/p&gt;
-        &lt;p&gt;I shared this theory with someone over dinner, and then thought to myself that I should give the models a proper chance to prove me wrong. I prompted Opus 5.5 on my phone:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;This game isn&apos;t fun enough yet. Make it a LOT more fun.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This time I was running in &lt;a href=&quot;https://code.claude.com/docs/en/workflows&quot;&gt;Ultracode mode&lt;/a&gt;, where Claude Code (in this case Claude Code for Web) runs &quot;dynamic workflows&quot;, described in their docs as:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;A dynamic workflow is a JavaScript script that orchestrates many &lt;a href=&quot;https://code.claude.com/docs/en/sub-agents&quot;&gt;subagents&lt;/a&gt; at once.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;This kicked off &lt;em&gt;many hours&lt;/em&gt; of work. I started it in the evening and didn&apos;t get a playable result back until late into the next morning. But the results were spectacular.&lt;/p&gt;
-        &lt;p&gt;You can &lt;a href=&quot;https://simonw.github.io/battledrones/v4/&quot;&gt;try v4 here&lt;/a&gt; - it looks like this:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v4.jpg&quot; alt=&quot;The lava map. Uplink satellites are being taken, crystals look better, Elite text is shown above a unit, there is an arrow marked Fight to jump to a fight, the AI vs AI mode has a speed controller - plenty of new features here.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;I had Claude &lt;a href=&quot;https://github.com/simonw/battledrones/blob/main/Battle%20Drones%20The%20Fun%20Update%20%E2%80%94%20Release%20Notes.md&quot;&gt;write its own release notes&lt;/a&gt; - here are the highlights:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Every skirmish and Daily Op now opens with a choice, gives the side that&apos;s losing a way back, and pulls the armies into the middle of the map. There are also two new ways to play.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Openers&lt;/strong&gt;: pick Blitz, Industry or Air Wing before the clock starts.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Call-down powers&lt;/strong&gt;: Barrage, EMP, Drop Pod and the Sky Hammer orbital strike.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Objectives and salvage&lt;/strong&gt;: Uplink relays, supply drops and wrecks worth scrap.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Feel&lt;/strong&gt;: combat juice, adaptive music, unit voices and an announcer.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Command&lt;/strong&gt;: battle alerts, game speed, saved squads and touch placement.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;New modes&lt;/strong&gt;: Last Stand survival waves and an 8-mission Ops campaign.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Progression&lt;/strong&gt;: heroes, an after-action report with awards, a career, 7 mutators and a Daily Op.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Fights run longer and swing more. In 1,200 AI-vs-AI test matches on Normal, games still undecided after 25 minutes fell from 14% to 0.9%. The share of wins by a side that had been 800+ scrap behind rose from 24% to 46%.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Part of the reason Claude took so long was that it ran over a thousand simulated playtest sessions, and used the results to rebalance the existing units, add new ones, and introduce new features.&lt;/p&gt;
-        &lt;h4 id=&quot;v5-battle-drones-goes-3d&quot;&gt;v5: Battle Drones goes 3D&lt;/h4&gt;
-        &lt;p&gt;After the success of Ultracode at &quot;Make it a LOT more fun&quot;, I decided to be more ambitious:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Port this game to three.js with 3D models for all of the buildings and vehicles and landscapes&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;That was another overnight run. I woke up to &lt;a href=&quot;https://simonw.github.io/battledrones/v5/&quot;&gt;this v5 version&lt;/a&gt;:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v5.jpg&quot; alt=&quot;Now it is in 3D - the battlefield is at a slight angle, the buildings and vehicles are all 3D models, the rocks and trees look a bit 3D as well.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;The new 3D models were entirely constructed by Claude in TypeScript code.&lt;/p&gt;
-        &lt;p&gt;v6 (&lt;a href=&quot;https://simonw.github.io/battledrones/v6/&quot;&gt;play v6 here&lt;/a&gt;) added some more visual polish. v7 (&lt;a href=&quot;https://simonw.github.io/battledrones/v7/&quot;&gt;play v7&lt;/a&gt;) added robot infantry (troopers, rocket squads, snipers) and a &quot;Condor&quot; troop carrying aircraft.&lt;/p&gt;
-        &lt;h4 id=&quot;v8-archipelago&quot;&gt;v8: Archipelago&lt;/h4&gt;
-        &lt;p&gt;I was beginning to feel guilty at how little actual design input I had into the game - it really had been a case of me saying &quot;make it more fun&quot; and &quot;add visual polish&quot; for the past few releases.&lt;/p&gt;
-        &lt;p&gt;I&apos;d noticed that the AI didn&apos;t use the new infantry and troop carrying aircraft from v7 very often - there wasn&apos;t a great strategic reason to use them.&lt;/p&gt;
-        &lt;p&gt;It would be neat if we had a new map with a new game mechanic that actively encouraged players to load up Condors with infantry robots and send them out into the map.&lt;/p&gt;
-        &lt;p&gt;This resulted in my longest prompt yet:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Design a new map. Goal is to make different strategic incentives that encourage use of Infantry and Condors and aerial vehicles.&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;To do this the map will have limited harvester resources but several more uplinks - but uplinks will be on islands that are inaccessible by land vehicles or infantry. These uplinks can also not be claimed using air vehicles. The ONLY way to get them is to fly infantry there in a Condor.&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Armies always start with a Condor and a single squad. If an army has no Condor a new one will be provided for free, flying in from the edge closest to their HQ and landing there. That free condor will come with a single free squad on board.&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;The two HQs should be entirely separated by water, but still accessible by vehicles thanks to two bridges across the map in different places&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;I want to encourage a battle over uplinks.&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;The map should be the times the size of other maps - still square&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;First research and then critique this design. Only build after we have agreed on any modifications&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;You get to design a new biome for this&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;The result was the tropical &lt;strong&gt;Archipelago&lt;/strong&gt; map, with seven island uplinks that players can only capture by flying out infantry in a Condor. It&apos;s definitely the most fun map to play, once you&apos;ve got the hang of the basic game mechanics from the simpler maps. The &lt;a href=&quot;https://simonw.github.io/battledrones/v9/&quot;&gt;v9 edition&lt;/a&gt; made that map a little more interesting - it now looks like this:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/battledrones-v8.jpg&quot; alt=&quot;Three islands, each with an uplink satellite. Blue holds one, red holds another, A blue condor is flying towards the red island, which is guarded by a red plane. There is a bridge nearby. The theme is tropical islands and looks very pleasant.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;v10-goliath-and-agent-battles&quot;&gt;v10: Goliath, and agent battles&lt;/h4&gt;
-        &lt;p&gt;I decided to add giant robot mechs to the game - think Jaegers from &lt;a href=&quot;https://en.wikipedia.org/wiki/Pacific_Rim_(film)#Plot&quot;&gt;Pacific Rim&lt;/a&gt;, or Titans from Warhammer 40,000.&lt;/p&gt;
-        &lt;p&gt;Here are some of the prompts I used to brainstorm with Claude:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Help me brainstorm ideas for adding giant robots to this game - think dreadnoughts or titans from W20K - how could we do this in a way that enhanced gameplay, kept things balanced, added unique twist? Don&apos;t overthink this yet&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Let&apos;s keep brainstorming. I like the idea that it&apos;s a mobile base - that can accept harvested scrap and can have buildings built near it (even if it later moves on) and can produce infantry units too. An interaction with condor would be neat but I don&apos;t know what that could be.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Idea: as it gets damage it loses the ability to fire some weapons - by default it has eye laser (like lancers) and arm canons (like titan) and two shoulder mounted mortars, plus machine guns similar to a squad of troops&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Damage knocks out mortars and then laser - it always has guns. You can&apos;t build next to a building that was only put there because of the mech, you need the mech there for off-base building and only within three squares of it&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;[...] Lets do two condors can carry the mech&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;The end result is &lt;em&gt;really cool&lt;/em&gt;.&lt;/p&gt;
-        
-        &lt;video
-        width=&quot;1644&quot;
-        height=&quot;1080&quot;
-        preload=&quot;none&quot;
-        loop=&quot;1&quot; controls=&quot;1&quot;
-        playsinline=&quot;1&quot; muted=&quot;1&quot;
-        style=&quot;display: block; width: 100%; height: auto;&quot;
-        poster=&quot;https://static.simonwillison.net/static/2026/goliath-poster.jpg&quot;
-        &gt;
-        &lt;source src=&quot;https://static.simonwillison.net/static/2026/goliath.mp4&quot; type=&quot;video/mp4&quot; /&gt;
-        Your browser does not support HTML video.
-        &lt;/video&gt;
-        
-        &lt;p style=&quot;margin-top: 1em&quot;&gt;Goliaths can be constructed using a Gantry - a building that can only be created after first building a Fab, Bay, Airpad, and Tech Lab. You can see the Goliath under construction, and it then walks out from the Gantry and can march around the map.&lt;/p&gt;
-        &lt;p&gt;Goliaths can &quot;anchor&quot;, which digs them into the ground. In their anchored state they can act as a new HQ, constructing infantry units and additional buildings in a new area.&lt;/p&gt;
-        &lt;p&gt;Two Condor aircraft can hook onto a Goliath, at which point it can be flown around the map!&lt;/p&gt;
-        &lt;p&gt;The game now ends when you destroy the enemy&apos;s HQ building &lt;em&gt;and&lt;/em&gt; any Goliaths they might have built.&lt;/p&gt;
-        &lt;p&gt;There are also a couple of mutators relating to Goliaths:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Goliath Armada&lt;/strong&gt; starts each side with four airborne Goliaths (each with a pair of Condors) and no other units.&lt;/li&gt;
-        &lt;li&gt;
-        &lt;strong&gt;Robot Love&lt;/strong&gt; adds a special rule: if enemy Goliaths get close to each other on the battlefield they fall in love and the game ends in a draw. (Thank Natalie for that one).&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;h4 id=&quot;agent-battles&quot;&gt;Agent battles&lt;/h4&gt;
-        &lt;p&gt;The other v10 feature is &lt;strong&gt;agent battles&lt;/strong&gt;. In musing about how multiplayer could work I had an idea: what if different LLMs could fight it out in the game?&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Fun extra challenge: think about how we might make multiplayer available to coding agents. It would be neat if we could set up a battle between eg GPT-6 Sol and Claude Opus 5.5 where each model has access to a tool which gives them information about the game (presumably non-visual, but only the information they could see through fog of war etc) and lets them control their units etc [...]&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Consult ~/dev/llm/docs and include notes in that file about how LLM could be used here via a new tools plugin&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Opus 5.5 went to work on this, producing &lt;a href=&quot;https://github.com/simonw/battledrones/blob/7001ed186c8b8aef4acb27f680ecf4c09b607e54/AGENT-BATTLES.md&quot;&gt;this AGENT-BATTLES.md proposal&lt;/a&gt; and then implementing and testing it. The feature also includes the ability to record and replay these battles - here&apos;s &lt;a href=&quot;https://simonw.github.io/battledrones/v11/?replay=battles/showcase/2026-10-14-frostbite-42-claude-haiku-5.5-vs-gpt-6-luna.json&quot;&gt;a replay of Claude Haiku 5.5 vs. GPT-6 Luna&lt;/a&gt;, and here&apos;s that same battle &lt;a href=&quot;https://simonw.github.io/battledrones/record-viewer.html?replay=battles/showcase/2026-10-14-frostbite-42-claude-haiku-5.5-vs-gpt-6-luna.json#r1&quot;&gt;in a separate debug tool&lt;/a&gt; that shows the underlying prompt responses.&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/agent-v-agent.jpg&quot; alt=&quot;Screenshot of a replay of a real-time strategy game between two AI models, shown from a top-down view of a snowy map with a dark frozen lake of cracked ice floes on the left and pine forests at the top and lower right. Top bar: pause button, &amp;quot;6:27&amp;quot;, &amp;quot;1×&amp;quot;, &amp;quot;anthropic/claude-haiku-5-5 · industry&amp;quot; in blue, &amp;quot;gpt-6-luna · industry&amp;quot; in red, a blue-and-red strength bar labeled &amp;quot;B&amp;quot; and &amp;quot;R&amp;quot;, and &amp;quot;0:03&amp;quot;. Left notification: &amp;quot;Blue: Pushing turrets at the enemy&apos;s south-east edge.&amp;quot; Replay panel: &amp;quot;Blue anthropic/claude-haiku-5-5 · industry vs Red gpt-6-luna · industry · frostbite seed 42&amp;quot;, a timeline slider at &amp;quot;6:27 / 7:48&amp;quot;, and buttons &amp;quot;−30s&amp;quot;, &amp;quot;+30s&amp;quot;, &amp;quot;All&amp;quot;, &amp;quot;Blue&apos;s eyes&amp;quot;, &amp;quot;Red&apos;s eyes&amp;quot;, &amp;quot;Notes&amp;quot;. In the scene, a group of blue tanks and a large blue Goliath mech trailing smoke advance near the ice edge at lower center, while a column of red turrets (one burning) lines the ice to their north, red tanks and trucks sit by a rocky ridge to the east, and red base buildings occupy the top right. A minimap is in the top right corner and zoom in, zoom out and lightning-bolt buttons are on the lower left.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;The prompt that drives agent battles &lt;a href=&quot;https://github.com/simonw/battledrones/blob/d584e351d9d28c4ba058b78ddcca9b93cd9bcd33/llm-tools-battledrones/llm_tools_battledrones.py#L106-L117&quot;&gt;can be seen here&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;There are a few more replays like this &lt;a href=&quot;https://github.com/simonw/battledrones/blob/main/README.md#watch-ai-models-play-it&quot;&gt;linked in the README&lt;/a&gt;. I hope to turn this into a full league table at some point in the future.&lt;/p&gt;
-        &lt;h4 id=&quot;v11-random-maps&quot;&gt;v11: Random Maps&lt;/h4&gt;
-        &lt;p&gt;This version exists purely because I glanced at my &lt;a href=&quot;https://claude.ai/new#settings/usage&quot;&gt;Claude Usage&lt;/a&gt; page one day and saw that I&apos;d only used 75% of my weekly allowance and it was resetting in 45 minutes. I decided to see if I could get an extra Battle Drones feature from my remaining tokens, and picked &quot;random map&quot; as the target:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Design and implement a mechanism for generating a random map using any of the available biomes - it should be the size of the largest map and rivers and bridges and rocks and forest and scrap and crystals are all in play. Make them rotationally symmetric and use a seed to allow them to be selected or reused later. You have 45 minutes to build this! Be creative.&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://claude.ai/code/session_01CfwMwDaK1kLKnRV6di8VMT&quot;&gt;the transcript&lt;/a&gt;, and an image Claude generated to show me its work:&lt;/p&gt;
-        &lt;p&gt;&lt;img src=&quot;https://static.simonwillison.net/static/2026/random-map-contact-sheet.jpg&quot; alt=&quot;Grid of ten top-down game maps, two per biome (temperate, desert, arctic, volcanic, tropical), each with a river or lava flow, bridges and roads. Title: &amp;quot;Battle Drones: generated maps (108x108, point-symmetric), 2 per biome, runtime ground painter&amp;quot;. Each map is captioned with a name and layout type plus a seed and crossing counts, e.g. &amp;quot;Hawthorn Delta · fork&amp;quot; &amp;quot;random-temperate-1x8a6r2 · 6 bridges, 4 fords&amp;quot;; layout types are fork, badlands, crossing and lake.&quot; style=&quot;max-width: 100%;&quot; /&gt;&lt;/p&gt;
-        &lt;h4 id=&quot;v12-multiplayer-via-sound&quot;&gt;v12: Multiplayer via sound&lt;/h4&gt;
-        &lt;p&gt;I only &lt;em&gt;just&lt;/em&gt; got this working, so I&apos;ve not had much time to actively test it yet. The latest Battle Drones now supports multiplayer via two devices sat within microphone distance of each other!&lt;/p&gt;
-        &lt;p&gt;This feature started out as my &lt;a href=&quot;https://simonwillison.net/2026/Oct/15/chirp-pong/&quot;&gt;Chirp Pong&lt;/a&gt; experiment from last week. I pointed Claude Code at that working proof of concept:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Clone Simonw/tools from GitHub and look at recent branches for the example pong game that uses web microphone to implement multiplayer between two phones via audio signals&lt;/code&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;code&gt;Build a version of that for battledrones&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Opus built &lt;a href=&quot;https://simonw.github.io/battledrones/radio-probe.html&quot;&gt;this Radio Probe tool&lt;/a&gt; to measure how much bandwidth we could get between two devices and, based on positive results from that, implemented a full audio modem system. I&apos;ve tried it between laptops, iPhones and iPads so far and it seems to work really well!&lt;/p&gt;
-        &lt;p&gt;Why use sound for this? Because I &lt;a href=&quot;https://simonwillison.net/2025/Dec/10/html-tools/#the-anatomy-of-an-html-tool&quot;&gt;love static HTML&lt;/a&gt; that costs nothing to run, and I don&apos;t want to spin up a server somewhere and then stay responsible for keeping it operating for as long as anyone might want to play the game.&lt;/p&gt;
-        &lt;h4 id=&quot;some-thoughts&quot;&gt;Some thoughts&lt;/h4&gt;
-        &lt;p&gt;I know almost &lt;em&gt;nothing&lt;/em&gt; about game development. This makes it a great opportunity to try out coding agents in a field where my existing software engineering experience has less impact on the results.&lt;/p&gt;
-        &lt;p&gt;Games are also super low stakes. The worst that can happen is one of my silly game experiments suffers a bug.&lt;/p&gt;
-        &lt;p&gt;This morning (&lt;a href=&quot;https://news.ycombinator.com/item?id=50168190&quot;&gt;via Hacker News&lt;/a&gt;) I found &lt;a href=&quot;https://www.ign.com/articles/steam-fans-are-begging-for-a-no-ai-filter-as-steam-next-fest-is-filled-with-slop&quot;&gt;Steam Fans Are Begging for a No-AI Filter as Steam Next Fest Is Filled With Slop&lt;/a&gt;. I wouldn&apos;t personally dream of submitting Battle Drones to an event like this - it&apos;s still way too low effort to warrant consideration as a legitimate indie gaming project.&lt;/p&gt;
-        &lt;p&gt;... but I can now see a path to vibe coded games like this being taken seriously. Battle Drones is fun, it looks good, it has innovative features (the multiplayer-over-audio thing is a first for an RTS as far as I can tell).&lt;/p&gt;
-        &lt;p&gt;I&apos;d love to see what someone with better taste than me and a driving passion to produce something truly exceptional could build!&lt;/p&gt;
-        &lt;p&gt;A few other observations from this project:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Static HTML and JavaScript is a fantastic medium for games development. WebGL works great, and &lt;a href=&quot;https://github.com/mrdoob/three.js/&quot;&gt;Three.js&lt;/a&gt; (and &lt;a href=&quot;https://github.com/phaserjs/phaser&quot;&gt;Phaser&lt;/a&gt; before it) are excellent platforms to build on that the current models know inside out.&lt;/li&gt;
-        &lt;li&gt;This also lets them run as &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps&quot;&gt;Progressive Web Apps&lt;/a&gt; - I didn&apos;t ask for it, but Battle Drones works offline. I was able to play it on a plane despite never having directly installed it - my phone had it cached.&lt;/li&gt;
-        &lt;li&gt;Giving Claude an OpenAI API key and telling it to generate images using OpenAI&apos;s models works really well. It can view the images it has generated and iterate on the prompts.&lt;/li&gt;
-        &lt;li&gt;Opus 5.5 is spectacular at 3D modeling using Three.js (and Blender, and no doubt other 3D applications as well). The &lt;a href=&quot;https://til.simonwillison.net/llms/blender-coding-agents-macos&quot;&gt;same is true&lt;/a&gt; of GPT-6 Astra. They are absolutely capable of building models for 3D game projects.&lt;/li&gt;
-        &lt;li&gt;For features like replay and multiplayer it&apos;s useful to have a deterministic simulation engine. At one point Claude had to replace calls to &lt;code&gt;Math.sin()&lt;/code&gt; and &lt;code&gt;Math.cos()&lt;/code&gt; and friends with &lt;a href=&quot;https://github.com/simonw/battledrones/blob/v12/src/sim/fmath.ts&quot;&gt;custom versions&lt;/a&gt; because different browsers (Chrome vs. Safari, for example) returned very slightly different numbers, desynchronizing the replay.&lt;/li&gt;
-        &lt;li&gt;Opus 5.5 can write music! There are no audio files in this project - the soundtrack is entirely generated through code, varies across different maps, and even gets more intense as the battle heats up. See &lt;a href=&quot;https://simonwillison.net/2026/Oct/6/scrimshaw-jukebox/&quot;&gt;Scrimshaw Jukebox&lt;/a&gt; for a previous experiment with Claude for music composition.&lt;/li&gt;
-        &lt;li&gt;I still can&apos;t get over how well the prompt &quot;Make it a LOT more fun&quot; worked.&lt;/li&gt;
-        &lt;li&gt;Tools are effectively free. I prompted up the &lt;a href=&quot;https://simonw.github.io/battledrones/radio-probe.html&quot;&gt;Radio Probe&lt;/a&gt;, the &lt;a href=&quot;https://simonw.github.io/battledrones/models.html&quot;&gt;Model browser&lt;/a&gt;, the &lt;a href=&quot;https://simonw.github.io/battledrones/record-viewer.html?replay=battles/showcase/2026-10-14-frostbite-42-claude-haiku-5.5-vs-gpt-6-luna.json#r1&quot;&gt;Agent vs. Agent debug tool&lt;/a&gt;, and Claude Code &lt;a href=&quot;https://github.com/simonw/battledrones/tree/main/tools&quot;&gt;built a bunch of tools&lt;/a&gt; for itself that I haven&apos;t even explored myself.&lt;/li&gt;
-        &lt;li&gt;Audio-based multiplayer between static HTML games works! I hope to see a whole lot more games use this same pattern - in digging around today I&apos;ve not found much prior art beyond &lt;a href=&quot;https://github.com/AlonHor/siner&quot;&gt;Siner&lt;/a&gt; by Alon Horesh and &lt;a href=&quot;https://github.com/ggerganov/ggwave&quot;&gt;ggwave&lt;/a&gt; by Georgi Gerganov (also of &lt;code&gt;llama.cpp&lt;/code&gt; fame).&lt;/li&gt;
-        &lt;li&gt;Claude Code &quot;Ultracode&quot; burns tokens like there&apos;s no tomorrow, but it can also solve complex problems (like adding audio-based multiplayer) from a single prompt.&lt;/li&gt;
-        &lt;li&gt;I&apos;m still not quite over the &lt;em&gt;guilt&lt;/em&gt; of building software in this way. I don&apos;t feel like I&apos;ve earned the right to create something this good, in a field in which I have so little prior experience! At this point I&apos;ve shown it to enough people in private that it felt wrong not to publish it for everyone else to see and learn from.&lt;/li&gt;
-        &lt;/ul&gt;
-        
-        &lt;h4 id=&quot;update-online-multiplayer-support&quot;&gt;Update: Online multiplayer support&lt;/h4&gt;
-        &lt;p&gt;Earlier in this article I said:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Games are also super low stakes. The worst that can happen is one of my silly game experiments suffers a bug.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Then I tried playing the multiplayer version with Natalie... and the high pitched modem sounds gave her a nasty headache!&lt;/p&gt;
-        &lt;p&gt;That&apos;s a pretty bad bug. I &lt;a href=&quot;https://github.com/simonw/battledrones/pull/36&quot;&gt;added a warning&lt;/a&gt; and was then inspired to build proper network multiplayer. I tried &lt;a href=&quot;https://github.com/simonw/battledrones/pull/37&quot;&gt;getting WebRTC to work&lt;/a&gt; but couldn&apos;t get a connection going between two of my own devices even on my own WiFi network, so &lt;a href=&quot;https://github.com/simonw/battledrones/pull/38&quot;&gt;I had Claude build&lt;/a&gt; a simple, stateless WebSockets relay server instead:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;If I wanted to support multiplayer between two devices at a very low cost without storing any state on the server could I do that with a tiny asyncio web server running on the cheapest Fly instance?&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Build the server and the fly.toml for deploying it, use Fly application name battledrones-relay - put that in a folder in the repo, include deploy instructions in the README in that folder&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Here&apos;s &lt;a href=&quot;https://github.com/simonw/battledrones/tree/v13/relay&quot;&gt;the resulting server&lt;/a&gt;. Since this scales to zero and runs on a single &lt;a href=&quot;https://fly.io/&quot;&gt;Fly.io&lt;/a&gt; &lt;code&gt;shared-cpu-1x&lt;/code&gt; instance it should cost me no more than $2.19/month - and that&apos;s if it stays hot and serving connections the whole time.&lt;/p&gt;
-        &lt;p&gt;Battle Drones now supports online multiplayer. Click &quot;Duel a friend online&quot;, then either share the resulting room URL via your messaging app of choice or have them snap a picture of the displayed QR Code.&lt;/p&gt;
-        &lt;p&gt;I also added a feature where you can copy JSON of the match once it has ended and then feed that into the replay feature to rewatch your game.&lt;/p&gt;
-        &lt;p&gt;I didn&apos;t expect to introduce online multiplayer this soon, but the headache bug felt like it warranted an urgent alternative.&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/vibe-coding&quot;&gt;vibe-coding&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude-code&quot;&gt;claude-code&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>My obituary for programming</title>
-      <link>https://simonwillison.net/2026/Oct/19/my-obituary-for-programming/</link>
-      <guid>https://simonwillison.net/2026/Oct/19/my-obituary-for-programming/</guid>
-      <pubDate>Mon, 19 Oct 2026 23:58:25 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://dumbmatter.com/2026/10/programming-obituary/&quot;&gt;My obituary for programming&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Jeremy Scheff poignantly captures the key loss caused by coding agents for career programmers who enjoyed the &lt;em&gt;puzzle&lt;/em&gt; of developing code:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;Programming turned into one of the greatest jobs you could imagine. You got paid to work on tricky little logic puzzles. The trickier the puzzle, the more you got paid. But even pretty simple puzzles were worth a lot of money because regular people just couldn&apos;t do it! No, they needed us. They would give us a problem and we would solve it the way we wanted. We set the strategy, we made the timeline, we defined what was and was not possible.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;If you&apos;re a programmer who thrives on building working systems and doesn&apos;t care too deeply about the problems solved along the way, LLMs are the gift that keeps on giving.&lt;/p&gt;
-        &lt;p&gt;If directly solving those problems was a big part of your enjoyment, the loss is very real.
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://lobste.rs/s/wtobpt/my_obituary_for_programming&quot;&gt;lobste.rs&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/programming&quot;&gt;programming&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/careers&quot;&gt;careers&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/coding-agents&quot;&gt;coding-agents&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/deep-blue&quot;&gt;deep-blue&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm-tools-datasette 0.1.1</title>
-      <link>https://simonwillison.net/2026/Oct/18/llm-tools-datasette/</link>
-      <guid>https://simonwillison.net/2026/Oct/18/llm-tools-datasette/</guid>
-      <pubDate>Sun, 18 Oct 2026 23:43:09 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm-tools-datasette/releases/tag/0.1.1&quot;&gt;llm-tools-datasette 0.1.1&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;When I switched LLM over to &lt;a href=&quot;https://github.com/pydantic/httpx2&quot;&gt;httpx2&lt;/a&gt; in &lt;a href=&quot;https://llm.datasette.io/en/stable/changelog.html#v0-33&quot;&gt;LLM 0.33&lt;/a&gt; I forget that this would break any plugins which used &lt;code&gt;httpx&lt;/code&gt; without directly depending on it. &lt;code&gt;llm-tools-datasette&lt;/code&gt; was one of those plugins, now fixed.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
