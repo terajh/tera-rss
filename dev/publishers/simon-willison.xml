@@ -4,7 +4,71 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Tue, 03 Nov 2026 21:24:10 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 04 Nov 2026 22:07:55 GMT</lastBuildDate>
+    <item>
+      <title>datasette-llm 0.1a10</title>
+      <link>https://simonwillison.net/2026/Nov/4/datasette-llm/</link>
+      <guid>https://simonwillison.net/2026/Nov/4/datasette-llm/</guid>
+      <pubDate>Wed, 04 Nov 2026 15:26:02 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-llm/releases/tag/0.1a10&quot;&gt;datasette-llm 0.1a10&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Fixes a &lt;a href=&quot;https://github.com/datasette/datasette-llm/pull/11&quot;&gt;bug&lt;/a&gt; that affected my &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;agent.datasette.io&lt;/a&gt; demo site, where the set of available LLM models was not correctly restricted to just those in the configuration.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-apps 0.3a0</title>
+      <link>https://simonwillison.net/2026/Nov/4/datasette-apps/</link>
+      <guid>https://simonwillison.net/2026/Nov/4/datasette-apps/</guid>
+      <pubDate>Wed, 04 Nov 2026 00:29:36 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-apps/releases/tag/0.3a0&quot;&gt;datasette-apps 0.3a0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;Datasette Apps adds support for hosting and editing custom HTML applications inside of Datasette.&lt;/p&gt;
+        &lt;p&gt;These can be created by hand, but it&apos;s easier to create them using LLMs via &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt;. This release improves that integration:&lt;/p&gt;
+        &lt;blockquote&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Apps can now be tagged in Datasette Agent chat messages by typing &lt;code&gt;#&lt;/code&gt;, which autocompletes from the apps the user has permission to view.&lt;/li&gt;
+        &lt;li&gt;New &lt;code&gt;app_add_stored_queries()&lt;/code&gt; and &lt;code&gt;app_remove_stored_queries()&lt;/code&gt; tools let the agent manage which stored queries an app is allowed to call. Granting a write query requires approval from the user first.&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;app_create()&lt;/code&gt; now checks that each requested stored query exists and that the user can view it, and asks the user to approve any write queries before the app is created.&lt;/li&gt;
+        &lt;li&gt;The &quot;View app&quot; buttons shown by the agent tools, and the links on &lt;code&gt;#&lt;/code&gt; app references, now open the app full screen in the Datasette Agent panel.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/blockquote&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-agent&quot;&gt;datasette-agent&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-apps&quot;&gt;datasette-apps&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-agent 0.5a0</title>
+      <link>https://simonwillison.net/2026/Nov/3/datasette-agent/</link>
+      <guid>https://simonwillison.net/2026/Nov/3/datasette-agent/</guid>
+      <pubDate>Tue, 03 Nov 2026 23:13:45 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-agent/releases/tag/0.5a0&quot;&gt;datasette-agent 0.5a0&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;This is a significant release of &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;Datasette Agent&lt;/a&gt;. The most notable new feature is called the &lt;strong&gt;panel&lt;/strong&gt; - it lets the agent chat open and then sit next to pages from Datasette, for example a table or query page.&lt;/p&gt;
+        &lt;p&gt;When combined with &lt;a href=&quot;https://github.com/datasette/datasette-apps&quot;&gt;datasette-apps&lt;/a&gt; this means you can prompt a database-backed app into existence and then modify it from the chat that sits next to that app.&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Screenshot of a split-screen chat interface titled &amp;quot;evaluate llm prices&amp;quot; (model tag &amp;quot;gpt-6-luna&amp;quot;): the conversation runs in a narrow column on the left, and a wide side panel on the right displays the app the assistant built, with &amp;quot;EXPORT&amp;quot; and &amp;quot;Close panel&amp;quot; buttons above it. In the chat, blue user bubbles read &amp;quot;Build an app to help explore this data&amp;quot; and &amp;quot;give it a more hacker aesthetic design&amp;quot;, each followed by collapsed tool calls (app_create, app_render, app_view, app_str_replace), &amp;quot;LLM Price Explorer v1.&amp;quot; and &amp;quot;v2.&amp;quot; entries with &amp;quot;View app&amp;quot; and &amp;quot;Edit&amp;quot; buttons, and short assistant replies describing the app and its new dark terminal-inspired theme. The right panel shows the resulting &amp;quot;LLM Price Explorer&amp;quot; in neon green monospace on black: stat cards for 185 models from 12 providers with workload costs from $0.042 (Jev 1.13) to $300.00 (o1 Pro), filter and workload cost estimate controls, and a table of matching models with input, output and cached input prices per million tokens.&quot; src=&quot;https://static.simonwillison.net/static/2026/datasette-agent-panel.webp&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;You can try it by signing in with your GitHub account to &lt;a href=&quot;https://agent.datasette.io/&quot;&gt;agent.datasette.io&lt;/a&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-agent&quot;&gt;datasette-agent&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>llm 0.37.1</title>
+      <link>https://simonwillison.net/2026/Nov/3/llm/</link>
+      <guid>https://simonwillison.net/2026/Nov/3/llm/</guid>
+      <pubDate>Tue, 03 Nov 2026 21:41:42 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.37.1&quot;&gt;llm 0.37.1&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;A bugfix release for &lt;a href=&quot;https://llm.datasette.io/&quot;&gt;LLM&lt;/a&gt;, with contributions from &lt;a href=&quot;https://github.com/remote-controlled-man&quot;&gt;Steven Huang&lt;/a&gt;, &lt;a href=&quot;https://github.com/tao-hpu&quot;&gt;Tao An&lt;/a&gt;, &lt;a href=&quot;https://github.com/ar-jan&quot;&gt;Arjan Mossel&lt;/a&gt;, and &lt;a href=&quot;https://github.com/XXXXXQ-0206&quot;&gt;XQ&lt;/a&gt;.&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Qwen 3.8 27B on my laptop can interpret model weights, too</title>
       <link>https://simonwillison.net/2026/Nov/3/qwen-can-interpret-model-weights/</link>
@@ -709,97 +773,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/music&quot;&gt;music&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/pelican-riding-a-bicycle&quot;&gt;pelican-riding-a-bicycle&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Donating Agent Skills to the Agentic AI Foundation</title>
-      <link>https://simonwillison.net/2026/Oct/22/donating-agent-skills/</link>
-      <guid>https://simonwillison.net/2026/Oct/22/donating-agent-skills/</guid>
-      <pubDate>Thu, 22 Oct 2026 18:09:56 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation&quot;&gt;Donating Agent Skills to the Agentic AI Foundation&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        News today from Anthropic:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;We’re committed to keeping Agent Skills open, community-driven, and vendor-neutral. Today, we are donating the standard to the Agentic AI Foundation (AAIF) under the Linux Foundation, &lt;a href=&quot;https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation&quot;&gt;which we co-founded&lt;/a&gt; with Block and OpenAI last year, and to which we donated the Model Context Protocol (MCP).&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;I&apos;m pleased to note I called this one &lt;a href=&quot;https://simonwillison.net/2025/Dec/19/agent-skills/&quot;&gt;last December&lt;/a&gt;, when Anthropic first declared skills to be an &quot;open standard&quot;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;I wouldn&apos;t be surprised to see this end up &lt;a href=&quot;https://simonwillison.net/2025/Dec/9/agentic-ai-foundation/&quot;&gt;in the AAIF&lt;/a&gt;, recently the new home of the MCP specification.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Fun side note: since my blog content is available to Claude via the &lt;a href=&quot;https://github.com/datasette/datasette-mcp&quot;&gt;datasette-mcp&lt;/a&gt;
-        plugin I found that post by &lt;a href=&quot;https://claude.ai/share/80b341de-590b-4834-bca9-0d9c9a3a0298&quot;&gt;prompting Claude&lt;/a&gt; to &quot;&lt;code&gt;Use simonwillison.net MCP to find if I ever talked about how I want skills to be donated to a standards body&lt;/code&gt;&quot;.
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/standards&quot;&gt;standards&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/anthropic&quot;&gt;anthropic&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/model-context-protocol&quot;&gt;model-context-protocol&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/skills&quot;&gt;skills&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quoting Armin Ronacher</title>
-      <link>https://simonwillison.net/2026/Oct/22/armin-ronacher/</link>
-      <guid>https://simonwillison.net/2026/Oct/22/armin-ronacher/</guid>
-      <pubDate>Thu, 22 Oct 2026 15:34:13 GMT</pubDate>
-      <content:encoded>
-        &lt;blockquote cite=&quot;https://twitter.com/mitsuhiko/status/2113207589978636646&quot;&gt;&lt;p&gt;As fun as AI is, we built so much bad software over the last 30 years, and now the universe is punishing us for our sins.&lt;/p&gt;&lt;/blockquote&gt;
-        &lt;p class=&quot;cite&quot;&gt;&amp;mdash; &lt;a href=&quot;https://twitter.com/mitsuhiko/status/2113207589978636646&quot;&gt;Armin Ronacher&lt;/a&gt;&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/armin-ronacher&quot;&gt;armin-ronacher&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-security-research&quot;&gt;ai-security-research&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Today&apos;s PHP Security Release, and How We&apos;re Strengthening PHP Security</title>
-      <link>https://simonwillison.net/2026/Oct/21/php-security-release/</link>
-      <guid>https://simonwillison.net/2026/Oct/21/php-security-release/</guid>
-      <pubDate>Wed, 21 Oct 2026 18:41:53 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://thephp.foundation/blog/2026/10/21/todays-php-security-release-and-how-were-strengthening-php-security/&quot;&gt;Today&amp;#x27;s PHP Security Release, and How We&amp;#x27;re Strengthening PHP Security&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        If you&apos;re running anything on PHP it&apos;s vital you upgrade - today&apos;s updates (across the entire PHP 8.x line) address two remote code execution holes, and there have been exploits circulating since last night, thanks to a leak in the coordinated disclosure process.&lt;/p&gt;
-        &lt;p&gt;This post from the PHP Foundation explain what went so wrong:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;On Tuesday, October 20th, at around 15:00 UTC, the two CVE IDs began circulating on online forums and social media. They came with a wrong release time and a wrong CVSS score of 10.0 (the actual score is 9.2). No technical details leaked. In response, the PHP project brought its pre-announcement forward and &lt;a href=&quot;https://www.php.net/archive/2026.php#2026-10-20-1&quot;&gt;published it at 19:30 UTC&lt;/a&gt;. It also moved the release from October 22nd, 14:00 UTC, to October 21st, 14:00 UTC [...]&lt;/p&gt;
-        &lt;p&gt;As a result of the leak and pre-announcement around 20:00 UTC, Calif, one of the security firms that had reported the issues mistakenly published a video. It showed their proof of concept working against a number of targets and revealed a few additional, though limited, details about the vulnerabilities. Copies of the deleted video started circulating on social media soon after. The video contributed to accelerated development of various PoCs (exploitation proof of concepts), which then increased circulation on October 21st.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;&lt;a href=&quot;https://www.wiz.io/blog/php2shell-php-rce&quot;&gt;This article&lt;/a&gt; from the team that discovered the original vulnerability includes a more detailed timeline of the original intended responsible disclosure:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;strong&gt;August 19, 2026:&lt;/strong&gt; Wiz Research discovers the first PHP vulnerability using Wiz Atlas, Gemini 4 Argon, and GPT-5.6 Sol.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;August 20, 2026:&lt;/strong&gt; Unauthenticated RCE is confirmed against Drupal.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;August 21, 2026:&lt;/strong&gt; Unauthenticated RCE is confirmed against WordPress.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;August 24, 2026:&lt;/strong&gt; Wiz Research reports the vulnerabilities to the PHP security team.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;September 21, 2026:&lt;/strong&gt; PHP acknowledges the reports and begins developing a coordinated fix.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;October 21, 2026:&lt;/strong&gt; Patched PHP releases become available.&lt;/li&gt;
-        &lt;li&gt;&lt;strong&gt;October 21, 2026:&lt;/strong&gt; Public disclosure.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;/blockquote&gt;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://news.ycombinator.com/item?id=50182987&quot;&gt;Hacker News&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/php&quot;&gt;php&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/security&quot;&gt;security&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai-security-research&quot;&gt;ai-security-research&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Panache — RTS Belle Époque pour mobile</title>
-      <link>https://simonwillison.net/2026/Oct/21/panache/</link>
-      <guid>https://simonwillison.net/2026/Oct/21/panache/</guid>
-      <pubDate>Wed, 21 Oct 2026 16:25:16 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/menufactory43/panache/&quot;&gt;Panache — RTS Belle Époque pour mobile&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-        Well this is delightful: I &lt;a href=&quot;https://simonwillison.net/2026/Oct/20/battledrones/&quot;&gt;released Battle Drones&lt;/a&gt; yesterday under an Apache 2.0 License and there&apos;s already a French language fork by Gabriel Turpin which reskins the game to take place in steampunk 1900s France and adds an animated intro!&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;strong&gt;Panache&lt;/strong&gt; est un jeu de stratégie en temps réel pour mobile et navigateur, dans la France de la Belle Époque (vers 1900) : dirigeables, Fardiers à vapeur, Creusot cuirassés, automates en képi, Gargantua la forteresse marchante — et beaucoup de panache.&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;You can &lt;a href=&quot;https://menufactory43.github.io/panache/&quot;&gt;play Panache here&lt;/a&gt; - it&apos;s worth clicking that link just to experience the new intro video.&lt;/p&gt;
-        &lt;p&gt;So far it&apos;s mostly just aesthetic updates as opposed to gameplay changes. The music has had a French twist added to it as well.&lt;/p&gt;
-        &lt;p&gt;The new steampunk models are so cool!&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;The new buildings are gold and red, there are dirigibles and biplanes, and the Goliath stomping mech has had a total makeover.&quot; src=&quot;https://static.simonwillison.net/static/2026/battledrones-french.jpg&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Here&apos;s a page with &lt;a href=&quot;https://simonw.github.io/battledrones/models.html&quot;&gt;the original Battle Drones models&lt;/a&gt; and that same page &lt;a href=&quot;https://menufactory43.github.io/panache/models.html&quot;&gt;with the new Panache alternatives&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;This is a comparison of the original and the new design for the Goliath:&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;On the left: blue stomping mech robot, missile launcher shoulders, classic sci-fi robot look. On the right: gold, steampunk, much more 1900s French look.&quot; src=&quot;https://static.simonwillison.net/static/2026/battledrones-goliath-diff.jpg&quot; /&gt;
-        
-        &lt;p&gt;&lt;small&gt;&lt;/small&gt;Via &lt;a href=&quot;https://twitter.com/Meffysto69/status/2112908755654365220&quot;&gt;@Meffysto69&lt;/a&gt;&lt;/small&gt;&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
