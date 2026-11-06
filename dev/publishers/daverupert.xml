@@ -4,7 +4,179 @@
     <title>dev RSS - Dave Rupert</title>
     <link>https://daverupert.com/</link>
     <description>Dave Rupert RSS 피드</description>
-    <lastBuildDate>Thu, 05 Nov 2026 21:57:06 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 06 Nov 2026 21:22:46 GMT</lastBuildDate>
+    <item>
+      <title>Pseudo-pseudo-classes for maximum interactive demos!</title>
+      <link>https://daverupert.com/2026/11/pseudo-pseudo-classes/</link>
+      <guid>https://daverupert.com/2026/11/pseudo-pseudo-classes/</guid>
+      <pubDate>Fri, 06 Nov 2026 15:50:00 GMT</pubDate>
+      <content:encoded>
+        &amp;lt;p&amp;gt;Have you ever wanted to display all variants of a Button next to each other in your Storybook like your designer did in Figma? But then you come to a screeching halt when you realize &amp;lt;code&amp;gt;:hover&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;:active&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;:focus&amp;lt;/code&amp;gt; don’t work without user-interaction? Blergh. &amp;lt;em&amp;gt;Whatever can we do?&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;I got nerd-sniped by this problem in the ShopTalk Discord when &amp;lt;a href=&amp;quot;https://github.com/nocksock&amp;quot;&amp;gt;Nils&amp;lt;/a&amp;gt; said he was trying to build a simple state machine demo for his components. A handful of immediate options came to my head:&amp;lt;/p&amp;gt;
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;Style states using &amp;lt;code&amp;gt;.is-hover&amp;lt;/code&amp;gt; utility classes (à la &amp;lt;a href=&amp;quot;https://smacss.com/book/type-state/&amp;quot;&amp;gt;SMACSS&amp;lt;/a&amp;gt;)&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Create a system of &amp;lt;code&amp;gt;[data-state=&amp;amp;quot;hover&amp;amp;quot;]&amp;lt;/code&amp;gt; attributes and copy over styles&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Build some over-the-top Playwright-based screenshot contraption&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        &amp;lt;p&amp;gt;Each of those approaches has trade-offs for me. I don’t want to ship extra component styles or manage duplicate global styles. And if I’m building a Playwright contraption for a CSS demo… yeesh, I should probably back away from the keyboard. When Nils mentioned he was using web components, I realized I might have an ace up my sleeve for a simple’ish solution to this problem.&amp;lt;/p&amp;gt;
+        &amp;lt;p class=&amp;quot;codepen&amp;quot; data-height=&amp;quot;500&amp;quot; data-pen-title=&amp;quot;Pseudo-pseudo-states Demo!&amp;quot; data-version=&amp;quot;2&amp;quot; data-default-tab=&amp;quot;result&amp;quot; data-slug-hash=&amp;quot;myWKNOm&amp;quot; data-user=&amp;quot;davatron5000&amp;quot; style=&amp;quot;height: 500px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;&amp;quot;&amp;gt;
+        &amp;lt;span&amp;gt;See the Pen &amp;lt;a href=&amp;quot;https://codepen.io/editor/davatron5000/pen/01a1643a-89fd-72d7-abe8-8e4728e20bae&amp;quot;&amp;gt;
+        Pseudo-pseudo-states Demo!&amp;lt;/a&amp;gt; by Dave Rupert (&amp;lt;a href=&amp;quot;https://codepen.io/davatron5000&amp;quot;&amp;gt;@davatron5000&amp;lt;/a&amp;gt;)
+        on &amp;lt;a href=&amp;quot;https://codepen.io&amp;quot;&amp;gt;CodePen&amp;lt;/a&amp;gt;.&amp;lt;/span&amp;gt;
+        &amp;lt;/p&amp;gt;
+        &amp;lt;script async src=&amp;quot;https://public.codepenassets.com/embed/index.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;p&amp;gt;There’s a handful of &amp;lt;em&amp;gt;Advanced Web Component Tips &amp;amp;amp; Tactics&amp;lt;/em&amp;gt; happening in this demo like &amp;lt;code&amp;gt;adoptedStyleSheets&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;ElementInternals&amp;lt;/code&amp;gt;, and custom state sets but the approach is pretty lightweight. I scan the custom element’s styles, clone the interactive bits, rewrite styles like &amp;lt;code&amp;gt;:hover&amp;lt;/code&amp;gt; state to &amp;lt;code&amp;gt;:state(hover)&amp;lt;/code&amp;gt; and add the new stylesheet inside the component.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;What I like about this approach compared to the other ideas I had is:&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;Styles owned by the component - No “magic” global styles or utilities.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Appended styles also owned by the component - No global conflicts.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Interactive states use regular HTML/CSS - Avoid managing interactive state in JavaScript when possible.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Write once, ship once - I don’t write or ship duplicate &amp;lt;code&amp;gt;:hover&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;.is-hover&amp;lt;/code&amp;gt; styles to customers.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Low maintenance - Beyond the initial setup, it’s automatic and I’m resilient to component style updates.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;Want an end-to-end walkthrough of how it all works? Please, follow me…&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;adopting-stylesheets-in-your-web-components&amp;quot;&amp;gt;Adopting stylesheets in your web components&amp;lt;a href=&amp;quot;#adopting-stylesheets-in-your-web-components&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Adopting stylesheets in your web components&amp;apos;&amp;quot; data-heading-content=&amp;quot;Adopting stylesheets in your web components&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;In web components, we’d typically author our styles in a CSS tagged template literal:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;const MyButtonStyles = css`
+        /* Change the host-element itself */
+        :host(:hover) {
+        background: pink;
+        scale: 1.1;
+        }
+        
+        /* Update a child element based on the host-element interaction */
+        :host(:hover) button {
+        background: pink;
+        scale: 1.1;
+        }
+        
+        /* Or put the interaction on the interactive child-element */
+        button:hover {
+        background: pink;
+        scale: 1.1;
+        }
+        `
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Then we create a new “constructed stylesheet” and populate the stylesheet with the styles we wrote. That stylesheet then attaches to our component by adding it to the Shadow Root’s array of &amp;lt;code&amp;gt;adoptedStyleSheets&amp;lt;/code&amp;gt; .&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;/* Create a new constructed stylesheet */
+        const MyButtonStyleSheet = new CSSStyleSheet()
+        MyButtonStyleSheet.replaceSync(MyButtonStyles)
+        
+        class MyButton extends HTMLElement {
+        constructor() {
+        /* Setup and create shadowroot */
+        super();
+        this.attachShadow({ mode: &amp;amp;quot;open&amp;amp;quot; })
+        
+        /* Adopt the constructed stylesheet */		
+        this.shadowRoot.adoptedStyleSheets = [MyButtonStyleSheet]
+        
+        /* ... etc */
+        }
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;The component will now render its styles without a &amp;lt;code&amp;gt;&amp;amp;lt;link&amp;amp;gt;&amp;lt;/code&amp;gt; tag or inline &amp;lt;code&amp;gt;&amp;amp;lt;style&amp;amp;gt;&amp;lt;/code&amp;gt; tag in the template. If we put two &amp;lt;code&amp;gt;MyButton&amp;lt;/code&amp;gt; components on the page, they’ll share the same stylesheet in memory which is a pretty neat efficiency gain for style application. &amp;lt;code&amp;gt;adoptedStyleSheets&amp;lt;/code&amp;gt; aren’t limited to web components, but they’re still pretty niche. But the web component ecosystem’s pattern of using &amp;lt;code&amp;gt;adoptedStyleSheets&amp;lt;/code&amp;gt; for style application will come in handy later when we want to apply our new custom states.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;attach-internals-to-unlock-custom-states&amp;quot;&amp;gt;Attach internals to unlock custom states&amp;lt;a href=&amp;quot;#attach-internals-to-unlock-custom-states&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Attach internals to unlock custom states&amp;apos;&amp;quot; data-heading-content=&amp;quot;Attach internals to unlock custom states&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Before we jump to the grand finale, there’s one &amp;lt;em&amp;gt;other&amp;lt;/em&amp;gt; unique-to-web-components feature we need to talk about first: &amp;lt;code&amp;gt;ElementInternals&amp;lt;/code&amp;gt;. In a web component &amp;lt;code&amp;gt;class&amp;lt;/code&amp;gt; you can call &amp;lt;code&amp;gt;attachInternals()&amp;lt;/code&amp;gt; which allows you to dip into the element’s guts and mutate the innards of your spicy &amp;lt;code&amp;gt;div&amp;lt;/code&amp;gt;.  An example of this might be setting an ARIA role:&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;class MyButton extends HTMLElement {
+        constructor() {
+        super();
+        this._internals = this.attachInternals()
+        this._internals.role = &amp;amp;quot;button&amp;amp;quot;
+        }
+        }
+        customElements.define(&amp;apos;my-button&amp;apos;, MyButton)
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;The accessibility inspector will report a role of &amp;lt;code&amp;gt;button&amp;lt;/code&amp;gt; for your &amp;lt;code&amp;gt;&amp;amp;lt;my-button&amp;amp;gt;&amp;lt;/code&amp;gt; custom element. Setting ARIA &amp;lt;code&amp;gt;role&amp;lt;/code&amp;gt; is a weak example because both &amp;lt;code&amp;gt;&amp;amp;lt;my-button role=&amp;amp;quot;button&amp;amp;quot;&amp;amp;gt;&amp;lt;/code&amp;gt; and &amp;lt;code&amp;gt;Element.role = &amp;amp;quot;button&amp;amp;quot;&amp;lt;/code&amp;gt; both work pretty seamlessly. But &amp;lt;code&amp;gt;ElementInternals&amp;lt;/code&amp;gt; brings other ✨superpowers✨ like adding form validation behaviors that you can’t do on a normal &amp;lt;code&amp;gt;div&amp;lt;/code&amp;gt;. One newer capability of &amp;lt;code&amp;gt;ElementInternals&amp;lt;/code&amp;gt; is that it allows you to create your own custom pseudo-classes and apply styles using &amp;lt;a href=&amp;quot;https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:state&amp;quot;&amp;gt;&amp;lt;code&amp;gt;:state()&amp;lt;/code&amp;gt;&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;class MyScrollingElement extends HTMLElement {
+        constructor() {
+        super();
+        this._internals = this.attachInternals()
+        }
+        
+        connectedCallback() {
+        this.addEventListener(&amp;apos;scroll&amp;apos;, this.handleScroll)
+        this.addEventListener(&amp;apos;scrollend&amp;apos;, this.handleScrollEnd)
+        }
+        
+        /* Use arrow functions to avoid `this` complications */
+        handleScroll = (_event) =&amp;amp;gt; {
+        this._internals.states.add(&amp;apos;scrolling&amp;apos;)
+        }
+        
+        handleScrollEnd = (_event) =&amp;amp;gt; {
+        this._internals.states.delete(&amp;apos;scrolling&amp;apos;)
+        }
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Now you can style your element when it’s scrolling using &amp;lt;code&amp;gt;:state(scrolling)&amp;lt;/code&amp;gt; and you’re manipulating the element’s internal state, not modifying HTML in the DOM.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-css&amp;quot;&amp;gt;:host {
+        overflow-y: scroll;
+        transition: background 0.2s;
+        }
+        
+        :host(:state(scrolling)) {
+        background: pink;
+        }
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;Isn’t that cool? With great power comes great spider-mans, of course, but having your own custom pseudos is a thing you can do now with web components.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;mimic-native-pseudo-states-using-custom-states&amp;quot;&amp;gt;Mimic native pseudo-states using custom states&amp;lt;a href=&amp;quot;#mimic-native-pseudo-states-using-custom-states&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Mimic native pseudo-states using custom states&amp;apos;&amp;quot; data-heading-content=&amp;quot;Mimic native pseudo-states using custom states&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Now that we have a loose grasp on all the pieces we need to make our demo work, the next steps are:&amp;lt;/p&amp;gt;
+        &amp;lt;ol&amp;gt;
+        &amp;lt;li&amp;gt;Find all our components and loop through them&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Copy their interactive rules to a new constructed stylesheet&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Replace &amp;lt;code&amp;gt;:hover&amp;lt;/code&amp;gt; with &amp;lt;code&amp;gt;:state(hover)&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Adopt the constructed stylesheet in the component&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Attach internals and imperatively set the state&amp;lt;/li&amp;gt;
+        &amp;lt;/ol&amp;gt;
+        &amp;lt;p&amp;gt;Here’s a simplified version of what’s happening in the CodePen version.&amp;lt;/p&amp;gt;
+        &amp;lt;pre&amp;gt;&amp;lt;code class=&amp;quot;language-js&amp;quot;&amp;gt;/* A bit of pseudo-code here... */
+        const MyButtons = document.querySelectorAll(&amp;apos;my-button&amp;apos;);
+        
+        const sheet = new CSSStyleSheet();
+        
+        MyButtons.forEach(async (button, index) =&amp;amp;gt; {
+        const isDefined = await customElements.whenDefined(button.localName);
+        
+        // Grab the stylesheet from the first  
+        if(isDefined &amp;amp;amp;&amp;amp;amp; index === 0) {
+        // Get current CSS rules
+        const cssRules = Array.from(
+        button.shadowRoot.adoptedStyleSheets[0].cssRules
+        )
+        .filter(rule =&amp;amp;gt; rule.cssText.includes(&amp;apos;:hover&amp;apos;))
+        .map(rule =&amp;amp;gt; rule.cssText.replaceAll(&amp;apos;:hover&amp;apos;, &amp;apos;:state(hover)&amp;apos;));
+        // Update the stylesheet contents
+        sheet.replaceSync(cssRules.join(&amp;apos;&amp;apos;));
+        }
+        
+        // Adopt the stylesheet
+        button.shadowRoot.adoptedStyleSheets = [...button.shadowRoot.adoptedStyleSheets, sheet]
+        
+        // Attach internals and set the state
+        if(button.dataset.state == &amp;apos;hover&amp;apos;) {
+        const _internals = button._internals ?? button.attachInternals();
+        _internals.states.add(&amp;apos;hover&amp;apos;);
+        }
+        })
+        &amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;
+        &amp;lt;p&amp;gt;And that’s the gist of the trick: clone the pseudo-class states and set imposter custom states. I’m hand-waving some of the more complex bits like &amp;lt;code&amp;gt;button:hover {}&amp;lt;/code&amp;gt; needs to be rewritten to &amp;lt;code&amp;gt;:host(:state(hover)) button {}&amp;lt;/code&amp;gt;, but again, feel free to read the code.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;And my demo makes a couple assumptions I know won’t scale:&amp;lt;/p&amp;gt;
+        &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;All &amp;lt;code&amp;gt;&amp;amp;lt;my-button&amp;amp;gt;&amp;lt;/code&amp;gt; elements use the same static stylesheet (e.g. it doesn’t change per component).&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Each &amp;lt;code&amp;gt;&amp;amp;lt;my-button&amp;amp;gt;&amp;lt;/code&amp;gt; only has one adoptedStyleSheet.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Hard-coded to &amp;lt;code&amp;gt;HTMLButtonElement&amp;lt;/code&amp;gt;-specific interactions.&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Assumes you either don’t have &amp;lt;code&amp;gt;ElementInternals&amp;lt;/code&amp;gt; already setup or already externally expose them &amp;lt;em&amp;gt;and&amp;lt;/em&amp;gt; you know that &amp;lt;code&amp;gt;@public&amp;lt;/code&amp;gt; property name.&amp;lt;/li&amp;gt;
+        &amp;lt;/ul&amp;gt;
+        &amp;lt;p&amp;gt;Next steps might be to make this a bit more robust and support &amp;lt;a href=&amp;quot;https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Pseudo-classes&amp;quot;&amp;gt;all the other platform pseudo-classes&amp;lt;/a&amp;gt; like &amp;lt;code&amp;gt;:popover-open&amp;lt;/code&amp;gt;, &amp;lt;code&amp;gt;:user-invalid&amp;lt;/code&amp;gt;, or &amp;lt;code&amp;gt;:playing&amp;lt;/code&amp;gt;. An agent could probably do this, not me though. I’m tired.&amp;lt;/p&amp;gt;
+        &amp;lt;h2 id=&amp;quot;shadow-dom-isnt-that-bad-actually&amp;quot;&amp;gt;Shadow DOM isn’t &amp;lt;em&amp;gt;that&amp;lt;/em&amp;gt; bad, actually.&amp;lt;a href=&amp;quot;#shadow-dom-isnt-that-bad-actually&amp;quot; aria-label=&amp;quot;Link to heading &amp;apos;Shadow DOM isn’t that bad, actually.&amp;apos;&amp;quot; data-heading-content=&amp;quot;Shadow DOM isn’t that bad, actually.&amp;quot; class=&amp;quot;anchor&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/h2&amp;gt;
+        &amp;lt;p&amp;gt;Shadow DOM often gets a bad rap even in web component circles. I fully understand the friction there. Everyone’s first test drive of Shadow DOM styling almost always ends up in flames, leading to a poor unboxing experience that’s hard to shake off.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;That said, I feel like this demo captures a glimpse at some of the unique  ✨superpowers✨ you get when styling with Shadow DOM. When coming from a global styles world, that loss of control can feel frustrating. But in my experience, with Shadow DOM encapsulation you’re gaining predictability and precise control by keeping everything local.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;You could probably figure out a way to do this with global styles. It’d be more difficult with roboclass-based scoping from something like CSS Modules, but I think it’s possible. But I imagine you’d have to parse through all the global &amp;lt;code&amp;gt;document.styleSheets&amp;lt;/code&amp;gt; and that seems like a lot of work to add a &amp;lt;code&amp;gt;:hover&amp;lt;/code&amp;gt; state demo to a &amp;lt;code&amp;gt;&amp;amp;lt;button&amp;amp;gt;&amp;lt;/code&amp;gt;. Style encapsulation here saves a lot of work.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;If you got all the way here and still hate Shadow DOM, I’d love to read a post of yours about where it broke down for you. But if you use Shadow DOM on the regular, I’d love to hear why it’s great. This has been my mantra for awhile now, but I think the web component community can do more about promoting the benefits. For example, there’s only &amp;lt;a href=&amp;quot;https://css-tricks.com/?s=adoptedstylesheets&amp;quot;&amp;gt;two articles about &amp;lt;code&amp;gt;adoptedStyleSheets&amp;lt;/code&amp;gt; on CSS-Tricks&amp;lt;/a&amp;gt; which seems low.&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;In the meantime, while I try to convince my bosses to let me blog for a living, &amp;lt;a href=&amp;quot;https://htmlwithsuperpowers.netlify.app/&amp;quot;&amp;gt;I’ve got my free course guidebook online&amp;lt;/a&amp;gt; and you can check it out.&amp;lt;/p&amp;gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Write mo&apos;</title>
       <link>https://daverupert.com/2026/11/write-mo/</link>
@@ -1419,20 +1591,6 @@
         &amp;lt;p&amp;gt;So, when a screenshot or copy-pasted block of “Here’s what Claude said…” comes across my screen… I don’t care about the screenshot. I don’t care about the screenshot because I want &amp;lt;em&amp;gt;your thoughts&amp;lt;/em&amp;gt;, not Claude’s. I want your unfiltered and half-baked ideas, not Claude’s synthesized extrusions. Instead of a screenshot of a reply, I’d rather have the original prompt so I can just ask the machine myself. At least then I’d know the context you provided the machine and your understanding of the problem, because that matters immensely.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;A trite example that I deal with from time to time, if you ask an LLM “React or Web Components?” it will say “React” because that’s what was &amp;lt;a href=&amp;quot;https://joshcollinsworth.com/blog/self-fulfilling-prophecy-of-react&amp;quot;&amp;gt;popular&amp;lt;/a&amp;gt; in the 2023 training data. But did you mention anything about different teams on different tech stacks? Anything about hitting memory ceilings? Context is everything to these machines and –as the disclaimers say– they can make mistakes. If we need anything more than an approximation, a language model might not be the right tool for the job.&amp;lt;/p&amp;gt;
         &amp;lt;p&amp;gt;Anyways, that’s my issue with other people’s chatbots weaving their way into my daily conversations. I’d rather have a human-to-human conversation with you, not a chat with Claude by proxy. What Claude said is an okay chunk of “&amp;lt;a href=&amp;quot;https://en.wikipedia.org/wiki/Anecdotal_evidence&amp;quot;&amp;gt;anecdata&amp;lt;/a&amp;gt;”, but it’s not a substitute for our working relationship.&amp;lt;/p&amp;gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>When moving fast, talking is the first thing to break</title>
-      <link>https://daverupert.com/2026/04/more-talk-less-grok/</link>
-      <guid>https://daverupert.com/2026/04/more-talk-less-grok/</guid>
-      <pubDate>Mon, 13 Apr 2026 15:10:00 GMT</pubDate>
-      <content:encoded>
-        &amp;lt;p&amp;gt;When you make speed and “moving fast” the biggest priority on a project or in an organization, the first thing to breakdown is talking to each other. Talking takes time. Consensus is expensive and slow. In a pressurized environment there’s no time to schedule calls, get input from subject matter experts, or resolve key differences of opinion. &amp;lt;em&amp;gt;ASAP&amp;lt;/em&amp;gt; makes a big assumption that all relevant parties are already in the room.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Not everything needs to be a conversation. I’m a firm believer in “get the user something to see if there’s interest”. I’d agree that over-thinking a problem and under-thinking a problem both have pitfalls. But dozens of ways exist to get feedback from users on in-progress work without overcommitting to a particular design. By prioritizing speed over talking, cross-org collaboration suffers and a faulty design can steamroll ahead. I am no soothsayer, but I can tell you that you set your organization up for a messy merge conflict in the future between teams who have been traveling in different directions.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;I think the second organizational casualty is “the system”. When speed is the priority, there’s no incentive to improve or invest in the shared system (e.g. a design system or codebase) under a tight deadline. If everyone needs to move fast, even something simple like renaming a folder could have dramatic setbacks. Hypermovers will create a new project folder or detach a Figma component. And that new folder of files grows to create it’s own duplicative system of components that are ever-so-slightly different such that they are incompatible with the rest of the system. Resolving system gaps requires conversations, it’s easier to eject from the system at the slightest inconvenience, duplicate, and go your own way. Effectively hiding the time bomb of technical debt for the next unfortunate sucker.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;I think AI exacerbates this problem. I think AI can help you build faster (although data suggest otherwise), but I also believe that LLMs are the ultimate tool in &amp;lt;a href=&amp;quot;https://ashley.rolfmore.com/stop-trying-to-engineer-your-way-out-of-listening-to-people/&amp;quot;&amp;gt;the “Don’t talk to my coworkers” toolchain&amp;lt;/a&amp;gt;. Why talk to an expert who might tell me no, when the omniscient machine that always tells me yes is right here? &amp;lt;a href=&amp;quot;https://daverupert.com/2026/03/people-are-not-friction/&amp;quot;&amp;gt;Avoiding that friction&amp;lt;/a&amp;gt; doesn’t produce better products faster. It makes future conversations more difficult thanks to higher sunk costs and deeper entrenched opinions.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;Other pieces of infrastructure begin to chip away when moving fast too: documentation, security, performance, reliability, &amp;lt;em&amp;gt;the fabric of modern American democracy&amp;lt;/em&amp;gt;, and developer satisfaction to name a handful. I’m pro-reducing bullshit, I’m pro-reducing toil. But I’m also pro-&amp;lt;a href=&amp;quot;https://mariozechner.at/posts/2026-03-25-thoughts-on-slowing-the-fuck-down/&amp;quot;&amp;gt;slowing the fuck down&amp;lt;/a&amp;gt; and doing actual human thinking before pulling a trigger… or sending a laser-guided Tomahawk missile… or whatever action-based analogy works best for your organization.&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;We all love dopamine, we all love seeing new ideas come to life, but more lines of code and duplicate systems –our own little kingdoms in code– doesn’t produce horizontal strength. The job of Engineering Management is no longer pushing tickets across the board to make executives clap, it’s helping organizations row in the same direction together. It’s relentlessly focusing on your users over lines of code and cool project codenames.&amp;lt;/p&amp;gt;
       </content:encoded>
     </item>
   </channel>
