@@ -4,7 +4,25 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sat, 07 Nov 2026 19:52:43 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 08 Nov 2026 19:59:12 GMT</lastBuildDate>
+    <item>
+      <title>datasette #3046: Don&apos;t serve link: rel=next HTTP headers to Firefox for HTML pages</title>
+      <link>https://simonwillison.net/2026/Nov/7/link-rel-next/</link>
+      <guid>https://simonwillison.net/2026/Nov/7/link-rel-next/</guid>
+      <pubDate>Sat, 07 Nov 2026 23:57:46 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/simonw/datasette/issues/3046&quot;&gt;datasette #3046: Don&amp;#x27;t serve link: rel=next HTTP headers to Firefox for HTML pages&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+        I was looking at the Firefox network panel today when I noticed that requests to a Datasette table page were triggering an &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Glossary/Prefetch&quot;&gt;HTTP prefetch&lt;/a&gt; to the next page of rows in that table.&lt;/p&gt;
+        &lt;p&gt;This was happening because Datasette pages serve an HTTP &lt;code&gt;link&lt;/code&gt; header like this:&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;link: &amp;lt;https://latest.datasette.io/fixtures/compound_three_primary_keys?_next=a%2Cd%2Cv&amp;gt;; rel=&quot;next&quot;&lt;/code&gt;&lt;/p&gt;
+        &lt;p&gt;This is bad. A tiny fraction of the visitors to one of those pages will click the &quot;next&quot; link, which means their browser is fetching unnecessary data and the Datasette server is having to render an entire page that then gets thrown away.&lt;/p&gt;
+        &lt;p&gt;I dug in and learned that Firefox has &lt;a href=&quot;https://bugzilla.mozilla.org/show_bug.cgi?id=175418&quot;&gt;an issue&lt;/a&gt; that has been open for 24 years about this behavior...&lt;/p&gt;
+        &lt;p&gt;And one of the early comments on that issue links to &lt;a href=&quot;https://simonwillison.net/2002/Oct/17/mozillaPrefetching/&quot;&gt;my blog post from 2002&lt;/a&gt; complaining about this feature. I hadn&apos;t just forgotten that I had written about it, I had forgotten the feature entirely!
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/firefox&quot;&gt;firefox&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/html&quot;&gt;html&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/mozilla&quot;&gt;mozilla&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Quoting Nilay Patel</title>
       <link>https://simonwillison.net/2026/Nov/6/nilay-patel/</link>
@@ -720,25 +738,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/game-design&quot;&gt;game-design&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/claude&quot;&gt;claude&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Quick Study</title>
-      <link>https://simonwillison.net/2026/Oct/23/quick-study-painter/</link>
-      <guid>https://simonwillison.net/2026/Oct/23/quick-study-painter/</guid>
-      <pubDate>Fri, 23 Oct 2026 21:35:13 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Tool:&lt;/strong&gt; &lt;a href=&quot;https://tools.simonwillison.net/quick-study-painter&quot;&gt;Quick Study&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;Prompt &lt;a href=&quot;https://claude.ai/share/71adda96-193f-4f2a-97c0-454e08066afb&quot;&gt;to Claude Opus 5.5 High&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;&lt;code&gt;Build an artifact where you open a photo and it rapidly (in a few seconds) paints a version of that photo using a canvas element and simulated paintbrush&lt;/code&gt;&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;See also &lt;a href=&quot;https://simonwillison.net/2026/Aug/25/pelican-watercolor/&quot;&gt;my previous experiment&lt;/a&gt; getting Claude Fable to simulate a watercolor illustration with P5.js.&lt;/p&gt;
-        &lt;p&gt;&lt;img alt=&quot;A simulated oil painting of a photograph of a heron&quot; src=&quot;https://static.simonwillison.net/static/2026/heron-oil.webp&quot; /&gt;&lt;/p&gt;
-        &lt;p&gt;Quick Study uses &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel edge detection&lt;/a&gt;, with no external libraries beyond Google Fonts.&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/tools&quot;&gt;tools&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
