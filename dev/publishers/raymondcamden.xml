@@ -4,12 +4,90 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Tue, 10 Nov 2026 00:20:17 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 10 Nov 2026 21:42:38 GMT</lastBuildDate>
+    <item>
+      <title>Migrating My Notes App to Supabase</title>
+      <link>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</link>
+      <guid>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</guid>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Every now and then I put a service, API, framework, etc on my list of things to look at, and when I eventually get around to it, I wish I had made the time sooner. That&apos;s absolutely the case today. About two weeks ago I blogged about how I used &lt;a href=&quot;https://tinyjs.app/index.html&quot;&gt;TinyJS&lt;/a&gt; to build a desktop note application. This worked great and made use of a local SQLite database on the machine for storage. I was curious about how I&apos;d migrate this to a &amp;quot;real&amp;quot; network based storage system that could be used in multiple places and tied to a particular account. I asked my AI agent (in this case, Claude, which I tend to use for all of my ad hoc questions about stuff) if &lt;a href=&quot;https://supabase.com&quot;&gt;Supabase&lt;/a&gt; would be an appropriate solution for this, and the response I got impressed the heck out of me.&lt;/p&gt;
+        &lt;p&gt;I knew Supabase was an online database system, and honestly, that&apos;s about all I knew. What I found out was it included a heck of a lot more. As just a high level overview, you get:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;A built-in REST API for your database. Like as soon as you&apos;ve got a table, you can start using it remotely.&lt;/li&gt;
+        &lt;li&gt;Edge functions - which means you don&apos;t need to use another serverless system to set up webhooks or other features.&lt;/li&gt;
+        &lt;li&gt;An S3-compatible storage system for your binary files. Again - this just means you don&apos;t need to go elsewhere.&lt;/li&gt;
+        &lt;li&gt;Incredibly robust auth including support for SSO and row-based security.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;There&apos;s more, but that last bullet was the important part. I knew that migrating my app to enable users and such would require connecting notebooks and notes to one user, ensuring they can&apos;t mess with other people&apos;s data and so forth, and discovering that&apos;s &amp;quot;just a feature&amp;quot; of Supabase was freaking awesome.&lt;/p&gt;
+        &lt;p&gt;While it&apos;s possible to do SSO with TinyJS (see &lt;a href=&quot;https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs&quot;&gt;my post&lt;/a&gt; on that topic), I decided for this iteration I&apos;d set up a hosted web app. You &lt;em&gt;can&lt;/em&gt; actually use TinyJS to wrap a web site and I may look into that later, but for now, this version lives on the web.&lt;/p&gt;
+        &lt;h2 id=&quot;the-migration&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-migration&quot;&gt;The Migration&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;For the migration itself, I pointed my agent at the existing TinyJS app and asked it to create a web version that made use of Google Auth and Supabase. Supabase has MCP support so I enabled that. The agent defined my initial table schema based on what I had used with SQLite. You can see the complete file &lt;a href=&quot;https://github.com/cfjedimaster/uninotesweb/blob/main/supabase/schema.sql&quot;&gt;here&lt;/a&gt; in the repo, but let me call out some interesting bits.&lt;/p&gt;
+        &lt;p&gt;First off, here&apos;s the table creation for notebooks, which is the top level storage for your notes.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;create table if not exists public.notebooks (
+        id uuid primary key default gen_random_uuid(),
+        user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+        name text not null check (char_length(btrim(name)) &amp;gt; 0),
+        created_at timestamptz not null default now()
+        );
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;All of this makes sense to me even with seeing some of this for the first time. There&apos;s a bit more for this table like indexes, but here&apos;s part of the security aspect:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;revoke all on public.notebooks from anon;
+        grant select, insert, update, delete on public.notebooks to authenticated;
+        
+        alter table public.notebooks enable row level security;
+        
+        create policy &amp;quot;Users can view their own notebooks&amp;quot;
+        on public.notebooks
+        for select
+        to authenticated
+        using ((select auth.uid()) = user_id);
+        
+        create policy &amp;quot;Users can create their own notebooks&amp;quot;
+        on public.notebooks
+        for insert
+        to authenticated
+        with check ((select auth.uid()) = user_id);
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;There&apos;s a bit more, but you get the idea. All of this ties into their &lt;a href=&quot;https://supabase.com/docs/guides/auth&quot;&gt;auth&lt;/a&gt; support in general, and their &lt;a href=&quot;https://supabase.com/docs/guides/auth#social-sign-in&quot;&gt;social sign in&lt;/a&gt; support in particular. I only worried about &lt;a href=&quot;https://supabase.com/docs/guides/auth/social-sign-in/auth-google&quot;&gt;Google auth&lt;/a&gt; support, but they&apos;ve got a whole set of different SSO options. (Facebook and GitHub in particular will probably be useful.) You actually configure your application&apos;s oauth callback to go to Supabase and they handle the token exchange and such there, which then leads back to your application&apos;s code being able to CRUD data belonging to the current user.&lt;/p&gt;
+        &lt;p&gt;Ok, to be honest, I simplified the &lt;em&gt;hell&lt;/em&gt; out of the above, but what matters to me the most is that this is all baked in and my agent was literally able to set this all up in less than an hour. Now to be fair, my agent was going from a completely built and designed app using the web platform to an actual web page, so a lot was done already, but I was really impressed by how quick this came together.&lt;/p&gt;
+        &lt;p&gt;On the front end, it makes use of Supabase&apos;s JavaScript client to simplify things as well. So for example, here&apos;s the call to get notebooks:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;export async function getNotebooks() {
+        const client = requireClient()
+        const { data, error } = await client
+        .from(&apos;notebooks&apos;)
+        .select(&apos;id, name, created_at, notes(count)&apos;)
+        .order(&apos;created_at&apos;, { ascending: true })
+        
+        if (error) throw error
+        
+        return (data ?? []).map(row =&amp;gt; ({
+        id: row.id,
+        name: row.name,
+        noteCount: Number(row.notes?.[0]?.count ?? 0)
+        }))
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;I mentioned up top that there&apos;s a REST API automatically for your data. When I was playing around I created a simple note table (no users, just an id, title, and body), and you can see this for yourself here:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;https://hqfgcffibrtfarzmpbhk.supabase.co/rest/v1/notes0?select=title,body,created_at&amp;amp;order=created_at.asc&amp;amp;limit=10
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In that URL you see a few things in play:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;You can filter down the result to certain columns using &lt;code&gt;select&lt;/code&gt;.&lt;/li&gt;
+        &lt;li&gt;You can sort.&lt;/li&gt;
+        &lt;li&gt;You can paginate.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I tied this to an API key that is connected to a policy with read only permissions. You pass that as an &lt;code&gt;apikey&lt;/code&gt; header. Another cool thing related to pagination, if you pass a header named &lt;code&gt;Prefer&lt;/code&gt; with the value &lt;code&gt;count=exact&lt;/code&gt;, you get a header response giving you the size of your result set. I don&apos;t show filtering above, but you can absolutely filter based on text matches, so given that support plus the ability to ask for a size of the result, you could do proper paging as well. Again, all baked in!&lt;/p&gt;
+        &lt;p&gt;The rest of the migration involved setting up a new OAuth client on the Google side (which I did by hand, uphill in the snow, both ways) and creating a site on Netlify (their MCP server made that easy). And you can see the final result here: &lt;a href=&quot;https://uninotes-web.netlify.app/&quot;&gt;https://uninotes-web.netlify.app/&lt;/a&gt;. Oh, I also did a basic marketing page cuz why not. The full source code is here: &lt;a href=&quot;https://github.com/cfjedimaster/uninotesweb/&quot;&gt;https://github.com/cfjedimaster/uninotesweb/&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;The last bit I&apos;m going to add is search. Since Supabase supports &lt;a href=&quot;https://supabase.com/docs/guides/database/full-text-search&quot;&gt;full text search&lt;/a&gt;, it should be relatively easy, and is one of my biggest gripes with OneNote. Another thing that kinda bugs me is that the app behaves like others where if you are logged in, you can&apos;t view the marketing page anymore. I may be the only one bothered by this, and a &lt;em&gt;lot&lt;/em&gt; of places do this, but there&apos;s definitely times when I want to look at the marketing stuff even after I&apos;ve logged in.&lt;/p&gt;
+        &lt;p&gt;Anyway, let me know what you think!&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>TIL - Postman and OAuth</title>
       <link>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</link>
       <guid>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few years back I shared two cool tips I learned about Postman (&lt;a href=&quot;https://www.raymondcamden.com/2024/05/22/dynamically-creating-variables-in-postman&quot;&gt;&amp;quot;Dynamically Creating Variables in Postman&amp;quot;&lt;/a&gt; and &lt;a href=&quot;https://www.raymondcamden.com/2024/05/24/creating-visualizations-in-postman&quot;&gt;&amp;quot;Creating Visualizations in Postman&amp;quot;&lt;/a&gt;). At the time, I noted that these were both well documented features in Postman and if I had bothered to actually spend some time in the docs, I would have known about those features already. Obviously after I wrote those posts I made the time to do that. Obviously... right?&lt;/p&gt;
         &lt;p&gt;Of course not. So what follows is something that probably most of you already know, but that I was really excited to discover today so if at least one person gets excited about this as well, then my job is done.&lt;/p&gt;
@@ -76,7 +154,7 @@
       <title>Getting Structured Data from Web Pages with AI and Re-usable Specs</title>
       <link>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</link>
       <guid>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I say from time to time, every now and then I build something as a proof of concept and the result is... ok? I&apos;m not really sure if the idea actually made sense and if the final result is usable, but the exploration was interesting enough that I think it warrants sharing with you good people. That&apos;s what today&apos;s post is.&lt;/p&gt;
         &lt;p&gt;This demo all began with a simple idea - how do you handle getting RSS like content from a site that doesn&apos;t actually have an RSS feed? This typically relies on looking at the page as data to be parsed.&lt;/p&gt;
@@ -800,7 +878,7 @@
       <title>Links For You (11/1/26)</title>
       <link>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</link>
       <guid>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and happy &amp;quot;Saints have a bye week so they can&apos;t lose&amp;quot; day. That may be bitter and I shouldn&apos;t write off their season yet but... maybe next year? Of course, this is just one more kinda crappy thing going on amongst a giant pile of other crappy things so - let&apos;s just get right to the links, shall we?&lt;/p&gt;
         &lt;h2 id=&quot;when-job-hunting-turns-into-a-security-lesson&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#when-job-hunting-turns-into-a-security-lesson&quot;&gt;When job hunting turns into a security lesson&lt;/a&gt;&lt;/h2&gt;
@@ -827,7 +905,7 @@
       <title>Generating PDF Invoices from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I shared a demo (&lt;a href=&quot;https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser%5D&quot;&gt;&amp;quot;Generating PDFs from Word Templates with officeParser&amp;quot;&lt;/a&gt;) that made use of the awesome &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; open source library. That demo was a simple &amp;quot;customer report&amp;quot; web app that took custom data and a Word template. Once the form was submitted, the library converted tokens in the Word template to real data and output a PDF. I decided to build another demo using the library, this time on the server with a simple Node.js script.&lt;/p&gt;
         &lt;p&gt;As I mentioned previously, this new feature mimics Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. At the time I wrote my blog post, the library just supported simple transformations. So given `` in your Word template, if you passed a name value of &apos;Ray&apos;, you would see that in the resulting PDF.&lt;/p&gt;
@@ -1151,7 +1229,7 @@
       <title>Building the Unicorn-themed app of my dreams with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Everyone likes to talk about light versus dark theme while no one is addressing the real need for our users - a proper unicorn theme. I mean, take a look at this beauty:&lt;/p&gt;
         &lt;p&gt;
@@ -1251,7 +1329,7 @@
       <title>Adding a PDF Display to Eleventy</title>
       <link>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</link>
       <guid>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short one. I&apos;ve talked about embedding PDFs on web pages for probably close to ten years now. Blame Adobe. Blame me being a nerd and finding this stuff interesting. Blame whoever. While I&apos;ve blogged about the topic, I&apos;ve also actually done that on my site here, in a variety of different ways.&lt;/p&gt;
         &lt;p&gt;A while back I realized I wasn&apos;t being consistent with how I did... &amp;quot;stuff&amp;quot; here, like call outs, Youtube links, etc. I started a &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/guide.md&quot;&gt;guide doc&lt;/a&gt; so I&apos;d have a quick way to remember what I did last time, and be more consistent.&lt;/p&gt;
@@ -1322,7 +1400,7 @@
       <title>Links For You (10/19/26)</title>
       <link>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</link>
       <guid>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Wowza - I&apos;m like nearly a month late on this. This is where I&apos;d try to come up with a good excuse, but I think if I just randomly point around at things and said... &amp;quot;life&amp;quot; most of you would completely understand where I&apos;m coming from. It&apos;s been a difficult few months for myself, and for nearly every person I know. This week I&apos;m going to try focus on the positive and the things that make me smile, and I hope all my lovely readers can do the same!&lt;/p&gt;
         &lt;h2 id=&quot;make-music%2C-not-war&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#make-music%2C-not-war&quot;&gt;Make Music, Not War&lt;/a&gt;&lt;/h2&gt;
@@ -1372,7 +1450,7 @@
       <title>Generating PDFs from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been singing the praises of the &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library for a while. It&apos;s an open source JavaScript library that can parse, extract, and convert between PDFs and Office documents, as well as OpenOffice, ePub and more. My demos have all focused on client-side examples but obviously the library would work great in a server side workflow as well. I haven&apos;t worked at Adobe for years now, but I still get strangely excited working with documents. I&apos;ll just add that to the long list of reasons I&apos;m a big nerd.&lt;/p&gt;
         &lt;p&gt;A few weeks ago, I reached out to &lt;a href=&quot;https://harshankur.com/&quot;&gt;Harsh Ankur&lt;/a&gt; about an idea inspired by Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. This was probably my favorite API in their suite of PDF services. You take a Word document, put in tokens, and call the API with your data. The API would swap out the tokens with real data and give you a PDF in return. (Or Word again if you wanted that.) I suggested this to Harsh and then - voila - he added it!&lt;/p&gt;
@@ -1457,7 +1535,7 @@
       <title>Adding Google Auth to TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
+      <pubDate>Tue, 10 Nov 2026 21:18:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few days ago I &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;posted&lt;/a&gt; about my experience playing around with &lt;a href=&quot;https://tinyjs.app/&quot;&gt;TinyJS&lt;/a&gt;. This is a &lt;em&gt;very&lt;/em&gt; light &amp;quot;web to desktop app&amp;quot; platform for - well - building desktop apps. Its simplicity and similarity to PhoneGap (at least for the desktop) has got me interested in seeing what I can build with the project. One of my ideas would be improved with a login system so I naturally looked into adding a &amp;quot;Login with Google&amp;quot; feature. While this was &lt;em&gt;mostly&lt;/em&gt; straightforward, I ran into some oddities and figured I&apos;d share it here.&lt;/p&gt;
         &lt;p&gt;I went into this exploration with a basic idea of how I&apos;d approach it:&lt;/p&gt;
@@ -1822,104 +1900,6 @@
         &lt;p&gt;This one&apos;s a bit of a beast, but some are fairly standard. Both &lt;code&gt;exchangeCodeForToken&lt;/code&gt; and &lt;code&gt;refreshAccessToken&lt;/code&gt; are standard OAuth stuff. Ditto for &lt;code&gt;getUserProfile&lt;/code&gt;. The important bit is &lt;code&gt;waitForCode&lt;/code&gt;. This is where the small web server is kicked off that attempts to handle the redirect back from Google. I said up front I used AI to build most of this and I have to be honest, I&apos;m glad I did as this part would have taken me quite some time.&lt;/p&gt;
         &lt;p&gt;All in all - it works great. The only real issue is a nit-picky one - when the app loads you see the login link for a second before the stored auth is verified. A bit of UX magic there would handle that.&lt;/p&gt;
         &lt;p&gt;There&apos;s an important part left out of this that I&apos;ll need to tackle next - which is how I would take the verified identity here and pass it to a remote service in a secure way such that the remote service can also verify it (&amp;quot;Yes, this was Raymond Camden&amp;quot;) before performing an action.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Tiny Apps with TinyJS</title>
-      <link>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</link>
-      <guid>https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs</guid>
-      <pubDate>Mon, 09 Nov 2026 23:48:46 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;About a year ago, I was still running my live stream (&lt;a href=&quot;https://www.youtube.com/watch?v=BzRUsvAR4oQ&amp;amp;list=PL_z-rqJYNijqhtPcEbwacp34TiFfb8eyO&quot;&gt;Code Break&lt;/a&gt;) and my final three streams all covered one topic - building desktop applications with non-native code. I covered &lt;a href=&quot;https://v2.tauri.app/&quot;&gt;Tauri&lt;/a&gt; (HTML on the front, Rust on the back) and &lt;a href=&quot;https://flet.dev/&quot;&gt;Flet&lt;/a&gt; (all Python). Recently I came across another option, &lt;a href=&quot;https://tinyjs.app/&quot;&gt;tinyjs&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;TinyJS (technically the name is &amp;quot;tinyjs&amp;quot; but I can&apos;t make myself use the lowercase in my writing like that ;) is a lot like PhoneGap/Apache Cordova. Your application is the system web view shipped along with the ability to make system calls via a bridge to &lt;a href=&quot;https://txikijs.org/&quot;&gt;txiki.js&lt;/a&gt;. This bridge gives you full access to the file system and more, like any other native app.&lt;/p&gt;
-        &lt;p&gt;Unlike PhoneGap, this is &lt;em&gt;just&lt;/em&gt; for desktop apps, which is fine, but I think the biggest selling point is the size of the bundled app - typically around 6 megs. That&apos;s tiny versus something like Electron.&lt;/p&gt;
-        &lt;p&gt;It&apos;s got hooks into everything a desktop app could need, like native dialogs and OS menus and such. It can write securely to the OS&apos;s credential store, use SQLite, and even handle application updating.&lt;/p&gt;
-        &lt;p&gt;I&apos;ve just begun playing with it recently and I&apos;ve got a few ideas for apps I want to build, but I thought I&apos;d share a quick demo. This one&apos;s a bit ugly, and to be clear, that&apos;s on me. As it&apos;s a web view, you&apos;ve got full control over how the end result looks. I was just going for something quick and dirty in my test.&lt;/p&gt;
-        &lt;h2 id=&quot;first-steps&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#first-steps&quot;&gt;First Steps&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;After doing a quick &lt;a href=&quot;https://tinyjs.app/docs.html#install&quot;&gt;install&lt;/a&gt;, you can scaffold at the command line with:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;tinyjs new appname
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;By default this scaffolds out a vanilla application (no React default, woot!) with a few files and folders - the important ones (at least initially while testing and learning) are:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;frontend - the UI/UX layer (HTML, CSS, JS)&lt;/li&gt;
-        &lt;li&gt;main.js - a &amp;quot;backend&amp;quot; file that lets you build services you expose to your front end code. This is where you do &amp;quot;system&amp;quot; stuff your frontend JavaScript can&apos;t do.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;As an example, your backend code could use this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;export const api: Record&amp;lt;string, TinyApiHandler&amp;gt; = {
-        hello: async ({ name }: { name: string }) =&amp;gt; &apos;hi &apos; + name + &apos; — from the backend&apos;,
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Which would then be available in the frontend as &lt;code&gt;await tiny.api.call(&apos;hello&apos;, {...})&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;Running the app is done via &lt;code&gt;tinyjs dev&lt;/code&gt; which will load the app and enable HMR. In my testing, reloading was &lt;em&gt;incredibly&lt;/em&gt; quick, but I didn&apos;t build anything large (yet).&lt;/p&gt;
-        &lt;h2 id=&quot;working-with-alpine&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#working-with-alpine&quot;&gt;Working with Alpine&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The CLI has got a number of different scaffolds you can use, including Alpine. (And I should say - huge thanks to &lt;a href=&quot;https://tarwin.art/&quot;&gt;tarwin&lt;/a&gt;, the creator - who answered a lot of my questions via email and added stuff I asked for left and right!) I scaffolded one like that and one thing I&apos;ll note - the scaffold for different frameworks will differ a bit from the simple app you get by default. Each project has a &lt;code&gt;tinyjs.json&lt;/code&gt; file which has metadata for the project, including where your backend file is and how the frontend works.&lt;/p&gt;
-        &lt;p&gt;For my simple test, I wanted to check a few things. First, is CORS still enforced when using &lt;code&gt;fetch&lt;/code&gt;? The short answer is yes, it is. The longer answer is that doesn&apos;t matter as you can use &lt;code&gt;tiny.fetch&lt;/code&gt; instead. I thought it would be fun then to build a simple &amp;quot;RSS to HTML&amp;quot; application where I could enter an RSS feed and render the items.&lt;/p&gt;
-        &lt;p&gt;I copied the browser distributable for the &lt;a href=&quot;https://www.npmjs.com/package/rss-parser&quot;&gt;&lt;code&gt;rss-parser&lt;/code&gt;&lt;/a&gt; project and simply included it in my HTML via a script tag. Here&apos;s the entirety of that file:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!doctype html&amp;gt;
-        &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
-        &amp;lt;link rel=&amp;quot;icon&amp;quot; type=&amp;quot;image/svg+xml&amp;quot; href=&amp;quot;/favicon.svg&amp;quot; /&amp;gt;
-        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot; /&amp;gt;
-        &amp;lt;title&amp;gt;RSS Parser&amp;lt;/title&amp;gt;
-        &amp;lt;/head&amp;gt;
-        &amp;lt;body&amp;gt;
-        &amp;lt;section id=&amp;quot;center&amp;quot; x-data=&amp;quot;hello&amp;quot;&amp;gt;
-        &amp;lt;h1&amp;gt;RSS Parser&amp;lt;/h1&amp;gt;
-        &amp;lt;input x-model=&amp;quot;url&amp;quot; placeholder=&amp;quot;RSS feed URL&amp;quot; /&amp;gt; &amp;lt;button @click=&amp;quot;parse&amp;quot;&amp;gt;Parse&amp;lt;/button&amp;gt;
-        &amp;lt;template x-if=&amp;quot;items.length &amp;gt; 0&amp;quot;&amp;gt;
-        &amp;lt;div&amp;gt;
-        &amp;lt;h2&amp;gt;Items&amp;lt;/h2&amp;gt;
-        &amp;lt;ul&amp;gt;
-        &amp;lt;template x-for=&amp;quot;item in items&amp;quot; :key=&amp;quot;item.link&amp;quot;&amp;gt;
-        &amp;lt;li&amp;gt;
-        &amp;lt;a :href=&amp;quot;item.link&amp;quot; target=&amp;quot;_blank&amp;quot; x-text=&amp;quot;item.title&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;
-        &amp;lt;/li&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &amp;lt;/ul&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &amp;lt;/section&amp;gt;
-        &amp;lt;script src=&amp;quot;/src/rss-parser.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;script type=&amp;quot;module&amp;quot; src=&amp;quot;/src/main.ts&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;That&apos;s all regular Alpine.js stuff, nothing fancy there. Now for the JavaScript:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-ts&quot;&gt;import &apos;./style.css&apos;;
-        import &apos;simpledotcss/simple.min.css&apos;;
-        
-        import Alpine from &apos;alpinejs&apos;;
-        
-        Alpine.data(&apos;hello&apos;, () =&amp;gt; ({
-        name: &apos;world&apos;,
-        url: &apos;https://www.raymondcamden.com/feed.xml&apos;,
-        items: [],
-        async init() {
-        },
-        async parse() {
-        const parser = new RSSParser();
-        let req = await tiny.fetch(this.url);
-        let res = await req.text();
-        let feed = await parser.parseString(res);
-        this.items = feed.items;
-        },
-        async ask() {
-        // Every function in the backend&apos;s api object is callable from the page.
-        this.reply = await tiny.api.call(&apos;hello&apos;, { name: this.name })
-        },
-        }))
-        
-        Alpine.start()
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;A few things to note here - I&apos;ve got some junk in the file still, like the &lt;code&gt;ask&lt;/code&gt; function which was a leftover from the scaffold. The important bit is the &lt;code&gt;parse&lt;/code&gt; function. The RSSParser object has the ability to parse a URL, but it uses fetch and is blocked by CORS. So instead I get the XML via &lt;code&gt;tiny.fetch&lt;/code&gt; and pass it to &lt;code&gt;parseString&lt;/code&gt;. And that&apos;s literally it. Here&apos;s a screenshot of the application running:&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/tj1.png&quot; loading=&quot;lazy&quot; alt=&quot;App running&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;h2 id=&quot;more-info&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#more-info&quot;&gt;More Info&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;The &lt;a href=&quot;https://tinyjs.app/docs.html&quot;&gt;docs&lt;/a&gt; obviously are a great place to start, and if you&apos;re curious about more of how it actually works, there&apos;s a good &lt;a href=&quot;https://tinyjs.app/docs.html#howitworks&quot;&gt;explanation&lt;/a&gt; of that as well.&lt;/p&gt;
-        &lt;p&gt;My next demo is going to be testing an OAuth login flow with the application. The project supports registering custom URL schemes which is typically how that&apos;s handled so it &lt;em&gt;should&lt;/em&gt; be possible, but I want to test it out myself of course. :)&lt;/p&gt;
-        &lt;p&gt;Photo by &lt;a href=&quot;https://unsplash.com/@goumbik?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Lukas Blazek&lt;/a&gt; on &lt;a href=&quot;https://unsplash.com/photos/coffee-latte-near-white-wireless-keyboard-and-apple-earpods-on-the-table-photography-GnvurwJsKaY?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText&quot;&gt;Unsplash&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>

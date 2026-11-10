@@ -4,7 +4,7 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Tue, 10 Nov 2026 00:20:20 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 10 Nov 2026 21:42:40 GMT</lastBuildDate>
     <item>
       <title>How can search engines crawl dynamic page content when JavaScript is disabled?</title>
       <link>https://stackoverflow.com/questions/80013003/how-can-search-engines-crawl-dynamic-page-content-when-javascript-is-disabled</link>
@@ -47,107 +47,6 @@
         &lt;/code&gt;&lt;/pre&gt;
         &lt;p&gt;Using &lt;code&gt;v-show&lt;/code&gt; would avoid remounting the selects, but it would also mount every select during the initial page load.&lt;/p&gt;
         &lt;p&gt;How can I defer mounting these selects until after the initial render, while keeping them ready for a fast transition to edit mode?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Vue 3 – Best approach to avoid rendering delays with dynamic form inputs (v-if vs v-show)? [closed]</title>
-      <link>https://stackoverflow.com/questions/80012717/vue-3-best-approach-to-avoid-rendering-delays-with-dynamic-form-inputs-v-if-v</link>
-      <guid>https://stackoverflow.com/questions/80012717/vue-3-best-approach-to-avoid-rendering-delays-with-dynamic-form-inputs-v-if-v</guid>
-      <pubDate>Mon, 26 Oct 2026 22:21:53 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Title: Vue 3 – How to avoid rendering delays when switching dynamic forms from view mode to edit mode?&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Hi everyone!&lt;/p&gt;
-        &lt;p&gt;I&apos;m working on a Vue 3 application using TypeScript and Element Plus, and I&apos;m experiencing some performance issues when switching between view mode and edit mode in dynamic forms.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;The current implementation:&lt;/strong&gt;&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;&lt;p&gt;In &lt;strong&gt;view mode&lt;/strong&gt;, fields are displayed as plain text.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;In &lt;strong&gt;edit mode&lt;/strong&gt;, those fields are replaced with interactive inputs, mainly &lt;code&gt;el-select&lt;/code&gt; components.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;The fields are generated dynamically using &lt;code&gt;v-for&lt;/code&gt;.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;I&apos;m currently using &lt;code&gt;v-if / v-else&lt;/code&gt; to switch between the two modes.&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;&lt;strong&gt;The problem:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;When switching to edit mode, there&apos;s a noticeable delay where the input section remains blank before the selects appear.&lt;/p&gt;
-        &lt;p&gt;This is NOT related to HTTP requests or data fetching. All the data and select options are already loaded.&lt;/p&gt;
-        &lt;p&gt;The delay seems to come from Vue mounting and rendering the components.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;Simplified example:&lt;/strong&gt;&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
-        import { ref } from &apos;vue&apos;
-        
-        interface Field {
-        id: number
-        value: string
-        options: { label: string; value: string }[]
-        }
-        
-        const isEditing = ref(false)
-        
-        const fields = ref&amp;lt;Field[]&amp;gt;(
-        Array.from({ length: 100 }, (_, index) =&amp;gt; ({
-        id: index,
-        value: `option-${index}-0`,
-        options: Array.from({ length: 100 }, (_, i) =&amp;gt; ({
-        label: `Option ${i + 1}`,
-        value: `option-${index}-${i}`
-        }))
-        }))
-        )
-        &amp;lt;/script&amp;gt;
-        
-        &amp;lt;template&amp;gt;
-        &amp;lt;button @click=&amp;quot;isEditing = !isEditing&amp;quot;&amp;gt;
-        {{ isEditing ? &apos;View mode&apos; : &apos;Edit mode&apos; }}
-        &amp;lt;/button&amp;gt;
-        
-        &amp;lt;div v-for=&amp;quot;field in fields&amp;quot; :key=&amp;quot;field.id&amp;quot;&amp;gt;
-        &amp;lt;span v-if=&amp;quot;!isEditing&amp;quot;&amp;gt;
-        {{ field.value }}
-        &amp;lt;/span&amp;gt;
-        
-        &amp;lt;el-select
-        v-else
-        v-model=&amp;quot;field.value&amp;quot;
-        filterable
-        &amp;gt;
-        &amp;lt;el-option
-        v-for=&amp;quot;option in field.options&amp;quot;
-        :key=&amp;quot;option.value&amp;quot;
-        :label=&amp;quot;option.label&amp;quot;
-        :value=&amp;quot;option.value&amp;quot;
-        /&amp;gt;
-        &amp;lt;/el-select&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This example uses 100 fields with 100 options each to illustrate the rendering cost. The exact number of fields varies in the real application.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;What I&apos;ve considered:&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;1. Using &lt;code&gt;v-show&lt;/code&gt; instead of &lt;code&gt;v-if&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;This would keep the select components mounted and simply toggle their visibility.&lt;/p&gt;
-        &lt;p&gt;However, it would also mean mounting all the selects during the initial page load, even if the user never enters edit mode.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;2. Lazy mounting + &lt;code&gt;v-show&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Mount the selects only after the initial page render, keep them hidden, and reuse them when switching to edit mode.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;3. Progressive rendering&lt;/strong&gt;&lt;/p&gt;
-        &lt;p&gt;Render the selects in smaller batches to avoid blocking the main thread.&lt;/p&gt;
-        &lt;p&gt;&lt;strong&gt;My questions:&lt;/strong&gt;&lt;/p&gt;
-        &lt;ol&gt;
-        &lt;li&gt;&lt;p&gt;What&apos;s the recommended approach for this scenario in Vue 3?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;How do you handle large dynamic forms with view/edit modes in production applications?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Is there a way to preload or progressively mount hidden components without negatively affecting initial rendering performance?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Would lazy mounting combined with &lt;code&gt;v-show&lt;/code&gt; be a reasonable solution, or is there a better pattern?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;li&gt;&lt;p&gt;Would you recommend optimizing the component mounting process rather than introducing a loading state?&lt;/p&gt;
-        &lt;/li&gt;
-        &lt;/ol&gt;
-        &lt;p&gt;Ideally, I&apos;d like to keep the initial page load lightweight while making the transition to edit mode as smooth as possible.&lt;/p&gt;
-        &lt;p&gt;I&apos;m particularly interested in solutions that scale well with large forms and dynamic components.&lt;/p&gt;
-        &lt;p&gt;Any suggestions, performance tips, or examples from real-world Vue 3 applications would be greatly appreciated!&lt;/p&gt;
-        &lt;p&gt;Thanks in advance!&lt;/p&gt;
       </content:encoded>
     </item>
     <item>
@@ -1617,6 +1516,29 @@
         &lt;p&gt;&lt;a href=&quot;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&lt;/a&gt;&lt;/p&gt;
         &lt;hr /&gt;
         &lt;p&gt;How can I take care of the reactivity?&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>Fullcalendar Vue slot templates</title>
+      <link>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</link>
+      <guid>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</guid>
+      <pubDate>Tue, 03 Mar 2026 10:14:17 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Fullcalendar docs mention only one slot template, &amp;quot;event-content&amp;quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren&apos;t mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/resourceAreaColumns&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/resourceAreaColumns&lt;/a&gt;) from resource timeline feature, but it doesn&apos;t work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/vue#slot-templates&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/vue#slot-templates&lt;/a&gt;)&lt;/p&gt;
+        &lt;p&gt;So while this works:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #eventContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This doesn&apos;t:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
+        &amp;lt;template #cellContent&amp;gt;
+        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
+        &amp;lt;/template&amp;gt;
+        &amp;lt;/FullCalendar&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
   </channel>
