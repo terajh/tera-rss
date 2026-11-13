@@ -4,12 +4,258 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Thu, 12 Nov 2026 22:19:39 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 13 Nov 2026 21:44:24 GMT</lastBuildDate>
+    <item>
+      <title>Porting My Bots to Netlify</title>
+      <link>https://www.raymondcamden.com/2026/11/13/porting-my-bots-to-netlify</link>
+      <guid>https://www.raymondcamden.com/2026/11/13/porting-my-bots-to-netlify</guid>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I&apos;ve got a number of &lt;a href=&quot;/bots&quot;&gt;bots&lt;/a&gt; I&apos;ve built for both fun and learning (well mostly fun), most of which were running on &lt;a href=&quot;https://pipedream.com&quot;&gt;Pipedream&lt;/a&gt;. Sadly, Pipedream is shutting down. I&apos;d naturally consider &lt;a href=&quot;https://val.town&quot;&gt;Val Town&lt;/a&gt; instead... but it&apos;s shutting down too. Yeah, wonderful times in tech these days, eh?&lt;/p&gt;
+        &lt;p&gt;I was a bit unsure of what to do with them. Cloudflare has excellent serverless support and I knew I could move them there, but instead I decided to wrap them into my site here itself. I was hesitant to do so at first - these bots really aren&apos;t part of my blog - but given that they&apos;re tiny (just one file, ignoring any dependencies), I figured I&apos;d bring em home and run them here.&lt;/p&gt;
+        &lt;p&gt;For each bot, I used the same method. I&apos;m using Google Antigravity for my personal work, so I told my agent something along the lines of:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;I want to migrate a bot that runs on Pipedream. Every four hours it 
+        posts to Mastodon (or Bluesky) and uses this logic to craft the actual
+        post:
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s where I then pasted in the code bits from Pipedream. Some were in JavaScript. Some were in Python. I trusted my agent to know it needed everything deployed in TypeScript.&lt;/p&gt;
+        &lt;p&gt;And honestly - it worked perfectly. I instructed my agent to store my credentials (Mastodon requires an access token, Bluesky your username and password) as Netlify environment variables. The Netlify CLI picks these up and provides access to them locally so testing was easy. Even better, the Netlify CLI supports testing these scheduled functions via the CLI, so for example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;netlify functions:invoke bot-superjoycat
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As an example of the final result, here&apos;s my Dragon Hoards bot, one of my favorites:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-typescript&quot;&gt;import type { Config, Context } from &apos;@netlify/functions&apos;;
+        import { generateSlug, type RandomWordOptions } from &apos;random-word-slugs&apos;;
+        import indefinite from &apos;indefinite&apos;;
+        import pluralize from &apos;pluralize&apos;;
+        import { BskyAgent } from &apos;@atproto/api&apos;;
+        
+        const getRandomIntInclusive = function (min: number, max: number) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1) + min);
+        };
+        
+        const locations = [
+        &apos;in an ancient temple&apos;,
+        &apos;in a jungle&apos;,
+        &apos;by a dusty fountain&apos;,
+        &apos;on the shore of an ocean&apos;,
+        &apos;on a distant planet&apos;,
+        &apos;inside a whirlpool&apos;,
+        &apos;on an ancient moon&apos;,
+        &apos;on an island&apos;,
+        &apos;by a lake&apos;,
+        &apos;by a forest lake&apos;,
+        &apos;under your bed&apos;,
+        &amp;quot;in a unicorn&apos;s forest&amp;quot;,
+        &apos;far from people&apos;,
+        &apos;under a lake&apos;,
+        &apos;in a castle in the sky&apos;,
+        &apos;on a forgotten mountain&apos;,
+        &apos;at the bottom of a whirlpool&apos;,
+        &apos;in a nebula&apos;,
+        &apos;far away under rocks and stone&apos;,
+        &apos;in a mossy grove&apos;,
+        &apos;in a sock drawer&apos;,
+        &apos;inside an abandoned castle&apos;,
+        &apos;at the end of a rainbow&apos;,
+        &apos;on a mountain top&apos;,
+        &apos;in a moonlit forest&apos;,
+        &apos;inside a black hole&apos;,
+        &apos;in the ruins of a city&apos;,
+        &apos;on a deserted island&apos;,
+        &apos;in a jungle&apos;,
+        &apos;in a forest temple&apos;,
+        &apos;in a long forgotten city&apos;,
+        &apos;on a moon&apos;,
+        &apos;on a distant planet&apos;,
+        &apos;deep inside a well&apos;,
+        &apos;in an old mansion&apos;,
+        &apos;on a crumbling mountain&apos;,
+        &apos;on a forgotten island&apos;,
+        &apos;in a haunted house&apos;,
+        &apos;on the other side of a rainbow&apos;,
+        &apos;on a lonely island&apos;,
+        &amp;quot;under a child&apos;s bed&amp;quot;,
+        &apos;in a castle in the clouds&apos;,
+        &apos;in the ruins of a village&apos;,
+        &apos;deep in a cave&apos;,
+        &apos;under a haunted house&apos;,
+        &apos;near a village&apos;,
+        ];
+        
+        const verbs = [
+        &apos;sees&apos;,
+        &apos;explores&apos;,
+        &apos;sorts&apos;,
+        &apos;inventories&apos;,
+        &apos;loves&apos;,
+        &apos;estimates&apos;,
+        &apos;guards&apos;,
+        &apos;tallies&apos;,
+        &apos;reminisces over&apos;,
+        &apos;regards&apos;,
+        &apos;looks over&apos;,
+        &apos;searches&apos;,
+        &apos;investigates&apos;,
+        &apos;is proud of&apos;,
+        &apos;examines&apos;,
+        &apos;fiddles with&apos;,
+        &apos;counts&apos;,
+        &apos;admires&apos;,
+        &apos;loves&apos;,
+        &apos;admires&apos;,
+        ];
+        
+        const getDragonType = function () {
+        const options: RandomWordOptions&amp;lt;1&amp;gt; = {
+        format: &apos;lower&apos;,
+        partsOfSpeech: [&apos;adjective&apos;],
+        categories: {
+        adjective: [&apos;color&apos;, &apos;appearance&apos;, &apos;personality&apos;],
+        },
+        };
+        
+        return generateSlug(1, options);
+        };
+        
+        const getLocation = function () {
+        return locations[getRandomIntInclusive(0, locations.length - 1)];
+        };
+        
+        const getVerb = function () {
+        return verbs[getRandomIntInclusive(0, verbs.length - 1)];
+        };
+        
+        const getHoard = function () {
+        const options: RandomWordOptions&amp;lt;1&amp;gt; = {
+        format: &apos;lower&apos;,
+        partsOfSpeech: [&apos;adjective&apos;],
+        categories: {
+        adjective: [&apos;quantity&apos;],
+        },
+        };
+        
+        const quantity = generateSlug(1, options);
+        
+        const options2: RandomWordOptions&amp;lt;1&amp;gt; = {
+        format: &apos;lower&apos;,
+        partsOfSpeech: [&apos;noun&apos;],
+        categories: {
+        noun: [&apos;animals&apos;, &apos;food&apos;, &apos;thing&apos;],
+        },
+        };
+        
+        const item = pluralize(generateSlug(1, options2));
+        const ofWords = [&apos;hundreds&apos;, &apos;thousands&apos;, &apos;millions&apos;, &apos;billions&apos;];
+        let joiner = &apos; &apos;;
+        /*
+        hard coded logic - may revisit
+        */
+        if (ofWords.indexOf(quantity) &amp;gt;= 0) joiner = &apos; of &apos;;
+        
+        return `${quantity}${joiner}${item}`;
+        };
+        
+        const getFeeling = function () {
+        const options: RandomWordOptions&amp;lt;1&amp;gt; = {
+        format: &apos;lower&apos;,
+        partsOfSpeech: [&apos;adjective&apos;],
+        categories: {
+        adjective: [&apos;condition&apos;],
+        },
+        };
+        
+        return generateSlug(1, options);
+        };
+        
+        export default async (req: Request, context: Context) =&amp;gt; {
+        const mastodonToken = Netlify.env.get(&apos;BOT_DRAGONHOARDS&apos;);
+        const blueskyPassword =
+        Netlify.env.get(&apos;BLUESKY_DRAGONHOARDS_PASSWORD&apos;) || Netlify.env.get(&apos;BOT_DRAGONHOARDS_BLUESKY&apos;);
+        
+        if (!mastodonToken || !blueskyPassword) {
+        console.error(&apos;Missing BOT_DRAGONHOARDS or BLUESKY_DRAGONHOARDS_PASSWORD environment variable&apos;);
+        return new Response(&apos;Missing BOT_DRAGONHOARDS or BLUESKY_DRAGONHOARDS_PASSWORD environment variable&apos;, {
+        status: 500,
+        });
+        }
+        
+        const type = getDragonType();
+        const hoards: string[] = [];
+        for (let i = 0; i &amp;lt; 3; i++) {
+        hoards.push(getHoard());
+        }
+        
+        const hoardStr = `${hoards[0]}, ${hoards[1]}, and ${hoards[2]}`;
+        const statusText = `${indefinite(type, { capitalize: true })} dragon lives ${getLocation()}. She ${getVerb()} her hoard, which consists of ${hoardStr}. She feels ${getFeeling()}.`;
+        
+        // 1. Post to Mastodon
+        const tootRes = await fetch(&apos;https://mastodon.social/api/v1/statuses&apos;, {
+        method: &apos;POST&apos;,
+        headers: {
+        Authorization: `Bearer ${mastodonToken}`,
+        &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;,
+        },
+        body: new URLSearchParams({ status: statusText }),
+        });
+        
+        if (!tootRes.ok) {
+        const errText = await tootRes.text();
+        console.error(`Failed to post to Mastodon: ${tootRes.status} ${errText}`);
+        return new Response(&apos;Failed to post to Mastodon&apos;, { status: 502 });
+        }
+        
+        const mastodonResult = await tootRes.json();
+        console.log(`Posted to Mastodon: ${mastodonResult.url ?? mastodonResult.id}`);
+        
+        // 2. Post to Bluesky
+        const agent = new BskyAgent({
+        service: &apos;https://bsky.social&apos;,
+        });
+        
+        await agent.login({
+        identifier: &apos;dragonhoards.bsky.social&apos;,
+        password: blueskyPassword,
+        });
+        
+        const bskyResult = await agent.post({
+        text: statusText,
+        langs: [&apos;en-US&apos;],
+        createdAt: new Date().toISOString(),
+        });
+        console.log(`Posted to Bluesky: ${bskyResult.uri}`);
+        
+        return Response.json({
+        text: statusText,
+        mastodon: mastodonResult,
+        bluesky: bskyResult,
+        });
+        };
+        
+        export const config: Config = {
+        schedule: &apos;0 */4 * * *&apos;, // Every 4 hours on the hour (UTC)
+        };
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;You can see an example of this bot below:&lt;/p&gt;
+        &lt;blockquote class=&quot;mastodon-embed&quot; data-embed-url=&quot;https://mastodon.social/@dragonhoards/117610909536016556/embed&quot; style=&quot;background: #FCF8FF; border-radius: 8px; border: 1px solid #C9C4DA; margin: 0; max-width: 540px; min-width: 270px; overflow: hidden; padding: 0;&quot;&gt; &lt;a href=&quot;https://mastodon.social/@dragonhoards/117610909536016556&quot; target=&quot;_blank&quot; style=&quot;align-items: center; color: #1C1A25; display: flex; flex-direction: column; font-family: system-ui, -apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Oxygen, Ubuntu, Cantarell, &apos;Fira Sans&apos;, &apos;Droid Sans&apos;, &apos;Helvetica Neue&apos;, Roboto, sans-serif; font-size: 14px; justify-content: center; letter-spacing: 0.25px; line-height: 20px; padding: 24px; text-decoration: none;&quot;&gt; &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;32&quot; height=&quot;32&quot; viewBox=&quot;0 0 79 75&quot;&gt;&lt;path d=&quot;M63 45.3v-20c0-4.1-1-7.3-3.2-9.7-2.1-2.4-5-3.7-8.5-3.7-4.1 0-7.2 1.6-9.3 4.7l-2 3.3-2-3.3c-2-3.1-5.1-4.7-9.2-4.7-3.5 0-6.4 1.3-8.6 3.7-2.1 2.4-3.1 5.6-3.1 9.7v20h8V25.9c0-4.1 1.7-6.2 5.2-6.2 3.8 0 5.8 2.5 5.8 7.4V37.7H44V27.1c0-4.9 1.9-7.4 5.8-7.4 3.5 0 5.2 2.1 5.2 6.2V45.3h8ZM74.7 16.6c.6 6 .1 15.7.1 17.3 0 .5-.1 4.8-.1 5.3-.7 11.5-8 16-15.6 17.5-.1 0-.2 0-.3 0-4.9 1-10 1.2-14.9 1.4-1.2 0-2.4 0-3.6 0-4.8 0-9.7-.6-14.4-1.7-.1 0-.1 0-.1 0s-.1 0-.1 0 0 .1 0 .1 0 0 0 0c.1 1.6.4 3.1 1 4.5.6 1.7 2.9 5.7 11.4 5.7 5 0 9.9-.6 14.8-1.7 0 0 0 0 0 0 .1 0 .1 0 .1 0 0 .1 0 .1 0 .1.1 0 .1 0 .1.1v5.6s0 .1-.1.1c0 0 0 0 0 .1-1.6 1.1-3.7 1.7-5.6 2.3-.8.3-1.6.5-2.4.7-7.5 1.7-15.4 1.3-22.7-1.2-6.8-2.4-13.8-8.2-15.5-15.2-.9-3.8-1.6-7.6-1.9-11.5-.6-5.8-.6-11.7-.8-17.5C3.9 24.5 4 20 4.9 16 6.7 7.9 14.1 2.2 22.3 1c1.4-.2 4.1-1 16.5-1h.1C51.4 0 56.7.8 58.1 1c8.4 1.2 15.5 7.5 16.6 15.6Z&quot; fill=&quot;currentColor&quot;/&gt;&lt;/svg&gt; &lt;div style=&quot;color: #787588; margin-top: 16px;&quot;&gt;Post by @dragonhoards@mastodon.social&lt;/div&gt; &lt;div style=&quot;font-weight: bold;&quot;&gt;View on Mastodon&lt;/div&gt; &lt;/a&gt; &lt;/blockquote&gt; &lt;script data-allowed-prefixes=&quot;https://mastodon.social/&quot; async src=&quot;https://mastodon.social/embed.js&quot;&gt;&lt;/script&gt;
+        &lt;blockquote class=&quot;bluesky-embed&quot; data-bluesky-uri=&quot;at://did:plc:u62qb6gjgpfcix3vu6nbqxpl/app.bsky.feed.post/3n27rllxmyo2p&quot; data-bluesky-cid=&quot;bafyreidazcdkonnrit24sbda33j4m3o4sxzz44tqwad6533bsfk24w5rve&quot; data-bluesky-embed-color-mode=&quot;system&quot;&gt;&lt;p lang=&quot;en-US&quot;&gt;A faithful dragon lives at the bottom of a whirlpool. She searches her hoard, which consists of full xylophones, many zebras, and billions of refrigerators. She feels important.&lt;/p&gt;&amp;mdash; Dragon Hoards (&lt;a href=&quot;https://bsky.app/profile/did:plc:u62qb6gjgpfcix3vu6nbqxpl?ref_src=embed&quot;&gt;@dragonhoards.bsky.social&lt;/a&gt;) &lt;a href=&quot;https://bsky.app/profile/did:plc:u62qb6gjgpfcix3vu6nbqxpl/post/3n27rllxmyo2p?ref_src=embed&quot;&gt;November 13, 2026 at 2:01 PM&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://embed.bsky.app/static/embed.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+        &lt;p&gt;All in all, painless, except I did make one mistake that I didn&apos;t notice until just now. I forgot to deploy the environment variables. Earlier in the post I mentioned my agent had done that, but I had definitely misunderstood. That&apos;s absolutely my fault and I should have checked my bots this morning to ensure they&apos;re running. Now I&apos;m 100% sure. Really. (Ok, I held off on hitting publish on this post until I saw it for sure. ;)&lt;/p&gt;
+        &lt;p&gt;FYI, and I just found this out myself a minute ago, the Netlify CLI can actually look for errors across your entire site, including functions, and filter to errors. It&apos;s as simple as:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;netlify logs --source functions --source edge-functions --source deploy --since 24h -l error fatal
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here&apos;s an example of that output:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/11/ntl.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Netlify errors&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;That&apos;s super clear, so I added it to my npm scripts: &lt;code&gt;npm run checkproderrors&lt;/code&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Migrating My Notes App to Supabase</title>
       <link>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</link>
       <guid>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I put a service, API, framework, etc on my list of things to look at, and when I eventually get around to it, I wish I had made the time sooner. That&apos;s absolutely the case today. About two weeks ago I blogged about how I used &lt;a href=&quot;https://tinyjs.app/index.html&quot;&gt;TinyJS&lt;/a&gt; to build a desktop note application. This worked great and made use of a local SQLite database on the machine for storage. I was curious about how I&apos;d migrate this to a &amp;quot;real&amp;quot; network based storage system that could be used in multiple places and tied to a particular account. I asked my AI agent (in this case, Claude, which I tend to use for all of my ad hoc questions about stuff) if &lt;a href=&quot;https://supabase.com&quot;&gt;Supabase&lt;/a&gt; would be an appropriate solution for this, and the response I got impressed the heck out of me.&lt;/p&gt;
         &lt;p&gt;I knew Supabase was an online database system, and honestly, that&apos;s about all I knew. What I found out was it included a heck of a lot more. As just a high level overview, you get:&lt;/p&gt;
@@ -87,7 +333,7 @@
       <title>TIL - Postman and OAuth</title>
       <link>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</link>
       <guid>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few years back I shared two cool tips I learned about Postman (&lt;a href=&quot;https://www.raymondcamden.com/2024/05/22/dynamically-creating-variables-in-postman&quot;&gt;&amp;quot;Dynamically Creating Variables in Postman&amp;quot;&lt;/a&gt; and &lt;a href=&quot;https://www.raymondcamden.com/2024/05/24/creating-visualizations-in-postman&quot;&gt;&amp;quot;Creating Visualizations in Postman&amp;quot;&lt;/a&gt;). At the time, I noted that these were both well documented features in Postman and if I had bothered to actually spend some time in the docs, I would have known about those features already. Obviously after I wrote those posts I made the time to do that. Obviously... right?&lt;/p&gt;
         &lt;p&gt;Of course not. So what follows is something that probably most of you already know, but that I was really excited to discover today so if at least one person gets excited about this as well, then my job is done.&lt;/p&gt;
@@ -154,7 +400,7 @@
       <title>Getting Structured Data from Web Pages with AI and Re-usable Specs</title>
       <link>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</link>
       <guid>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I say from time to time, every now and then I build something as a proof of concept and the result is... ok? I&apos;m not really sure if the idea actually made sense and if the final result is usable, but the exploration was interesting enough that I think it warrants sharing with you good people. That&apos;s what today&apos;s post is.&lt;/p&gt;
         &lt;p&gt;This demo all began with a simple idea - how do you handle getting RSS like content from a site that doesn&apos;t actually have an RSS feed? This typically relies on looking at the page as data to be parsed.&lt;/p&gt;
@@ -878,7 +1124,7 @@
       <title>Links For You (11/1/26)</title>
       <link>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</link>
       <guid>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and happy &amp;quot;Saints have a bye week so they can&apos;t lose&amp;quot; day. That may be bitter and I shouldn&apos;t write off their season yet but... maybe next year? Of course, this is just one more kinda crappy thing going on amongst a giant pile of other crappy things so - let&apos;s just get right to the links, shall we?&lt;/p&gt;
         &lt;h2 id=&quot;when-job-hunting-turns-into-a-security-lesson&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#when-job-hunting-turns-into-a-security-lesson&quot;&gt;When job hunting turns into a security lesson&lt;/a&gt;&lt;/h2&gt;
@@ -905,7 +1151,7 @@
       <title>Generating PDF Invoices from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I shared a demo (&lt;a href=&quot;https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser%5D&quot;&gt;&amp;quot;Generating PDFs from Word Templates with officeParser&amp;quot;&lt;/a&gt;) that made use of the awesome &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; open source library. That demo was a simple &amp;quot;customer report&amp;quot; web app that took custom data and a Word template. Once the form was submitted, the library converted tokens in the Word template to real data and output a PDF. I decided to build another demo using the library, this time on the server with a simple Node.js script.&lt;/p&gt;
         &lt;p&gt;As I mentioned previously, this new feature mimics Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. At the time I wrote my blog post, the library just supported simple transformations. So given `` in your Word template, if you passed a name value of &apos;Ray&apos;, you would see that in the resulting PDF.&lt;/p&gt;
@@ -1229,7 +1475,7 @@
       <title>Building the Unicorn-themed app of my dreams with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Everyone likes to talk about light versus dark theme while no one is addressing the real need for our users - a proper unicorn theme. I mean, take a look at this beauty:&lt;/p&gt;
         &lt;p&gt;
@@ -1329,7 +1575,7 @@
       <title>Adding a PDF Display to Eleventy</title>
       <link>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</link>
       <guid>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short one. I&apos;ve talked about embedding PDFs on web pages for probably close to ten years now. Blame Adobe. Blame me being a nerd and finding this stuff interesting. Blame whoever. While I&apos;ve blogged about the topic, I&apos;ve also actually done that on my site here, in a variety of different ways.&lt;/p&gt;
         &lt;p&gt;A while back I realized I wasn&apos;t being consistent with how I did... &amp;quot;stuff&amp;quot; here, like call outs, Youtube links, etc. I started a &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/guide.md&quot;&gt;guide doc&lt;/a&gt; so I&apos;d have a quick way to remember what I did last time, and be more consistent.&lt;/p&gt;
@@ -1400,7 +1646,7 @@
       <title>Links For You (10/19/26)</title>
       <link>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</link>
       <guid>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Wowza - I&apos;m like nearly a month late on this. This is where I&apos;d try to come up with a good excuse, but I think if I just randomly point around at things and said... &amp;quot;life&amp;quot; most of you would completely understand where I&apos;m coming from. It&apos;s been a difficult few months for myself, and for nearly every person I know. This week I&apos;m going to try focus on the positive and the things that make me smile, and I hope all my lovely readers can do the same!&lt;/p&gt;
         &lt;h2 id=&quot;make-music%2C-not-war&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#make-music%2C-not-war&quot;&gt;Make Music, Not War&lt;/a&gt;&lt;/h2&gt;
@@ -1450,7 +1696,7 @@
       <title>Generating PDFs from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
+      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve been singing the praises of the &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library for a while. It&apos;s an open source JavaScript library that can parse, extract, and convert between PDFs and Office documents, as well as OpenOffice, ePub and more. My demos have all focused on client-side examples but obviously the library would work great in a server side workflow as well. I haven&apos;t worked at Adobe for years now, but I still get strangely excited working with documents. I&apos;ll just add that to the long list of reasons I&apos;m a big nerd.&lt;/p&gt;
         &lt;p&gt;A few weeks ago, I reached out to &lt;a href=&quot;https://harshankur.com/&quot;&gt;Harsh Ankur&lt;/a&gt; about an idea inspired by Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. This was probably my favorite API in their suite of PDF services. You take a Word document, put in tokens, and call the API with your data. The API would swap out the tokens with real data and give you a PDF in return. (Or Word again if you wanted that.) I suggested this to Harsh and then - voila - he added it!&lt;/p&gt;
@@ -1529,377 +1775,6 @@
         &lt;p&gt;Try this yourself here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/officeparser/wordtemplate/dist/index.html&quot;&gt;https://cfjedimaster.github.io/webdemos/officeparser/wordtemplate/dist/index.html&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;You can find the complete source for this here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/wordtemplate&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/wordtemplate&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;As I mentioned above, currently the token system is relatively simple, but I&apos;ve been talking with Harsh about some improvements that I bet will land pretty soon. Let me know what you think!&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Adding Google Auth to TinyJS</title>
-      <link>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</link>
-      <guid>https://www.raymondcamden.com/2026/10/12/adding-google-auth-to-tinyjs</guid>
-      <pubDate>Thu, 12 Nov 2026 21:54:37 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;A few days ago I &lt;a href=&quot;https://www.raymondcamden.com/2026/10/08/tiny-apps-with-tinyjs&quot;&gt;posted&lt;/a&gt; about my experience playing around with &lt;a href=&quot;https://tinyjs.app/&quot;&gt;TinyJS&lt;/a&gt;. This is a &lt;em&gt;very&lt;/em&gt; light &amp;quot;web to desktop app&amp;quot; platform for - well - building desktop apps. Its simplicity and similarity to PhoneGap (at least for the desktop) has got me interested in seeing what I can build with the project. One of my ideas would be improved with a login system so I naturally looked into adding a &amp;quot;Login with Google&amp;quot; feature. While this was &lt;em&gt;mostly&lt;/em&gt; straightforward, I ran into some oddities and figured I&apos;d share it here.&lt;/p&gt;
-        &lt;p&gt;I went into this exploration with a basic idea of how I&apos;d approach it:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Create an app in the Google Cloud console to represent my app, getting the client id and secret.&lt;/li&gt;
-        &lt;li&gt;Generate a link using the standard OAuth flow&lt;/li&gt;
-        &lt;li&gt;For my redirect URL, use a custom URI scheme (like &lt;code&gt;mycustomapp://&lt;/code&gt;) so that on redirect from Google, it would open the app automatically&lt;/li&gt;
-        &lt;li&gt;The response would include the code I&apos;d exchange for an access token (and refresh token), at which point I could get the user&apos;s profile and have their name and email address. I&apos;m only thinking of that as my mental model for this little POC is &lt;em&gt;just&lt;/em&gt; login, not using other Google services.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Right away I hit a couple of snags.&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Google&apos;s OAuth flow specifically blocks the use of a custom URI scheme. Instead, you need to hit a locally running web server which would handle getting and verifying the code. I&apos;ve actually seen this before, you end up with a new tab in your browser that says you can close the tab, but I had never implemented it before.&lt;/li&gt;
-        &lt;li&gt;The next bit isn&apos;t a snag per se, but in my research, I found that in most places, your desktop app can include just the client id, but for Google, you must include the secret as well. Obviously that makes me nervous as heck, but again, this is apparently a well known thing for desktop apps that authenticate with Google. While I don&apos;t feel 100% certain about this, I asked multiple agents, Googled, and so forth, and they all seemed to be in agreement. Absolutely correct me in a comment below if I&apos;m wrong.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;Alright, so with all of that in mind - I want to once again thank the author of the program for pointing me to the &lt;a href=&quot;https://github.com/tarwin/tinyjsapp-examples/tree/main/platter&quot;&gt;platter demo&lt;/a&gt; which implements the local web server mentioned above. I was able to point my coding agent to that when working through the demo.&lt;/p&gt;
-        &lt;p&gt;I have &lt;em&gt;not&lt;/em&gt; put my code into a GitHub repo, but will include everything below. As this was just a POC I didn&apos;t feel like it was necessary, but if you want a zip, just ask. Nicely. Or not. I&apos;ll still send it.&lt;/p&gt;
-        &lt;h2 id=&quot;the-code&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#the-code&quot;&gt;The Code&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;Ok, let me start with the simplest part, the HTML. I&apos;m not using Alpine for this, or any real CSS. It&apos;s just this:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
-        &amp;lt;html&amp;gt;
-        &amp;lt;head&amp;gt;
-        &amp;lt;meta charset=&amp;quot;utf-8&amp;quot;&amp;gt;
-        &amp;lt;title&amp;gt;__NAME__&amp;lt;/title&amp;gt;
-        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style.css&amp;quot;&amp;gt;
-        &amp;lt;/head&amp;gt;
-        &amp;lt;body&amp;gt;
-        
-        &amp;lt;main&amp;gt;
-        &amp;lt;h1&amp;gt;Google sign-in Test&amp;lt;/h1&amp;gt;
-        &amp;lt;a id=&amp;quot;login-link&amp;quot; href=&amp;quot;#&amp;quot;&amp;gt;Login with Google&amp;lt;/a&amp;gt;
-        &amp;lt;section id=&amp;quot;profile&amp;quot; aria-live=&amp;quot;polite&amp;quot; hidden&amp;gt;
-        &amp;lt;h2&amp;gt;Signed in&amp;lt;/h2&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Name:&amp;lt;/strong&amp;gt; &amp;lt;span id=&amp;quot;profile-name&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Email:&amp;lt;/strong&amp;gt; &amp;lt;span id=&amp;quot;profile-email&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;/section&amp;gt;
-        &amp;lt;p id=&amp;quot;login-error&amp;quot; role=&amp;quot;alert&amp;quot; hidden&amp;gt;&amp;lt;/p&amp;gt;
-        &amp;lt;/main&amp;gt;
-        
-        &amp;lt;script src=&amp;quot;app.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-        &amp;lt;/body&amp;gt;
-        &amp;lt;/html&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I&apos;ve got a login link (blank, that gets filled in later), a section that&apos;s displayed when you are logged in, and a block for errors. The login link should be hidden as well (I&apos;ll explain why later), but again I was trying to keep this simple.&lt;/p&gt;
-        &lt;p&gt;Now let&apos;s look at the JavaScript, and this is a bit of a mess. With a proper framework like Alpine it would be better organized, but it gets the job done.&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const CLIENT_ID = &amp;quot;safe but why not be sure&amp;quot;;
-        
-        const REDIRECT_URI = &amp;quot;http://127.0.0.1:8765/callback&amp;quot;;
-        const TOKENS_KEY = &amp;quot;google-oauth-tokens&amp;quot;;
-        
-        async function makeLoginUrl() {
-        const b64url = (buf) =&amp;gt;
-        btoa(String.fromCharCode(...new Uint8Array(buf)))
-        .replace(/\+/g, &amp;quot;-&amp;quot;).replace(/\//g, &amp;quot;_&amp;quot;).replace(/=+$/, &amp;quot;&amp;quot;);
-        
-        const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
-        const challenge = b64url(
-        await crypto.subtle.digest(&amp;quot;SHA-256&amp;quot;, new TextEncoder().encode(verifier))
-        );
-        const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
-        
-        // keep these for the token exchange step
-        sessionStorage.setItem(&amp;quot;pkce_verifier&amp;quot;, verifier);
-        sessionStorage.setItem(&amp;quot;oauth_state&amp;quot;, state);
-        
-        const params = new URLSearchParams({
-        client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        response_type: &amp;quot;code&amp;quot;,
-        scope: &amp;quot;openid email profile&amp;quot;,
-        access_type: &amp;quot;offline&amp;quot;,
-        prompt: &amp;quot;consent&amp;quot;,
-        code_challenge: challenge,
-        code_challenge_method: &amp;quot;S256&amp;quot;,
-        state,
-        });
-        
-        return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-        }
-        
-        document.addEventListener(&amp;quot;DOMContentLoaded&amp;quot;, async () =&amp;gt; {
-        const loginLink = document.querySelector(&amp;quot;#login-link&amp;quot;);
-        
-        try {
-        const savedTokens = await tiny.app.secrets.get(TOKENS_KEY);
-        if (savedTokens) {
-        try {
-        const session = await tiny.api.call(&amp;quot;restoreSession&amp;quot;, {
-        tokens: JSON.parse(savedTokens),
-        clientId: CLIENT_ID,
-        });
-        await tiny.app.secrets.set(TOKENS_KEY, JSON.stringify(session.tokens));
-        showProfile(session.profile);
-        return;
-        } catch {
-        await tiny.app.secrets.delete(TOKENS_KEY);
-        }
-        }
-        await prepareLogin(loginLink);
-        } catch (error) {
-        showError(`Google sign-in failed: ${error.message}`);
-        }
-        });
-        
-        async function prepareLogin(loginLink) {
-        const url = await makeLoginUrl();
-        const state = sessionStorage.getItem(&amp;quot;oauth_state&amp;quot;);
-        const codeVerifier = sessionStorage.getItem(&amp;quot;pkce_verifier&amp;quot;);
-        loginLink.href = url;
-        loginLink.target = &amp;quot;_blank&amp;quot;;
-        loginLink.rel = &amp;quot;noopener&amp;quot;;
-        
-        loginLink.onclick = async () =&amp;gt; {
-        try {
-        const session = await tiny.api.call(&amp;quot;waitForCode&amp;quot;, {
-        port: 8765,
-        state,
-        codeVerifier,
-        clientId: CLIENT_ID,
-        });
-        await tiny.app.secrets.set(TOKENS_KEY, JSON.stringify(session.tokens));
-        showProfile(session.profile);
-        } catch (error) {
-        showError(`Google sign-in failed: ${error.message}`);
-        await prepareLogin(loginLink);
-        }
-        };
-        }
-        
-        function showProfile(profile) {
-        document.querySelector(&amp;quot;#profile-name&amp;quot;).textContent = profile.name || &amp;quot;Not provided&amp;quot;;
-        document.querySelector(&amp;quot;#profile-email&amp;quot;).textContent = profile.email || &amp;quot;Not provided&amp;quot;;
-        document.querySelector(&amp;quot;#profile&amp;quot;).hidden = false;
-        document.querySelector(&amp;quot;#login-link&amp;quot;).hidden = true;
-        document.querySelector(&amp;quot;#login-error&amp;quot;).hidden = true;
-        }
-        
-        function showError(message) {
-        const errorOutput = document.querySelector(&amp;quot;#login-error&amp;quot;);
-        errorOutput.textContent = message;
-        errorOutput.hidden = false;
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;I start off with a utility function to generate my login link. Note that redirect URI - it&apos;s going to be hosted by my app via the backend script and makes an assumption on a port that&apos;s free. A better version would try a set of ports to see which can be used.&lt;/p&gt;
-        &lt;p&gt;In my &lt;code&gt;DOMContentLoaded&lt;/code&gt; block I&apos;ve got multiple things going on.&lt;/p&gt;
-        &lt;p&gt;First off - I look at a secure storage system for an existing access token. This is documented in the &lt;a href=&quot;https://tinyjs.app/docs.html#secrets&quot;&gt;secrets and auth&lt;/a&gt; section of TinyJS&apos;s docs. If the values exist, a call to the backend is made to try to verify the values and treat the user as already logged in.&lt;/p&gt;
-        &lt;p&gt;If this fails, or the values weren&apos;t there, we:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Get the login URL and update the DOM&lt;/li&gt;
-        &lt;li&gt;Tell the backend to fire up the HTTP server&lt;/li&gt;
-        &lt;li&gt;And then wait for a success.&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;The final two functions just display the profile or an error. Now let&apos;s look at the backend:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// Yes, I said it was safe, still, why share it here?
-        const GOOGLE_CLIENT_SECRET = &amp;quot;my secret brings the boys to the yard&amp;quot;;
-        
-        async function exchangeCodeForToken({ code, codeVerifier, clientId, port }) {
-        const response = await fetch(&amp;quot;https://oauth2.googleapis.com/token&amp;quot;, {
-        method: &amp;quot;POST&amp;quot;,
-        headers: {
-        &amp;quot;content-type&amp;quot;: &amp;quot;application/x-www-form-urlencoded&amp;quot;,
-        },
-        body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: `http://127.0.0.1:${port}/callback`,
-        grant_type: &amp;quot;authorization_code&amp;quot;,
-        code_verifier: codeVerifier,
-        }),
-        });
-        const tokens = await response.json();
-        if (!response.ok || tokens.error) {
-        throw new Error(tokens.error_description || tokens.error || `Token request failed (${response.status}).`);
-        }
-        return tokens;
-        }
-        
-        async function refreshAccessToken(refreshToken, clientId) {
-        const response = await fetch(&amp;quot;https://oauth2.googleapis.com/token&amp;quot;, {
-        method: &amp;quot;POST&amp;quot;,
-        headers: {
-        &amp;quot;content-type&amp;quot;: &amp;quot;application/x-www-form-urlencoded&amp;quot;,
-        },
-        body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        refresh_token: refreshToken,
-        grant_type: &amp;quot;refresh_token&amp;quot;,
-        }),
-        });
-        const tokens = await response.json();
-        if (!response.ok || tokens.error) {
-        throw new Error(tokens.error_description || tokens.error || `Token refresh failed (${response.status}).`);
-        }
-        return tokens;
-        }
-        
-        function expiresAt(tokens) {
-        const expiresIn = Number(tokens.expires_in);
-        if (!tokens.access_token || !Number.isFinite(expiresIn) || expiresIn &amp;lt;= 0) {
-        throw new Error(&amp;quot;Google returned an invalid access token response.&amp;quot;);
-        }
-        return Date.now() + expiresIn * 1000;
-        }
-        
-        async function getUserProfile(accessToken) {
-        const response = await fetch(&amp;quot;https://openidconnect.googleapis.com/v1/userinfo&amp;quot;, {
-        headers: {
-        authorization: `Bearer ${accessToken}`,
-        },
-        });
-        const profile = await response.json();
-        if (!response.ok) {
-        throw new Error(profile.error_description || profile.error || `Profile request failed (${response.status}).`);
-        }
-        return {
-        name: profile.name || &amp;quot;&amp;quot;,
-        email: profile.email || &amp;quot;&amp;quot;,
-        };
-        }
-        
-        async function restoreSession(tokens, clientId) {
-        if (!tokens?.access_token || !tokens?.refresh_token || !tokens?.expires_at) {
-        throw new Error(&amp;quot;Saved sign-in is incomplete.&amp;quot;);
-        }
-        
-        let refreshedTokens = {};
-        if (tokens.expires_at &amp;lt;= Date.now() + 60000) {
-        refreshedTokens = await refreshAccessToken(tokens.refresh_token, clientId);
-        }
-        
-        const updatedTokens = {
-        access_token: refreshedTokens.access_token || tokens.access_token,
-        refresh_token: refreshedTokens.refresh_token || tokens.refresh_token,
-        expires_at: refreshedTokens.access_token
-        ? expiresAt(refreshedTokens)
-        : tokens.expires_at,
-        };
-        const profile = await getUserProfile(updatedTokens.access_token);
-        return { profile, tokens: updatedTokens };
-        }
-        
-        async function waitForCode(port, expectedState, codeVerifier, clientId) {
-        return new Promise((resolve, reject) =&amp;gt; {
-        let server;
-        let timer;
-        let settled = false;
-        let processing = false;
-        
-        const stopServer = () =&amp;gt; {
-        if (timer) clearTimeout(timer);
-        if (!server) return;
-        const activeServer = server;
-        server = null;
-        try {
-        activeServer.close();
-        } catch (error) {
-        console.error(&amp;quot;Failed to close OAuth callback server:&amp;quot;, error);
-        }
-        };
-        
-        const finish = (error, code, closeImmediately = false) =&amp;gt; {
-        if (settled) return;
-        settled = true;
-        if (timer) clearTimeout(timer);
-        if (closeImmediately) stopServer();
-        else setTimeout(stopServer, 1000);
-        if (error) reject(error);
-        else resolve(code);
-        };
-        
-        const escapeHtml = (value) =&amp;gt; String(value)
-        .replace(/&amp;amp;/g, &amp;quot;&amp;amp;amp;&amp;quot;)
-        .replace(/&amp;lt;/g, &amp;quot;&amp;amp;lt;&amp;quot;)
-        .replace(/&amp;gt;/g, &amp;quot;&amp;amp;gt;&amp;quot;)
-        .replace(/&amp;quot;/g, &amp;quot;&amp;amp;quot;&amp;quot;)
-        .replace(/&apos;/g, &amp;quot;&amp;amp;#39;&amp;quot;);
-        const htmlResponse = (message, status = 200) =&amp;gt; new Response(
-        `&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h3&amp;gt;${escapeHtml(message)}&amp;lt;/h3&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;`,
-        {
-        status,
-        headers: {
-        &amp;quot;content-type&amp;quot;: &amp;quot;text/html; charset=utf-8&amp;quot;,
-        &amp;quot;content-security-policy&amp;quot;: &amp;quot;default-src &apos;none&apos;; style-src &apos;unsafe-inline&apos;&amp;quot;,
-        },
-        }
-        );
-        
-        server = tjs.serve({
-        port,
-        fetch: async (request) =&amp;gt; {
-        let url;
-        try {
-        url = new URL(request.url);
-        } catch {
-        return htmlResponse(&amp;quot;Invalid callback request.&amp;quot;, 400);
-        }
-        
-        if (url.pathname !== &amp;quot;/callback&amp;quot;) return htmlResponse(&amp;quot;Not found.&amp;quot;, 404);
-        if (settled) return htmlResponse(&amp;quot;This login request has already been processed.&amp;quot;, 410);
-        if (processing) return htmlResponse(&amp;quot;This login request is being processed.&amp;quot;, 409);
-        if (url.searchParams.get(&amp;quot;state&amp;quot;) !== expectedState) {
-        return htmlResponse(&amp;quot;State mismatch. Return to the app and try again.&amp;quot;, 400);
-        }
-        
-        const oauthError = url.searchParams.get(&amp;quot;error&amp;quot;);
-        if (oauthError) {
-        finish(new Error(oauthError));
-        return htmlResponse(&amp;quot;Login failed: &amp;quot; + oauthError);
-        }
-        
-        const code = url.searchParams.get(&amp;quot;code&amp;quot;);
-        if (!code) {
-        finish(new Error(&amp;quot;OAuth callback did not include an authorization code.&amp;quot;));
-        return htmlResponse(&amp;quot;Login failed: authorization code was missing.&amp;quot;, 400);
-        }
-        
-        processing = true;
-        try {
-        const tokens = await exchangeCodeForToken({
-        code,
-        codeVerifier,
-        clientId,
-        port,
-        });
-        const profile = await getUserProfile(tokens.access_token);
-        finish(null, {
-        profile,
-        tokens: {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_at: expiresAt(tokens),
-        },
-        });
-        return htmlResponse(&amp;quot;Login complete. You can close this tab.&amp;quot;);
-        } catch (error) {
-        finish(error);
-        return htmlResponse(&amp;quot;Token exchange failed: &amp;quot; + error.message, 502);
-        }
-        },
-        });
-        
-        timer = setTimeout(() =&amp;gt; {
-        finish(new Error(&amp;quot;Timed out waiting for the OAuth callback.&amp;quot;), null, true);
-        }, 120000);
-        });
-        }
-        
-        export const api = {
-        restoreSession: ({ tokens, clientId }) =&amp;gt; {
-        if (!clientId) throw new Error(&amp;quot;Google client ID is required.&amp;quot;);
-        return restoreSession(tokens, clientId);
-        },
-        waitForCode: ({ port, state, codeVerifier, clientId }) =&amp;gt; {
-        if (!codeVerifier || !clientId) {
-        throw new Error(&amp;quot;OAuth code verifier and client ID are required.&amp;quot;);
-        }
-        return waitForCode(port, state, codeVerifier, clientId);
-        },
-        };
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This one&apos;s a bit of a beast, but some are fairly standard. Both &lt;code&gt;exchangeCodeForToken&lt;/code&gt; and &lt;code&gt;refreshAccessToken&lt;/code&gt; are standard OAuth stuff. Ditto for &lt;code&gt;getUserProfile&lt;/code&gt;. The important bit is &lt;code&gt;waitForCode&lt;/code&gt;. This is where the small web server is kicked off that attempts to handle the redirect back from Google. I said up front I used AI to build most of this and I have to be honest, I&apos;m glad I did as this part would have taken me quite some time.&lt;/p&gt;
-        &lt;p&gt;All in all - it works great. The only real issue is a nit-picky one - when the app loads you see the login link for a second before the stored auth is verified. A bit of UX magic there would handle that.&lt;/p&gt;
-        &lt;p&gt;There&apos;s an important part left out of this that I&apos;ll need to tackle next - which is how I would take the verified identity here and pass it to a remote service in a secure way such that the remote service can also verify it (&amp;quot;Yes, this was Raymond Camden&amp;quot;) before performing an action.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
