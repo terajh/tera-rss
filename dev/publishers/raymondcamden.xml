@@ -4,12 +4,255 @@
     <title>dev RSS - Raymond Camden</title>
     <link>https://www.raymondcamden.com/</link>
     <description>Raymond Camden RSS 피드</description>
-    <lastBuildDate>Fri, 13 Nov 2026 21:44:24 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 14 Nov 2026 20:17:51 GMT</lastBuildDate>
+    <item>
+      <title>A Quick Demo of Gemini&apos;s Decisions API</title>
+      <link>https://www.raymondcamden.com/2026/11/14/a-quick-demo-of-geminis-decisions-api</link>
+      <guid>https://www.raymondcamden.com/2026/11/14/a-quick-demo-of-geminis-decisions-api</guid>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;Yesterday, Google formally released their new &lt;a href=&quot;https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/&quot;&gt;Decisions API&lt;/a&gt;, and it&apos;s a pretty important new addition to Gemini in general, so I thought I&apos;d share a quick introduction and demo to give you an idea of how it can be used. Of course, the first thing I need to do is explain what it is and why you should care.&lt;/p&gt;
+        &lt;h2 id=&quot;decisions-api%3F&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#decisions-api%3F&quot;&gt;Decisions API?&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;Generative AI has been able to answer questions since the beginning. Where the difficulty lies is in turning those answers into machine readable output. What do I mean by that? I can write code that takes a photo and asks my AI service what&apos;s in the photo. So for example - I pass this photo to Claude:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/11/cat1.jpg&quot; loading=&quot;lazy&quot; alt=&quot;Cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I asked, &amp;quot;what&apos;s in this picture&amp;quot;, and got:&lt;/p&gt;
+        &lt;script type=&quot;module&quot; src=&quot;https://cdn.jsdelivr.net/npm/zero-md@3?register&quot;&gt;&lt;/script&gt;
+        &lt;zero-md&gt;
+        &lt;template data-append&gt;
+        &lt;style&gt;
+        .markdown-body {
+        padding: 20px;
+        margin-bottom: 30px;
+        }
+        &lt;/style&gt;
+        &lt;/template&gt;
+        &lt;script type=&quot;text/markdown&quot;&gt;
+        &lt;p&gt;A fluffy cat lounging on a white table. It looks like a ragdoll or similar pointed breed: dark chocolate-brown face, ears, and front legs, a creamy tan body, and white mittened back paws and tail tip. Its eyes look closed, so it&apos;s either dozing or very relaxed.&lt;/p&gt;
+        &lt;p&gt;Around it:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Left:&lt;/strong&gt; a tall, ribbed blue plastic tumbler with a little water in the bottom&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Behind the cat:&lt;/strong&gt; a stainless steel cup holding wilted flowers, with a yellow bloom drooping over the side&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Top right:&lt;/strong&gt; a pair of white over-ear headphones on the table&lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+        &lt;p&gt;&lt;strong&gt;Background:&lt;/strong&gt; a dark wooden chair on the right and what looks like a kitchen appliance at the top left&lt;/p&gt;
+        &lt;/script&gt;
+        &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/zero-md&gt;
+        &lt;p&gt;Cool. But what if I wanted to &lt;em&gt;only&lt;/em&gt; know if there is a cat in the picture? If I make my prompt &amp;quot;just answer one question - is there a cat in this picture?&amp;quot; I get a nice &amp;quot;Yes&amp;quot; back. Again, cool.&lt;/p&gt;
+        &lt;p&gt;But doing this in code makes things a bit fuzzy. Like, what if my agent came back with &amp;quot;Yep&amp;quot; or &amp;quot;There is a cat&amp;quot;? Usually the way around this is with passing schema to the agent. Gemini supports &lt;a href=&quot;https://aistudio.google.com/docs/structured-output&quot;&gt;structured outputs&lt;/a&gt; where you define a JSON schema and tell the agent to respond using it.&lt;/p&gt;
+        &lt;p&gt;For example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;type&amp;quot;: &amp;quot;object&amp;quot;,
+        &amp;quot;properties&amp;quot;: {
+        &amp;quot;isCat&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;boolean&amp;quot;,
+        &amp;quot;description&amp;quot;: &amp;quot;True if the image contains a cat, false otherwise.&amp;quot;
+        }
+        },
+        &amp;quot;required&amp;quot;: [&amp;quot;isCat&amp;quot;]
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This will then give me JSON my code can work with in a programmatic manner. Once again, cool, but... this could be better.&lt;/p&gt;
+        &lt;p&gt;Way back in September, &lt;a href=&quot;https://typesafe.ai/&quot;&gt;TypeSafe&lt;/a&gt; released Jev. Wikipedia defines it as a &amp;quot;discriminative model&amp;quot;, not generation. Instead of outputting text, or JSON (which is still text of course), the result is a decision essentially. You still pass it an input that kinda resembles JSON schema, but instead can be thought of as defining what the result will be from the model. The model isn&apos;t going to &amp;quot;generate&amp;quot; text, but answer the input. That&apos;s probably a bit fuzzy, but hopefully the demo will help clear it up.&lt;/p&gt;
+        &lt;p&gt;This input comes in the form of:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Yes and no questions (referred to as a noul)&lt;/li&gt;
+        &lt;li&gt;A set of choices&lt;/li&gt;
+        &lt;li&gt;A scored item&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;The &lt;a href=&quot;https://en.wikipedia.org/wiki/Jev_(AI_model)&quot;&gt;Jev Wikipedia&lt;/a&gt; page has a good example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;&amp;quot;new_noul_1&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;noul&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;&amp;lt;true/false question&amp;gt;&amp;quot;,
+        &amp;quot;criteria&amp;quot;: { &amp;quot;true&amp;quot;: &amp;lt;entry&amp;gt;, &amp;quot;false&amp;quot;: &amp;lt;entry&amp;gt; }
+        },
+        &amp;quot;new_choice_2&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;choice&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;Which option fits the state?&amp;quot;,
+        &amp;quot;criteria&amp;quot;: { &amp;quot;option_0&amp;quot;: &amp;lt;entry&amp;gt;, ..., &amp;quot;option_n-1&amp;quot;: &amp;lt;entry&amp;gt; }
+        },
+        &amp;quot;new_score_1&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;score&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;Where does the state fall on the scale?&amp;quot;,
+        &amp;quot;criteria&amp;quot;: [&amp;quot;option_0&amp;quot;: &amp;lt;entry&amp;gt;, ..., &amp;quot;option_n-1&amp;quot;: &amp;lt;entry&amp;gt;]
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The biggest benefits of an API like this are speed and cost.&lt;/p&gt;
+        &lt;h2 id=&quot;gemini&apos;s-support&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#gemini&apos;s-support&quot;&gt;Gemini&apos;s Support&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;I linked to the announcement above where you can find more details on the cost and such, and I&apos;ll go ahead and steal their demo as a good initial example:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from google import genai
+        
+        client = genai.Client(http_options={&amp;quot;api_version&amp;quot;: &amp;quot;v1beta&amp;quot;})
+        
+        result = client.decisions.create(
+        model=&amp;quot;gemini-decision-1&amp;quot;,
+        input=[{
+        &amp;quot;type&amp;quot;: &amp;quot;image&amp;quot;,
+        &amp;quot;uri&amp;quot;: &amp;quot;https://storage.googleapis.com/generativeai-downloads/images/spill.jpg&amp;quot;,
+        &amp;quot;mime_type&amp;quot;: &amp;quot;image/jpeg&amp;quot;,
+        },
+        {
+        &amp;quot;type&amp;quot;: &amp;quot;text&amp;quot;,
+        &amp;quot;text&amp;quot;: &amp;quot;Breakroom counter check before the 9 AM client meeting.&amp;quot;,
+        },
+        ],
+        questions={
+        &amp;quot;has_spill&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;noul&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;Is there an uncleaned liquid spill on the counter?&amp;quot;,
+        },
+        &amp;quot;next_action&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;choice&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;Which cleanup action fits the scene?&amp;quot;,
+        &amp;quot;criteria&amp;quot;: {
+        &amp;quot;wipe_with_cloth&amp;quot;: &amp;quot;Small counter spill with a cloth or towel already nearby.&amp;quot;,
+        &amp;quot;dispatch_janitorial&amp;quot;: &amp;quot;Large floor hazard, broken glass, or active leak.&amp;quot;,
+        &amp;quot;ready_for_meeting&amp;quot;: &amp;quot;Counter is clean and ready.&amp;quot;,
+        },
+        },
+        &amp;quot;severity&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;score&amp;quot;,
+        &amp;quot;instructions&amp;quot;: &amp;quot;Rate the severity of the counter mess.&amp;quot;,
+        &amp;quot;criteria&amp;quot;: [
+        &amp;quot;Clean and ready.&amp;quot;,
+        &amp;quot;Minor localized spill.&amp;quot;,
+        &amp;quot;Major spill or safety hazard.&amp;quot;,
+        ],
+        },
+        },
+        )
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This is a great example as it shows all three types of options (noul, choice, and score) based on analyzing an image. I liked the idea of an image based demo so of course - I built a cat one.&lt;/p&gt;
+        &lt;h2 id=&quot;my-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#my-demo&quot;&gt;My Demo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p&gt;My demo lets you select a picture (or take one if you are on a mobile device) and it answers three important questions&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Is this a picture of a cat?&lt;/li&gt;
+        &lt;li&gt;Is the cat asleep?&lt;/li&gt;
+        &lt;li&gt;Is the cat on a keyboard?&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;I&apos;ll share a link to the complete source at the end, but instead I&apos;ll focus on the processing. On the front end, after you&apos;ve taken a picture, that data is sent to my server side code. This method is run to do the processing:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;async function analyzeImageWithDecisionsAPI(base64Image, mimeType) {
+        if (!GEMINI_API_KEY) {
+        throw new Error(&apos;GEMINI_API_KEY environment variable is not set.&apos;);
+        }
+        
+        const requestBody = {
+        model: &apos;gemini-decision-1&apos;,
+        input: [
+        {
+        type: &apos;image&apos;,
+        data: base64Image,
+        mime_type: mimeType || &apos;image/jpeg&apos;
+        }
+        ],
+        questions: {
+        is_cat: {
+        type: &apos;noul&apos;,
+        instructions: &apos;Is there a cat in this image?&apos;
+        },
+        is_asleep: {
+        type: &apos;noul&apos;,
+        instructions: &apos;Is the cat asleep?&apos;
+        },
+        on_keyboard: {
+        type: &apos;noul&apos;,
+        instructions: &apos;Is the cat on a keyboard?&apos;
+        }
+        }
+        };
+        
+        const response = await fetch(&apos;https://generativelanguage.googleapis.com/v1beta/decisions&apos;, {
+        method: &apos;POST&apos;,
+        headers: {
+        &apos;Content-Type&apos;: &apos;application/json&apos;,
+        &apos;x-goog-api-key&apos;: GEMINI_API_KEY
+        },
+        body: JSON.stringify(requestBody)
+        });
+        
+        const data = await response.json();
+        if (!response.ok) {
+        const message = data?.error?.message || `Gemini API error (${response.status})`;
+        throw new Error(message);
+        }
+        
+        return data;
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The important bit is the &lt;code&gt;questions&lt;/code&gt; block where I define my three yes and no questions. The image is passed along as Base64, and the response is fed back to the client side code.&lt;/p&gt;
+        &lt;div class=&quot;callout&quot;&gt;As a reminder, Google&apos;s Gemini APIs let you send along raw image data in Base64 up to 100 megs big. (PDFs can only be 50 megs big.) If you need to send more data, you&apos;ll want to use the [Files API](https://ai.google.dev/gemini-api/docs/files). In the past, the limit was much smaller, and for demos using a mobile phone&apos;s camera, it was easy to go over that limit. In theory, 100 megs should be safe.&lt;/div&gt;
+        &lt;p&gt;Alright, so I&apos;m not going to host my demo live as I want to ensure I don&apos;t blow away my credits, but here&apos;s some examples:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/11/catd1.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat demo 1&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;And the raw output was:&lt;/p&gt;
+        &lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;{
+        &amp;quot;answers&amp;quot;: {
+        &amp;quot;on_keyboard&amp;quot;: {
+        &amp;quot;confidence&amp;quot;: 0.8782465239480963,
+        &amp;quot;noul&amp;quot;: 0.12175347605190362,
+        &amp;quot;type&amp;quot;: &amp;quot;noul&amp;quot;
+        },
+        &amp;quot;is_asleep&amp;quot;: {
+        &amp;quot;confidence&amp;quot;: 0.8563699701674832,
+        &amp;quot;noul&amp;quot;: 0.1436300298325168,
+        &amp;quot;type&amp;quot;: &amp;quot;noul&amp;quot;
+        },
+        &amp;quot;is_cat&amp;quot;: {
+        &amp;quot;confidence&amp;quot;: 0.8833242468725534,
+        &amp;quot;noul&amp;quot;: 0.8833242468725534,
+        &amp;quot;type&amp;quot;: &amp;quot;noul&amp;quot;
+        }
+        },
+        &amp;quot;usage&amp;quot;: {
+        &amp;quot;total_tokens&amp;quot;: 1246,
+        &amp;quot;total_input_tokens&amp;quot;: 1246,
+        &amp;quot;input_tokens_by_modality&amp;quot;: [
+        {
+        &amp;quot;modality&amp;quot;: &amp;quot;text&amp;quot;,
+        &amp;quot;tokens&amp;quot;: 182
+        },
+        {
+        &amp;quot;modality&amp;quot;: &amp;quot;image&amp;quot;,
+        &amp;quot;tokens&amp;quot;: 1064
+        }
+        ],
+        &amp;quot;total_output_tokens&amp;quot;: 0
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Make note - total output tokens is 0 - I literally paid for the input tokens and the API call itself.&lt;/p&gt;
+        &lt;p&gt;Here&apos;s a good negative result:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/11/catd2.png&quot; loading=&quot;lazy&quot; alt=&quot;Not a cat&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;And here&apos;s one on a keyboard:&lt;/p&gt;
+        &lt;p&gt;
+        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/11/catd3.png&quot; loading=&quot;lazy&quot; alt=&quot;Cat programmer&quot; class=&quot;imgborder imgcenter&quot;&gt;
+        &lt;/p&gt;
+        &lt;p&gt;I added some timings to my logic and roughly each test was 2 seconds or so. I saw some less than, and a few at 4, but in general, really freaking fast. Also I think it&apos;s fair to take into account the size of the images I was passing - each was near 5 megs big. I did more tests with optimized images and the speed was considerably faster - all about 1 second.&lt;/p&gt;
+        &lt;p&gt;You may be curious (I was), if given the fact that questions two and three should &lt;em&gt;always&lt;/em&gt; be false if question one is false, will the API intelligently stop processing? The answer is that it will not - and I think that&apos;s fair - the model would need to preprocess questions ahead of time in order to do that. There&apos;s a few ways you could handle this in a real app:&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;Use 2 calls. The first is the general &amp;quot;is it a cat&amp;quot; with the second only being run if you get a yes with a good degree of confidence.&lt;/li&gt;
+        &lt;li&gt;Use logic in the result. Pass all 3, but if the first one is no, or not yes with enough confidence, treat the other two as false no matter what.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Let me know what you think, and if you would like to play with the demo yourself, you can grab the bits here: &lt;a href=&quot;https://github.com/cfjedimaster/ai-testingzone/tree/main/decisions_api&quot;&gt;https://github.com/cfjedimaster/ai-testingzone/tree/main/decisions_api&lt;/a&gt;. Don&apos;t forget to get your own key.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>Porting My Bots to Netlify</title>
       <link>https://www.raymondcamden.com/2026/11/13/porting-my-bots-to-netlify</link>
       <guid>https://www.raymondcamden.com/2026/11/13/porting-my-bots-to-netlify</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I&apos;ve got a number of &lt;a href=&quot;/bots&quot;&gt;bots&lt;/a&gt; I&apos;ve built for both fun and learning (well mostly fun), most of which were running on &lt;a href=&quot;https://pipedream.com&quot;&gt;Pipedream&lt;/a&gt;. Sadly, Pipedream is shutting down. I&apos;d naturally consider &lt;a href=&quot;https://val.town&quot;&gt;Val Town&lt;/a&gt; instead... but it&apos;s shutting down too. Yeah, wonderful times in tech these days, eh?&lt;/p&gt;
         &lt;p&gt;I was a bit unsure of what to do with them. Cloudflare has excellent serverless support and I knew I could move them there, but instead I decided to wrap them into my site here itself. I was hesitant to do so at first - these bots really aren&apos;t part of my blog - but given that they&apos;re tiny (just one file, ignoring any dependencies), I figured I&apos;d bring em home and run them here.&lt;/p&gt;
@@ -255,7 +498,7 @@
       <title>Migrating My Notes App to Supabase</title>
       <link>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</link>
       <guid>https://www.raymondcamden.com/2026/11/10/migrating-my-notes-app-to-supabase</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Every now and then I put a service, API, framework, etc on my list of things to look at, and when I eventually get around to it, I wish I had made the time sooner. That&apos;s absolutely the case today. About two weeks ago I blogged about how I used &lt;a href=&quot;https://tinyjs.app/index.html&quot;&gt;TinyJS&lt;/a&gt; to build a desktop note application. This worked great and made use of a local SQLite database on the machine for storage. I was curious about how I&apos;d migrate this to a &amp;quot;real&amp;quot; network based storage system that could be used in multiple places and tied to a particular account. I asked my AI agent (in this case, Claude, which I tend to use for all of my ad hoc questions about stuff) if &lt;a href=&quot;https://supabase.com&quot;&gt;Supabase&lt;/a&gt; would be an appropriate solution for this, and the response I got impressed the heck out of me.&lt;/p&gt;
         &lt;p&gt;I knew Supabase was an online database system, and honestly, that&apos;s about all I knew. What I found out was it included a heck of a lot more. As just a high level overview, you get:&lt;/p&gt;
@@ -333,7 +576,7 @@
       <title>TIL - Postman and OAuth</title>
       <link>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</link>
       <guid>https://www.raymondcamden.com/2026/11/07/til-postman-and-oauth</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;A few years back I shared two cool tips I learned about Postman (&lt;a href=&quot;https://www.raymondcamden.com/2024/05/22/dynamically-creating-variables-in-postman&quot;&gt;&amp;quot;Dynamically Creating Variables in Postman&amp;quot;&lt;/a&gt; and &lt;a href=&quot;https://www.raymondcamden.com/2024/05/24/creating-visualizations-in-postman&quot;&gt;&amp;quot;Creating Visualizations in Postman&amp;quot;&lt;/a&gt;). At the time, I noted that these were both well documented features in Postman and if I had bothered to actually spend some time in the docs, I would have known about those features already. Obviously after I wrote those posts I made the time to do that. Obviously... right?&lt;/p&gt;
         &lt;p&gt;Of course not. So what follows is something that probably most of you already know, but that I was really excited to discover today so if at least one person gets excited about this as well, then my job is done.&lt;/p&gt;
@@ -400,7 +643,7 @@
       <title>Getting Structured Data from Web Pages with AI and Re-usable Specs</title>
       <link>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</link>
       <guid>https://www.raymondcamden.com/2026/11/05/getting-structured-data-from-web-pages-with-ai-and-re-usable-specs</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;As I say from time to time, every now and then I build something as a proof of concept and the result is... ok? I&apos;m not really sure if the idea actually made sense and if the final result is usable, but the exploration was interesting enough that I think it warrants sharing with you good people. That&apos;s what today&apos;s post is.&lt;/p&gt;
         &lt;p&gt;This demo all began with a simple idea - how do you handle getting RSS like content from a site that doesn&apos;t actually have an RSS feed? This typically relies on looking at the page as data to be parsed.&lt;/p&gt;
@@ -1124,7 +1367,7 @@
       <title>Links For You (11/1/26)</title>
       <link>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</link>
       <guid>https://www.raymondcamden.com/2026/11/01/links-for-you-11126</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Happy Sunday, and happy &amp;quot;Saints have a bye week so they can&apos;t lose&amp;quot; day. That may be bitter and I shouldn&apos;t write off their season yet but... maybe next year? Of course, this is just one more kinda crappy thing going on amongst a giant pile of other crappy things so - let&apos;s just get right to the links, shall we?&lt;/p&gt;
         &lt;h2 id=&quot;when-job-hunting-turns-into-a-security-lesson&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#when-job-hunting-turns-into-a-security-lesson&quot;&gt;When job hunting turns into a security lesson&lt;/a&gt;&lt;/h2&gt;
@@ -1151,7 +1394,7 @@
       <title>Generating PDF Invoices from Word Templates with officeParser</title>
       <link>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</link>
       <guid>https://www.raymondcamden.com/2026/10/27/generating-pdf-invoices-from-word-templates-with-officeparser</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Last week I shared a demo (&lt;a href=&quot;https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser%5D&quot;&gt;&amp;quot;Generating PDFs from Word Templates with officeParser&amp;quot;&lt;/a&gt;) that made use of the awesome &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; open source library. That demo was a simple &amp;quot;customer report&amp;quot; web app that took custom data and a Word template. Once the form was submitted, the library converted tokens in the Word template to real data and output a PDF. I decided to build another demo using the library, this time on the server with a simple Node.js script.&lt;/p&gt;
         &lt;p&gt;As I mentioned previously, this new feature mimics Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. At the time I wrote my blog post, the library just supported simple transformations. So given `` in your Word template, if you passed a name value of &apos;Ray&apos;, you would see that in the resulting PDF.&lt;/p&gt;
@@ -1475,7 +1718,7 @@
       <title>Building the Unicorn-themed app of my dreams with TinyJS</title>
       <link>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</link>
       <guid>https://www.raymondcamden.com/2026/10/23/building-the-unicorn-themed-app-of-my-dreams-with-tinyjs</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Everyone likes to talk about light versus dark theme while no one is addressing the real need for our users - a proper unicorn theme. I mean, take a look at this beauty:&lt;/p&gt;
         &lt;p&gt;
@@ -1575,7 +1818,7 @@
       <title>Adding a PDF Display to Eleventy</title>
       <link>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</link>
       <guid>https://www.raymondcamden.com/2026/10/21/adding-a-pdf-display-to-eleventy</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;This will be a short one. I&apos;ve talked about embedding PDFs on web pages for probably close to ten years now. Blame Adobe. Blame me being a nerd and finding this stuff interesting. Blame whoever. While I&apos;ve blogged about the topic, I&apos;ve also actually done that on my site here, in a variety of different ways.&lt;/p&gt;
         &lt;p&gt;A while back I realized I wasn&apos;t being consistent with how I did... &amp;quot;stuff&amp;quot; here, like call outs, Youtube links, etc. I started a &lt;a href=&quot;https://github.com/cfjedimaster/raymondcamden2023/blob/main/guide.md&quot;&gt;guide doc&lt;/a&gt; so I&apos;d have a quick way to remember what I did last time, and be more consistent.&lt;/p&gt;
@@ -1646,7 +1889,7 @@
       <title>Links For You (10/19/26)</title>
       <link>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</link>
       <guid>https://www.raymondcamden.com/2026/10/19/links-for-you-101926</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
+      <pubDate>Sat, 14 Nov 2026 19:48:35 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;Wowza - I&apos;m like nearly a month late on this. This is where I&apos;d try to come up with a good excuse, but I think if I just randomly point around at things and said... &amp;quot;life&amp;quot; most of you would completely understand where I&apos;m coming from. It&apos;s been a difficult few months for myself, and for nearly every person I know. This week I&apos;m going to try focus on the positive and the things that make me smile, and I hope all my lovely readers can do the same!&lt;/p&gt;
         &lt;h2 id=&quot;make-music%2C-not-war&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#make-music%2C-not-war&quot;&gt;Make Music, Not War&lt;/a&gt;&lt;/h2&gt;
@@ -1690,91 +1933,6 @@
         &lt;script defer src=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.js&quot;&gt;&lt;/script&gt;
         &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/lite-youtube-embed/0.3.2/lite-yt-embed.css&quot; integrity=&quot;sha512-utq8YFW0J2abvPCECXM0zfICnIVpbEpW4lI5gl01cdJu+Ct3W6GQMszVITXMtBLJunnaTp6bbzk5pheKX2XuXQ==&quot; crossorigin=&quot;anonymous&quot; referrerpolicy=&quot;no-referrer&quot; /&gt;
         &lt;p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Generating PDFs from Word Templates with officeParser</title>
-      <link>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</link>
-      <guid>https://www.raymondcamden.com/2026/10/17/generating-pdfs-from-word-templates-with-officeparser</guid>
-      <pubDate>Fri, 13 Nov 2026 21:21:24 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I&apos;ve been singing the praises of the &lt;a href=&quot;https://officeparser.harshankur.com/&quot;&gt;officeParser&lt;/a&gt; library for a while. It&apos;s an open source JavaScript library that can parse, extract, and convert between PDFs and Office documents, as well as OpenOffice, ePub and more. My demos have all focused on client-side examples but obviously the library would work great in a server side workflow as well. I haven&apos;t worked at Adobe for years now, but I still get strangely excited working with documents. I&apos;ll just add that to the long list of reasons I&apos;m a big nerd.&lt;/p&gt;
-        &lt;p&gt;A few weeks ago, I reached out to &lt;a href=&quot;https://harshankur.com/&quot;&gt;Harsh Ankur&lt;/a&gt; about an idea inspired by Adobe&apos;s &lt;a href=&quot;https://developer.adobe.com/document-services/docs/overview/document-generation-api/&quot;&gt;Document Generation API&lt;/a&gt;. This was probably my favorite API in their suite of PDF services. You take a Word document, put in tokens, and call the API with your data. The API would swap out the tokens with real data and give you a PDF in return. (Or Word again if you wanted that.) I suggested this to Harsh and then - voila - he added it!&lt;/p&gt;
-        &lt;p&gt;At this time, the token system is simply a replacement system. You add &lt;code&gt;My name is &lt;/code&gt; in your Word document, and if you pass &lt;code&gt;{ &amp;quot;name&amp;quot;:&amp;quot;Juniper Montage&amp;quot;}&lt;/code&gt; via the library&apos;s APIs you&apos;ll get &lt;code&gt;My name is Juniper Montage&lt;/code&gt; on the way out.&lt;/p&gt;
-        &lt;p&gt;This new support is a core API, &lt;a href=&quot;https://officeparser.harshankur.com/#spec/template&quot;&gt;OfficeTemplate&lt;/a&gt;, and supports both replacing values from a regular JavaScript object or returning an array of results from a JavaScript array of objects. (Which, by the way, is something I was trying to get Adobe to add to their APIs. One of their competitors, &lt;a href=&quot;https://www.docugenerate.com/&quot;&gt;DocuGenerate&lt;/a&gt;, has had this for a while.)&lt;/p&gt;
-        &lt;p&gt;Here&apos;s how simple it is to use. First, create and save a Word document. Formatting doesn&apos;t matter - make it as pretty or simple as you would like. Here&apos;s an example with a few tokens:&lt;/p&gt;
-        &lt;div id=&quot;pdf-viewer-1&quot; style=&quot;width: 100%; height: 500px; margin-bottom: 30px&quot;&gt;&lt;/div&gt;
-        &lt;script type=&quot;module&quot;&gt;
-        import EmbedPDF, { ZoomMode } from &apos;https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js&apos;;
-        
-        EmbedPDF.init({
-        type: &apos;container&apos;,
-        target: document.getElementById(&apos;pdf-viewer-1&apos;),
-        src: &apos;https://static.raymondcamden.com/assets/document.pdf&apos;,
-        theme: { preference: &apos;system&apos; },
-        disabledCategories: [&apos;annotation&apos;],
-        zoom: {
-        defaultZoomLevel: ZoomMode.FitWidth
-        }
-        });
-        &lt;/script&gt;
-        &lt;p&gt;Imagine this is stored as &lt;code&gt;customerReport.docx&lt;/code&gt;. To turn this into a PDF, you would first import the relevant libraries (in the sample below I&apos;m using an npm installed version, not CDN):&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { OfficeConverter, OfficeTemplate } from &apos;officeparser/browser-native-pdf&apos;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Then - grab the Word document as binary data:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const response = await fetch(&apos;/assets/customerReport.docx&apos;)
-        const template = new Uint8Array(await response.arrayBuffer())
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Get some sample data:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const data = {
-        customerName: &apos;Northwind &amp;amp; Co&apos;,
-        date: &apos;2026-10-16&apos;,
-        productsTotal: 7,
-        reportYear: 2026,
-        profit: 2500,
-        losses: 125,
-        recommendation: &apos;Continue growing. Duh&apos;,
-        reporter: &apos;Juniper Montage&apos;,
-        }
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Next, use the library to convert the template:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const docx = await OfficeTemplate.render(template, { data })
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;Finally, turn the rendered document into a PDF. The result&apos;s &lt;code&gt;value&lt;/code&gt; is the PDF&apos;s binary
-        data:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const { value: pdfBytes } = await OfficeConverter.convert(docx, &apos;pdf&apos;, {
-        generatorConfig: { pdfConfig: { engine: &apos;native&apos; } },
-        })
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;At this point you can do whatever, like open it in a new tab:&lt;/p&gt;
-        &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const pdf = new Blob([pdfBytes], { type: &apos;application/pdf&apos; })
-        window.open(URL.createObjectURL(pdf), &apos;_blank&apos;)
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;As a note, this requires an additional package, &lt;strong&gt;only in the browser&lt;/strong&gt;, &lt;a href=&quot;https://www.npmjs.com/package/pdf-lib&quot;&gt;pdf-lib&lt;/a&gt;.&lt;/p&gt;
-        &lt;h2 id=&quot;a-real-demo&quot; tabindex=&quot;-1&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#a-real-demo&quot;&gt;A Real Demo&lt;/a&gt;&lt;/h2&gt;
-        &lt;p&gt;To show this in action, I built a simple demo that lets you fill in a form, and get the result as a PDF.&lt;/p&gt;
-        &lt;p&gt;
-        &lt;img src=&quot;https://static.raymondcamden.com/images/2026/10/form1.png&quot; loading=&quot;lazy&quot; alt=&quot;The entry form&quot; class=&quot;imgborder imgcenter&quot;&gt;
-        &lt;/p&gt;
-        &lt;p&gt;This form is tied to a bit of JavaScript that grabs the values, makes use of &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl&quot;&gt;Intl&lt;/a&gt; to format dates, numbers, and currencies, and then uses officeParser to create a dynamic PDF from your values. Here&apos;s an example:&lt;/p&gt;
-        &lt;div id=&quot;pdf-viewer-2&quot; style=&quot;width: 100%; height: 500px; margin-bottom: 30px&quot;&gt;&lt;/div&gt;
-        &lt;script type=&quot;module&quot;&gt;
-        import EmbedPDF, { ZoomMode } from &apos;https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js&apos;;
-        
-        EmbedPDF.init({
-        type: &apos;container&apos;,
-        target: document.getElementById(&apos;pdf-viewer-2&apos;),
-        src: &apos;https://static.raymondcamden.com/assets/foo.pdf&apos;,
-        theme: { preference: &apos;system&apos; },
-        disabledCategories: [&apos;annotation&apos;],
-        zoom: {
-        defaultZoomLevel: ZoomMode.FitWidth
-        }
-        });
-        &lt;/script&gt;
-        &lt;p&gt;Try this yourself here: &lt;a href=&quot;https://cfjedimaster.github.io/webdemos/officeparser/wordtemplate/dist/index.html&quot;&gt;https://cfjedimaster.github.io/webdemos/officeparser/wordtemplate/dist/index.html&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;You can find the complete source for this here: &lt;a href=&quot;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/wordtemplate&quot;&gt;https://github.com/cfjedimaster/webdemos/tree/master/officeparser/wordtemplate&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;As I mentioned above, currently the token system is relatively simple, but I&apos;ve been talking with Harsh about some improvements that I bet will land pretty soon. Let me know what you think!&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
