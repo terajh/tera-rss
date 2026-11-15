@@ -4,7 +4,51 @@
     <title>dev RSS - Simon Willison</title>
     <link>https://simonwillison.net</link>
     <description>Simon Willison RSS 피드</description>
-    <lastBuildDate>Sat, 14 Nov 2026 20:17:51 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 15 Nov 2026 20:43:29 GMT</lastBuildDate>
+    <item>
+      <title>datasette-llm 0.1a11</title>
+      <link>https://simonwillison.net/2026/Nov/14/datasette-llm/</link>
+      <guid>https://simonwillison.net/2026/Nov/14/datasette-llm/</guid>
+      <pubDate>Sat, 14 Nov 2026 23:59:28 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/datasette/datasette-llm/releases/tag/0.1a11&quot;&gt;datasette-llm 0.1a11&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;code&gt;datasette-llm&lt;/code&gt; is the intermediate plugin for Datasette that supports configuring LLMs for use with other Datasette plugins.&lt;/p&gt;
+        &lt;p&gt;This release adds support for OpenAI-compatible endpoints, so you can configure Datasette to use an LLM hosted anywhere that talks the OpenAI pseudo-standard web protocol.&lt;/p&gt;
+        &lt;p&gt;This means that if you&apos;re running local models with &lt;a href=&quot;https://lmstudio.ai&quot;&gt;LM Studio&lt;/a&gt; or &lt;a href=&quot;https://ollama.com&quot;&gt;Ollama&lt;/a&gt; or &lt;a href=&quot;https://github.com/ggml-org/llama.cpp&quot;&gt;llama.cpp&lt;/a&gt; (which just hit &lt;a href=&quot;https://huggingface.co/blog/ggml-org/llama-cpp-v1&quot;&gt;v1.0.0&lt;/a&gt;) you can run Datasette via &lt;code&gt;uvx&lt;/code&gt; like this:&lt;/p&gt;
+        &lt;div class=&quot;highlight highlight-source-shell&quot;&gt;&lt;pre&gt;wget https://datasette.io/content.db
+        
+        uvx --with datasette-agent datasette \
+        --root --secret 1 \
+        -s plugins.datasette-llm.default_model &lt;span class=&quot;pl-s&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;{&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;model&quot;: &quot;lmstudio-qwen&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;model_name&quot;: &quot;qwen/qwen3.8-27b&quot;,&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;    &quot;api_base&quot;: &quot;http://localhost:1234/v1&quot;&lt;/span&gt;
+        &lt;span class=&quot;pl-s&quot;&gt;  }&lt;span class=&quot;pl-pds&quot;&gt;&apos;&lt;/span&gt;&lt;/span&gt; content.db&lt;/pre&gt;&lt;/div&gt;
+        
+        &lt;p&gt;And you&apos;ll get a local server running a Datasette Agent instance powered by your local model!&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Screenshot of a chat interface. Header bar reads &amp;quot;home&amp;quot; on the left and &amp;quot;root&amp;quot; with a hamburger menu icon on the right. Below is a back arrow, the heading &amp;quot;Chat&amp;quot;, a model label &amp;quot;lmstudio-qwen&amp;quot; and an &amp;quot;EXPORT&amp;quot; button. A blue user message bubble says &amp;quot;how many repos and how many releases are there?&amp;quot; Below it is a collapsed tool call &amp;quot;list_databases_and_tables&amp;quot; and an expanded tool call &amp;quot;sql_query&amp;quot;. Its REQUEST section shows database &amp;quot;content&amp;quot;, display &amp;quot;both&amp;quot; and the SQL: SELECT (SELECT COUNT(*) FROM repos) AS repo_count, (SELECT COUNT(*) FROM releases) AS release_count. Its RESPONSE section shows columns repo_count and release_count with a single row of 200 and 1889. Below that is a table with columns repo_count and release_count and one row: 200, 1889, followed by a &amp;quot;View SQL query&amp;quot; button. The assistant reply reads &amp;quot;There are 200 repos and 1,889 releases in the content database.&amp;quot; At the bottom is a text input with placeholder &amp;quot;Type a message... (# to tag a table or query)&amp;quot; and a blue &amp;quot;Send&amp;quot; button.&quot; src=&quot;https://static.simonwillison.net/static/2026/lmstudio-datasette-agent.webp&quot; /&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/uv&quot;&gt;uv&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-agent&quot;&gt;datasette-agent&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
+    <item>
+      <title>datasette-vega 0.7</title>
+      <link>https://simonwillison.net/2026/Nov/14/datasette-vega/</link>
+      <guid>https://simonwillison.net/2026/Nov/14/datasette-vega/</guid>
+      <pubDate>Sat, 14 Nov 2026 17:09:09 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/datasette-vega/releases/tag/0.7&quot;&gt;datasette-vega 0.7&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;A new release of Datasette&apos;s longest untouched plugin, for rendering charts (using &lt;a href=&quot;https://vega.github.io/vega-lite/&quot;&gt;Vega-Lite&lt;/a&gt;) against data in a table or custom query. The last release was in July 2018!&lt;/p&gt;
+        &lt;p&gt;I finally bumped it for compatibility with the latest Datasette alphas, plus some cosmetic tweaks to make it work better with &lt;a href=&quot;https://lite.datasette.io/&quot;&gt;Datasette Lite&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;(Datasette Lite just gained the ability to run JavaScript plugins like this! I&apos;ll write more about that soon.)&lt;/p&gt;
+        &lt;p&gt;Since it works with Datasette Lite, the live demo in the README now &lt;a href=&quot;https://lite.datasette.io/?install=datasette-vega&amp;amp;csv=https%3A%2F%2Fraw.githubusercontent.com%2Ffivethirtyeight%2Fdata%2Fmaster%2Fairline-safety%2Fairline-safety.csv#/data/airline-safety?_size=max#g.mark=bar&amp;amp;g.x_column=airline&amp;amp;g.x_type=ordinal&amp;amp;g.y_column=fatalities_00_14&amp;amp;g.y_type=quantitative&quot;&gt;links to this demo on Datasette Lite&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;img alt=&quot;Screenshot of a charting tool. A panel headed &amp;quot;Charting options&amp;quot; has radio buttons for &amp;quot;Bar&amp;quot; (selected), &amp;quot;Line&amp;quot; and &amp;quot;Scatter&amp;quot;. Below are select menus: &amp;quot;X column&amp;quot; set to &amp;quot;airline&amp;quot; with &amp;quot;Type&amp;quot; set to &amp;quot;Label&amp;quot;, and &amp;quot;Y column&amp;quot; set to &amp;quot;fatalities_00_14&amp;quot; with &amp;quot;Type&amp;quot; set to &amp;quot;Numeric&amp;quot;. A &amp;quot;Swap X and Y&amp;quot; button sits beneath those, followed by &amp;quot;Color&amp;quot; and &amp;quot;Size&amp;quot; menus both set to &amp;quot;-- none --&amp;quot;. Underneath the panel is a blue bar chart with airline names along the X axis and fatalities_00_14 on the Y axis, running from 0 to 550 - most airlines have no bar, a handful have bars, and Malaysia Airlines is the tallest.&quot; src=&quot;https://static.simonwillison.net/static/2026/datasette-vega.webp&quot; /&gt;&lt;/p&gt;
+        
+        
+        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/datasette&quot;&gt;datasette&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/visualisation&quot;&gt;visualisation&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/datasette-lite&quot;&gt;datasette-lite&lt;/a&gt;&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>datasette-cluster-map 0.19</title>
       <link>https://simonwillison.net/2026/Nov/13/datasette-cluster-map/</link>
@@ -847,45 +891,6 @@
         
         
         &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/privacy&quot;&gt;privacy&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/youtube&quot;&gt;youtube&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>October sponsors-only newsletter</title>
-      <link>https://simonwillison.net/2026/Nov/3/october-newsletter/</link>
-      <guid>https://simonwillison.net/2026/Nov/3/october-newsletter/</guid>
-      <pubDate>Tue, 03 Nov 2026 05:28:59 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;I sent out the October edition of my &lt;a href=&quot;https://github.com/sponsors/simonw/&quot;&gt;sponsors-only monthly newsletter&lt;/a&gt;. If you are a sponsor (or start a sponsorship now) you can &lt;a href=&quot;https://github.com/simonw-private/monthly/blob/main/2026-10-october.md&quot;&gt;access it here&lt;/a&gt;. This month:&lt;/p&gt;
-        &lt;ul&gt;
-        &lt;li&gt;The October inflection point for vibe game development&lt;/li&gt;
-        &lt;li&gt;The vulnerability apocalypse gets hot&lt;/li&gt;
-        &lt;li&gt;LLM releases&lt;/li&gt;
-        &lt;li&gt;API credits for $100+/month subscriptions&lt;/li&gt;
-        &lt;li&gt;What I&apos;m using right now&lt;/li&gt;
-        &lt;li&gt;My software releases&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;p&gt;My September newsletter &lt;a href=&quot;https://simonwillison.net/newsletters/monthly-2026-09-september/&quot;&gt;can now be seen here&lt;/a&gt;, as a preview of what you&apos;ll get. Pay $10/month to stay a month ahead of the free copy!&lt;/p&gt;
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/newsletter&quot;&gt;newsletter&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>llm 0.37</title>
-      <link>https://simonwillison.net/2026/Nov/2/llm/</link>
-      <guid>https://simonwillison.net/2026/Nov/2/llm/</guid>
-      <pubDate>Mon, 02 Nov 2026 23:49:30 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;&lt;strong&gt;Release:&lt;/strong&gt; &lt;a href=&quot;https://github.com/simonw/llm/releases/tag/0.37&quot;&gt;llm 0.37&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;There&apos;s a &lt;em&gt;lot&lt;/em&gt; of stuff in this new release of my LLM CLI tool and Python library, representing around two months of accumulated features and fixes.&lt;/p&gt;
-        &lt;p&gt;I added &lt;code&gt;gpt-6.1-sol&lt;/code&gt; and &lt;code&gt;gpt-6.1-terra&lt;/code&gt;, plus a new &lt;a href=&quot;https://llm.datasette.io/en/stable/other-models.html#configure-an-openai-compatible-model&quot;&gt;llm openai endpoint add&lt;/a&gt; command to make it easier to configure additional models that use OpenAI-compatible endpoints.&lt;/p&gt;
-        &lt;p&gt;I switched the default model (if you have not set your own default) to &lt;code&gt;gpt-6-luna&lt;/code&gt; - half the price of the previous default, &lt;code&gt;gpt-5.6-luna&lt;/code&gt;.&lt;/p&gt;
-        &lt;p&gt;LLM&apos;s support for embeddings now accepts that different binary content may have different content-type - necessary for models like &lt;a href=&quot;https://deepmind.google/models/gemini/embedding/&quot;&gt;Gemini Embedding 2&lt;/a&gt;, which can embed text, audio, images, and video.&lt;/p&gt;
-        &lt;p&gt;A lot of open source maintainers complain about a flood of AI-assisted PRs. LLM is my project that has been most affected by this and, to be honest, I&apos;m not finding it to be a problem. That&apos;s mainly because I have Opus 5.5 or GPT-6 Astra help me with triage to spot the most useful fixes!&lt;/p&gt;
-        &lt;p&gt;This release includes fixes from 12 authors - almost all AI-assisted - and the burden of reviewing them wasn&apos;t nearly as great as I expected. I really see them as bug reports with attached examples - sometimes I land them, sometimes I implement my own fix.&lt;/p&gt;
-        &lt;p&gt;So thanks to &lt;a href=&quot;https://github.com/0d00ciallo0721&quot;&gt;0d00ciallo0721&lt;/a&gt;, &lt;a href=&quot;https://github.com/ac1982&quot;&gt;ac1982&lt;/a&gt;, &lt;a href=&quot;https://github.com/allenflux&quot;&gt;Allen Flux&lt;/a&gt;, &lt;a href=&quot;https://github.com/bianyh&quot;&gt;Bian Yuhan&lt;/a&gt;, &lt;a href=&quot;https://github.com/porkedchop&quot;&gt;Bishop Kammeraad&lt;/a&gt;, &lt;a href=&quot;https://github.com/feiiiiii5&quot;&gt;Chen Yufeiyang&lt;/a&gt;, &lt;a href=&quot;https://github.com/chrikrah&quot;&gt;Christopher Krah&lt;/a&gt;, &lt;a href=&quot;https://github.com/ethanstoner&quot;&gt;Ethan Stoner&lt;/a&gt;, &lt;a href=&quot;https://github.com/er-s-an&quot;&gt;Jiachen Xie&lt;/a&gt;, &lt;a href=&quot;https://github.com/Pajimo&quot;&gt;Olamide Faniyan&lt;/a&gt;, &lt;a href=&quot;https://github.com/sharatchandrasai999-sketch&quot;&gt;Sharat Chandra Sai Boddu&lt;/a&gt;, &lt;a href=&quot;https://github.com/nosmile99&quot;&gt;nosmile99&lt;/a&gt; for helping out with (or spending tokens on) this release!&lt;/p&gt;
-        
-        
-        &lt;p&gt;Tags: &lt;a href=&quot;https://simonwillison.net/tags/open-source&quot;&gt;open-source&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llm&quot;&gt;llm&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/generative-ai&quot;&gt;generative-ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/projects&quot;&gt;projects&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/ai&quot;&gt;ai&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/embeddings&quot;&gt;embeddings&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/llms&quot;&gt;llms&lt;/a&gt;, &lt;a href=&quot;https://simonwillison.net/tags/annotated-release-notes&quot;&gt;annotated-release-notes&lt;/a&gt;&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
