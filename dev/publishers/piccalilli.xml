@@ -4,7 +4,361 @@
     <title>dev RSS - Andy Bell</title>
     <link>https://piccalil.li/</link>
     <description>Andy Bell RSS 피드</description>
-    <lastBuildDate>Tue, 17 Nov 2026 23:18:55 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 23:03:30 GMT</lastBuildDate>
+    <item>
+      <title>Understanding CSS random()</title>
+      <link>https://piccalil.li/blog/understanding-css-random/?ref=main-rss-feed</link>
+      <guid>https://piccalil.li/blog/understanding-css-random/?ref=main-rss-feed</guid>
+      <pubDate>Wed, 18 Nov 2026 11:55:00 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;One develops a certain degree of muscle memory putting together &lt;a href=&quot;https://piccalil.li/javascript-for-everyone/&quot;&gt;an in-depth course on JavaScript&apos;s arcane workings&lt;/a&gt;. That&apos;s why a particularly keen-eyed reader might notice that the posts on &lt;a href=&quot;https://wil.to/posts&quot;&gt;my own blog&lt;/a&gt; have started shamelessly copying &lt;em&gt;taking inspiration from&lt;/em&gt; features that you&apos;ll see here on Piccalilli.&lt;/p&gt;
+        &lt;p&gt;These little margin notes, for example.&lt;/p&gt;
+        &lt;p&gt;In the earliest drafts of &lt;a href=&quot;https://piccalil.li/javascript-for-everyone&quot;&gt;&lt;em&gt;JavaScript for Everyone&lt;/em&gt;&lt;/a&gt; I was using Piccalilli&apos;s &lt;code&gt;&amp;lt;SideNote&amp;gt;&lt;/code&gt; component to solve for a specific problem that I ran into almost immediately: JavaScript is made out of JavaScript, and you can&apos;t cover almost any topic or syntax without touching on dozens of other topics and syntaxes. When I found myself backed into a corner by terminology and concepts related to the topic at hand that we hadn&apos;t yet covered, I would use a side note to call it out — a way to keep from littering every lesson&apos;s prose with &quot;&lt;em&gt;which we&apos;ll cover later&lt;/em&gt;&quot;s and &quot;&lt;em&gt;don&apos;t worry about this yet&lt;/em&gt;&quot;s:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/sidenote-formal.png&quot; alt=&quot;A screenshot of an article layout showing a main paragraph about javascript primitives on the left, paired with a boxed side note in the right margin explaining that variables will be covered in detail after primitives&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;As tends to happen with any feature, the more I found myself settling into the project, the looser the use case for these little components became:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/sidenote-informal.png&quot; alt=&quot;A screenshot of an article layout showing a paragraph explaining javascript symbols on the left, paired with a boxed side note in the right margin joking that the pun &amp;quot;uniquely fraught&amp;quot; is very funny and will be on the test.&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;...And owing to a condition that I call &lt;em&gt;The Speedrunner&apos;s Temperament&lt;/em&gt;, I inevitably ended up using them to play with the boundaries of the medium a little bit, just to see what I could get away with:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/sidenote-meta.png&quot; alt=&quot;A screenshot of an article layout showing a paragraph on the left joking about playing an airhorn sound effect when a JavaScript promise resolves, paired with a boxed side note in the right margin that reads, &amp;quot;Editors note: Mat, we&apos;ve talked about this.&amp;quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;I ended up really missing these little widgets when I&apos;d be writing for my own site, so I used a little bit of my downtime this week to steal &lt;em&gt;take inspiration from&lt;/em&gt; them. The core of it ends up bring a relatively light lift, thanks to grid layout and a quick Eleventy shortcode that parses a supplied string as Markdown and returns the result wrapped in &lt;code&gt;&amp;lt;aside class=&quot;sidenote&quot;&amp;gt;&amp;lt;/aside&amp;gt;&lt;/code&gt;. I use &quot;hand-scribbled&quot; accents for notation on my website, so I carried that sort of design treatment over to these as well:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/wilto-scribble.png&quot; alt=&quot;An example of Mat&apos;s blog, showing prose and a side note in the right margin. There&apos;s a hand-drawn style line leading up to the note.&quot; /&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/css-random/wilto-scribble.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;Good start, but anything worth doing is worth doing to ludicrous excess, I always say: a subtle application of &lt;code&gt;animation-timeline: view()&lt;/code&gt; makes them fade in and scale up ever-so-slightly as they approached the center of the viewport, by a slightly different &lt;code&gt;scale()&lt;/code&gt; factor across breakpoints. That had things looking pretty sharp, but arguably a little &lt;em&gt;too&lt;/em&gt; sharp — these were meant to be &quot;scribbled in the margins&quot; both tonally and in terms of presentation, and a perfectly squared span of text wasn&apos;t quite getting that across. Easy enough to put a quick &lt;code&gt;transform: rotate(2deg)&lt;/code&gt; on there too, but that would still give me a uniform result throughout the page:&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/wilto-skew.png&quot; alt=&quot;Multiple of the same style notes as the image above. This time, they both slightly vary in rotation angle.&quot; /&gt;&lt;/p&gt;
+        &lt;p&gt;What I needed was some old fashioned, organic-style &lt;em&gt;jank&lt;/em&gt;, and that gave me the perfect excuse to finally try out the &lt;a href=&quot;https://caniuse.com/mdn-css_types_random&quot;&gt;brand new&lt;/a&gt; &lt;code&gt;random()&lt;/code&gt; CSS function.&lt;/p&gt;
+        &lt;p&gt;In its most basic form &lt;code&gt;random()&lt;/code&gt; accepts a pair of comma-separated values that will act as the lower and upper bounds for the random value that will result, and an optional third value defining the &lt;strong&gt;step&lt;/strong&gt; — the intervals between those limits. &lt;code&gt;random( 0px, 10px )&lt;/code&gt; will result in an arbitrary pixel value between 0 and 10, while &lt;code&gt;random( 0px, 10px, 5px )&lt;/code&gt; will result in 0, 5, or 10. Nothin&apos; to it, at face value. &lt;code&gt;transform: rotate( random( -2.5deg, 2.5deg ) )&lt;/code&gt; suited my needs just fine, giving me a random rotation value between -2.5 and 2.5 degrees. By default this calculation is &lt;strong&gt;scoped to each individual element, which means that each note will have its own random rotation&lt;/strong&gt;:&lt;/p&gt;
+        
+        &lt;p&gt;Choice of the word &quot;scoped&quot; there very deliberate, for reasons you&apos;ll soon understand.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: scale(0.925) rotate(random(-2.5deg, 2.5deg));
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;img src=&quot;https://piccalil.b-cdn.net/images/blog/wilto-randomskew.png&quot; alt=&quot;As demonstrated in the previous image, the notes now have an even more random rotation angle.&quot; /&gt;&lt;/p&gt;
+        
+        &lt;p&gt;Now we&apos;re talking — now &lt;em&gt;those&lt;/em&gt; are some jaunty angles!&lt;/p&gt;
+        
+        &lt;p&gt;Quick work, though we&apos;re not quite done yet. For one thing, remember that I mentioned I was applying slightly different transforms to these components across breakpoints — overriding the &lt;code&gt;transform&lt;/code&gt; property in a media query meant I needed to include that random rotation again, lest the new instance of &lt;code&gt;transform&lt;/code&gt; undo my rotation altogether. Easy enough to fix:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: scale(0.925) rotate(random(-2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        .sidenote {
+        /* Just using `transform: scale(1.1);` would override the rotation, so: */
+        transform: scale(1) rotate(random(-2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The result is that the baseline scale of my sidenotes changes while — notably — &lt;strong&gt;each element maintains the same random rotation across breakpoints, rather than being recalculated&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;Of course, I&apos;m using &lt;code&gt;transform&lt;/code&gt; in my little timeline animation as well (in browsing contexts where &lt;code&gt;animation-timeline: view()&lt;/code&gt; is supported, at least). By animating a &lt;code&gt;transform&lt;/code&gt; that didn&apos;t include that &lt;code&gt;rotate()&lt;/code&gt; value, my rotation could be once again be undone, and my sidenotes summarily &lt;em&gt;de-jauntified&lt;/em&gt;.&lt;/p&gt;
+        
+        &lt;p&gt;I am a professional technical writer.&lt;/p&gt;
+        
+        &lt;p&gt;Just as easily fixed; I just needed to repeat the &lt;code&gt;rotate&lt;/code&gt; transforms inside my &lt;code&gt;@keyframes&lt;/code&gt; rule as well:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        animation: movein ease-in-out;
+        animation-timeline: view();
+        /* … */
+        transform: scale(0.925) rotate(random(2.5deg, 2.5deg));
+        }
+        @keyframes movein {
+        0%,
+        100% {
+        opacity: 0.5;
+        transform: scale(0.925) rotate(random(2.5deg, 2.5deg));
+        }
+        50% {
+        opacity: 0.9;
+        transform: scale(1) rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As before, no recalculation takes place in terms of each individual note&apos;s rotation inside or outside of the animation window — the reason being, all these calls to &lt;code&gt;random()&lt;/code&gt; share the same random &lt;strong&gt;base value&lt;/strong&gt; (or &lt;strong&gt;seed&lt;/strong&gt;) used to generate the rendered value.&lt;/p&gt;
+        &lt;p&gt;The base value is the randomly generated number that provides the basis for calculating the value that results from the call to &lt;code&gt;random()&lt;/code&gt;. When &lt;code&gt;random( 0px, 100px )&lt;/code&gt; is called, a random seed between &lt;code&gt;0&lt;/code&gt; and &lt;code&gt;1&lt;/code&gt; is generated and used to perform the calculation of the resulting value - if the value of that seed is &lt;code&gt;.5&lt;/code&gt;, the resulting value is &lt;code&gt;50px&lt;/code&gt;. If the value of the seed ends up being &lt;code&gt;.25&lt;/code&gt;, the resulting value is &lt;code&gt;25px&lt;/code&gt;. Any two &lt;code&gt;random()&lt;/code&gt; calculations based on the same seed will always give you the same end result.&lt;/p&gt;
+        &lt;p&gt;The way I&apos;m using &lt;code&gt;random()&lt;/code&gt; in the snippet above, the rotation value that results from the first evaluated call to &lt;code&gt;random()&lt;/code&gt; will be the value that results from the the other calls to &lt;code&gt;random()&lt;/code&gt;, since they&apos;re all able to share the same base value used to generate that rendered value. Once &lt;code&gt;random()&lt;/code&gt; is called and a base value is generated, an identifier that represents that seed value is created — a &lt;strong&gt;random cache key&lt;/strong&gt; that can be used anywhere that cache key is in &lt;strong&gt;scope&lt;/strong&gt;. In the examples you&apos;ve seen so far here, the cache key is leaning on the default scoping behavior: scoped to individual elements (each instance of &lt;code&gt;.sidenote&lt;/code&gt;), the property name (&lt;code&gt;transform&lt;/code&gt;), and the &lt;strong&gt;index&lt;/strong&gt; of that call — the order in which &lt;code&gt;random()&lt;/code&gt; was called within the value of that property.&lt;/p&gt;
+        &lt;p&gt;That&apos;s a lot on paper (and I found the concept of index scoping particularly tricky, I don&apos;t mind admitting), but it &lt;em&gt;does&lt;/em&gt; make a lot more sense one we start putting some of this into practice. To start with, let&apos;s step through some of the &lt;code&gt;random()&lt;/code&gt; usage you&apos;ve already seen in a little more detail:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The first call to &lt;code&gt;random()&lt;/code&gt; generates a random seed between 0–1, uses it to calculate a value between &lt;code&gt;-2.5deg&lt;/code&gt; and &lt;code&gt;2.5deg&lt;/code&gt;, and creates a cache key — an invisible identifier that represents the random seed. Here, that cache key will be &lt;strong&gt;scoped to the first&lt;/strong&gt; &lt;code&gt;random()&lt;/code&gt; &lt;strong&gt;value in subsequent&lt;/strong&gt; &lt;code&gt;transform&lt;/code&gt; &lt;strong&gt;declarations that are applied to each individual element targeted by the selector&lt;/strong&gt;. Given these calls to &lt;code&gt;random()&lt;/code&gt; using the same values, on the same element (any individual &lt;code&gt;div&lt;/code&gt;), within the same property (&lt;code&gt;transform&lt;/code&gt;), as the first call to &lt;code&gt;random()&lt;/code&gt; in each declaration — that is, at the same &lt;em&gt;index&lt;/em&gt; — the random seed already available to that scope is used for the calculation, and the same rotation results. If our page contains two &lt;code&gt;div&lt;/code&gt;s, they&apos;ll both end up with different random values since the cache key is scoped to each individual element.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;CSS is declarative, which means that there&apos;s no assumption of any specific evaluation order and &quot;the first call to random&quot; doesn&apos;t necessarily mean &quot;the one at the top.&quot;&lt;/p&gt;
+        &lt;p&gt;That&apos;s the detail that necessitates all the repetition, messy as it might seem: we couldn&apos;t have a shorthand that says &quot;use the same value as that other &lt;code&gt;random()&lt;/code&gt;&quot; if &quot;that other &lt;code&gt;random()&lt;/code&gt;&quot; may or may not have been evaluated yet. By repeating the values, these functionally-identical instances of &lt;code&gt;random()&lt;/code&gt; can share a single base value regardless of their evaluation order.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Given another element altogether, we leave the scope where that cache key applies — so a new random seed is created to perform that calculation and a new cache key is generated for that new scope:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;
+        &amp;lt;p&amp;gt;&amp;lt;/p&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        
+        p {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In this snippet three discrete cache keys are generated, each representing a different seed value, and each resulting in a different rendered value. One for &lt;em&gt;each&lt;/em&gt; &lt;code&gt;div&lt;/code&gt;, scoped to the &lt;code&gt;transform&lt;/code&gt; property and and first index (the first instance of &lt;code&gt;random()&lt;/code&gt; in the declaration). For each individual &lt;code&gt;div&lt;/code&gt; on the page, and given the same &lt;code&gt;transform&lt;/code&gt; property, a call to &lt;code&gt;random()&lt;/code&gt; at the same index uses the same seed — each &lt;code&gt;div&lt;/code&gt; ends up with a different rotation value, and those values are maintained across breakpoints. Naturally, that cache key is &lt;em&gt;out&lt;/em&gt; of scope for the subsequent &lt;code&gt;p&lt;/code&gt;, so a new value is calculated there.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;Keep in mind that this is &lt;em&gt;element&lt;/em&gt;-based, not &lt;em&gt;selector&lt;/em&gt;-based — so long as we&apos;re targeting the same element, using the same property, and a value with the same index, the same cache key applies:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;div class=&quot;rightround&quot;&amp;gt;&amp;lt;/div&amp;gt;
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        .rightround {
+        transform: rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Different selector, but selector isn&apos;t a scoping factor — for the same element, using the same property, with the same &lt;code&gt;random()&lt;/code&gt; index, the result is the same rotation.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Again, how &lt;code&gt;random()&lt;/code&gt; works &lt;em&gt;mechanically&lt;/em&gt; might seem a little arcane, but the out-of-the-box behavior gives us predictable results with relatively little code, and &quot;keep the scoping as tight as possible&quot; is an inarguably sensible default for any addition to the web platform. For my part, leaning on defaults means my little sidenotes play out something to the tune of:&lt;/p&gt;
+        
+        &lt;p&gt;&lt;em&gt;Looking at you here, 1900s-era JavaScript&lt;/em&gt;.&lt;/p&gt;
+        
+        &lt;pre&gt;&lt;code&gt;:root {
+        --scale-down: 0.925;
+        --scale-up: 1;
+        }
+        
+        .sidenote {
+        align-self: flex-end;
+        animation: movein ease-in-out;
+        animation-timeline: view();
+        /* … */
+        transform: scale(var(--scale-down)) rotate(random(2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        .sidenote {
+        /* … */
+        transform: scale(var(--scale-down)) rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        
+        @keyframes movein {
+        0%,
+        100% {
+        opacity: 0.5;
+        transform: scale(var(--scale-down)) rotate(random(2.5deg, 2.5deg));
+        }
+        50% {
+        opacity: 0.9;
+        transform: scale(var(--scale-up)) rotate(random(2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;That&apos;s a &lt;em&gt;lot&lt;/em&gt; of repetition, I know, but remember that there&apos;s no assumption of execution order in CSS — any one of these &lt;code&gt;random()&lt;/code&gt; calls could be the one that defines their shared cache key.&lt;/p&gt;
+        &lt;p&gt;Now, leaning on the default scoping behavior gets the job done for my little margin notes, but doesn&apos;t mean we&apos;re &lt;em&gt;stuck&lt;/em&gt; with the default scoping behavior. So far we&apos;ve only been passing &lt;code&gt;random()&lt;/code&gt; a minimum and maximum value, but that first argument can instead be used to &lt;em&gt;define&lt;/em&gt; a random key, with a specific identifier and specific scope — the second argument then defines the minimum value, and so on:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: rotate(random(--random-rotation auto, -5deg, 5deg, 1deg));
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Used this way, that first argument will allow you to specify two things. The first is a dashed identifier (prefixed with &lt;code&gt;--&lt;/code&gt;) that will act as the cache key. The second is a keyword that dictates whether that value should be scoped to a property (&lt;code&gt;property-scoped&lt;/code&gt;) or property &lt;em&gt;and&lt;/em&gt; index (&lt;code&gt;property-index-scoped&lt;/code&gt;), to individual elements (&lt;code&gt;element-scoped&lt;/code&gt;) or all matching elements identically, to individual elements &lt;em&gt;and&lt;/em&gt; property and position (&lt;code&gt;auto&lt;/code&gt;, the default), or a fixed number (&lt;code&gt;fixed&lt;/code&gt;) which you&apos;d likely only use for debugging purposes. Once we&apos;ve established a random key and a scope where it applies, we can reuse it in other instances of &lt;code&gt;random()&lt;/code&gt; — an explicit means of saying &quot;if a random seed is already available in this scope, use it.&quot;&lt;/p&gt;
+        &lt;p&gt;Mind the comma placement here, too — the dashed identifier and scope keyword make up &lt;em&gt;one&lt;/em&gt; argument. I may or may not have tripped over &lt;code&gt;rotate( random( --random-rotation, auto, 0px, 10px )&lt;/code&gt; a few times myself.&lt;/p&gt;
+        &lt;p&gt;Let&apos;s walk through our scoping options one at a time:&lt;/p&gt;
+        &lt;h2&gt;&lt;code&gt;auto&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;In the example above, the &lt;code&gt;--random-rotation&lt;/code&gt; identifier I specified just ends up serving as a human-readable representation of the cache key — by specifying &lt;code&gt;auto&lt;/code&gt; for the scope, I&apos;m still just leaning on the default per-element property and index scoping.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;:root {
+        --scale-down: 0.925;
+        --scale-up: 1;
+        }
+        
+        .sidenote {
+        align-self: flex-end;
+        animation: movein ease-in-out;
+        animation-timeline: view();
+        /* … */
+        transform: scale(var(--scale-down)) rotate(random(--sidenote-rotation auto, 2.5deg, 2.5deg));
+        }
+        
+        @media (min-width: 55rem) {
+        .sidenote {
+        /* … */
+        transform: scale(var(--scale-down)) rotate(random(--sidenote-rotation auto, 2.5deg, 2.5deg));
+        }
+        }
+        
+        @keyframes movein {
+        0%,
+        100% {
+        opacity: 0.5;
+        transform: scale(var(--scale-down)) rotate(random(--sidenote-rotation auto, 2.5deg, 2.5deg));
+        }
+        50% {
+        opacity: 0.9;
+        transform: scale(var(--scale-up)) rotate(random(--sidenote-rotation auto, 2.5deg, 2.5deg));
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;It adds a little more noise to an isolated case like this one, but I certainly wouldn&apos;t mind having a human-readable label for the availability of a given cache key if we assume a couple thousand lines of real-world CSS between these instances of &lt;code&gt;random()&lt;/code&gt;.&lt;/p&gt;
+        &lt;div&gt;&lt;h2&gt;FYI&lt;/h2&gt;
+        &lt;p&gt;Despite sharing a shape, this identifier is very different from using &lt;code&gt;random()&lt;/code&gt; in conjunction with a custom property. In this case, that property will still represent a call to the &lt;code&gt;random()&lt;/code&gt; function &lt;em&gt;itself&lt;/em&gt;, not the result of that function&apos;s evaluation:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;:root {
+        --random-margin: random(0px, 10px);
+        }
+        
+        div {
+        margin-block-start: var(--random-margin);
+        }
+        
+        p {
+        margin-block-start: var(--random-margin);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;&lt;code&gt;--random-size&lt;/code&gt; won&apos;t represent the &lt;em&gt;results&lt;/em&gt; of calling &lt;code&gt;random( 0px, 10px );&lt;/code&gt;, the way &lt;code&gt;const randomSize = ${ Math.floor(Math.random() * 10 )px&lt;/code&gt; would — it represents a fresh call to &lt;code&gt;random( 0px, 10px )&lt;/code&gt; every time it&apos;s used.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;My JavaScript-addled brain recoils in horror.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;p&gt;Again though, the addition of a manually-specified cache key doesn&apos;t gain us anything over using a generated cache key apart from a human-readable label for what are expected to be shared &lt;code&gt;random()&lt;/code&gt; results, and specifying &lt;code&gt;auto&lt;/code&gt; will result in the same scoping rules. What specifying a cache key &lt;em&gt;does&lt;/em&gt; gain us is the ability to &lt;em&gt;change&lt;/em&gt; the scope where that key will be available:&lt;/p&gt;
+        &lt;h2&gt;&lt;code&gt;property-scoped&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;The &lt;em&gt;invisibility&lt;/em&gt; of default/&lt;code&gt;auto&lt;/code&gt; scoping has the potential for confusion once we start adding a little real-world complexity, particularly when it comes to the &quot;index&quot; part of the equation. Given the following, we might expect all these calls to make use of the same random key, same seed, and same rendered result:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        margin-block: random(1rem, 5rem);
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        margin-block: random(1rem, 5rem) random(1rem, 5rem);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here, we&apos;re targeting the same element inside and outside the media query and we&apos;re using the same property, but the cache key generated by the first call to &lt;code&gt;random()&lt;/code&gt; is scoped to the &lt;em&gt;first&lt;/em&gt; random value of the &lt;code&gt;margin-block&lt;/code&gt; declaration applied to each &lt;code&gt;div&lt;/code&gt; — even though we might expect these declarations to give us the same rendered result, the declaration using the start and end shorthand will have an identical &lt;code&gt;margin-block-start&lt;/code&gt;, but generate a &lt;em&gt;new&lt;/em&gt; random value for the &lt;code&gt;margin-block-end&lt;/code&gt;. If we wanted these declarations to be functionally equivalent, we need something a little outside of the default scoping rules.&lt;/p&gt;
+        &lt;p&gt;If we instead specify &lt;code&gt;property-scoped&lt;/code&gt; to say that the random key should be scoped to &lt;em&gt;just&lt;/em&gt; the property — not the index — we can reuse that calculated value as both values in the &lt;code&gt;margin-block&lt;/code&gt; shorthand:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        margin-block: random(--random-margin property-scoped, 1rem, 5rem);
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        margin-block: random(--random-margin property-scoped, 1rem, 5rem) random(--random-margin property-scoped, 1rem, 5rem);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Now the same value will be used for all three values.&lt;/p&gt;
+        &lt;p&gt;We don&apos;t &lt;em&gt;have&lt;/em&gt; to specify an identifier for the cache key. The previous snippet is functionally identical to:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        margin-block: random(property-scoped, 1rem, 5rem);
+        }
+        
+        /* … */
+        
+        @media (min-width: 55rem) {
+        div {
+        margin-block: random(property-scoped, 1rem, 5rem) random(property-scoped, 1rem, 5rem);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Same result, but again: given a couple thousand lines of CSS between these statements, I&apos;d just as soon know what random seed is meant to be associated with which declarations at-a-glance.&lt;/p&gt;
+        &lt;p&gt;There&apos;s a catch here, though: by explicitly specifying &lt;code&gt;property-scope&lt;/code&gt;, we&apos;ve broadened the scope to &lt;em&gt;only&lt;/em&gt; be limited by property — the cache key is no longer scoped to individual elements. Instead, &lt;em&gt;any&lt;/em&gt; matching elements will be able to share a single cache key. If we were to only specify &lt;code&gt;property-scope&lt;/code&gt;, like so:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: rotate(random(--random-key property-scoped, -2.5deg, 2.5deg));
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The resulting value will be shared by all elements matching our selector, across all properties — a result comparable to:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: rotate(/* Pick a random number between -2.5deg and 2.5deg */);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Good news, though: we can control that too.&lt;/p&gt;
+        &lt;h2&gt;&lt;code&gt;element-scoped&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;By &lt;em&gt;also&lt;/em&gt; adding &lt;code&gt;element-scoped&lt;/code&gt; to this first argument, we can specify that the shared base value is scoped to individual elements &lt;em&gt;and&lt;/em&gt; scoped to property only, not index:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: rotate(random(--random-key element-scoped property-scoped, -2.5deg, 2.5deg);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But the same way specifying only &lt;code&gt;property-scoped&lt;/code&gt; meant &quot;&lt;em&gt;only&lt;/em&gt; scoped to property&quot; and lost that individual-element scoping, we can broaden the scope to &quot;individual elements, &lt;em&gt;any&lt;/em&gt; property, &lt;em&gt;any&lt;/em&gt; index&quot; by specifying &lt;code&gt;element-scoped&lt;/code&gt; alone:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        margin-block: random(element-scoped, 1rem, 5rem);
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        margin: random(element-scoped, 1rem, 5rem) 2rem;
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Here we&apos;re saying that per-element is the only applicable scope for this cache key — instead of the default/&lt;code&gt;auto&lt;/code&gt; behavior of being scoped to individual elements, property, and index, this cache key is &lt;em&gt;only&lt;/em&gt; scoped to individual elements. That means any instance of &lt;code&gt;random()&lt;/code&gt; using these values in any property that applies to any &lt;code&gt;div&lt;/code&gt; on the page can share the same random seed, and will result in the same value:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;div {
+        margin-block: random(element-scoped, 1rem, 5rem);
+        }
+        
+        @media (min-width: 55rem) {
+        div {
+        margin: random(element-scoped, 1rem, 5rem) 2rem;
+        }
+        
+        div.by-class {
+        padding: random(element-scoped, 1rem, 5rem);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The resulting seed is scoped to each individual &lt;code&gt;div&lt;/code&gt; in the rendered page, so all of these calls to &lt;code&gt;random()&lt;/code&gt; will result in the same random value between &lt;code&gt;1em&lt;/code&gt; and &lt;code&gt;5em&lt;/code&gt; — but at higher breakpoints, any &lt;code&gt;div.by-class&lt;/code&gt; will use that same value for &lt;code&gt;padding&lt;/code&gt; as well.&lt;/p&gt;
+        &lt;p&gt;&lt;/p&gt;
+        &lt;h2&gt;Identifier Only&lt;/h2&gt;
+        &lt;p&gt;We can, in fact, go one step global-er. Specifying an identifier and omitting a specific scope for that identifier results in the broadest possible scope for a cache key: a random key not specific to property or index, &lt;em&gt;and&lt;/em&gt; not scoped to individual elements — a random seed scoped to &lt;strong&gt;all elements and properties targeted by that styling&lt;/strong&gt;.&lt;/p&gt;
+        &lt;p&gt;“Global-er.” Professional technical writer, folks; can&apos;t stress that enough.&lt;/p&gt;
+        &lt;p&gt;In this example, the same random seed will be used to calculate a random value that can be reused for any property and any index, but it won&apos;t be recalculated from one &lt;code&gt;div&lt;/code&gt; to another, either. Unless otherwise overridden elsewhere, the &lt;em&gt;same&lt;/em&gt; random value will be used across every &lt;code&gt;div&lt;/code&gt; targeted by these selectors:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: scale(0.925) rotate(random(--random-key, -2.5deg, 2.5deg));
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;The resulting value will be shared by all elements matching our selector, across all properties — a result comparable to:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: scale(0.925) rotate(/* A random value between -2.5deg and 2.5deg */);
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;But because we&apos;re not scoping this to property or index, that means &lt;em&gt;all&lt;/em&gt; of these calls to &lt;code&gt;random()&lt;/code&gt; will result in the same value:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        margin-block-start: random(--random-key, 1rem, 5rem);
+        }
+        
+        @media (min-width: 30rem) {
+        .sidenote {
+        border: solid red;
+        border-width: random(--random-key, 1rem, 5rem) random(--random-key, 1rem, 5rem) 0 0;
+        }
+        }
+        
+        @media (min-width: 50rem) {
+        .sidenote {
+        font-size: random(--random-key, 1rem, 5rem);
+        }
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Any property, any index — and because we&apos;ve left the realm of &lt;code&gt;auto&lt;/code&gt; or &lt;code&gt;element-scoped&lt;/code&gt;, every &lt;code&gt;.sidenote&lt;/code&gt; element will be rendered using the same random value for all of these properties, if and when they apply to the user&apos;s browsing context.&lt;/p&gt;
+        &lt;h2&gt;&lt;code&gt;fixed&lt;/code&gt;&lt;/h2&gt;
+        &lt;p&gt;There&apos;s one more random key you can specify, and it&apos;s a weird one. Remember back where I said &quot;when &lt;code&gt;random( 0px, 100px )&lt;/code&gt; is called, a random seed between &lt;code&gt;0&lt;/code&gt; and &lt;code&gt;1&lt;/code&gt; is generated to perform the calculation of the resulting value - how, given &lt;code&gt;random( 0px, 100px )&lt;/code&gt; and a random seed of &lt;code&gt;.5&lt;/code&gt;, the resulting value would be &lt;code&gt;50px&lt;/code&gt;?&quot; Well, the keyword &lt;code&gt;fixed&lt;/code&gt; will allow you to specify a base value &lt;em&gt;manually&lt;/em&gt;, using a number between zero and one — a hard-coded seed:&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;.sidenote {
+        transform: rotate(random(fixed 0.5, -2.5deg, 2.5deg)); /* 0deg */
+        transform: rotate(random(fixed 0.5, 0deg, 20deg)); /* 10deg */
+        transform: rotate(random(fixed 0.25, 0deg, 100deg)); /* 25deg */
+        }
+        &lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;As you might have guessed, &lt;code&gt;fixed&lt;/code&gt; has a pretty specific use case: it gives you a quick way to try out some of the values that might result from a call to &lt;code&gt;random()&lt;/code&gt; without needing to scratch out the entire line and replace it with a static value. You&apos;d never use this in production.&lt;/p&gt;
+        &lt;p&gt;Odds are, you&apos;ll only reach for &lt;code&gt;fixed&lt;/code&gt; when finessing the upper and lower bounds of a call to &lt;code&gt;random()&lt;/code&gt; to see how a range of potential results would render — I certainly did, if only to try it out. Granted, trying a few different &lt;code&gt;fixed&lt;/code&gt; values on for size was probably overkill for my purposes; realistically, a sense of how a whopping five (5) potential degrees of rotation will play across a few little side notes doesn&apos;t require much more than a couple of page-reloads and a little imagination. Still, tinkering with those base values &lt;em&gt;does&lt;/em&gt; give you a little glimpse into the mechanics of how &lt;code&gt;random()&lt;/code&gt; rolls the dice.&lt;/p&gt;
+        
+        &lt;p&gt;“Anything worth doing is worth—” well, you know the rest.&lt;/p&gt;
+        
+        &lt;p&gt;As for how those base values are &lt;em&gt;shared&lt;/em&gt; between calls to &lt;code&gt;random()&lt;/code&gt;, well, that clearly requires a little more imagination.&lt;/p&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>The Index: Issue #206</title>
       <link>https://piccalil.li/the-index/206/?ref=main-rss-feed</link>
@@ -104,39 +458,6 @@
         &lt;p&gt;AI technologies have given &lt;em&gt;anyone&lt;/em&gt; the ability to bring their ideas to life, but to produce a high quality service that actually works for the people it needs to work for requires experience, specialist skills and creativity.&lt;/p&gt;
         &lt;p&gt;We’ve got heaps of all of that here at Set Studio and we&apos;ve got availability starting in 2027, so check us out and see what we&apos;re about.&lt;/p&gt;
         &lt;p&gt;&lt;a href=&quot;https://set.studio?utm_source=the-index&amp;utm_medium=newsletter&quot;&gt;Check out our work&lt;/a&gt;&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>If we stop, we lose</title>
-      <link>https://piccalil.li/blog/if-we-stop-we-lose/?ref=main-rss-feed</link>
-      <guid>https://piccalil.li/blog/if-we-stop-we-lose/?ref=main-rss-feed</guid>
-      <pubDate>Thu, 29 Oct 2026 11:55:00 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;It&apos;s been a rather &lt;em&gt;morale draining&lt;/em&gt; era in the making websites industry since the wider tech industry decided to gamble everything on LLMs. We at Piccalilli see it amongst the community and &lt;em&gt;feel it&lt;/em&gt; ourselves.&lt;/p&gt;
-        &lt;p&gt;You&apos;ll also have noticed the velocity of posts has slowed down somewhat on this website with no new courses announced either. There&apos;s a couple of reasons for that. First, &lt;a href=&quot;https://bell.bz/in-response-to-the-death-of-web-development-education/&quot;&gt;the numbers have taken a dramatic tumble&lt;/a&gt; — &lt;a href=&quot;https://molily.de/web-dev-education/&quot;&gt;industry-wide&lt;/a&gt; — but also, aside from being very busy in &lt;a href=&quot;https://set.studio/&quot;&gt;the studio&lt;/a&gt;, we&apos;ve been &lt;em&gt;tired&lt;/em&gt;. Swimming against this particular current will do that, even for folks like us that have &lt;em&gt;always&lt;/em&gt; operated like that.&lt;/p&gt;
-        &lt;p&gt;Something else you might have noticed is that a lot of other educators have gone a lot &lt;em&gt;quieter&lt;/em&gt; this year too. I&apos;m writing this post today to hopefully try and fix that.&lt;/p&gt;
-        &lt;h2&gt;A shot in the arm&lt;/h2&gt;
-        &lt;p&gt;I had a delightful conversation with &lt;a href=&quot;https://css-tricks.com/&quot;&gt;CSS-Tricks&lt;/a&gt; head honcho, &lt;a href=&quot;https://geoffgraham.me/&quot;&gt;Geoff&lt;/a&gt;, yesterday. Aside from the excellent vibes as a result of CSS-Tricks &lt;a href=&quot;https://css-tricks.com/css-tricks-has-a-new-owner/&quot;&gt;being back as an independent publisher&lt;/a&gt;, I started in a rather glum mood. After spending a few minutes listening to Geoff&apos;s exciting plans though I really perked up.&lt;/p&gt;
-        &lt;p&gt;We&apos;re nowhere near CSS-Tricks here, but we&apos;ve always looked up to them as an example of what years and years at the top of your game looks like. Sure, the DigitalOcean acquisition didn&apos;t work out, but the fact that the publication is not only back, but well up for the fight against the supposed death of web education is really inspiring to me. I &lt;em&gt;needed&lt;/em&gt; that win, as did &lt;a href=&quot;https://wil.to/posts/taking-back-css-tricks/&quot;&gt;many others&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;I needed it so much, it&apos;s spurred me on to write this article to hopefully give us &lt;em&gt;all&lt;/em&gt; a shot in the arm.&lt;/p&gt;
-        &lt;h2&gt;There is no inevitable future and education will always matter&lt;/h2&gt;
-        &lt;p&gt;A comment I see all the time is &quot;we don&apos;t need articles and courses because we can just ask an LLM now&quot;, which I guess is true, but I could also eat an entire can of spray cheese. It ain&apos;t gonna nourish me!&lt;/p&gt;
-        &lt;p&gt;AI technologies have given anyone the ability to bring their ideas to life, but to produce a high quality end product that &lt;em&gt;actually works&lt;/em&gt; for the people it needs to work for requires experience, specialist skills and creativity. That &lt;em&gt;is&lt;/em&gt; a reality, which aside from Silicon Valley&apos;s best efforts, is why there are still working developers out there, regardless of &quot;frontier model&quot; power. Human developer&apos;s experience is &lt;em&gt;necessary&lt;/em&gt; because LLM outputs still (somehow, after hundreds of billions of investment) fall short.&lt;/p&gt;
-        &lt;p&gt;Let me repeat that: their experience is &lt;em&gt;necessary&lt;/em&gt;. Who inevitably contributed to that experience? Yep: educators.&lt;/p&gt;
-        &lt;p&gt;&lt;/p&gt;
-        &lt;h2&gt;Let&apos;s get to work then&lt;/h2&gt;
-        &lt;p&gt;This article is mainly addressed to fellow educators, but also to people that write on their personal blogs. &lt;strong&gt;You must keep going because people still need us&lt;/strong&gt;. If we don&apos;t, we lose.&lt;/p&gt;
-        &lt;p&gt;The LLM era is opening up an enormous skills gap that&apos;s only going to get wider as the industry continues to pull up the ladder, eliminating entry level positions. We&apos;re needed to help people really understand how all of this stuff &lt;em&gt;works&lt;/em&gt;, so even if they are at &lt;a href=&quot;https://piccalil.li/blog/are-peoples-bosses-really-making-them-use-ai/&quot;&gt;the behest of LLM mandates&lt;/a&gt;, they can produce better outputs.&lt;/p&gt;
-        &lt;p&gt;The technology is going nowhere — that toothpaste is long out of the tube — but how many other hype cycles have underwhelmed in the end?&lt;/p&gt;
-        &lt;p&gt;Spoiler, all of them&lt;/p&gt;
-        &lt;p&gt;The economics of the AI industry simply do not work and the technology — albeit ever-present in development — will fall into its actual place eventually, as a &lt;a href=&quot;https://bell.bz/the-logical-destination-of-llms/&quot;&gt;niche tool&lt;/a&gt;.&lt;/p&gt;
-        &lt;p&gt;With all of this in mind, we&apos;re fighting back too, so &lt;a href=&quot;https://piccalil.li/guest-authoring/&quot;&gt;I&apos;m opening up the guest authoring on this site again&lt;/a&gt;, &lt;a href=&quot;https://css-tricks.com/guest-writing/&quot;&gt;just like Geoff is over on CSS-Tricks&lt;/a&gt;. I&apos;m determined to get this website &lt;em&gt;cooking&lt;/em&gt; again and I would love to share &lt;em&gt;your&lt;/em&gt; words with the rest of the industry.&lt;/p&gt;
-        &lt;p&gt;Let&apos;s buck up our ideas and get cracking, everyone. There&apos;s lots to teach and I know we&apos;ve got plenty of fight left in us.&lt;/p&gt;
-        &lt;p&gt;To quote our very own &lt;a href=&quot;https://wil.to/js4e/newsletter/mat-update-22/&quot;&gt;Mat Marquis&lt;/a&gt;:&lt;/p&gt;
-        &lt;blockquote&gt;
-        &lt;p&gt;You and me, we’re not done until we say we’re done&lt;/p&gt;
-        &lt;/blockquote&gt;
-        &lt;p&gt;Don&apos;t let the bastards grind you down.&lt;/p&gt;
       </content:encoded>
     </item>
   </channel>
