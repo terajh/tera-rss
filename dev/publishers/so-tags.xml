@@ -4,7 +4,90 @@
     <title>dev RSS - Stack Overflow Tags</title>
     <link>https://stackoverflow.com/</link>
     <description>Stack Overflow Tags RSS 피드</description>
-    <lastBuildDate>Sat, 21 Nov 2026 21:18:19 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 22 Nov 2026 21:27:58 GMT</lastBuildDate>
+    <item>
+      <title>(index):28 Uncaught TypeError: Cannot read properties of undefined (reading &apos;channel&apos;)</title>
+      <link>https://stackoverflow.com/questions/80018122/index28-uncaught-typeerror-cannot-read-properties-of-undefined-reading-cha</link>
+      <guid>https://stackoverflow.com/questions/80018122/index28-uncaught-typeerror-cannot-read-properties-of-undefined-reading-cha</guid>
+      <pubDate>Sun, 22 Nov 2026 14:34:59 GMT</pubDate>
+      <content:encoded>
+        &lt;p&gt;I want a notification to appear on the page whenever a new post is created.&lt;/p&gt;
+        &lt;p&gt;However, I’m getting an error stating that the &apos;channel&apos; property cannot be identified.&lt;/p&gt;
+        &lt;p&gt;I’ve verified that the event name and its corresponding method are correct.&lt;/p&gt;
+        &lt;p&gt;The Pusher settings in the `.env` file are also correct.&lt;/p&gt;
+        &lt;p&gt;The `vite.config.js` configuration is correct as well.&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+        &amp;lt;html lang=&amp;quot;{{ str_replace(&apos;_&apos;, &apos;-&apos;, app()-&amp;gt;getLocale()) }}&amp;quot;&amp;gt;
+        &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&amp;quot;utf-8&amp;quot;&amp;gt;
+        &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1&amp;quot;&amp;gt;
+        
+        &amp;lt;title&amp;gt;{{ config(&apos;app.name&apos;, &apos;Laravel&apos;) }}&amp;lt;/title&amp;gt;
+        
+        &amp;lt;!-- Fonts --&amp;gt;
+        &amp;lt;link rel=&amp;quot;preconnect&amp;quot; href=&amp;quot;https://fonts.bunny.net&amp;quot;&amp;gt;
+        &amp;lt;link href=&amp;quot;https://fonts.bunny.net/css?family=instrument-sans:400,500,600&amp;quot; rel=&amp;quot;stylesheet&amp;quot; /&amp;gt;
+        &amp;lt;meta name=&amp;quot;csrf-token&amp;quot; content=&amp;quot;{{ csrf_token() }}&amp;quot;&amp;gt;
+        
+        &amp;lt;!-- Styles / Scripts --&amp;gt;
+        @if (file_exists(public_path(&apos;build/manifest.json&apos;)) || file_exists(public_path(&apos;hot&apos;)))
+        @vite([&apos;resources/sass/app.scss&apos;, &apos;resources/js/app.js&apos;])
+        &amp;lt;/head&amp;gt;
+        &amp;lt;body&amp;gt;
+        
+        &amp;lt;div id=&amp;quot;app&amp;quot;&amp;gt;
+        @csrf
+        &amp;lt;example-component&amp;gt;
+        
+        &amp;lt;/example-component&amp;gt;
+        
+        &amp;lt;/body&amp;gt;
+        &amp;lt;script type=&amp;quot;module&amp;quot;&amp;gt;
+        window.Echo.channel(&apos;posts&apos;)
+        .listen(&apos;.posts&apos;, (data) =&amp;gt; {
+        console.log(&apos;Order status updated: &apos;, data);
+        var d1 = document.getElementById(&apos;notification&apos;);
+        d1.insertAdjacentHTML(&apos;beforeend&apos;, &apos;&amp;lt;div class=&amp;quot;alert alert-success alert-dismissible fade show&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;i class=&amp;quot;fa fa-circle-check&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;  &apos;+data.message+&apos;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&apos;);
+        });
+        &amp;lt;/script&amp;gt;
+        
+        
+        &amp;lt;/html&amp;gt;
+        
+        import Echo from &apos;laravel-echo&apos;;
+        
+        import Pusher from &apos;pusher-js&apos;;
+        // window.Pusher = Pusher;
+        window.Pusher = require(&apos;pusher-js&apos;);
+        
+        
+        window.Echo = new Echo({
+        broadcaster: &amp;quot;pusher&amp;quot;,
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        forceTLS: true,
+        wsHost: import.meta.env.VITE_PUSHER_HOST,
+        wsPort: import.meta.env.VITE_PUSHER_PORT,
+        wssPort: import.meta.env.VITE_PUSHER_PORT,
+        enabledTransports: [&amp;quot;ws&amp;quot;, &amp;quot;wss&amp;quot;],
+        });
+        import &apos;./bootstrap&apos;;
+        import { createApp } from &apos;vue&apos;;
+        
+        /**
+        * Next, we will create a fresh Vue application instance. You may then begin
+        * registering components with the application instance so they are ready
+        * to use in your application&apos;s views. An example is included for you.
+        */
+        
+        const app = createApp({});
+        
+        import ExampleComponent from &apos;./components/ExampleComponent.vue&apos;;
+        app.component(&apos;example-component&apos;, ExampleComponent);
+        app.mount(&apos;#app&apos;);
+        &lt;/code&gt;&lt;/pre&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>How can search engines crawl dynamic page content when JavaScript is disabled?</title>
       <link>https://stackoverflow.com/questions/80013003/how-can-search-engines-crawl-dynamic-page-content-when-javascript-is-disabled</link>
@@ -1516,29 +1599,6 @@
         &lt;p&gt;&lt;a href=&quot;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://stackblitz.com/edit/nuxt-starter-a1s1dox4?file=app%2Fapp.vue&lt;/a&gt;&lt;/p&gt;
         &lt;hr /&gt;
         &lt;p&gt;How can I take care of the reactivity?&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Fullcalendar Vue slot templates</title>
-      <link>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</link>
-      <guid>https://stackoverflow.com/questions/79900039/fullcalendar-vue-slot-templates</guid>
-      <pubDate>Tue, 03 Mar 2026 10:14:17 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;Fullcalendar docs mention only one slot template, &amp;quot;event-content&amp;quot; that can be used to inject Vue via slots. There are also others like day-header-content or day-cell-content, they aren&apos;t mentioned anywhere to handle scoped slots, but they are mentioned when docs mention content injection. With that in mind I tried to use cell-content(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/resourceAreaColumns&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/resourceAreaColumns&lt;/a&gt;) from resource timeline feature, but it doesn&apos;t work. Are there any scoped slots for premium features? I would expect it to work like with every other content injection(referenced here: &lt;a href=&quot;https://fullcalendar.io/docs/vue#slot-templates&quot; rel=&quot;nofollow noreferrer&quot;&gt;https://fullcalendar.io/docs/vue#slot-templates&lt;/a&gt;)&lt;/p&gt;
-        &lt;p&gt;So while this works:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
-        &amp;lt;template #eventContent&amp;gt;
-        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &amp;lt;/FullCalendar&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
-        &lt;p&gt;This doesn&apos;t:&lt;/p&gt;
-        &lt;pre&gt;&lt;code&gt;&amp;lt;FullCalendar&amp;gt;
-        &amp;lt;template #cellContent&amp;gt;
-        &amp;lt;p&amp;gt;Example&amp;lt;/p&amp;gt;
-        &amp;lt;/template&amp;gt;
-        &amp;lt;/FullCalendar&amp;gt;
-        &lt;/code&gt;&lt;/pre&gt;
       </content:encoded>
     </item>
   </channel>
