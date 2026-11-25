@@ -4,12 +4,54 @@
     <title>dev RSS - Zach Leatherman</title>
     <link>https://www.zachleat.com/</link>
     <description>Zach Leatherman RSS 피드</description>
-    <lastBuildDate>Tue, 24 Nov 2026 02:49:29 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 25 Nov 2026 00:19:52 GMT</lastBuildDate>
+    <item>
+      <title>Your Tools are Hiding npm Audits from You</title>
+      <link>https://www.zachleat.com/web/npm-audit-report/</link>
+      <guid>https://www.zachleat.com/web/npm-audit-report/</guid>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
+      <content:encoded>
+        &lt;h2 id=&quot;meaningful-audits-are-important&quot;&gt;Meaningful Audits are Important&lt;/h2&gt;
+        &lt;p&gt;Look at these two &lt;code&gt;npm audit&lt;/code&gt; outputs generated this morning and tell me which project is more secure:&lt;/p&gt;
+        &lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;$ &lt;span class=&quot;token function&quot;&gt;npm&lt;/span&gt; audit
+        &lt;span class=&quot;token comment&quot;&gt;# uh… 521 lines of vulnerability reports truncated&lt;/span&gt;
+        &lt;span class=&quot;token number&quot;&gt;78&lt;/span&gt; vulnerabilities &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;7&lt;/span&gt; low, &lt;span class=&quot;token number&quot;&gt;23&lt;/span&gt; moderate, &lt;span class=&quot;token number&quot;&gt;46&lt;/span&gt; high, &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt; critical&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+        &lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;$ &lt;span class=&quot;token function&quot;&gt;npm&lt;/span&gt; audit
+        found &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt; vulnerabilities&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;Which project is more secure? The one with 0 vulnerabilities, right? &lt;em&gt;Not necessarily!&lt;/em&gt;&lt;/p&gt;
+        &lt;p&gt;The former was created from a fresh &lt;code&gt;create-gatsby&lt;/code&gt; command to make a Gatsby project. The latter was created from a fresh &lt;code&gt;create-next-app&lt;/code&gt; to create a Next.js project (defaults selected for both).&lt;/p&gt;
+        &lt;p&gt;&lt;em&gt;Spicy take incoming:&lt;/em&gt; both Next.js and Gatsby have similarly &lt;em&gt;egregious&lt;/em&gt; security footprints but Next sweeps their vulnerability reports under the rug.&lt;/p&gt;
+        &lt;h2 id=&quot;dependency-hide-and-seek&quot;&gt;Dependency Hide and Seek&lt;/h2&gt;
+        &lt;p&gt;&lt;code&gt;next&lt;/code&gt; (&lt;code&gt;v16.4.6&lt;/code&gt; at time of writing) bypasses &lt;code&gt;node_modules&lt;/code&gt; entirely for its own dependencies (I first &lt;a href=&quot;https://www.zachleat.com/web/site-generator-review/&quot;&gt;wrote about this in 2023&lt;/a&gt;). If you look inside &lt;code&gt;node_modules/next/dist/compiled&lt;/code&gt; you’ll see 139 unique dependencies that (when audited) report 11 low, 2 moderate, 19 high, and 3 critical vulerabilities otherwise &lt;em&gt;unreported&lt;/em&gt; by standard audit report mechanisms.&lt;/p&gt;
+        &lt;p&gt;Gatsby is no longer maintained so it was surprising to see more critical &lt;strong&gt;(hidden)&lt;/strong&gt; vulnerabilities in Next.js than critical &lt;strong&gt;(visible)&lt;/strong&gt; vulnerabilities in Gatsby.&lt;/p&gt;
+        &lt;p&gt;This practice of bundling dependencies isn’t exclusive to Next.js: Vite repeats an arguably similar practice in &lt;code&gt;node_modules/vite/dist&lt;/code&gt; though with bundler-generated output. It’s a bit easier to excuse this practice as a local developer tool and not a production runtime but (in my personal opinion) it seems like an overcorrection to opt-out dependencies from audits entirely.&lt;/p&gt;
+        &lt;p&gt;(It should also be noted that Vite has a &lt;em&gt;very good record&lt;/em&gt; of keeping its bundled dependencies up-to-date and audit-free.)&lt;/p&gt;
+        &lt;p&gt;Transparency and insight are the most important pieces of security auditing mechanisms and doing an &lt;code&gt;npm audit&lt;/code&gt; when using these tools misses in-use dependencies.&lt;/p&gt;
+        &lt;h2 id=&quot;behind-the-curtain&quot;&gt;Behind the Curtain&lt;/h2&gt;
+        &lt;p&gt;Another common practice (though &lt;em&gt;less&lt;/em&gt; egregious) to sweep audits under the rug is to have your &lt;strong&gt;&lt;code&gt;create-&lt;/code&gt; CLI package&lt;/strong&gt; install dependencies for you and conveniently hide audit output from the install step. This practice is less egregious because it won’t &lt;em&gt;hide&lt;/em&gt; dependencies in-use from a &lt;code&gt;npm audit&lt;/code&gt; command run in the project independently, though I would argue that it isn’t sufficiently transparent.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;code&gt;create-gatsby&lt;/code&gt; uses &lt;code&gt;npm install --no-audit&lt;/code&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;create-astro&lt;/code&gt;, TanStack CLI, and &lt;code&gt;create-preact&lt;/code&gt; don’t show console output&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;create-nuxt&lt;/code&gt; and &lt;code&gt;ng new&lt;/code&gt; (Angular) print console output only when install fails&lt;/li&gt;
+        &lt;li&gt;&lt;code&gt;sv create&lt;/code&gt; (Svelte) shows momentarily but clears the log post-install&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p&gt;Your &lt;strong&gt;package manager&lt;/strong&gt; might take an opinionated stance here too. While &lt;code&gt;npm &lt;/code&gt; shows audit reports after an &lt;code&gt;npm install&lt;/code&gt; command, both pnpm and yarn do not!&lt;/p&gt;
+        &lt;h2 id=&quot;prototype-pollution-report&quot;&gt;Prototype Pollution Report&lt;/h2&gt;
+        &lt;p&gt;I wanted a report that normalized away these issues to compare different framework ecosystems and you can see the output of that at the cheekily named &lt;a href=&quot;https://ppr.zachleat.dev/&quot;&gt;Prototype Pollution Report&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;&lt;a href=&quot;https://ppr.zachleat.dev/&quot;&gt;&lt;img src=&quot;https://www.zachleat.com/img/built/GdiRYhqc39-2434.avif&quot; alt=&quot;Screenshot of Prototype Pollution Report Tool&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; width=&quot;2434&quot; height=&quot;1914&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;It updates about once a day and will show how different ecosystems measure over time.&lt;/p&gt;
+        &lt;ul&gt;
+        &lt;li&gt;The Ecosystem Scoreboard measures &lt;em&gt;all&lt;/em&gt; non-deprecated packages published from various projects and takes a bit of an opinionated stance: maintainers need to deprecate packages they no longer maintain!&lt;/li&gt;
+        &lt;li&gt;The Core-only Scoreboard measures &lt;em&gt;only&lt;/em&gt; the core package, which I felt like was interesting enough to have standalone.&lt;/li&gt;
+        &lt;li&gt;Full package lists (with audit counts) are shown at the end.&lt;/li&gt;
+        &lt;/ul&gt;
+      </content:encoded>
+    </item>
     <item>
       <title>All of my 300+ browser tabs are beautiful</title>
       <link>https://www.zachleat.com/web/firefox-list-all-tabs/</link>
       <guid>https://www.zachleat.com/web/firefox-list-all-tabs/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I am a habitual tab hoarder so I created a Firefox addon to help me manage every one of my very special browser tabs.&lt;/p&gt;
         &lt;p&gt;&lt;img src=&quot;https://www.zachleat.com/img/built/lafT3xBfoz-2972.avif&quot; alt=&quot;Screenshot of List All Tabs (light mode) showing 306 open tabs (137 active and 169 unloaded)&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; width=&quot;2972&quot; height=&quot;2138&quot;&gt;&lt;/p&gt;
@@ -41,7 +83,7 @@
       <title>“AI, make the website good”</title>
       <link>https://www.zachleat.com/web/ai-websites/</link>
       <guid>https://www.zachleat.com/web/ai-websites/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;style&gt;
         .iframe--card {
@@ -66,7 +108,7 @@
       <title>Icon Fall Web Component</title>
       <link>https://www.zachleat.com/web/icon-fall/</link>
       <guid>https://www.zachleat.com/web/icon-fall/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I’ve been doing some spring/fall cleaning and found an unpublished follow-up component to &lt;a href=&quot;https://www.zachleat.com/web/snow-fall/&quot;&gt;&lt;code&gt;&amp;lt;snow-fall&amp;gt;&lt;/code&gt;&lt;/a&gt; (a web component to “snow” on your website — which also happens to work with emoji too). Originally it was created as an easter egg for &lt;a href=&quot;https://blog.fontawesome.com/&quot;&gt;Blog Awesome&lt;/a&gt; (click on the Font Awesome flag in the very bottom of the footer) but others have wanted to use it for more things!&lt;/p&gt;
         &lt;p&gt;Presenting: &lt;code&gt;&amp;lt;icon-fall&amp;gt;&lt;/code&gt;:&lt;/p&gt;
@@ -90,7 +132,7 @@
       <title>Table of Contents Web Component</title>
       <link>https://www.zachleat.com/web/table-of-contents/</link>
       <guid>https://www.zachleat.com/web/table-of-contents/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;blockquote&gt;
         &lt;p&gt;…and another one.&lt;/p&gt;
@@ -125,7 +167,7 @@
       <title>Solar Eclipse Toggle Web Component (two state dark/light mode toggle)</title>
       <link>https://www.zachleat.com/web/solar-eclipse/</link>
       <guid>https://www.zachleat.com/web/solar-eclipse/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;In &lt;a href=&quot;https://www.zachleat.com/web/two-state-dark-mode-toggle/&quot;&gt;Trying out a Two-state Dark Mode Toggle&lt;/a&gt; I summarized the Two-state Dark and Light mode Toggle discussion as I experimented with a  toggle in my personal website footer.&lt;/p&gt;
         &lt;p&gt;After launch, &lt;a href=&quot;https://fediverse.zachleat.com/@cwilcox808@c.im/117259821195055457&quot;&gt;Curtis Wilcox left some good feedback to improve the accessibility of the component&lt;/a&gt;.&lt;/p&gt;
@@ -145,7 +187,7 @@
       <title>Trying out a Two-state Dark Mode Toggle</title>
       <link>https://www.zachleat.com/web/two-state-dark-mode-toggle/</link>
       <guid>https://www.zachleat.com/web/two-state-dark-mode-toggle/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;div class=&quot;callout callout-update&quot;&gt;
         &lt;svg class=&quot;z-icon&quot; width=&quot;1em&quot; height=&quot;1em&quot; viewBox=&quot;0 0 576 512&quot;&gt;&lt;use href=&quot;#fas-fa-clock-rotate-left&quot; xlink:href=&quot;#fas-fa-clock-rotate-left&quot;&gt;&lt;/use&gt;&lt;/svg&gt;
@@ -183,7 +225,7 @@
       <title>I was tired of building 474 separate pages for Open Graph Images</title>
       <link>https://www.zachleat.com/web/open-graph-easy-build/</link>
       <guid>https://www.zachleat.com/web/open-graph-easy-build/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;em&gt;Prior blog post (if you want the full context): &lt;a href=&quot;https://www.zachleat.com/web/automatic-opengraph/&quot;&gt;If I work really hard on my Open Graph Images, People will share my Blog Posts&lt;/a&gt; (2021 Aug)&lt;/em&gt;&lt;/p&gt;
         &lt;p&gt;Here’s the gist:&lt;/p&gt;
@@ -207,7 +249,7 @@
       <title>Use Speedlify2 to Continuously Measure Website Performance</title>
       <link>https://www.zachleat.com/web/speedlify2/</link>
       <guid>https://www.zachleat.com/web/speedlify2/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;&lt;a href=&quot;https://www.speedlify.dev/&quot;&gt;&lt;img src=&quot;https://www.zachleat.com/img/built/XeWs_v2xk7-1000.avif&quot; alt=&quot;Speedlify2 screenshot&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; width=&quot;1000&quot; height=&quot;960&quot;&gt;&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;&lt;em&gt;&lt;a href=&quot;https://www.speedlify.dev/&quot;&gt;&lt;svg class=&quot;z-icon&quot; width=&quot;1em&quot; height=&quot;1em&quot; viewBox=&quot;0 0 512 512&quot;&gt;&lt;use href=&quot;#fas-fa-arrow-right&quot; xlink:href=&quot;#fas-fa-arrow-right&quot;&gt;&lt;/use&gt;&lt;/svg&gt;&lt;strong&gt;&lt;code&gt;speedlify.dev&lt;/code&gt;, now running Speedlify2&lt;/strong&gt;&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
@@ -252,7 +294,7 @@
       <title>Am I neglecting my open source projects?</title>
       <link>https://www.zachleat.com/web/is-this-still-being-maintained/</link>
       <guid>https://www.zachleat.com/web/is-this-still-being-maintained/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
+      <pubDate>Tue, 24 Nov 2026 23:50:37 GMT</pubDate>
       <content:encoded>
         &lt;p&gt;I have &lt;em&gt;a lot&lt;/em&gt; of open source projects (of varying sizes and shapes).&lt;/p&gt;
         &lt;p&gt;At time of writing, I’m currently maintaining ×78 npm packages. Of those, 22 are super lightweight zero-dependency custom elements a.k.a. 🚾 Web Components (&lt;em&gt;love the future compatibility I get with very little maintenance required&lt;/em&gt;). In addition, I also have a few &lt;a href=&quot;https://www.zachleat.com/domains/&quot;&gt;active websites&lt;/a&gt; and starter/template projects that are open source too.&lt;/p&gt;
@@ -268,23 +310,6 @@
         &lt;p&gt;Currently my most neglected package is the &lt;a href=&quot;https://github.com/11ty/eleventy-plugin-vue&quot;&gt;Eleventy Vue plugin&lt;/a&gt; (which owns 31 of my 42 total npm audits) and I’m actively deciding whether to revive it or retire it 🫣.&lt;/p&gt;
         &lt;p&gt;&lt;strong&gt;All of my 77 other packages only have 11 total npm audit reports!&lt;/strong&gt; I’m feeling extremely proud of that, which feels related to the work I’ve been doing to &lt;a href=&quot;https://www.zachleat.com/web/npm-security/&quot;&gt;lock down publishing workflows&lt;/a&gt; and &lt;a href=&quot;https://www.11ty.dev/blog/dependency-watch/&quot;&gt;reduce dependencies&lt;/a&gt;. Though that number may change over time, I now have an easy centralized place to check it. This report also makes it very obvious the relationship between dependency count and audit reports. &lt;a href=&quot;https://e18e.dev/&quot;&gt;Keep reducing those dependencies, y’all!&lt;/a&gt;&lt;/p&gt;
         &lt;p&gt;The other result of monitoring this report is that I have archived a bunch of old projects that I don’t want to track, which has a nice cleansing feeling to it.&lt;/p&gt;
-      </content:encoded>
-    </item>
-    <item>
-      <title>Back Build Awesome Pro and make it easier to build for the web!</title>
-      <link>https://www.zachleat.com/web/build-awesome-pro/</link>
-      <guid>https://www.zachleat.com/web/build-awesome-pro/</guid>
-      <pubDate>Tue, 24 Nov 2026 02:19:12 GMT</pubDate>
-      <content:encoded>
-        &lt;p&gt;The &lt;a href=&quot;https://www.kickstarter.com/projects/fontawesome/build-awesome-pro?ref=43ttgb&quot;&gt;Build Awesome (11ty) Kickstarter (Final_FINAL_v2)&lt;/a&gt; is live! We’re trying to make it easier for &lt;em&gt;anyone&lt;/em&gt; to build, publish, and maintain web sites!&lt;/p&gt;
-        &lt;div class=&quot;primarylink&quot;&gt;
-        Update: the &lt;a href=&quot;https://www.kickstarter.com/projects/fontawesome/build-awesome-pro?ref=43ttgb&quot;&gt;Kickstarter campaign has concluded&lt;/a&gt; but late pledging (and late pricing) is still available.
-        &lt;/div&gt;
-        &lt;hr&gt;
-        &lt;ul&gt;
-        &lt;li&gt;Go &lt;a href=&quot;https://www.kickstarter.com/projects/fontawesome/build-awesome-pro?ref=43ttgb&quot;&gt;directly to the Kickstarter&lt;/a&gt;.&lt;/li&gt;
-        &lt;li&gt;Read more on the &lt;a href=&quot;https://www.11ty.dev/blog/build-awesome-pro/&quot;&gt;Blog&lt;/a&gt;.&lt;/li&gt;
-        &lt;/ul&gt;
       </content:encoded>
     </item>
   </channel>
